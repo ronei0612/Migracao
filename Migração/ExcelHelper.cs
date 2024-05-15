@@ -1,10 +1,5 @@
 ﻿using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Migração
 {
@@ -68,7 +63,7 @@ namespace Migração
 			return columnLetter;
 		}
 
-		public void GravarExcel(string nomeArquivo, Dictionary<string, object[]> linhas)
+		public void GravarExcel1(string nomeArquivo, Dictionary<string, object[]> linhas)
 		{
 			// Criando um novo arquivo Excel
 			IWorkbook workbook = new XSSFWorkbook();
@@ -104,6 +99,40 @@ namespace Migração
 			{
 				workbook.Write(stream);
 			}
+		}
+
+		public void GravarExcel(string nomeArquivo, Dictionary<string, object[]> linhas)
+		{
+			IWorkbook workbook = new XSSFWorkbook();  // Cria um novo workbook
+			ISheet sheet1 = workbook.CreateSheet("Planilha1");  // Cria uma nova planilha
+
+			// Insere os dados do dicionário na planilha
+			int coluna = 0;
+			foreach (var item in linhas)
+			{
+				// Insere o nome da coluna
+				IRow row = sheet1.CreateRow(0);
+				ICell cell = row.CreateCell(coluna);
+				cell.SetCellValue(item.Key);
+
+				// Insere os dados da coluna
+				int linha = 1;
+				foreach (var valor in item.Value)
+				{
+					row = sheet1.GetRow(linha) ?? sheet1.CreateRow(linha);
+					cell = row.CreateCell(coluna);
+					if (valor != null)
+						cell.SetCellValue(valor.ToString());
+					linha++;
+				}
+
+				coluna++;
+			}
+
+			// Salva o arquivo Excel
+			FileStream sw = File.Create(nomeArquivo + ".xlsx");
+			workbook.Write(sw);
+			sw.Close();
 		}
 	}
 }

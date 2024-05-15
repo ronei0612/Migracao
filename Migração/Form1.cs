@@ -1,17 +1,4 @@
-using ExcelDataReader;
-using NPOI.HPSF;
-using NPOI.HSSF.UserModel;
-using NPOI.SS.Formula.Functions;
-using NPOI.SS.UserModel;
-using NPOI.Util.Collections;
-using NPOI.XSSF.UserModel;
-using OfficeOpenXml;
-using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
-using System.Text;
-using System.Text.RegularExpressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Migração
 {
@@ -62,14 +49,16 @@ namespace Migração
 					//foreach (ListViewItem item in listView1.Items)
 					//	Importar(item.Text);
 
-					var arquivo = "";
+					var pasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Desktop");
+					var arquivo = "Migracao_" + maskedTxtEstabelecimento.Text + "_DentalOffice_Pacientes";
+					string caminhoDoArquivo = Path.Combine(pasta, arquivo);
 
 					if (comboBoxSistema.Text.Equals("dentaloffice", StringComparison.CurrentCultureIgnoreCase))
 					{
 						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
 						{
 							var dentalOffice = new DentalOffice();
-							arquivo = dentalOffice.ImportarPacientes(textBoxExcel1.Text, maskedTxtEstabelecimento.Text);
+							dentalOffice.ImportarPacientes(textBoxExcel1.Text, maskedTxtEstabelecimento.Text, caminhoDoArquivo);
 						}
 					}
 					else if (comboBoxSistema.Text.Equals("odontocompany"))
@@ -77,11 +66,12 @@ namespace Migração
 						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
 						{
 							var dentalOffice = new DentalOffice();
-							arquivo = dentalOffice.ImportarPacientes(textBoxExcel1.Text, maskedTxtEstabelecimento.Text);
+							dentalOffice.ImportarPacientes(textBoxExcel1.Text, maskedTxtEstabelecimento.Text, caminhoDoArquivo);
 						}
 					}
 
-					string caminhoDoArquivo = Path.Combine(Application.StartupPath, arquivo); // Substitua pelo caminho do seu arquivo
+					// Application.StartupPath
+					caminhoDoArquivo += ".xlsx";
 					string argumento = "/select, \"" + caminhoDoArquivo + "\"";
 
 					Process.Start("explorer.exe", argumento);

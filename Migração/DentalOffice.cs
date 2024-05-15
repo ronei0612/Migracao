@@ -1,16 +1,11 @@
 ﻿using NPOI.SS.UserModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Migração
 {
 	internal class DentalOffice
 	{
-		public string ImportarPacientes(string arquivoExcel, string estabelecimentoID)
+		public void ImportarPacientes(string arquivoExcel, string estabelecimentoID, string salvarArquivo)
 		{
 			DateTime dataMinima = new DateTime(1900, 01, 01), dataMaxima = new DateTime(2079, 06, 06), dataHoje = DateTime.Now;
 			var indiceLinha = 1;
@@ -89,15 +84,12 @@ namespace Migração
 				dados.Add("nomeCompleto", nomeCompleto.Cast<object>().ToArray());
 				dados.Add("cpf", cpf.Cast<object>().ToArray());
 
-				string arquivo = estabelecimentoID + "_DentalOffice_Pacientes";
 				var sqlHelper = new SqlHelper();
 
-				var insert = sqlHelper.GerarSqlInsert(arquivo, dados);
-				excelHelper.GravarExcel("asdf", dados);
+				var insert = sqlHelper.GerarSqlInsert(salvarArquivo, dados);
+				excelHelper.GravarExcel(salvarArquivo, dados);
 
-				File.WriteAllText(arquivo, insert);
-
-				return arquivo + ".xlsx";
+				File.WriteAllText(salvarArquivo + ".sql", insert);
 			}
 
 			catch (Exception error)

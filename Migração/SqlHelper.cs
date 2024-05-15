@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace Migração
 {
@@ -29,7 +25,7 @@ namespace Migração
 				{
 					sql.Append($"'{valueArray[i]}', ");
 				}
-				sql.Remove(sql.Length - 2, 2).Append("), ");
+				sql.Remove(sql.Length - 2, 2).Append("), " + Environment.NewLine);
 			}
 
 			// Remove a última vírgula e espaço e adiciona um ponto e vírgula

@@ -94,7 +94,8 @@ namespace Migração
 				IRow row = sheet.CreateRow(rowIndex++);
 				for (int i = 0; i < linha.Value.Length; i++)
 				{
-					row.CreateCell(i).SetCellValue(linha.Value[i].ToString());
+					if (linha.Value[i] != null)
+						row.CreateCell(i).SetCellValue(linha.Value[i].ToString());
 				}
 			}
 

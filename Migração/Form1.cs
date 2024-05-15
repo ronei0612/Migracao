@@ -46,7 +46,7 @@ namespace Migração
 		private void btnImportar_Click(object sender, EventArgs e)
 		{
 			try
-			{				
+			{
 
 				foreach (ListViewItem item in listView1.Items)
 				{
@@ -221,22 +221,23 @@ namespace Migração
 			}
 
 			// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
-			sql.Remove(sql.Length - 2, 2).Append(") VALUES (");
+			sql.Remove(sql.Length - 2, 2).Append(") VALUES ");
 
-			// Adiciona os valores das colunas
-			foreach (var valueArray in dataDict.Values)
+			// Adiciona os valores das colunas para cada linha
+			for (int i = 0; i < dataDict.Values.First().Length; i++)
 			{
-				foreach (var value in valueArray)
+				sql.Append("(");
+				foreach (var valueArray in dataDict.Values)
 				{
-					sql.Append($"'{value}', ");
+					sql.Append($"'{valueArray[i]}', ");
 				}
+				sql.Remove(sql.Length - 2, 2).Append("), ");
 			}
 
-			// Remove a última vírgula e espaço e adiciona um parêntese de fechamento
-			sql.Remove(sql.Length - 2, 2).Append(");");
+			// Remove a última vírgula e espaço e adiciona um ponto e vírgula
+			sql.Remove(sql.Length - 2, 2).Append(";");
 
 			return sql.ToString();
 		}
-
 	}
 }

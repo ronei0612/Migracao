@@ -1,4 +1,5 @@
 ﻿using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Migração
 {
-	public class ExcelHelper
+	internal class ExcelHelper
 	{
 		public IWorkbook LerExcel(string filePath)
 		{
@@ -65,6 +66,43 @@ namespace Migração
 			}
 
 			return columnLetter;
+		}
+
+		public void GravarExcel(string nomeArquivo, Dictionary<string, object[]> linhas)
+		{
+			// Criando um novo arquivo Excel
+			IWorkbook workbook = new XSSFWorkbook();
+			ISheet sheet = workbook.CreateSheet("Dados");
+
+			// Escrevendo cabeçalhos
+			IRow headerRow = sheet.CreateRow(0);
+			//for (int i = 0; i < cabecalhos.Count; i++)
+			//{
+			//	headerRow.CreateCell(i).SetCellValue(cabecalhos[i]);
+			//}
+
+			var cabecalhos = new List<string>(linhas.Keys);
+			for (int i = 0; i < cabecalhos.Count; i++)
+			{
+				headerRow.CreateCell(i).SetCellValue(cabecalhos[i]);
+			}
+
+			// Escrevendo dados
+			int rowIndex = 1;
+			foreach (var linha in linhas)
+			{
+				IRow row = sheet.CreateRow(rowIndex++);
+				for (int i = 0; i < linha.Value.Length; i++)
+				{
+					row.CreateCell(i).SetCellValue(linha.Value[i].ToString());
+				}
+			}
+
+			// Salvando o arquivo
+			using (FileStream stream = new FileStream(nomeArquivo + ".xlsx", FileMode.Create, FileAccess.Write))
+			{
+				workbook.Write(stream);
+			}
 		}
 	}
 }

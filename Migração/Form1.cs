@@ -8,6 +8,7 @@ using NPOI.XSSF.UserModel;
 using OfficeOpenXml;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -58,10 +59,32 @@ namespace Migração
 			{
 				try
 				{
-					foreach (ListViewItem item in listView1.Items)
-						Importar(item.Text);
+					//foreach (ListViewItem item in listView1.Items)
+					//	Importar(item.Text);
 
-					MessageBox.Show("<div class='msgResult iconOk icon-info-round icon-size2'>Migração<p class='msgSubResult'>Sucesso</p></div>", "Migração concluída", MessageBoxButtons.OK, MessageBoxIcon.Information);
+					var arquivo = "";
+
+					if (comboBoxSistema.Text.Equals("dentaloffice", StringComparison.CurrentCultureIgnoreCase))
+					{
+						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
+						{
+							var dentalOffice = new DentalOffice();
+							arquivo = dentalOffice.ImportarPacientes(textBoxExcel1.Text, maskedTxtEstabelecimento.Text);
+						}
+					}
+					else if (comboBoxSistema.Text.Equals("odontocompany"))
+					{
+						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
+						{
+							var dentalOffice = new DentalOffice();
+							arquivo = dentalOffice.ImportarPacientes(textBoxExcel1.Text, maskedTxtEstabelecimento.Text);
+						}
+					}
+
+					string caminhoDoArquivo = Path.Combine(Application.StartupPath, arquivo); // Substitua pelo caminho do seu arquivo
+					string argumento = "/select, \"" + caminhoDoArquivo + "\"";
+
+					Process.Start("explorer.exe", argumento);
 				}
 				catch (Exception ex)
 				{
@@ -73,7 +96,7 @@ namespace Migração
 		private bool ValidarCampos()
 		{
 			if (comboBoxSistema.SelectedIndex == -1 || comboBoxSistema.SelectedIndex == -1 || string.IsNullOrWhiteSpace(maskedTxtEstabelecimento.Text)
-				 || string.IsNullOrWhiteSpace(textBoxExcel1.Text) || string.IsNullOrWhiteSpace(textBoxExcel2.Text))
+				 || string.IsNullOrWhiteSpace(textBoxExcel1.Text))
 				return false;
 
 			if (!File.Exists(textBoxExcel1.Text))
@@ -81,157 +104,61 @@ namespace Migração
 				MessageBox.Show("Arquivo não existe:" + Environment.NewLine + textBoxExcel1.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				return false;
 			}
-			else if (Path.GetExtension(textBoxExcel1.Text).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+			else if (!Path.GetExtension(textBoxExcel1.Text).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
 			{
 				MessageBox.Show("Arquivo não é um Excel (.xlsx):" + Environment.NewLine + textBoxExcel1.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				return false;
 			}
 
-			if (!File.Exists(textBoxExcel2.Text))
-			{
-				MessageBox.Show("Arquivo não existe:" + Environment.NewLine + textBoxExcel2.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-				return false;
-			}
-			else if (Path.GetExtension(textBoxExcel2.Text).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
-			{
-				MessageBox.Show("Arquivo não é um Excel (.xlsx):" + Environment.NewLine + textBoxExcel2.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-				return false;
-			}
+			if (textBoxExcel2.Visible == true)
+				if (!File.Exists(textBoxExcel2.Text))
+				{
+					MessageBox.Show("Arquivo não existe:" + Environment.NewLine + textBoxExcel2.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+					return false;
+				}
+				else if (!Path.GetExtension(textBoxExcel2.Text).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+				{
+					MessageBox.Show("Arquivo não é um Excel (.xlsx):" + Environment.NewLine + textBoxExcel2.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+					return false;
+				}
 
 			return true;
 		}
 
-		private void Importar(string arquivoExcel)
-		{
-			IWorkbook workbook;
-			var excelHelper = new ExcelHelper();
-			DateTime dataMinima = new DateTime(1900, 01, 01), dataMaxima = new DateTime(2079, 06, 06), dataHoje = DateTime.Now;
-			var indiceLinha = 1;
-			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
+		//private void Importar(string arquivoExcel1, string arquivoExcel2, string sistema, string importacao)
+		//{
+		//	IWorkbook workbook;
+		//	var excelHelper = new ExcelHelper();
+		//	var dentalOffice = new DentalOffice();
 
-			var mascaraCPF = "000.000.000-00";
-			mascaraCPF = mascaraCPF.Split('.')[0].Replace(".", @"\.").Replace("-", @"\-");
-			var mascaraCPFLenth = Regex.Replace(mascaraCPF, "[^0-9]", "").Length.ToString();
+		//	try
+		//	{
+		//		workbook = excelHelper.LerExcel(arquivoExcel1);
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		throw new Exception("Erro ao ler o arquivo Excel: " + ex.Message);
+		//	}
 
-			try
-			{
-				workbook = excelHelper.LerExcel(arquivoExcel);
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Erro ao ler o arquivo Excel: " + ex.Message);
-			}
+		//	var cabecalhos = excelHelper.GetCabecalhosExcel(workbook);
+		//	var linhas = excelHelper.GetLinhasExcel(workbook);
 
-			var cabecalhos = excelHelper.GetCabecalhosExcel(workbook);
-			var linhas = excelHelper.GetLinhasExcel(workbook);
+		//	try
+		//	{
+		//		var dados = dentalOffice.ImportarPacientes(linhas, cabecalhos);				
 
-			try
-			{
-				var dados = new Dictionary<string, object[]>();
+		//		GravarExcel("asdf", dados);
+		//		var insert = GerarSqlInsert("asdfff", dados);
+		//		File.WriteAllText("aaaa.sql", insert);
+		//	}
 
-				var linhasCount = linhas.Count;
+		//	catch (Exception error)
+		//	{
+		//		throw new Exception(error.Message);
+		//	}
+		//}
 
-				var nomeCompleto = new string[linhasCount];
-				var cpf = new string[linhasCount];
-				var numcadastro = new int[linhasCount];
-				var consumidorID = new int[linhasCount];
-				var codigoAntigo = new int[linhasCount];
-				var pessoaID = new int[linhasCount];
-
-				foreach (var linha in linhas)
-				{
-					indiceLinha++;
-
-					foreach (var celula in linha.Cells)
-					{
-						if (celula != null)
-						{
-							celulaValor = celula.ToString().Trim();
-							tituloColuna = cabecalhos[celula.Address.Column];
-							colunaLetra = celula.Address.ToString();
-
-							if (!string.IsNullOrWhiteSpace(celulaValor))
-							{
-								//if (!dados.ContainsKey(tituloColuna))
-								//{
-								//	dados[tituloColuna] = new List<object>();
-								//}
-								//dados[tituloColuna].Add(int.Parse(celulaValor));
-
-								switch (tituloColuna)
-								{
-									case "numcadastro":
-										numcadastro[indiceLinha - 2] = int.Parse(celulaValor);
-										break;
-									case "primeironome":
-										nomeCompleto[indiceLinha - 2] = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
-										break;
-									case "cpf":
-										cpf[indiceLinha - 2] = celulaValor.Contains(".") && celulaValor.Contains("-") && celulaValor.Length <= 14 ? celulaValor : celulaValor.Length == int.Parse(mascaraCPFLenth) ? Convert.ToUInt64(celulaValor).ToString(mascaraCPF) : "";
-										break;
-								}
-							}
-						}
-					}
-				}
-
-				dados.Add("numcadastro", numcadastro.Cast<object>().ToArray());
-				dados.Add("nomeCompleto", nomeCompleto.Cast<object>().ToArray());
-				dados.Add("cpf", cpf.Cast<object>().ToArray());
-
-				//GravarExcel("asdf", dados);
-				var insert = GerarSqlInsert("asdfff", dados);
-				File.WriteAllText("aaaa.sql", insert);
-
-			}
-
-			catch (Exception error)
-			{
-				var mensagemErro = $"Falha na linha {indiceLinha}, coluna {colunaLetra}, Valor esperado: {tituloColuna}, valor da célula: \"{celulaValor}\": {error.Message}";
-
-				if (!string.IsNullOrWhiteSpace(variaveisValor))
-					mensagemErro += Environment.NewLine + "Variáveis" + Environment.NewLine + variaveisValor;
-
-				throw new Exception(mensagemErro);
-			}
-		}
-
-		private void GravarExcel(string nomeArquivo, Dictionary<string, object[]> linhas)
-		{
-			// Criando um novo arquivo Excel
-			IWorkbook workbook = new XSSFWorkbook();
-			ISheet sheet = workbook.CreateSheet("Dados");
-
-			// Escrevendo cabeçalhos
-			IRow headerRow = sheet.CreateRow(0);
-			//for (int i = 0; i < cabecalhos.Count; i++)
-			//{
-			//	headerRow.CreateCell(i).SetCellValue(cabecalhos[i]);
-			//}
-
-			var cabecalhos = new List<string>(linhas.Keys);
-			for (int i = 0; i < cabecalhos.Count; i++)
-			{
-				headerRow.CreateCell(i).SetCellValue(cabecalhos[i]);
-			}
-
-			// Escrevendo dados
-			int rowIndex = 1;
-			foreach (var linha in linhas)
-			{
-				IRow row = sheet.CreateRow(rowIndex++);
-				for (int i = 0; i < linha.Value.Length; i++)
-				{
-					row.CreateCell(i).SetCellValue(linha.Value[i].ToString());
-				}
-			}
-
-			// Salvando o arquivo
-			using (FileStream stream = new FileStream(nomeArquivo + ".xlsx", FileMode.Create, FileAccess.Write))
-			{
-				workbook.Write(stream);
-			}
-		}
+		
 
 		//private IWorkbook LerExcel(Stream fileStream)
 		//{
@@ -250,36 +177,6 @@ namespace Migração
 		//	}
 		//}
 
-		public string GerarSqlInsert(string tableName, Dictionary<string, object[]> dataDict)
-		{
-			var sql = new StringBuilder($"INSERT INTO {tableName} (");
-
-			// Adiciona os nomes das colunas
-			foreach (var key in dataDict.Keys)
-			{
-				sql.Append($"{key}, ");
-			}
-
-			// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
-			sql.Remove(sql.Length - 2, 2).Append(") VALUES ");
-
-			// Adiciona os valores das colunas para cada linha
-			for (int i = 0; i < dataDict.Values.First().Length; i++)
-			{
-				sql.Append('(');
-				foreach (var valueArray in dataDict.Values)
-				{
-					sql.Append($"'{valueArray[i]}', ");
-				}
-				sql.Remove(sql.Length - 2, 2).Append("), ");
-			}
-
-			// Remove a última vírgula e espaço e adiciona um ponto e vírgula
-			sql.Remove(sql.Length - 2, 2).Append(';');
-
-			return sql.ToString();
-		}
-
 		void MostrarCamposExcel()
 		{
 			maskedTxtEstabelecimento.Focus();
@@ -287,12 +184,18 @@ namespace Migração
 
 			if (comboBoxSistema.SelectedIndex > -1 && comboBoxImportacao.SelectedIndex > -1 && !string.IsNullOrEmpty(maskedTxtEstabelecimento.Text))
 			{
-				textBoxExcel1.Visible = true;
-				textBoxExcel2.Visible = true;
-				btnExcel.Visible = true;
-				btnExcel2.Visible = true;
 				labelExcel1.Text = comboBoxImportacao.Text;
 				labelExcel1.Visible = true;
+				textBoxExcel1.Visible = true;
+				btnExcel.Visible = true;
+
+				if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
+				{
+					labelExcel2.Text = "Pacientes";
+					labelExcel2.Visible = true;
+					textBoxExcel2.Visible = true;
+					btnExcel2.Visible = true;
+				}
 			}
 			else
 			{

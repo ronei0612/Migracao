@@ -1,11 +1,13 @@
 using ExcelDataReader;
 using NPOI.HSSF.UserModel;
+using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.Util.Collections;
 using NPOI.XSSF.UserModel;
 using OfficeOpenXml;
 using System.Collections.Generic;
 using System.Data;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Migração
@@ -85,14 +87,16 @@ namespace Migração
 
 			try
 			{
-				var dados = new Dictionary<string, List<object>>();
+				var dados = new Dictionary<string, object[]>();
 
-				//var nomeCompleto = new List<string>();
-				//var cpf = new List<string>(); 
-				//var controle = new List<int>();
-				//var consumidorID = new List<int>();
-				//var codigoAntigo = new List<int>();
-				//var pessoaID = new List<int>();
+				var linhasCount = linhas.Count;
+
+				var nomeCompleto = new string[linhasCount];
+				var cpf = new string[linhasCount];
+				var numcadastro = new int[linhasCount];
+				var consumidorID = new int[linhasCount];
+				var codigoAntigo = new int[linhasCount];
+				var pessoaID = new int[linhasCount];
 
 				foreach (var linha in linhas)
 				{
@@ -108,24 +112,22 @@ namespace Migração
 
 							if (!string.IsNullOrWhiteSpace(celulaValor))
 							{
-								if (!dados.ContainsKey(tituloColuna))
-								{
-									dados[tituloColuna] = new List<object>();
-								}
+								//if (!dados.ContainsKey(tituloColuna))
+								//{
+								//	dados[tituloColuna] = new List<object>();
+								//}
+								//dados[tituloColuna].Add(int.Parse(celulaValor));
 
 								switch (tituloColuna)
 								{
-									case "ID":
-									case "Controle":
-									case "CodigoAntigo":
-									case "PessoaID":
-										dados[tituloColuna].Add(int.Parse(celulaValor));
+									case "numcadastro":
+										numcadastro[indiceLinha - 2] = int.Parse(celulaValor);
 										break;
-									case "NomeCompleto":
-										dados[tituloColuna].Add(celulaValor.Substring(0, Math.Min(70, celulaValor.Length)));
+									case "primeironome":
+										nomeCompleto[indiceLinha - 2] = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
 										break;
-									case "CPF":
-										dados[tituloColuna].Add(celulaValor.Contains(".") && celulaValor.Contains("-") && celulaValor.Length <= 14 ? celulaValor : celulaValor.Length == int.Parse(mascaraCPFLenth) ? Convert.ToUInt64(celulaValor).ToString(mascaraCPF) : "");
+									case "cpf":
+										cpf[indiceLinha - 2] = celulaValor.Contains(".") && celulaValor.Contains("-") && celulaValor.Length <= 14 ? celulaValor : celulaValor.Length == int.Parse(mascaraCPFLenth) ? Convert.ToUInt64(celulaValor).ToString(mascaraCPF) : "";
 										break;
 								}
 							}
@@ -133,7 +135,14 @@ namespace Migração
 					}
 				}
 
-				GravarExcel("asdf", dados);
+				dados.Add("numcadastro", numcadastro.Cast<object>().ToArray());
+				dados.Add("nomeCompleto", nomeCompleto.Cast<object>().ToArray());
+				dados.Add("cpf", cpf.Cast<object>().ToArray());
+
+				//GravarExcel("asdf", dados);
+				var insert = GerarSqlInsert("asdfff", dados);
+				File.WriteAllText("aaaa.sql", insert);
+
 			}
 
 			catch (Exception error)
@@ -147,7 +156,7 @@ namespace Migração
 			}
 		}
 
-		private void GravarExcel(string nomeArquivo, Dictionary<string, List<object>> linhas)
+		private void GravarExcel(string nomeArquivo, Dictionary<string, object[]> linhas)
 		{
 			// Criando um novo arquivo Excel
 			IWorkbook workbook = new XSSFWorkbook();
@@ -171,7 +180,7 @@ namespace Migração
 			foreach (var linha in linhas)
 			{
 				IRow row = sheet.CreateRow(rowIndex++);
-				for (int i = 0; i < linha.Value.Count; i++)
+				for (int i = 0; i < linha.Value.Length; i++)
 				{
 					row.CreateCell(i).SetCellValue(linha.Value[i].ToString());
 				}
@@ -200,6 +209,34 @@ namespace Migração
 		//		throw new Exception("Formato de arquivo Excel não suportado.");
 		//	}
 		//}
+
+		public string GerarSqlInsert(string tableName, Dictionary<string, object[]> dataDict)
+		{
+			StringBuilder sql = new StringBuilder($"INSERT INTO {tableName} (");
+
+			// Adiciona os nomes das colunas
+			foreach (var key in dataDict.Keys)
+			{
+				sql.Append($"{key}, ");
+			}
+
+			// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
+			sql.Remove(sql.Length - 2, 2).Append(") VALUES (");
+
+			// Adiciona os valores das colunas
+			foreach (var valueArray in dataDict.Values)
+			{
+				foreach (var value in valueArray)
+				{
+					sql.Append($"'{value}', ");
+				}
+			}
+
+			// Remove a última vírgula e espaço e adiciona um parêntese de fechamento
+			sql.Remove(sql.Length - 2, 2).Append(");");
+
+			return sql.ToString();
+		}
 
 	}
 }

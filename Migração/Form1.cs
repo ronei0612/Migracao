@@ -1,4 +1,5 @@
 using ExcelDataReader;
+using NPOI.HPSF;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Migração
 {
@@ -27,12 +29,19 @@ namespace Migração
 			openFileDialog.Title = "Selecione um arquivo";
 
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
-			{
-				string filePath = openFileDialog.FileName;
+				textBoxExcel1.Text = openFileDialog.FileName;
+			//ListViewItem item = new ListViewItem(filePath);
+			//listView1.Items.Add(item);
+		}
 
-				ListViewItem item = new ListViewItem(filePath);
-				listView1.Items.Add(item);
-			}
+		private void btnExcel2_Click(object sender, EventArgs e)
+		{
+			OpenFileDialog openFileDialog = new OpenFileDialog();
+			openFileDialog.Filter = "Arquivo Excel |*.xlsx";
+			openFileDialog.Title = "Selecione um arquivo";
+
+			if (openFileDialog.ShowDialog() == DialogResult.OK)
+				textBoxExcel2.Text = openFileDialog.FileName;
 		}
 
 		private void btnDelExcel_Click(object sender, EventArgs e)
@@ -45,20 +54,51 @@ namespace Migração
 
 		private void btnImportar_Click(object sender, EventArgs e)
 		{
-			try
+			if (ValidarCampos())
 			{
-
-				foreach (ListViewItem item in listView1.Items)
+				try
 				{
-					Importar(item.Text);
-				}
+					foreach (ListViewItem item in listView1.Items)
+						Importar(item.Text);
 
-				MessageBox.Show("<div class='msgResult iconOk icon-info-round icon-size2'>Migração<p class='msgSubResult'>Sucesso</p></div>", "Migração concluída", MessageBoxButtons.OK, MessageBoxIcon.Information);
+					MessageBox.Show("<div class='msgResult iconOk icon-info-round icon-size2'>Migração<p class='msgSubResult'>Sucesso</p></div>", "Migração concluída", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show(ex.Message, "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				}
 			}
-			catch (Exception ex)
+		}
+
+		private bool ValidarCampos()
+		{
+			if (comboBoxSistema.SelectedIndex == -1 || comboBoxSistema.SelectedIndex == -1 || string.IsNullOrWhiteSpace(maskedTxtEstabelecimento.Text)
+				 || string.IsNullOrWhiteSpace(textBoxExcel1.Text) || string.IsNullOrWhiteSpace(textBoxExcel2.Text))
+				return false;
+
+			if (!File.Exists(textBoxExcel1.Text))
 			{
-				MessageBox.Show(ex.Message, "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				MessageBox.Show("Arquivo não existe:" + Environment.NewLine + textBoxExcel1.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				return false;
 			}
+			else if (Path.GetExtension(textBoxExcel1.Text).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+			{
+				MessageBox.Show("Arquivo não é um Excel (.xlsx):" + Environment.NewLine + textBoxExcel1.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				return false;
+			}
+
+			if (!File.Exists(textBoxExcel2.Text))
+			{
+				MessageBox.Show("Arquivo não existe:" + Environment.NewLine + textBoxExcel2.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				return false;
+			}
+			else if (Path.GetExtension(textBoxExcel2.Text).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+			{
+				MessageBox.Show("Arquivo não é um Excel (.xlsx):" + Environment.NewLine + textBoxExcel2.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				return false;
+			}
+
+			return true;
 		}
 
 		private void Importar(string arquivoExcel)
@@ -212,7 +252,7 @@ namespace Migração
 
 		public string GerarSqlInsert(string tableName, Dictionary<string, object[]> dataDict)
 		{
-			StringBuilder sql = new StringBuilder($"INSERT INTO {tableName} (");
+			var sql = new StringBuilder($"INSERT INTO {tableName} (");
 
 			// Adiciona os nomes das colunas
 			foreach (var key in dataDict.Keys)
@@ -226,7 +266,7 @@ namespace Migração
 			// Adiciona os valores das colunas para cada linha
 			for (int i = 0; i < dataDict.Values.First().Length; i++)
 			{
-				sql.Append("(");
+				sql.Append('(');
 				foreach (var valueArray in dataDict.Values)
 				{
 					sql.Append($"'{valueArray[i]}', ");
@@ -235,9 +275,51 @@ namespace Migração
 			}
 
 			// Remove a última vírgula e espaço e adiciona um ponto e vírgula
-			sql.Remove(sql.Length - 2, 2).Append(";");
+			sql.Remove(sql.Length - 2, 2).Append(';');
 
 			return sql.ToString();
+		}
+
+		void MostrarCamposExcel()
+		{
+			maskedTxtEstabelecimento.Focus();
+
+			if (comboBoxSistema.SelectedIndex > -1 && comboBoxImportacao.SelectedIndex > -1 && !string.IsNullOrEmpty(maskedTxtEstabelecimento.Text))
+			{
+				textBoxExcel1.Visible = true;
+				textBoxExcel2.Visible = true;
+				btnExcel.Visible = true;
+				btnExcel2.Visible = true;
+				labelExcel1.Text = comboBoxImportacao.Text;
+				labelExcel1.Visible = true;
+			}
+			else
+			{
+				textBoxExcel1.Visible = false;
+				textBoxExcel2.Visible = false;
+				btnExcel.Visible = false;
+				btnExcel2.Visible = false;
+			}
+		}
+
+		private void comboBoxSistema_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			MostrarCamposExcel();
+		}
+
+		private void comboBoxImportacao_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			MostrarCamposExcel();
+		}
+
+		private void maskedTxtEstabelecimento_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
+		{
+			
+		}
+
+		private void maskedTxtEstabelecimento_TextChanged(object sender, EventArgs e)
+		{
+			MostrarCamposExcel();
 		}
 	}
 }

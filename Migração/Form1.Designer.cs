@@ -64,10 +64,12 @@
 			maskedTxtEstabelecimento.Mask = "00000000000";
 			maskedTxtEstabelecimento.Name = "maskedTxtEstabelecimento";
 			maskedTxtEstabelecimento.Size = new Size(110, 23);
-			maskedTxtEstabelecimento.TabIndex = 4;
+			maskedTxtEstabelecimento.TabIndex = 2;
 			maskedTxtEstabelecimento.ValidatingType = typeof(int);
 			maskedTxtEstabelecimento.MaskInputRejected += maskedTxtEstabelecimento_MaskInputRejected;
+			maskedTxtEstabelecimento.Click += maskedTxtEstabelecimento_Click;
 			maskedTxtEstabelecimento.TextChanged += maskedTxtEstabelecimento_TextChanged;
+			maskedTxtEstabelecimento.Enter += maskedTxtEstabelecimento_Enter;
 			// 
 			// btnImportar
 			// 
@@ -75,7 +77,7 @@
 			btnImportar.Margin = new Padding(3, 2, 3, 2);
 			btnImportar.Name = "btnImportar";
 			btnImportar.Size = new Size(88, 22);
-			btnImportar.TabIndex = 6;
+			btnImportar.TabIndex = 5;
 			btnImportar.Text = "⚙ Importar";
 			btnImportar.UseVisualStyleBackColor = true;
 			btnImportar.Click += btnImportar_Click;
@@ -100,7 +102,7 @@
 			btnExcel.Margin = new Padding(3, 2, 3, 2);
 			btnExcel.Name = "btnExcel";
 			btnExcel.Size = new Size(31, 22);
-			btnExcel.TabIndex = 1;
+			btnExcel.TabIndex = 3;
 			btnExcel.Text = "📂";
 			btnExcel.UseVisualStyleBackColor = true;
 			btnExcel.Visible = false;
@@ -168,7 +170,7 @@
 			comboBoxImportacao.Margin = new Padding(3, 2, 3, 2);
 			comboBoxImportacao.Name = "comboBoxImportacao";
 			comboBoxImportacao.Size = new Size(211, 23);
-			comboBoxImportacao.TabIndex = 9;
+			comboBoxImportacao.TabIndex = 1;
 			comboBoxImportacao.SelectedIndexChanged += comboBoxImportacao_SelectedIndexChanged;
 			// 
 			// label4
@@ -205,7 +207,7 @@
 			btnExcel2.Margin = new Padding(3, 2, 3, 2);
 			btnExcel2.Name = "btnExcel2";
 			btnExcel2.Size = new Size(31, 22);
-			btnExcel2.TabIndex = 13;
+			btnExcel2.TabIndex = 4;
 			btnExcel2.Text = "📂";
 			btnExcel2.UseVisualStyleBackColor = true;
 			btnExcel2.Visible = false;
@@ -229,7 +231,7 @@
 			comboBoxSistema.Margin = new Padding(3, 2, 3, 2);
 			comboBoxSistema.Name = "comboBoxSistema";
 			comboBoxSistema.Size = new Size(211, 23);
-			comboBoxSistema.TabIndex = 14;
+			comboBoxSistema.TabIndex = 0;
 			comboBoxSistema.SelectedIndexChanged += comboBoxSistema_SelectedIndexChanged;
 			// 
 			// Form1

@@ -283,6 +283,7 @@ namespace Migração
 		void MostrarCamposExcel()
 		{
 			maskedTxtEstabelecimento.Focus();
+			maskedTxtEstabelecimento.SelectAll();
 
 			if (comboBoxSistema.SelectedIndex > -1 && comboBoxImportacao.SelectedIndex > -1 && !string.IsNullOrEmpty(maskedTxtEstabelecimento.Text))
 			{
@@ -314,12 +315,22 @@ namespace Migração
 
 		private void maskedTxtEstabelecimento_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
 		{
-			
+
 		}
 
 		private void maskedTxtEstabelecimento_TextChanged(object sender, EventArgs e)
 		{
 			MostrarCamposExcel();
+		}
+
+		private void maskedTxtEstabelecimento_Enter(object sender, EventArgs e)
+		{
+			maskedTxtEstabelecimento.SelectAll();
+		}
+
+		private void maskedTxtEstabelecimento_Click(object sender, EventArgs e)
+		{
+			maskedTxtEstabelecimento.SelectAll();
 		}
 	}
 }

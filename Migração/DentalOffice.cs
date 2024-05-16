@@ -7,122 +7,7 @@ namespace Migração
 {
 	internal class DentalOffice
 	{
-		int nomeCompletoColumnIndex = -1;
-		int codigoColumnIndex = -1;
-		int cpfColumnIndex = -1;
-		int consumidorColumnIndex = -1;
-
-		public int GetConsumidorID(ISheet sheet, string cpf = "", string nomeCompleto = "", string codigo = "")
-		{
-			IRow headerRow = sheet.GetRow(0); // assumindo que o cabeçalho está na primeira linha
-			int retorno = 0;
-
-			if (consumidorColumnIndex == -1)
-			{
-				for (int column = 0; column < headerRow.LastCellNum; column++)
-					if (headerRow.GetCell(column).ToString().Equals("consumidorid", StringComparison.CurrentCultureIgnoreCase))
-					{
-						consumidorColumnIndex = column;
-						break;
-					}
-
-				if (consumidorColumnIndex == -1)
-					throw new Exception("Coluna ConsumidorID não encontrada");
-			}
-
-			if (!string.IsNullOrWhiteSpace(cpf))
-			{
-				if (cpfColumnIndex == -1)
-				{
-					for (int column = 0; column < headerRow.LastCellNum; column++)
-						if (headerRow.GetCell(column).ToString().Equals("cpf", StringComparison.CurrentCultureIgnoreCase))
-						{
-							cpfColumnIndex = column;
-							break;
-						}
-
-					if (cpfColumnIndex == -1)
-						throw new Exception("Coluna CPF não encontrada");
-				}
-
-				for (int row = 1; row <= sheet.LastRowNum; row++) // começa em 1 para pular o cabeçalho
-					if (sheet.GetRow(row) != null) // verifica se a linha não está vazia
-					{
-						string cpfCellValue = sheet.GetRow(row).GetCell(cpfColumnIndex).ToString();
-						if (cpfCellValue == cpf)
-							retorno = int.Parse(sheet.GetRow(row).GetCell(consumidorColumnIndex).ToString()); // retorna o ConsumidorID se o CPF corresponder
-					}
-			}
-
-			if (retorno == 0 && !string.IsNullOrWhiteSpace(nomeCompleto) && !string.IsNullOrWhiteSpace(codigo))
-			{
-				if (nomeCompletoColumnIndex == -1)
-				{
-					for (int column = 0; column < headerRow.LastCellNum; column++)
-						if (headerRow.GetCell(column).ToString().Equals("nomecompleto", StringComparison.CurrentCultureIgnoreCase))
-						{
-							nomeCompletoColumnIndex = column;
-							break;
-						}
-
-					if (nomeCompletoColumnIndex == -1)
-						throw new Exception("Coluna NomeCompleto não encontrada");
-				}
-
-				if (codigoColumnIndex == -1)
-				{
-					for (int column = 0; column < headerRow.LastCellNum; column++)
-						if (headerRow.GetCell(column).ToString().Equals("codigoantigo", StringComparison.CurrentCultureIgnoreCase))
-						{
-							codigoColumnIndex = column;
-							break;
-						}
-
-					if (codigoColumnIndex == -1)
-						throw new Exception("Coluna CodigoAntigo não encontrada");
-				}
-
-				for (int row = 1; row <= sheet.LastRowNum; row++) // começa em 1 para pular o cabeçalho
-					if (sheet.GetRow(row) != null) // verifica se a linha não está vazia
-					{
-						string nomeCompletoCellValue = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString();
-						string codigoCellValue = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString();
-
-						if (nomeCompletoCellValue == nomeCompleto && codigoCellValue == codigo)
-							retorno = int.Parse(sheet.GetRow(row).GetCell(consumidorColumnIndex).ToString()); // retorna o ConsumidorID se o NomeCompleto e codigo corresponderem
-					}
-			}
-
-			if (retorno == 0 && !string.IsNullOrWhiteSpace(nomeCompleto))
-			{
-				if (nomeCompletoColumnIndex == -1)
-				{
-					nomeCompletoColumnIndex = -1;
-
-					for (int column = 0; column < headerRow.LastCellNum; column++)
-						if (headerRow.GetCell(column).ToString().Equals("nomecompleto", StringComparison.CurrentCultureIgnoreCase))
-						{
-							nomeCompletoColumnIndex = column;
-							break;
-						}
-
-					if (nomeCompletoColumnIndex == -1)
-						throw new Exception("Coluna NomeCompleto não encontrada");
-				}
-
-				for (int row = 1; row <= sheet.LastRowNum; row++) // começa em 1 para pular o cabeçalho
-					if (sheet.GetRow(row) != null) // verifica se a linha não está vazia
-					{
-						string nomeCompletoCellValue = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString();
-						if (nomeCompletoCellValue == cpf)
-							retorno = int.Parse(sheet.GetRow(row).GetCell(consumidorColumnIndex).ToString()); // retorna o ConsumidorID se o CPF corresponder
-					}
-			}
-
-			return retorno;
-		}
-
-		public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, string estabelecimentoID, string RespFinanceiroPessoaID, string salvarArquivo)
+		public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, string EstabelecimentoID, string RespFinanceiroPessoaID, string salvarArquivo)
 		{
 			DateTime dataMinima = new DateTime(1900, 01, 01), dataMaxima = new DateTime(2079, 06, 06), dataHoje = DateTime.Now;
 			var indiceLinha = 1;
@@ -156,6 +41,7 @@ namespace Migração
 
 			var cabecalhos = excelHelper.GetCabecalhosExcel(workbook);
 			var linhas = excelHelper.GetLinhasExcel(workbook);
+			excelHelper.ZerarVariaveis();
 
 			try
 			{
@@ -165,7 +51,7 @@ namespace Migração
 
 				var nomeCompleto = new string[linhasCount];
 				var descricao = new string[linhasCount];
-				int?[] consumidorID = new int?[linhasCount];
+				string[] consumidorID = new string[linhasCount];
 				string?[] outroSacadoNome = new string?[linhasCount];
 				var loginID = new int[linhasCount];
 				var planoContasID = new int[linhasCount];
@@ -176,11 +62,12 @@ namespace Migração
 				var data = dataHoje;
 				var dataPagamento = new string[linhasCount];
 				var nascimentoData = new DateTime[linhasCount];
-				//var transacaoID = new TituloTransacoes[linhasCount];
 				var titulosEspecies = new byte[linhasCount];
 				var transacaoID = new byte[linhasCount];
 				var tituloSituacaoID = new byte[linhasCount];
 				var tipoID = new byte[linhasCount];
+				var respFinanceiroPessoaID = new string[linhasCount];
+				var estabelecimentoID = new string[linhasCount];
 
 				foreach (var linha in linhas)
 				{
@@ -196,12 +83,6 @@ namespace Migração
 
 							if (!string.IsNullOrWhiteSpace(celulaValor))
 							{
-								//if (!dados.ContainsKey(tituloColuna))
-								//{
-								//	dados[tituloColuna] = new List<object>();
-								//}
-								//dados[tituloColuna].Add(int.Parse(celulaValor));
-
 								switch (tituloColuna)
 								{
 									case "paciente":
@@ -246,21 +127,20 @@ namespace Migração
 							planoContasID[indiceLinha - 2] = 55;
 							pagoMulta[indiceLinha - 2] = 0;
 							pagoJuros[indiceLinha - 2] = 0;
+							respFinanceiroPessoaID[indiceLinha - 2] = RespFinanceiroPessoaID.Trim();
+							estabelecimentoID[indiceLinha - 2] = EstabelecimentoID.Trim();
 
-							int consumidorIDValue = GetConsumidorID(sheetConsumidores, nomeCompleto: nomeCompleto[indiceLinha - 2], codigo: codigo[indiceLinha - 2].ToString());
+							int consumidorIDValue = excelHelper.GetConsumidorID(sheetConsumidores, nomeCompleto: nomeCompleto[indiceLinha - 2], codigo: codigo[indiceLinha - 2].ToString());
 							if (consumidorIDValue > 0)
 							{
-								consumidorID[indiceLinha - 2] = consumidorIDValue;
-								outroSacadoNome[indiceLinha - 2] = null;
+								consumidorID[indiceLinha - 2] = consumidorIDValue.ToString();
+								outroSacadoNome[indiceLinha - 2] = "null";
 							}
 							else
 							{
-								consumidorID[indiceLinha - 2] = null;
+								consumidorID[indiceLinha - 2] = "null";
 								outroSacadoNome[indiceLinha - 2] = nomeCompleto[indiceLinha - 2].Substring(0, Math.Min(50, nomeCompleto[indiceLinha - 2].Length));
 							}
-
-							//consumidorID[indiceLinha - 2] = GetConsumidorID(sheetConsumidores, nomeCompleto: nomeCompleto[indiceLinha - 2], codigo: codigo[indiceLinha - 2].ToString());
-							//tituloSituacaoID[indiceLinha - 2] = documento > 0 ? documento : (long?)null;
 						}
 					}
 				}
@@ -279,7 +159,7 @@ namespace Migração
 				dados.Add("PlanoContasID", planoContasID.Cast<object>().ToArray());
 				dados.Add("TransacaoID", transacaoID.Cast<object>().ToArray());
 				dados.Add("EspecieID", titulosEspecies.Cast<object>().ToArray());
-				dados.Add("FinanceiroID", RespFinanceiroPessoaID.Cast<object>().ToArray());
+				dados.Add("FinanceiroID", respFinanceiroPessoaID.Cast<object>().ToArray());
 				dados.Add("EstabelecimentoID", estabelecimentoID.Cast<object>().ToArray());
 
 				dados.Add("OutroSacadoNome", outroSacadoNome.Cast<object>().ToArray());

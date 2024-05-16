@@ -60,6 +60,12 @@ namespace Migração
 							var dentalOffice = new DentalOffice();
 							dentalOffice.ImportarPacientes(textBoxExcel1.Text, maskedTxtEstabelecimento.Text, caminhoDoArquivo);
 						}
+
+						else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
+						{
+							var dentalOffice = new DentalOffice();
+							dentalOffice.ImportarRecebidos(textBoxExcel1.Text, textBoxExcel2.Text, maskedTxtEstabelecimento.Text, maskedTextBox2.Text, caminhoDoArquivo);
+						}
 					}
 					else if (comboBoxSistema.Text.Equals("odontocompany"))
 					{
@@ -148,7 +154,7 @@ namespace Migração
 		//	}
 		//}
 
-		
+
 
 		//private IWorkbook LerExcel(Stream fileStream)
 		//{
@@ -179,12 +185,15 @@ namespace Migração
 				textBoxExcel1.Visible = true;
 				btnExcel.Visible = true;
 
-				if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
+				if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase)
+					|| comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
 				{
-					labelExcel2.Text = "Pacientes";
+					labelExcel2.Text = "Pacientes Referência";
 					labelExcel2.Visible = true;
 					textBoxExcel2.Visible = true;
 					btnExcel2.Visible = true;
+					label2.Visible = true;
+					maskedTextBox2.Visible = true;
 				}
 			}
 			else
@@ -224,6 +233,16 @@ namespace Migração
 		private void maskedTxtEstabelecimento_Click(object sender, EventArgs e)
 		{
 			maskedTxtEstabelecimento.SelectAll();
+		}
+
+		private void maskedTextBox2_Enter(object sender, EventArgs e)
+		{
+			maskedTextBox2.SelectAll();
+		}
+
+		private void maskedTextBox2_TextChanged(object sender, EventArgs e)
+		{
+
 		}
 	}
 }

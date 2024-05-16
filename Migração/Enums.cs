@@ -72,4 +72,11 @@ namespace Migração
 		CobrancaJudicial = 6,
 		Cancelamento = 90
 	}
+	public enum TransacaoTiposID
+	{
+		All = 0,
+		Recebimento = 1,
+		Pagamento = 2
+	}
+
 }

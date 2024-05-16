@@ -37,8 +37,8 @@ namespace Migração
 				sql.Remove(sql.Length - 2, 2).Append("), " + Environment.NewLine);
 			}
 
-			// Remove a última vírgula e espaço e adiciona um ponto e vírgula
-			sql.Remove(sql.Length - 2, 2).Append(';');
+			// Remove a última quebra de linha e vírgula e espaço e adiciona um ponto e vírgula
+			sql.Remove(sql.Length - 4, 4).Append(';');
 
 			return sql.ToString();
 		}

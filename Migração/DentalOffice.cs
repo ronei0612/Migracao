@@ -14,18 +14,6 @@ namespace Migração
 
 		public int GetConsumidorID(ISheet sheet, string cpf = "", string nomeCompleto = "", string codigo = "")
 		{
-			//for (int row = 1; row <= sheet.LastRowNum; row++) // começa em 1 para pular o cabeçalho
-			//{
-			//	if (sheet.GetRow(row) != null) // verifica se a linha não está vazia
-			//	{
-			//		string cpfCellValue = sheet.GetRow(row).GetCell(2).ToString(); // assumindo que CPF é a terceira coluna
-			//		if (cpfCellValue == cpf)
-			//		{
-			//			return int.Parse(sheet.GetRow(row).GetCell(0).ToString()); // retorna o ConsumidorID se o CPF corresponder
-			//		}
-			//	}
-			//}
-
 			IRow headerRow = sheet.GetRow(0); // assumindo que o cabeçalho está na primeira linha
 			int retorno = 0;
 
@@ -185,7 +173,8 @@ namespace Migração
 				var pagoValor = new decimal[linhasCount];
 				var pagoMulta = new int[linhasCount];
 				var pagoJuros = new int[linhasCount];
-				var dataPagamento = new DateTime[linhasCount];
+				var data = dataHoje;
+				var dataPagamento = new string[linhasCount];
 				var nascimentoData = new DateTime[linhasCount];
 				//var transacaoID = new TituloTransacoes[linhasCount];
 				var titulosEspecies = new byte[linhasCount];
@@ -222,15 +211,16 @@ namespace Migração
 										codigo[indiceLinha - 2] = int.Parse(celulaValor);
 										break;
 									case "data_pagamento":
-										if (DateTime.TryParse(celulaValor, out dataPagamento[indiceLinha - 2]))
+										if (DateTime.TryParse(celulaValor, out data))
 										{
 										}
 										else if (double.TryParse(celulaValor, out double codigoData))
-											dataPagamento[indiceLinha - 2] = DateTime.FromOADate(codigoData);
+											data = DateTime.FromOADate(codigoData);
 										else
 											throw new Exception("Erro na conversão de data");
-										if ((dataPagamento[indiceLinha - 2] >= dataMinima && dataPagamento[indiceLinha - 2] <= dataMaxima) == false)
-											dataPagamento[indiceLinha - 2] = dataHoje;
+										if ((data >= dataMinima && data <= dataMaxima) == false)
+											data = dataHoje;
+										dataPagamento[indiceLinha - 2] = data.ToString("yyyy-MM-dd HH:mm:ss.f");
 										break;
 									case "forma_pagamento":
 										titulosEspecies[indiceLinha - 2] = (byte)(celulaValor.ToLower() == "dinheiro" ? TitulosEspeciesID.Dinheiro
@@ -281,24 +271,25 @@ namespace Migração
 				dados.Add("SituacaoID", tituloSituacaoID.Cast<object>().ToArray());
 				dados.Add("PagoMulta", pagoMulta.Cast<object>().ToArray());
 				dados.Add("PagoJuros", pagoJuros.Cast<object>().ToArray());
-				dados.Add("TipoID", tipoID.Cast<object>().ToArray());
-				dados.Add("OutroSacadoNome", outroSacadoNome.Cast<object>().ToArray());
+				dados.Add("DevidoValor", pagoValor.Cast<object>().ToArray());
+				dados.Add("PagoValor", pagoValor.Cast<object>().ToArray());
 
+				dados.Add("TipoID", tipoID.Cast<object>().ToArray());
 				dados.Add("LoginID", loginID.Cast<object>().ToArray());
 				dados.Add("PlanoContasID", planoContasID.Cast<object>().ToArray());
 				dados.Add("TransacaoID", transacaoID.Cast<object>().ToArray());
 				dados.Add("EspecieID", titulosEspecies.Cast<object>().ToArray());
+				dados.Add("FinanceiroID", RespFinanceiroPessoaID.Cast<object>().ToArray());
+				dados.Add("EstabelecimentoID", estabelecimentoID.Cast<object>().ToArray());
 
+				dados.Add("OutroSacadoNome", outroSacadoNome.Cast<object>().ToArray());
 				dados.Add("Data", dataPagamento.Cast<object>().ToArray());
 				dados.Add("DataBaseCalculo", dataPagamento.Cast<object>().ToArray());
 				dados.Add("DataInclusao", dataPagamento.Cast<object>().ToArray());
-				dados.Add("FinanceiroID", RespFinanceiroPessoaID.Cast<object>().ToArray());
-				//dados.Add("Documento", codigo.Cast<object>().ToArray());
-				dados.Add("EstabelecimentoID", estabelecimentoID.Cast<object>().ToArray());
 
 				var sqlHelper = new SqlHelper();
 
-				var insert = sqlHelper.GerarSqlInsert(salvarArquivo, dados);
+				var insert = sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", dados);
 				File.WriteAllText(salvarArquivo + ".sql", insert);
 				excelHelper.GravarExcel(salvarArquivo, dados);
 			}

@@ -94,7 +94,6 @@ namespace Migração
 				}
 			}
 
-			// Salvando o arquivo
 			using (FileStream stream = new FileStream(nomeArquivo + ".xlsx", FileMode.Create, FileAccess.Write))
 			{
 				workbook.Write(stream);
@@ -103,33 +102,35 @@ namespace Migração
 
 		public void GravarExcel(string nomeArquivo, Dictionary<string, object[]> linhas)
 		{
-			IWorkbook workbook = new XSSFWorkbook();  // Cria um novo workbook
-			ISheet sheet1 = workbook.CreateSheet("Planilha1");  // Cria uma nova planilha
+			IWorkbook workbook = new XSSFWorkbook();
+			ISheet sheet1 = workbook.CreateSheet("Planilha1");
 
-			// Insere os dados do dicionário na planilha
+			// Cria a linha de cabeçalho e insere os nomes das colunas
+			IRow row = sheet1.CreateRow(0);
 			int coluna = 0;
 			foreach (var item in linhas)
 			{
-				// Insere o nome da coluna
-				IRow row = sheet1.CreateRow(0);
 				ICell cell = row.CreateCell(coluna);
 				cell.SetCellValue(item.Key);
+				coluna++;
+			}
 
-				// Insere os dados da coluna
+			// Insere os dados nas linhas para cada coluna
+			coluna = 0;
+			foreach (var item in linhas)
+			{
 				int linha = 1;
 				foreach (var valor in item.Value)
 				{
 					row = sheet1.GetRow(linha) ?? sheet1.CreateRow(linha);
-					cell = row.CreateCell(coluna);
+					ICell cell = row.CreateCell(coluna);
 					if (valor != null)
 						cell.SetCellValue(valor.ToString());
 					linha++;
 				}
-
 				coluna++;
 			}
 
-			// Salva o arquivo Excel
 			FileStream sw = File.Create(nomeArquivo + ".xlsx");
 			workbook.Write(sw);
 			sw.Close();

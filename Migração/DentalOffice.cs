@@ -52,7 +52,7 @@ namespace Migração
 						{
 							celulaValor = celula.ToString().Trim();
 							tituloColuna = cabecalhos[celula.Address.Column];
-							colunaLetra = celula.Address.ToString();
+							colunaLetra = excelHelper.GetColumnLetter(celula);
 
 							if (!string.IsNullOrWhiteSpace(celulaValor))
 							{
@@ -80,6 +80,8 @@ namespace Migração
 					}
 				}
 
+				indiceLinha = 0;
+
 				dados.Add("numcadastro", numcadastro.Cast<object>().ToArray());
 				dados.Add("nomeCompleto", nomeCompleto.Cast<object>().ToArray());
 				dados.Add("cpf", cpf.Cast<object>().ToArray());
@@ -98,6 +100,9 @@ namespace Migração
 
 				if (!string.IsNullOrWhiteSpace(variaveisValor))
 					mensagemErro += Environment.NewLine + "Variáveis" + Environment.NewLine + variaveisValor;
+
+				if (indiceLinha <= 0)
+					mensagemErro = error.Message;
 
 				throw new Exception(mensagemErro);
 			}

@@ -24,16 +24,12 @@ namespace Migração
 				sql.Append('(');
 				foreach (var valueArray in dataDict.Values)
 				{
-					Debug.WriteLine("i=" + i);
-					Debug.WriteLine("valueArray[i]=" + valueArray[i]);
 					try
 					{
 						if (valueArray[i] == null)
 							sql.Append($"NULL, ");
-						else if (valueArray[i].ToString().ToLower() == "null")
-							sql.Append($"NULL, ");
-						else
-							sql.Append($"'{valueArray[i]}', ");
+						else							
+							sql.Append($"'{VerificarSeDateTime(valueArray[i])}', ");
 					} catch
 					{
 						sql.Append($"NULL, ");
@@ -46,6 +42,14 @@ namespace Migração
 			sql.Remove(sql.Length - 4, 4).Append(';');
 
 			return sql.ToString();
+		}
+
+		public object VerificarSeDateTime(object input)
+		{
+			if (input is DateTime dateTime)
+				return dateTime.ToString("yyyy-MM-dd HH:mm:ss.f");
+
+			return input;
 		}
 	}
 }

@@ -109,9 +109,6 @@ namespace Migração
 
 		void MostrarCamposExcel()
 		{
-			txtEstabelecimentoID.Focus();
-			txtEstabelecimentoID.SelectAll();
-
 			if (comboBoxSistema.SelectedIndex > -1 && comboBoxImportacao.SelectedIndex > -1 && !string.IsNullOrEmpty(txtEstabelecimentoID.Text))
 			{
 				labelExcel1.Text = comboBoxImportacao.Text;

@@ -61,7 +61,7 @@
 			btnImportar.Margin = new Padding(3, 2, 3, 2);
 			btnImportar.Name = "btnImportar";
 			btnImportar.Size = new Size(88, 22);
-			btnImportar.TabIndex = 5;
+			btnImportar.TabIndex = 6;
 			btnImportar.Text = "⚙ Importar";
 			btnImportar.UseVisualStyleBackColor = true;
 			btnImportar.Click += btnImportar_Click;
@@ -190,7 +190,7 @@
 			txtEstabelecimentoID.Margin = new Padding(3, 2, 3, 2);
 			txtEstabelecimentoID.Name = "txtEstabelecimentoID";
 			txtEstabelecimentoID.Size = new Size(110, 23);
-			txtEstabelecimentoID.TabIndex = 16;
+			txtEstabelecimentoID.TabIndex = 2;
 			txtEstabelecimentoID.TextChanged += txtEstabelecimentoID_TextChanged;
 			txtEstabelecimentoID.KeyPress += txtEstabelecimentoID_KeyPress;
 			// 
@@ -200,7 +200,7 @@
 			txtPessoaID.Margin = new Padding(3, 2, 3, 2);
 			txtPessoaID.Name = "txtPessoaID";
 			txtPessoaID.Size = new Size(110, 23);
-			txtPessoaID.TabIndex = 17;
+			txtPessoaID.TabIndex = 5;
 			txtPessoaID.Visible = false;
 			txtPessoaID.TextChanged += txtPessoaID_TextChanged;
 			txtPessoaID.KeyPress += txtPessoaID_KeyPress;

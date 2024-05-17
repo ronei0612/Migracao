@@ -1,13 +1,17 @@
-﻿using NPOI.SS.UserModel;
+﻿using NPOI.SS.Formula.Functions;
+using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using static NPOI.HSSF.Util.HSSFColor;
+using static OfficeOpenXml.ExcelErrorValue;
 
 namespace Migração
 {
 	internal class DentalOffice
 	{
-		public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, string EstabelecimentoID, string RespFinanceiroPessoaID, string salvarArquivo)
+		public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, string estabelecimentoID, string respFinanceiroPessoaID, string salvarArquivo)
 		{
 			DateTime dataMinima = new DateTime(1900, 01, 01), dataMaxima = new DateTime(2079, 06, 06), dataHoje = DateTime.Now;
 			var indiceLinha = 1;
@@ -33,6 +37,7 @@ namespace Migração
 			{
 				IWorkbook workbookConsumidores = excelHelper.LerExcel(arquivoExcelConsumidores);
 				sheetConsumidores = workbookConsumidores.GetSheetAt(0);
+				excelHelper.InitializeDictionary(sheetConsumidores);
 			}
 			catch (Exception ex)
 			{
@@ -41,37 +46,20 @@ namespace Migração
 
 			var cabecalhos = excelHelper.GetCabecalhosExcel(workbook);
 			var linhas = excelHelper.GetLinhasExcel(workbook);
-			excelHelper.ZerarVariaveis();
+			var fluxoCaixas = new List<FluxoCaixa>();
 
 			try
 			{
-				var dados = new Dictionary<string, object[]>();
-
-				var linhasCount = linhas.Count;
-
-				var nomeCompleto = new string[linhasCount];
-				var descricao = new string[linhasCount];
-				string[] consumidorID = new string[linhasCount];
-				string?[] outroSacadoNome = new string?[linhasCount];
-				var loginID = new int[linhasCount];
-				var planoContasID = new int[linhasCount];
-				var codigo = new long[linhasCount];
-				var pagoValor = new decimal[linhasCount];
-				var pagoMulta = new int[linhasCount];
-				var pagoJuros = new int[linhasCount];
-				var data = dataHoje;
-				var dataPagamento = new string[linhasCount];
-				var nascimentoData = new DateTime[linhasCount];
-				var titulosEspecies = new byte[linhasCount];
-				var transacaoID = new byte[linhasCount];
-				var tituloSituacaoID = new byte[linhasCount];
-				var tipoID = new byte[linhasCount];
-				var respFinanceiroPessoaID = new string[linhasCount];
-				var estabelecimentoID = new string[linhasCount];
-
 				foreach (var linha in linhas)
 				{
 					indiceLinha++;
+
+					string nomeCompleto = "", dataPagamento, outroSacadoNome = "";
+					int controle = 0, recibo = 0, codigo = 0, loginID = 1;
+					int? consumidorID = 0;
+					decimal pagoValor = 0;
+					byte titulosEspecies = 0;
+					DateTime nascimentoData = dataHoje, data = dataHoje;
 
 					foreach (var celula in linha.Cells)
 					{
@@ -86,10 +74,10 @@ namespace Migração
 								switch (tituloColuna)
 								{
 									case "paciente":
-										nomeCompleto[indiceLinha - 2] = celulaValor.Substring(0, Math.Min(256, celulaValor.Length));
+										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
 										break;
 									case "numero_registro":
-										codigo[indiceLinha - 2] = int.Parse(celulaValor);
+										codigo = int.Parse(celulaValor);
 										break;
 									case "data_pagamento":
 										if (DateTime.TryParse(celulaValor, out data))
@@ -101,10 +89,10 @@ namespace Migração
 											throw new Exception("Erro na conversão de data");
 										if ((data >= dataMinima && data <= dataMaxima) == false)
 											data = dataHoje;
-										dataPagamento[indiceLinha - 2] = data.ToString("yyyy-MM-dd HH:mm:ss.f");
+										dataPagamento = data.ToString("yyyy-MM-dd HH:mm:ss.f");
 										break;
 									case "forma_pagamento":
-										titulosEspecies[indiceLinha - 2] = (byte)(celulaValor.ToLower() == "dinheiro" ? TitulosEspeciesID.Dinheiro
+										titulosEspecies = (byte)(celulaValor.ToLower() == "dinheiro" ? TitulosEspeciesID.Dinheiro
 											: celulaValor.ToLower() == "cheque" ? TitulosEspeciesID.Cheque
 											: celulaValor.ToLower() == "boleto bancário" ? TitulosEspeciesID.BoletoBancario
 											: celulaValor.ToLower() == "cartão de crédito" ? TitulosEspeciesID.CartaoCredito
@@ -115,69 +103,94 @@ namespace Migração
 											: TitulosEspeciesID.DepositoEmConta);
 										break;
 									case "valor":
-										pagoValor[indiceLinha - 2] = decimal.Parse(celulaValor.Replace(",", "."), CultureInfo.InvariantCulture);
+										pagoValor = decimal.Parse(celulaValor.Replace(",", "."), CultureInfo.InvariantCulture);
 										break;
 								}
 							}
+						}						
+					}
 
-							transacaoID[indiceLinha - 2] = (byte)TituloTransacoes.Liquidacao;
-							tituloSituacaoID[indiceLinha - 2] = (byte)TituloSituacoesID.Normal;
-							tipoID[indiceLinha - 2] = (byte)TransacaoTiposID.Recebimento;
-							loginID[indiceLinha - 2] = 1;
-							planoContasID[indiceLinha - 2] = 55;
-							pagoMulta[indiceLinha - 2] = 0;
-							pagoJuros[indiceLinha - 2] = 0;
-							respFinanceiroPessoaID[indiceLinha - 2] = RespFinanceiroPessoaID.Trim();
-							estabelecimentoID[indiceLinha - 2] = EstabelecimentoID.Trim();
+					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, codigo: codigo.ToString());
+					if (!string.IsNullOrEmpty(consumidorIDValue))
+					{
+						consumidorID = int.Parse(consumidorIDValue);
+						outroSacadoNome = "null";
 
-							int consumidorIDValue = excelHelper.GetConsumidorID(sheetConsumidores, nomeCompleto: nomeCompleto[indiceLinha - 2], codigo: codigo[indiceLinha - 2].ToString());
-							if (consumidorIDValue > 0)
-							{
-								consumidorID[indiceLinha - 2] = consumidorIDValue.ToString();
-								outroSacadoNome[indiceLinha - 2] = "null";
-							}
-							else
-							{
-								consumidorID[indiceLinha - 2] = "null";
-								outroSacadoNome[indiceLinha - 2] = nomeCompleto[indiceLinha - 2].Substring(0, Math.Min(50, nomeCompleto[indiceLinha - 2].Length));
-							}
-						}
+						fluxoCaixas.Add(new FluxoCaixa()
+						{
+							ConsumidorID = consumidorID,
+							SituacaoID = 1,
+							PagoMulta = 0,
+							PagoJuros = 0,
+							TipoID = (byte)TransacaoTiposID.Recebimento,
+							Data = data,
+							TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
+							EspecieID = titulosEspecies,
+							DataBaseCalculo = data,
+							DevidoValor = pagoValor,
+							PagoValor = pagoValor,
+							EstabelecimentoID = int.Parse(estabelecimentoID),
+							LoginID = 1,
+							DataInclusao = data,
+							FinanceiroID = int.Parse(respFinanceiroPessoaID)
+						});
+					}
+					else
+					{
+						consumidorID = null;
+						outroSacadoNome = nomeCompleto.Substring(0, Math.Min(50, nomeCompleto.Length));
+
+						fluxoCaixas.Add(new FluxoCaixa()
+						{
+							OutroSacadoNome = nomeCompleto.Substring(0, Math.Min(50, nomeCompleto.Length)),
+							SituacaoID = 1,
+							PagoMulta = 0,
+							PagoJuros = 0,
+							TipoID = (byte)TransacaoTiposID.Recebimento,
+							Data = data,
+							TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
+							EspecieID = titulosEspecies,
+							DataBaseCalculo = data,
+							DevidoValor = pagoValor,
+							PagoValor = pagoValor,
+							EstabelecimentoID = int.Parse(estabelecimentoID),
+							LoginID = 1,
+							DataInclusao = data,
+							FinanceiroID = int.Parse(respFinanceiroPessoaID)
+						});
 					}
 				}
 
 				indiceLinha = 0;
 
-				dados.Add("ConsumidorID", consumidorID.Cast<object>().ToArray());
-				dados.Add("SituacaoID", tituloSituacaoID.Cast<object>().ToArray());
-				dados.Add("PagoMulta", pagoMulta.Cast<object>().ToArray());
-				dados.Add("PagoJuros", pagoJuros.Cast<object>().ToArray());
-				dados.Add("DevidoValor", pagoValor.Cast<object>().ToArray());
-				dados.Add("PagoValor", pagoValor.Cast<object>().ToArray());
-
-				dados.Add("TipoID", tipoID.Cast<object>().ToArray());
-				dados.Add("LoginID", loginID.Cast<object>().ToArray());
-				dados.Add("PlanoContasID", planoContasID.Cast<object>().ToArray());
-				dados.Add("TransacaoID", transacaoID.Cast<object>().ToArray());
-				dados.Add("EspecieID", titulosEspecies.Cast<object>().ToArray());
-				dados.Add("FinanceiroID", respFinanceiroPessoaID.Cast<object>().ToArray());
-				dados.Add("EstabelecimentoID", estabelecimentoID.Cast<object>().ToArray());
-
-				dados.Add("OutroSacadoNome", outroSacadoNome.Cast<object>().ToArray());
-				dados.Add("Data", dataPagamento.Cast<object>().ToArray());
-				dados.Add("DataBaseCalculo", dataPagamento.Cast<object>().ToArray());
-				dados.Add("DataInclusao", dataPagamento.Cast<object>().ToArray());
+				var dados = new Dictionary<string, object[]>
+				{
+					{ "ConsumidorID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.ConsumidorID).ToArray() },
+					{ "SituacaoID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.SituacaoID).ToArray() },
+					{ "PagoMulta", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.PagoMulta).ToArray() },
+					{ "PagoJuros", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.PagoJuros).ToArray() },
+					{ "TipoID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.TipoID).ToArray() },
+					{ "Data", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.Data).ToArray() },
+					{ "TransacaoID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.TransacaoID).ToArray() },
+					{ "EspecieID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.EspecieID).ToArray() },
+					{ "DataBaseCalculo", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DataBaseCalculo).ToArray() },
+					{ "DevidoValor", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DevidoValor).ToArray() },
+					{ "PagoValor", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.PagoValor).ToArray() },
+					{ "EstabelecimentoID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.EstabelecimentoID).ToArray() },
+					{ "LoginID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.LoginID).ToArray() },
+					{ "DataInclusao", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DataInclusao).ToArray() },
+					{ "FinanceiroID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.FinanceiroID).ToArray() },
+					{ "OutroSacadoNome", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.OutroSacadoNome).ToArray() }
+				};
 
 				var sqlHelper = new SqlHelper();
-
 				var insert = sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", dados);
 				File.WriteAllText(salvarArquivo + ".sql", insert);
 				excelHelper.GravarExcel(salvarArquivo, dados);
 			}
-
 			catch (Exception error)
 			{
 				var mensagemErro = $"Falha na linha {indiceLinha}, coluna {colunaLetra}, Valor esperado: {tituloColuna}, valor da célula: \"{celulaValor}\": {error.Message}";
-
 				if (!string.IsNullOrWhiteSpace(variaveisValor))
 					mensagemErro += Environment.NewLine + "Variáveis" + Environment.NewLine + variaveisValor;
 
@@ -213,16 +226,9 @@ namespace Migração
 
 			try
 			{
-				var dados = new Dictionary<string, object[]>();
-
 				var linhasCount = linhas.Count;
-
-				var nomeCompleto = new string[linhasCount];
-				var cpf = new string[linhasCount];
-				var numcadastro = new int[linhasCount];
-				var consumidorID = new int[linhasCount];
-				var codigoAntigo = new int[linhasCount];
-				var pessoaID = new int[linhasCount];
+				var consumidores = new List<Consumidor>();
+				var pessoas = new List<Pessoa>();
 
 				foreach (var linha in linhas)
 				{
@@ -235,6 +241,8 @@ namespace Migração
 							celulaValor = celula.ToString().Trim();
 							tituloColuna = cabecalhos[celula.Address.Column];
 							colunaLetra = excelHelper.GetColumnLetter(celula);
+							int numcadastro = 0;
+							string nomeCompleto = "", cpf = "";
 
 							if (!string.IsNullOrWhiteSpace(celulaValor))
 							{
@@ -247,31 +255,67 @@ namespace Migração
 								switch (tituloColuna)
 								{
 									case "numcadastro":
-										numcadastro[indiceLinha - 2] = int.Parse(celulaValor);
+										numcadastro = int.Parse(celulaValor);
 										break;
 									case "primeironome":
-										nomeCompleto[indiceLinha - 2] = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
 										break;
 									case "cpf":
-										cpf[indiceLinha - 2] = celulaValor.Contains('.') && celulaValor.Contains('-') && celulaValor.Length <= 14 ? celulaValor 
+										cpf = celulaValor.Contains('.') && celulaValor.Contains('-') && celulaValor.Length <= 14 ? celulaValor 
 											: celulaValor.Length == int.Parse(mascaraCPFLenth) ? Convert.ToUInt64(celulaValor).ToString(mascaraCPF) : "";
 										break;
 								}
 							}
 						}
 					}
+
+					pessoas.Add(new Pessoa()
+					{
+						NomeCompleto = "",
+						Apelido = "",
+						CPF = "",
+						AssinaturaDigital = "",
+						CNS = "",
+						ConselhoCodigo = "",
+						ConselhoSigla = "",
+						ConselhoUF = "",
+						DataInclusao = dataHoje,
+						Email = "",
+						FalecimentoCausa = "",
+						FoneticaApelido = "",
+						FoneticaNomeCompleto = "",
+						FoneticaNomeSocial = "",
+						ID = 0,
+						Nacionalidade = "",
+						NascimentoLocal = "",
+						NomeSocial = "",
+						Origem = "",
+						ProfissaoOutra = "",
+						ResumoFormacao = "",
+						RG = "",
+						Sexo = false,
+						SkypeNome = "",
+						TipoSangue = ""
+					});
 				}
 
 				indiceLinha = 0;
 
-				dados.Add("numcadastro", numcadastro.Cast<object>().ToArray());
-				dados.Add("nomeCompleto", nomeCompleto.Cast<object>().ToArray());
-				dados.Add("cpf", cpf.Cast<object>().ToArray());
+				//dados.Add("numcadastro", numcadastro.Cast<object>().ToArray());
+				//dados.Add("nomeCompleto", nomeCompleto.Cast<object>().ToArray());
+				//dados.Add("cpf", cpf.Cast<object>().ToArray());
+
+				var dados1 = new Dictionary<string, object[]>
+				{
+					{ "NomeCompleto", pessoas.ConvertAll(pessoa => (object)pessoa.NomeCompleto).ToArray() },
+					//{ "CPF", pessoas.ConvertAll(pessoa => (object)pessoa.CPF).ToArray() },
+					//{ "Telefone", pessoas.ConvertAll(pessoa => (object)pessoa.Telefone).ToArray() }
+				};
 
 				var sqlHelper = new SqlHelper();
 
-				var insert = sqlHelper.GerarSqlInsert(salvarArquivo, dados);
-				excelHelper.GravarExcel(salvarArquivo, dados);
+				var insert = sqlHelper.GerarSqlInsert(salvarArquivo, dados1);
+				excelHelper.GravarExcel(salvarArquivo, dados1);
 
 				File.WriteAllText(salvarArquivo + ".sql", insert);
 			}

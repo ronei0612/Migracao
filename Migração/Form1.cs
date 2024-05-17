@@ -50,7 +50,7 @@ namespace Migração
 					//	Importar(item.Text);
 
 					var pasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Desktop");
-					var arquivo = "Migracao_" + maskedTxtEstabelecimento.Text + "_DentalOffice_Pacientes";
+					var arquivo = "Migracao_" + txtEstabelecimentoID.Text + "_DentalOffice_Pacientes";
 					string caminhoDoArquivo = Path.Combine(pasta, arquivo);
 
 					if (comboBoxSistema.Text.Equals("dentaloffice", StringComparison.CurrentCultureIgnoreCase))
@@ -58,13 +58,13 @@ namespace Migração
 						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
 						{
 							var dentalOffice = new DentalOffice();
-							dentalOffice.ImportarPacientes(textBoxExcel1.Text, maskedTxtEstabelecimento.Text, caminhoDoArquivo);
+							dentalOffice.ImportarPacientes(textBoxExcel1.Text, txtEstabelecimentoID.Text, caminhoDoArquivo);
 						}
 
 						else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
 						{
 							var dentalOffice = new DentalOffice();
-							dentalOffice.ImportarRecebidos(textBoxExcel1.Text, textBoxExcel2.Text, maskedTxtEstabelecimento.Text, maskedTextBox2.Text, caminhoDoArquivo);
+							dentalOffice.ImportarRecebidos(textBoxExcel1.Text, textBoxExcel2.Text, txtEstabelecimentoID.Text, txtPessoaID.Text, caminhoDoArquivo);
 						}
 					}
 					else if (comboBoxSistema.Text.Equals("odontocompany"))
@@ -72,7 +72,7 @@ namespace Migração
 						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
 						{
 							var dentalOffice = new DentalOffice();
-							dentalOffice.ImportarPacientes(textBoxExcel1.Text, maskedTxtEstabelecimento.Text, caminhoDoArquivo);
+							dentalOffice.ImportarPacientes(textBoxExcel1.Text, txtEstabelecimentoID.Text, caminhoDoArquivo);
 						}
 					}
 
@@ -91,7 +91,7 @@ namespace Migração
 
 		private bool ValidarCampos()
 		{
-			if (comboBoxSistema.SelectedIndex == -1 || comboBoxSistema.SelectedIndex == -1 || string.IsNullOrWhiteSpace(maskedTxtEstabelecimento.Text)
+			if (comboBoxSistema.SelectedIndex == -1 || comboBoxSistema.SelectedIndex == -1 || string.IsNullOrWhiteSpace(txtEstabelecimentoID.Text)
 				 || string.IsNullOrWhiteSpace(textBoxExcel1.Text))
 				return false;
 
@@ -175,10 +175,10 @@ namespace Migração
 
 		void MostrarCamposExcel()
 		{
-			maskedTxtEstabelecimento.Focus();
-			maskedTxtEstabelecimento.SelectAll();
+			txtEstabelecimentoID.Focus();
+			txtEstabelecimentoID.SelectAll();
 
-			if (comboBoxSistema.SelectedIndex > -1 && comboBoxImportacao.SelectedIndex > -1 && !string.IsNullOrEmpty(maskedTxtEstabelecimento.Text))
+			if (comboBoxSistema.SelectedIndex > -1 && comboBoxImportacao.SelectedIndex > -1 && !string.IsNullOrEmpty(txtEstabelecimentoID.Text))
 			{
 				labelExcel1.Text = comboBoxImportacao.Text;
 				labelExcel1.Visible = true;
@@ -193,7 +193,7 @@ namespace Migração
 					textBoxExcel2.Visible = true;
 					btnExcel2.Visible = true;
 					label2.Visible = true;
-					maskedTextBox2.Visible = true;
+					txtPessoaID.Visible = true;
 				}
 			}
 			else
@@ -243,6 +243,26 @@ namespace Migração
 		private void maskedTextBox2_TextChanged(object sender, EventArgs e)
 		{
 
+		}
+
+		private void txtPessoaID_KeyPress(object sender, KeyPressEventArgs e)
+		{
+			e.Handled = !(char.IsNumber(e.KeyChar) || e.KeyChar == (char)Keys.Back);
+		}
+
+		private void txtEstabelecimentoID_KeyPress(object sender, KeyPressEventArgs e)
+		{
+			e.Handled = !(char.IsNumber(e.KeyChar) || e.KeyChar == (char)Keys.Back);
+		}
+
+		private void txtEstabelecimentoID_TextChanged(object sender, EventArgs e)
+		{
+			MostrarCamposExcel();
+		}
+
+		private void txtPessoaID_TextChanged(object sender, EventArgs e)
+		{
+			//MostrarCamposExcel();
 		}
 	}
 }

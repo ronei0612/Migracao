@@ -28,7 +28,9 @@ namespace Migração
 					Debug.WriteLine("valueArray[i]=" + valueArray[i]);
 					try
 					{
-						if (valueArray[i].ToString().ToLower() == "null")
+						if (valueArray[i] == null)
+							sql.Append($"NULL, ");
+						else if (valueArray[i].ToString().ToLower() == "null")
 							sql.Append($"NULL, ");
 						else
 							sql.Append($"'{valueArray[i]}', ");

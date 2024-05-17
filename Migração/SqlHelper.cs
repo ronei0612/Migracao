@@ -11,9 +11,7 @@ namespace Migração
 
 			// Adiciona os nomes das colunas
 			foreach (var key in dataDict.Keys)
-			{
 				sql.Append($"{key}, ");
-			}
 
 			// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
 			sql.Remove(sql.Length - 2, 2).Append(") VALUES " + Environment.NewLine);
@@ -30,7 +28,8 @@ namespace Migração
 							sql.Append($"NULL, ");
 						else							
 							sql.Append($"'{VerificarSeDateTime(valueArray[i])}', ");
-					} catch
+					}
+					catch
 					{
 						sql.Append($"NULL, ");
 					}

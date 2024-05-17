@@ -5,127 +5,76 @@ namespace Migração
 {
 	internal class ExcelHelper
 	{
-		int nomeCompletoColumnIndex = -1;
-		int codigoColumnIndex = -1;
-		int cpfColumnIndex = -1;
-		int consumidorColumnIndex = -1;
+		private ISheet sheet;
+		//private Dictionary<string, string> consumidorIdDict = new Dictionary<string, string>();
+		private Dictionary<string, string> nomeDict = new Dictionary<string, string>();
+		private Dictionary<string, string> cpfDict = new Dictionary<string, string>();
+		private Dictionary<string, string> nomeCodDict = new Dictionary<string, string>();
 
-		public void ZerarVariaveis()
+		public void InitializeDictionary(ISheet sheet)
 		{
-			nomeCompletoColumnIndex = -1;
-			codigoColumnIndex = -1;
-			cpfColumnIndex = -1;
-			consumidorColumnIndex = -1;
+			this.sheet = sheet;
+			IRow headerRow = sheet.GetRow(0);
+			int cpfColumnIndex = GetColumnIndex(headerRow, "cpf");
+			int nomeCompletoColumnIndex = GetColumnIndex(headerRow, "nomecompleto");
+			int codigoColumnIndex = GetColumnIndex(headerRow, "codigoantigo");
+			int consumidorColumnIndex = GetColumnIndex(headerRow, "consumidorid");
+
+			for (int row = 1; row <= sheet.LastRowNum; row++)
+			{
+				if (sheet.GetRow(row) != null)
+				{
+					string cpfCellValue = sheet.GetRow(row).GetCell(cpfColumnIndex) != null ? sheet.GetRow(row).GetCell(cpfColumnIndex).ToString() : "";
+					string nomeCompletoCellValue = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex) != null ? sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString() : "";
+					string codigoCellValue = sheet.GetRow(row).GetCell(codigoColumnIndex) != null ? sheet.GetRow(row).GetCell(codigoColumnIndex).ToString() : "";
+					string consumidorIdCellValue = sheet.GetRow(row).GetCell(consumidorColumnIndex) != null ? sheet.GetRow(row).GetCell(consumidorColumnIndex).ToString() : "";
+
+					//string key = cpfCellValue + "|" + nomeCompletoCellValue + "|" + codigoCellValue;
+					//if (!consumidorIdDict.ContainsKey(key))
+					//	consumidorIdDict.Add(key, consumidorIdCellValue);
+
+					string key = cpfCellValue;
+					if (!cpfDict.ContainsKey(key))
+						cpfDict.Add(key, consumidorIdCellValue);
+
+					key = nomeCompletoCellValue + "|" + codigoCellValue;
+					if (!nomeCodDict.ContainsKey(key))
+						nomeCodDict.Add(key, consumidorIdCellValue);
+
+					key = nomeCompletoCellValue;
+					if (!nomeDict.ContainsKey(key))
+						nomeDict.Add(key, consumidorIdCellValue);
+				}
+			}
 		}
 
-		public int GetConsumidorID(ISheet sheet, string cpf = "", string nomeCompleto = "", string codigo = "")
+		private int GetColumnIndex(IRow headerRow, string columnName)
 		{
-			IRow headerRow = sheet.GetRow(0); // assumindo que o cabeçalho está na primeira linha
-			int retorno = 0;
-
-			if (consumidorColumnIndex == -1)
+			for (int column = 0; column < headerRow.LastCellNum; column++)
 			{
-				for (int column = 0; column < headerRow.LastCellNum; column++)
-					if (headerRow.GetCell(column).ToString().Equals("consumidorid", StringComparison.CurrentCultureIgnoreCase))
-					{
-						consumidorColumnIndex = column;
-						break;
-					}
-
-				if (consumidorColumnIndex == -1)
-					throw new Exception("Coluna ConsumidorID não encontrada");
-			}
-
-			if (!string.IsNullOrWhiteSpace(cpf))
-			{
-				if (cpfColumnIndex == -1)
+				if (headerRow.GetCell(column).ToString().Equals(columnName, StringComparison.CurrentCultureIgnoreCase))
 				{
-					for (int column = 0; column < headerRow.LastCellNum; column++)
-						if (headerRow.GetCell(column).ToString().Equals("cpf", StringComparison.CurrentCultureIgnoreCase))
-						{
-							cpfColumnIndex = column;
-							break;
-						}
-
-					if (cpfColumnIndex == -1)
-						throw new Exception("Coluna CPF não encontrada");
+					return column;
 				}
-
-				for (int row = 1; row <= sheet.LastRowNum; row++) // começa em 1 para pular o cabeçalho
-					if (sheet.GetRow(row) != null) // verifica se a linha não está vazia
-					{
-						string cpfCellValue = sheet.GetRow(row).GetCell(cpfColumnIndex).ToString();
-						if (cpfCellValue == cpf)
-							retorno = int.Parse(sheet.GetRow(row).GetCell(consumidorColumnIndex).ToString()); // retorna o ConsumidorID se o CPF corresponder
-					}
 			}
+			throw new Exception($"Coluna {columnName} não encontrada");
+		}
 
-			if (retorno == 0 && !string.IsNullOrWhiteSpace(nomeCompleto) && !string.IsNullOrWhiteSpace(codigo))
-			{
-				if (nomeCompletoColumnIndex == -1)
-				{
-					for (int column = 0; column < headerRow.LastCellNum; column++)
-						if (headerRow.GetCell(column).ToString().Equals("nomecompleto", StringComparison.CurrentCultureIgnoreCase))
-						{
-							nomeCompletoColumnIndex = column;
-							break;
-						}
+		public string GetConsumidorID(string cpf = "", string nomeCompleto = "", string codigo = "")
+		{
+			string key = cpf;
+			if (cpfDict.ContainsKey(key))
+				return cpfDict[key];
 
-					if (nomeCompletoColumnIndex == -1)
-						throw new Exception("Coluna NomeCompleto não encontrada");
-				}
+			key = nomeCompleto + "|" + codigo;
+			if (nomeCodDict.ContainsKey(key))
+				return nomeCodDict[key];
 
-				if (codigoColumnIndex == -1)
-				{
-					for (int column = 0; column < headerRow.LastCellNum; column++)
-						if (headerRow.GetCell(column).ToString().Equals("codigoantigo", StringComparison.CurrentCultureIgnoreCase))
-						{
-							codigoColumnIndex = column;
-							break;
-						}
+			key = nomeCompleto;
+			if (nomeDict.ContainsKey(key))
+				return nomeDict[key];
 
-					if (codigoColumnIndex == -1)
-						throw new Exception("Coluna CodigoAntigo não encontrada");
-				}
-
-				for (int row = 1; row <= sheet.LastRowNum; row++) // começa em 1 para pular o cabeçalho
-					if (sheet.GetRow(row) != null) // verifica se a linha não está vazia
-					{
-						string nomeCompletoCellValue = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString();
-						string codigoCellValue = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString();
-
-						if (nomeCompletoCellValue == nomeCompleto && codigoCellValue == codigo)
-							retorno = int.Parse(sheet.GetRow(row).GetCell(consumidorColumnIndex).ToString()); // retorna o ConsumidorID se o NomeCompleto e codigo corresponderem
-					}
-			}
-
-			if (retorno == 0 && !string.IsNullOrWhiteSpace(nomeCompleto))
-			{
-				if (nomeCompletoColumnIndex == -1)
-				{
-					nomeCompletoColumnIndex = -1;
-
-					for (int column = 0; column < headerRow.LastCellNum; column++)
-						if (headerRow.GetCell(column).ToString().Equals("nomecompleto", StringComparison.CurrentCultureIgnoreCase))
-						{
-							nomeCompletoColumnIndex = column;
-							break;
-						}
-
-					if (nomeCompletoColumnIndex == -1)
-						throw new Exception("Coluna NomeCompleto não encontrada");
-				}
-
-				for (int row = 1; row <= sheet.LastRowNum; row++) // começa em 1 para pular o cabeçalho
-					if (sheet.GetRow(row) != null) // verifica se a linha não está vazia
-					{
-						string nomeCompletoCellValue = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString();
-						if (nomeCompletoCellValue == cpf)
-							retorno = int.Parse(sheet.GetRow(row).GetCell(consumidorColumnIndex).ToString()); // retorna o ConsumidorID se o CPF corresponder
-					}
-			}
-
-			return retorno;
+			return "";
 		}
 
 		public IWorkbook LerExcel(string filePath)
@@ -194,10 +143,6 @@ namespace Migração
 
 			// Escrevendo cabeçalhos
 			IRow headerRow = sheet.CreateRow(0);
-			//for (int i = 0; i < cabecalhos.Count; i++)
-			//{
-			//	headerRow.CreateCell(i).SetCellValue(cabecalhos[i]);
-			//}
 
 			var cabecalhos = new List<string>(linhas.Keys);
 			for (int i = 0; i < cabecalhos.Count; i++)

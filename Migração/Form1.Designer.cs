@@ -29,14 +29,10 @@
 		private void InitializeComponent()
 		{
 			label1 = new Label();
-			maskedTxtEstabelecimento = new MaskedTextBox();
 			btnImportar = new Button();
 			label2 = new Label();
 			openFileDialog1 = new OpenFileDialog();
 			btnExcel = new Button();
-			listView1 = new ListView();
-			btnDelExcel = new Button();
-			maskedTextBox2 = new MaskedTextBox();
 			textBoxExcel1 = new TextBox();
 			labelExcel1 = new Label();
 			comboBoxImportacao = new ComboBox();
@@ -59,24 +55,9 @@
 			label1.TabIndex = 0;
 			label1.Text = "EstabelecimentoID:";
 			// 
-			// maskedTxtEstabelecimento
-			// 
-			maskedTxtEstabelecimento.Location = new Point(506, 178);
-			maskedTxtEstabelecimento.Margin = new Padding(3, 2, 3, 2);
-			maskedTxtEstabelecimento.Mask = "00000000000";
-			maskedTxtEstabelecimento.Name = "maskedTxtEstabelecimento";
-			maskedTxtEstabelecimento.Size = new Size(110, 23);
-			maskedTxtEstabelecimento.TabIndex = 2;
-			maskedTxtEstabelecimento.ValidatingType = typeof(int);
-			maskedTxtEstabelecimento.Visible = false;
-			maskedTxtEstabelecimento.MaskInputRejected += maskedTxtEstabelecimento_MaskInputRejected;
-			maskedTxtEstabelecimento.Click += maskedTxtEstabelecimento_Click;
-			maskedTxtEstabelecimento.TextChanged += maskedTxtEstabelecimento_TextChanged;
-			maskedTxtEstabelecimento.Enter += maskedTxtEstabelecimento_Enter;
-			// 
 			// btnImportar
 			// 
-			btnImportar.Location = new Point(306, 291);
+			btnImportar.Location = new Point(306, 181);
 			btnImportar.Margin = new Padding(3, 2, 3, 2);
 			btnImportar.Name = "btnImportar";
 			btnImportar.Size = new Size(88, 22);
@@ -110,42 +91,6 @@
 			btnExcel.UseVisualStyleBackColor = true;
 			btnExcel.Visible = false;
 			btnExcel.Click += btnExcel_Click;
-			// 
-			// listView1
-			// 
-			listView1.Location = new Point(551, 269);
-			listView1.Margin = new Padding(3, 2, 3, 2);
-			listView1.Name = "listView1";
-			listView1.Size = new Size(139, 44);
-			listView1.TabIndex = 3;
-			listView1.UseCompatibleStateImageBehavior = false;
-			listView1.View = View.List;
-			listView1.Visible = false;
-			// 
-			// btnDelExcel
-			// 
-			btnDelExcel.Location = new Point(644, 235);
-			btnDelExcel.Margin = new Padding(3, 2, 3, 2);
-			btnDelExcel.Name = "btnDelExcel";
-			btnDelExcel.Size = new Size(31, 22);
-			btnDelExcel.TabIndex = 2;
-			btnDelExcel.Text = "🗑";
-			btnDelExcel.UseVisualStyleBackColor = true;
-			btnDelExcel.Visible = false;
-			btnDelExcel.Click += btnDelExcel_Click;
-			// 
-			// maskedTextBox2
-			// 
-			maskedTextBox2.Location = new Point(506, 219);
-			maskedTextBox2.Margin = new Padding(3, 2, 3, 2);
-			maskedTextBox2.Mask = "00000000000";
-			maskedTextBox2.Name = "maskedTextBox2";
-			maskedTextBox2.Size = new Size(110, 23);
-			maskedTextBox2.TabIndex = 5;
-			maskedTextBox2.ValidatingType = typeof(int);
-			maskedTextBox2.Visible = false;
-			maskedTextBox2.TextChanged += maskedTextBox2_TextChanged;
-			maskedTextBox2.Enter += maskedTextBox2_Enter;
 			// 
 			// textBoxExcel1
 			// 
@@ -264,7 +209,7 @@
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
-			ClientSize = new Size(700, 322);
+			ClientSize = new Size(700, 213);
 			Controls.Add(txtPessoaID);
 			Controls.Add(txtEstabelecimentoID);
 			Controls.Add(label3);
@@ -276,13 +221,9 @@
 			Controls.Add(comboBoxImportacao);
 			Controls.Add(labelExcel1);
 			Controls.Add(textBoxExcel1);
-			Controls.Add(maskedTextBox2);
-			Controls.Add(btnDelExcel);
-			Controls.Add(listView1);
 			Controls.Add(btnExcel);
 			Controls.Add(label2);
 			Controls.Add(btnImportar);
-			Controls.Add(maskedTxtEstabelecimento);
 			Controls.Add(label1);
 			FormBorderStyle = FormBorderStyle.FixedToolWindow;
 			Margin = new Padding(3, 2, 3, 2);
@@ -296,14 +237,10 @@
 		#endregion
 
 		private Label label1;
-		private MaskedTextBox maskedTxtEstabelecimento;
 		private Button btnImportar;
 		private Label label2;
 		private OpenFileDialog openFileDialog1;
 		private Button btnExcel;
-		private ListView listView1;
-		private Button btnDelExcel;
-		private MaskedTextBox maskedTextBox2;
 		private TextBox textBoxExcel1;
 		private Label labelExcel1;
 		private ComboBox comboBoxImportacao;

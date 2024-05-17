@@ -11,33 +11,22 @@ namespace Migração
 
 		private void btnExcel_Click(object sender, EventArgs e)
 		{
-			OpenFileDialog openFileDialog = new OpenFileDialog();
-			//openFileDialog.Filter = "Arquivo Excel |*.xls;*.xlsx";
+			var openFileDialog = new OpenFileDialog();
 			openFileDialog.Filter = "Arquivo Excel |*.xlsx";
 			openFileDialog.Title = "Selecione um arquivo";
 
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
 				textBoxExcel1.Text = openFileDialog.FileName;
-			//ListViewItem item = new ListViewItem(filePath);
-			//listView1.Items.Add(item);
 		}
 
 		private void btnExcel2_Click(object sender, EventArgs e)
 		{
-			OpenFileDialog openFileDialog = new OpenFileDialog();
+			var openFileDialog = new OpenFileDialog();
 			openFileDialog.Filter = "Arquivo Excel |*.xlsx";
 			openFileDialog.Title = "Selecione um arquivo";
 
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
 				textBoxExcel2.Text = openFileDialog.FileName;
-		}
-
-		private void btnDelExcel_Click(object sender, EventArgs e)
-		{
-			if (listView1.SelectedItems.Count > 0)
-				listView1.Items.Remove(listView1.SelectedItems[0]);
-			else
-				MessageBox.Show("Por favor, selecione um item para remover.", "Nenhum item selecionado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 		}
 
 		private void btnImportar_Click(object sender, EventArgs e)
@@ -46,9 +35,6 @@ namespace Migração
 			{
 				try
 				{
-					//foreach (ListViewItem item in listView1.Items)
-					//	Importar(item.Text);
-
 					var pasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Desktop");
 					var arquivo = "Migracao_" + txtEstabelecimentoID.Text + "_DentalOffice_Pacientes";
 					string caminhoDoArquivo = Path.Combine(pasta, arquivo);
@@ -121,58 +107,6 @@ namespace Migração
 			return true;
 		}
 
-		//private void Importar(string arquivoExcel1, string arquivoExcel2, string sistema, string importacao)
-		//{
-		//	IWorkbook workbook;
-		//	var excelHelper = new ExcelHelper();
-		//	var dentalOffice = new DentalOffice();
-
-		//	try
-		//	{
-		//		workbook = excelHelper.LerExcel(arquivoExcel1);
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		throw new Exception("Erro ao ler o arquivo Excel: " + ex.Message);
-		//	}
-
-		//	var cabecalhos = excelHelper.GetCabecalhosExcel(workbook);
-		//	var linhas = excelHelper.GetLinhasExcel(workbook);
-
-		//	try
-		//	{
-		//		var dados = dentalOffice.ImportarPacientes(linhas, cabecalhos);				
-
-		//		GravarExcel("asdf", dados);
-		//		var insert = GerarSqlInsert("asdfff", dados);
-		//		File.WriteAllText("aaaa.sql", insert);
-		//	}
-
-		//	catch (Exception error)
-		//	{
-		//		throw new Exception(error.Message);
-		//	}
-		//}
-
-
-
-		//private IWorkbook LerExcel(Stream fileStream)
-		//{
-		//	// Determine the Excel format and create appropriate workbook instance
-		//	if (Path.GetExtension(FileName).Equals(".xls", StringComparison.OrdinalIgnoreCase))
-		//	{
-		//		return new HSSFWorkbook(fileStream);
-		//	}
-		//	else if (Path.GetExtension(FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
-		//	{
-		//		return new XSSFWorkbook(fileStream);
-		//	}
-		//	else
-		//	{
-		//		throw new Exception("Formato de arquivo Excel não suportado.");
-		//	}
-		//}
-
 		void MostrarCamposExcel()
 		{
 			txtEstabelecimentoID.Focus();
@@ -213,36 +147,6 @@ namespace Migração
 		private void comboBoxImportacao_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			MostrarCamposExcel();
-		}
-
-		private void maskedTxtEstabelecimento_MaskInputRejected(object sender, MaskInputRejectedEventArgs e)
-		{
-
-		}
-
-		private void maskedTxtEstabelecimento_TextChanged(object sender, EventArgs e)
-		{
-			MostrarCamposExcel();
-		}
-
-		private void maskedTxtEstabelecimento_Enter(object sender, EventArgs e)
-		{
-			maskedTxtEstabelecimento.SelectAll();
-		}
-
-		private void maskedTxtEstabelecimento_Click(object sender, EventArgs e)
-		{
-			maskedTxtEstabelecimento.SelectAll();
-		}
-
-		private void maskedTextBox2_Enter(object sender, EventArgs e)
-		{
-			maskedTextBox2.SelectAll();
-		}
-
-		private void maskedTextBox2_TextChanged(object sender, EventArgs e)
-		{
-
 		}
 
 		private void txtPessoaID_KeyPress(object sender, KeyPressEventArgs e)

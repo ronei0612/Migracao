@@ -205,7 +205,7 @@ namespace Migração
 			}
 		}
 
-        public void ImportarFornecedor(string arquivoExcel, string arquivoExcelCidades, string estabelecimentoID, string salvarArquivo)
+        public void ImportarFornecedores(string arquivoExcel, string arquivoExcelCidades, string estabelecimentoID, string salvarArquivo)
         {
             DateTime dataMinima = new DateTime(1900, 01, 01), dataMaxima = new DateTime(2079, 06, 06), dataHoje = DateTime.Now;
             var indiceLinha = 1;
@@ -315,30 +315,30 @@ namespace Migração
                                                 celular = long.Parse(possivelCelular);
                                         }
                                         break;
-                                    case "ENDERECO":
-                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
-                                        break;
-                                    case "BAIRRO":
-                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
-                                        break;
-                                    case "NUM_ENDERECO":
-                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
-                                        break;
-                                    case "CIDADE":
-                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
-                                        break;
-                                    case "ESTADO":
-                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
-                                        break;
-                                    case "CEP":
-                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
-                                        break;
-                                    case "OBS1":
-                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
-                                        break;
-                                    case "NUM_CONVENIO":
-                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
-                                        break;
+                                    //case "ENDERECO":
+                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    break;
+                                    //case "BAIRRO":
+                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    break;
+                                    //case "NUM_ENDERECO":
+                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    break;
+                                    //case "CIDADE":
+                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    break;
+                                    //case "ESTADO":
+                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    break;
+                                    //case "CEP":
+                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    break;
+                                    //case "OBS1":
+                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    break;
+                                    //case "NUM_CONVENIO":
+                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    break;
                                     case "DT_CADASTRO":
                                         if (DateTime.TryParse(celulaValor, out dataCadastro))
                                         {
@@ -369,12 +369,11 @@ namespace Migração
                     if (fornecedor)
                         fornecedores.Add(new Fornecedor()
                         {
-							Ativo = fornecedor,
+							Ativo = true,
 							DataInclusao = dataCadastro,
 							EstabelecimentoID = int.Parse(estabelecimentoID),
-							LoginID = 1
-							
-							
+							NomeFantasia = nomeCompleto,
+							LoginID = 1							
                         });
                 }
 
@@ -385,8 +384,8 @@ namespace Migração
                     { "Ativo", fornecedores.ConvertAll(fornecedor => (object)fornecedor.Ativo).ToArray() },
                     { "DataInclusao", fornecedores.ConvertAll(fornecedor => (object)fornecedor.DataInclusao).ToArray() },
                     { "EstabelecimentoID", fornecedores.ConvertAll(fornecedor => (object)fornecedor.EstabelecimentoID).ToArray() },
-                    { "LoginID", fornecedores.ConvertAll(fornecedor => (object)fornecedor.LoginID).ToArray() }
-
+                    { "LoginID", fornecedores.ConvertAll(fornecedor => (object)fornecedor.LoginID).ToArray() },
+                    { "NomeFantasia", fornecedores.ConvertAll(fornecedor => (object)fornecedor.NomeFantasia).ToArray() }
                 };
 
                 int count = 1;

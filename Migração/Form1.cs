@@ -52,7 +52,7 @@ namespace Migração
 							var dentalOffice = new DentalOffice();
 							dentalOffice.ImportarRecebidos(textBoxExcel1.Text, textBoxExcel2.Text, txtEstabelecimentoID.Text, txtPessoaID.Text, caminhoDoArquivo);
 						}
-					}
+                    }
 					else if (comboBoxSistema.Text.Equals("odontocompany", StringComparison.CurrentCultureIgnoreCase))
 					{
 						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
@@ -60,7 +60,13 @@ namespace Migração
 							var odontoCompany = new OdontoCompany();
 							odontoCompany.ImportarPacientes(textBoxExcel1.Text, textBoxExcel2.Text, txtEstabelecimentoID.Text, caminhoDoArquivo);
 						}
-					}
+
+						else if (comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            var odontoCompany = new OdontoCompany();
+                            odontoCompany.ImportarFornecedores(textBoxExcel1.Text, textBoxExcel2.Text, txtEstabelecimentoID.Text, caminhoDoArquivo);
+                        }
+                    }
 				}
 				catch (Exception ex)
 				{
@@ -111,7 +117,8 @@ namespace Migração
 				btnExcel.Visible = true;
 
 				if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase)
-					|| comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
+					|| comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase)
+                    || comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase))
 				{
 					labelExcel2.Text = "Referência";
 					labelExcel2.Visible = true;

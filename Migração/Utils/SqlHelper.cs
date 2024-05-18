@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 
 namespace Migração.Utils
 {
@@ -7,40 +6,54 @@ namespace Migração.Utils
     {
         public string GerarSqlInsert(string tableName, Dictionary<string, object[]> dataDict)
         {
-            var sql = new StringBuilder($"INSERT INTO {tableName} (");
+			var sqlList = new List<string>();
+			var sql = new StringBuilder($"INSERT INTO {tableName} (");
 
-            // Adiciona os nomes das colunas
-            foreach (var key in dataDict.Keys)
-                sql.Append($"{key}, ");
+			// Adiciona os nomes das colunas
+			foreach (var key in dataDict.Keys)
+				sql.Append($"{key}, ");
 
-            // Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
-            sql.Remove(sql.Length - 2, 2).Append(") VALUES " + Environment.NewLine);
+			// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
+			sql.Remove(sql.Length - 2, 2).Append(") VALUES ");
 
-            // Adiciona os valores das colunas para cada linha
-            for (int i = 0; i < dataDict.Values.First().Length; i++)
-            {
-                sql.Append('(');
-                foreach (var valueArray in dataDict.Values)
-                {
-                    try
-                    {
-                        if (valueArray[i] == null)
-                            sql.Append($"NULL, ");
-                        else
-                            sql.Append($"'{VerificarSeDateTime(valueArray[i])}', ");
-                    }
-                    catch
-                    {
-                        sql.Append($"NULL, ");
-                    }
-                }
-                sql.Remove(sql.Length - 2, 2).Append("), " + Environment.NewLine);
-            }
+			// Adiciona os valores das colunas para cada linha
+			for (int i = 0; i < dataDict.Values.First().Length; i++)
+			{
+				if (i != 0 && i % 1000 == 0)
+				{
+					sql.Remove(sql.Length - 2, 2).Append(';');
+					sqlList.Add(sql.ToString());
+					sql.Clear().Append($"INSERT INTO {tableName} (");
 
-            // Remove a última quebra de linha e vírgula e espaço e adiciona um ponto e vírgula
-            sql.Remove(sql.Length - 4, 4).Append(';');
+					foreach (var key in dataDict.Keys)
+						sql.Append($"{key}, ");
 
-            return sql.ToString();
+					sql.Remove(sql.Length - 2, 2).Append(") VALUES ");
+				}
+
+				sql.Append('(');
+				foreach (var valueArray in dataDict.Values)
+				{
+					try
+					{
+						if (valueArray[i] == null)
+							sql.Append($"NULL, ");
+						else
+							sql.Append($"'{VerificarSeDateTime(valueArray[i])}', ");
+					}
+					catch
+					{
+						sql.Append($"NULL, ");
+					}
+				}
+				sql.Remove(sql.Length - 2, 2).Append("), ");
+			}
+
+			// Remove a última vírgula e espaço e adiciona um ponto e vírgula
+			sql.Remove(sql.Length - 2, 2).Append(';');
+			sqlList.Add(sql.ToString());
+
+			return string.Join(Environment.NewLine, sqlList);
         }
 
         public object VerificarSeDateTime(object input)

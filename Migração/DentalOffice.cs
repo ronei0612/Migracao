@@ -1,4 +1,5 @@
-﻿using NPOI.SS.Formula.Functions;
+﻿using Migração.Models;
+using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using Org.BouncyCastle.Bcpg.OpenPgp;
@@ -9,7 +10,7 @@ using static OfficeOpenXml.ExcelErrorValue;
 
 namespace Migração
 {
-	internal class DentalOffice
+    internal class DentalOffice
 	{
 		public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, string estabelecimentoID, string respFinanceiroPessoaID, string salvarArquivo)
 		{
@@ -22,7 +23,7 @@ namespace Migração
 			var mascaraCPFLenth = Regex.Replace(mascaraCPF, "[^0-9]", "").Length.ToString();
 
 			IWorkbook workbook;
-			var excelHelper = new ExcelHelper();
+			var excelHelper = new Helpers.ExcelHelper();
 			try
 			{
 				workbook = excelHelper.LerExcel(arquivoExcel);
@@ -183,10 +184,15 @@ namespace Migração
 					{ "OutroSacadoNome", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.OutroSacadoNome).ToArray() }
 				};
 
-				var sqlHelper = new SqlHelper();
+				int count = 1;
+				while (File.Exists(salvarArquivo + count + ".sql"))
+					count++;				
+
+				var sqlHelper = new Helpers.SqlHelper();
 				var insert = sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", dados);
-				File.WriteAllText(salvarArquivo + ".sql", insert);
-				excelHelper.GravarExcel(salvarArquivo, dados);
+
+				File.WriteAllText($"{salvarArquivo} ({count}).sql", insert);
+				excelHelper.GravarExcel($"{salvarArquivo} ({count})", dados);
 			}
 			catch (Exception error)
 			{
@@ -211,7 +217,7 @@ namespace Migração
 			var mascaraCPFLenth = Regex.Replace(mascaraCPF, "[^0-9]", "").Length.ToString();
 
 			IWorkbook workbook;
-			var excelHelper = new ExcelHelper();
+			var excelHelper = new Helpers.ExcelHelper();
 			try
 			{
 				workbook = excelHelper.LerExcel(arquivoExcel);
@@ -301,23 +307,20 @@ namespace Migração
 
 				indiceLinha = 0;
 
-				//dados.Add("numcadastro", numcadastro.Cast<object>().ToArray());
-				//dados.Add("nomeCompleto", nomeCompleto.Cast<object>().ToArray());
-				//dados.Add("cpf", cpf.Cast<object>().ToArray());
-
-				var dados1 = new Dictionary<string, object[]>
+				var dados = new Dictionary<string, object[]>
 				{
 					{ "NomeCompleto", pessoas.ConvertAll(pessoa => (object)pessoa.NomeCompleto).ToArray() },
-					//{ "CPF", pessoas.ConvertAll(pessoa => (object)pessoa.CPF).ToArray() },
-					//{ "Telefone", pessoas.ConvertAll(pessoa => (object)pessoa.Telefone).ToArray() }
 				};
 
-				var sqlHelper = new SqlHelper();
+				int count = 1;
+				while (File.Exists(salvarArquivo + count + ".sql"))
+					count++;
 
-				var insert = sqlHelper.GerarSqlInsert(salvarArquivo, dados1);
-				excelHelper.GravarExcel(salvarArquivo, dados1);
+				var sqlHelper = new Helpers.SqlHelper();
+				var insert = sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", dados);
 
-				File.WriteAllText(salvarArquivo + ".sql", insert);
+				File.WriteAllText($"{salvarArquivo} ({count}).sql", insert);
+				excelHelper.GravarExcel($"{salvarArquivo} ({count})", dados);
 			}
 
 			catch (Exception error)

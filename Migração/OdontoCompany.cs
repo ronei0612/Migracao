@@ -204,7 +204,221 @@ namespace Migração
 				throw new Exception(mensagemErro);
 			}
 		}
-		public void ImportarPacientes(string arquivoExcel, string arquivoExcelCidades, string estabelecimentoID, string salvarArquivo)
+
+        public void ImportarFornecedor(string arquivoExcel, string arquivoExcelCidades, string estabelecimentoID, string salvarArquivo)
+        {
+            DateTime dataMinima = new DateTime(1900, 01, 01), dataMaxima = new DateTime(2079, 06, 06), dataHoje = DateTime.Now;
+            var indiceLinha = 1;
+            string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
+
+            var mascaraCPF = "000.000.000-00";
+            mascaraCPF = mascaraCPF.Split('.')[0].Replace(".", @"\.").Replace("-", @"\-");
+            var mascaraCPFLenth = Regex.Replace(mascaraCPF, "[^0-9]", "").Length.ToString();
+
+            IWorkbook workbook;
+            var excelHelper = new ExcelHelper();
+            try
+            {
+                workbook = excelHelper.LerExcel(arquivoExcel);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcel}\": {ex.Message}");
+            }
+
+            try
+            {
+                var workbookCidades = excelHelper.LerExcel(arquivoExcelCidades);
+                var sheetCidades = workbookCidades.GetSheetAt(0);
+                excelHelper.InitializeDictionaryCidade(sheetCidades);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
+            }
+
+            var cabecalhos = excelHelper.GetCabecalhosExcel(workbook);
+            var linhas = excelHelper.GetLinhasExcel(workbook);
+
+            try
+            {
+                var linhasCount = linhas.Count;
+                //var consumidores = new List<Consumidor>();
+                var fornecedores = new List<Fornecedor>();
+
+                foreach (var linha in linhas)
+                {
+                    indiceLinha++;
+                    bool cliente = false, fornecedor = false;
+					DateTime dataNascimento, dataCadastro = dataHoje;
+                    int numcadastro;
+                    string nomeCompleto = "", cpf = "", rg = "", email = "", apelido = "";
+                    bool sexo = true;
+                    long telefonePrinc, telefoneAltern, telefoneComercial, telefoneOutro, celular;
+
+                    foreach (var celula in linha.Cells)
+                    {
+                        if (celula != null)
+                        {
+                            celulaValor = celula.ToString().Trim();
+                            tituloColuna = cabecalhos[celula.Address.Column];
+                            colunaLetra = excelHelper.GetColumnLetter(celula);
+
+                            if (!string.IsNullOrWhiteSpace(celulaValor))
+                            {
+                                switch (tituloColuna)
+                                {
+                                    case "CLIENTE":
+                                        cliente = celulaValor == "S" ? true : false;
+                                        break;
+                                    case "FORNECEDOR":
+                                        fornecedor = celulaValor == "S" ? true : false;
+                                        break;
+                                    case "NOME":
+                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                        apelido = celulaValor.Contains(" ") ? celulaValor.Split(' ')[0] : celulaValor;
+                                        break;
+                                    case "CGC_CPF":
+                                        cpf = celulaValor.Contains('.') && celulaValor.Contains('-') && celulaValor.Length <= 14 ? celulaValor
+                                            : celulaValor.Length == int.Parse(mascaraCPFLenth) ? Convert.ToUInt64(celulaValor).ToString(mascaraCPF) : "";
+                                        break;
+                                    case "INSC_RG":
+                                        rg = celulaValor.Substring(0, Math.Min(20, celulaValor.Length));
+                                        break;
+
+                                    case "SEXO_M_F":
+                                        var sexoLetra = celulaValor.ToLower();
+                                        sexo = sexoLetra == "m" || sexoLetra != "f";
+                                        break;
+                                    case "EMAIL":
+                                        email = celulaValor.Contains('@') && celulaValor.Contains('.') ? celulaValor : "";
+                                        break;
+                                    case "FONE1":
+                                        var possivelTel1 = Regex.Replace(celulaValor, "[^0-9]", "");
+                                        if (possivelTel1.Length >= 8 && possivelTel1.Length <= 16)
+                                            telefonePrinc = long.Parse(possivelTel1);
+                                        break;
+                                    case "FONE2":
+                                        var possivelTel2 = Regex.Replace(celulaValor, "[^0-9]", "");
+                                        if (possivelTel2.Length >= 8 && possivelTel2.Length <= 16)
+                                            telefoneAltern = long.Parse(possivelTel2);
+                                        break;
+                                    case "CELULAR":
+                                        var possivelCelular = celulaValor;
+                                        if (celulaValor.Length > 15)
+                                        {
+                                        }
+                                        else
+                                        {
+                                            possivelCelular = Regex.Replace(possivelCelular, "[^0-9]", "");
+                                            if (possivelCelular.Length >= 8 && possivelCelular.Length <= 16)
+                                                celular = long.Parse(possivelCelular);
+                                        }
+                                        break;
+                                    case "ENDERECO":
+                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                        break;
+                                    case "BAIRRO":
+                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                        break;
+                                    case "NUM_ENDERECO":
+                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                        break;
+                                    case "CIDADE":
+                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                        break;
+                                    case "ESTADO":
+                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                        break;
+                                    case "CEP":
+                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                        break;
+                                    case "OBS1":
+                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                        break;
+                                    case "NUM_CONVENIO":
+                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                        break;
+                                    case "DT_CADASTRO":
+                                        if (DateTime.TryParse(celulaValor, out dataCadastro))
+                                        {
+                                        }
+                                        else if (double.TryParse(celulaValor, out double codigoData))
+                                            dataCadastro = DateTime.FromOADate(codigoData);
+                                        else
+                                            throw new Exception("Erro na conversão de data");
+                                        if ((dataCadastro >= dataMinima && dataCadastro <= dataMaxima) == false)
+                                            dataCadastro = dataHoje;
+                                        break;
+                                    case "DT_NASCIMENTO":
+                                        if (DateTime.TryParse(celulaValor, out dataNascimento))
+                                        {
+                                        }
+                                        else if (double.TryParse(celulaValor, out double codigoData))
+                                            dataNascimento = DateTime.FromOADate(codigoData);
+                                        else
+                                            throw new Exception("Erro na conversão de data");
+                                        if ((dataNascimento >= dataMinima && dataNascimento <= dataMaxima) == false)
+                                            dataNascimento = dataHoje;
+                                        break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (fornecedor)
+                        fornecedores.Add(new Fornecedor()
+                        {
+							Ativo = fornecedor,
+							DataInclusao = dataCadastro,
+							EstabelecimentoID = int.Parse(estabelecimentoID),
+							LoginID = 1
+							
+							
+                        });
+                }
+
+                indiceLinha = 0;
+
+                var dados = new Dictionary<string, object[]>
+                {
+                    { "Ativo", fornecedores.ConvertAll(fornecedor => (object)fornecedor.Ativo).ToArray() },
+                    { "DataInclusao", fornecedores.ConvertAll(fornecedor => (object)fornecedor.DataInclusao).ToArray() },
+                    { "EstabelecimentoID", fornecedores.ConvertAll(fornecedor => (object)fornecedor.EstabelecimentoID).ToArray() },
+                    { "LoginID", fornecedores.ConvertAll(fornecedor => (object)fornecedor.LoginID).ToArray() }
+
+                };
+
+                int count = 1;
+                while (File.Exists($"{salvarArquivo} ({count}).xlsx"))
+                    salvarArquivo = $"{salvarArquivo} ({count++})";
+
+                var sqlHelper = new SqlHelper();
+                var insert = sqlHelper.GerarSqlInsert("_MigracaoConsumidores_Temp", dados);
+
+                File.WriteAllText(salvarArquivo, insert);
+                excelHelper.GravarExcel(salvarArquivo, dados);
+
+                string argumento = "/select, \"" + salvarArquivo + ".xlsx" + "\"";
+
+                Process.Start("explorer.exe", argumento);
+            }
+
+            catch (Exception error)
+            {
+                var mensagemErro = $"Falha na linha {indiceLinha}, coluna {colunaLetra}, Valor esperado: {tituloColuna}, valor da célula: \"{celulaValor}\": {error.Message}";
+
+                if (!string.IsNullOrWhiteSpace(variaveisValor))
+                    mensagemErro += Environment.NewLine + "Variáveis" + Environment.NewLine + variaveisValor;
+
+                if (indiceLinha <= 0)
+                    mensagemErro = error.Message;
+
+                throw new Exception(mensagemErro);
+            }
+        }
+
+        public void ImportarPacientes(string arquivoExcel, string arquivoExcelCidades, string estabelecimentoID, string salvarArquivo)
 		{
 			DateTime dataMinima = new DateTime(1900, 01, 01), dataMaxima = new DateTime(2079, 06, 06), dataHoje = DateTime.Now;
 			var indiceLinha = 1;

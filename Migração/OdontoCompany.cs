@@ -1,16 +1,18 @@
-﻿using Migração.Models;
+﻿using Migração.Utils;
+using Migração.Models;
 using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using Org.BouncyCastle.Bcpg.OpenPgp;
 using System.Globalization;
+using System.Runtime.ConstrainedExecution;
 using System.Text.RegularExpressions;
 using static NPOI.HSSF.Util.HSSFColor;
 using static OfficeOpenXml.ExcelErrorValue;
 
 namespace Migração
 {
-    internal class DentalOffice
+	internal class OdontoCompany
 	{
 		public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, string estabelecimentoID, string respFinanceiroPessoaID, string salvarArquivo)
 		{
@@ -23,7 +25,7 @@ namespace Migração
 			var mascaraCPFLenth = Regex.Replace(mascaraCPF, "[^0-9]", "").Length.ToString();
 
 			IWorkbook workbook;
-			var excelHelper = new Utils.ExcelHelper();
+			var excelHelper = new ExcelHelper();
 			try
 			{
 				workbook = excelHelper.LerExcel(arquivoExcel);
@@ -108,7 +110,7 @@ namespace Migração
 										break;
 								}
 							}
-						}						
+						}
 					}
 
 					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, codigo: codigo.ToString());
@@ -184,15 +186,10 @@ namespace Migração
 					{ "OutroSacadoNome", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.OutroSacadoNome).ToArray() }
 				};
 
-				int count = 1;
-				while (File.Exists(salvarArquivo + count + ".sql"))
-					count++;				
-
-				var sqlHelper = new Utils.SqlHelper();
+				var sqlHelper = new SqlHelper();
 				var insert = sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", dados);
-
-				File.WriteAllText($"{salvarArquivo} ({count}).sql", insert);
-				excelHelper.GravarExcel($"{salvarArquivo} ({count})", dados);
+				File.WriteAllText(salvarArquivo + ".sql", insert);
+				excelHelper.GravarExcel(salvarArquivo, dados);
 			}
 			catch (Exception error)
 			{
@@ -206,7 +203,7 @@ namespace Migração
 				throw new Exception(mensagemErro);
 			}
 		}
-		public void ImportarPacientes(string arquivoExcel, string estabelecimentoID, string salvarArquivo)
+		public void ImportarPacientes(string arquivoExcel, string arquivoExcelCidades, string estabelecimentoID, string salvarArquivo)
 		{
 			DateTime dataMinima = new DateTime(1900, 01, 01), dataMaxima = new DateTime(2079, 06, 06), dataHoje = DateTime.Now;
 			var indiceLinha = 1;
@@ -217,14 +214,25 @@ namespace Migração
 			var mascaraCPFLenth = Regex.Replace(mascaraCPF, "[^0-9]", "").Length.ToString();
 
 			IWorkbook workbook;
-			var excelHelper = new Utils.ExcelHelper();
+			var excelHelper = new ExcelHelper();
 			try
 			{
 				workbook = excelHelper.LerExcel(arquivoExcel);
 			}
 			catch (Exception ex)
 			{
-				throw new Exception("Erro ao ler o arquivo Excel: " + ex.Message);
+				throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcel}\": {ex.Message}");
+			}
+
+			try
+			{
+				var workbookCidades = excelHelper.LerExcel(arquivoExcelCidades);
+				var sheetCidades = workbookCidades.GetSheetAt(0);
+				excelHelper.InitializeDictionaryConsumidor(sheetCidades);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
 			}
 
 			var cabecalhos = excelHelper.GetCabecalhosExcel(workbook);
@@ -239,6 +247,12 @@ namespace Migração
 				foreach (var linha in linhas)
 				{
 					indiceLinha++;
+					bool cliente = false, fornecedor = false;
+					DateTime dataNascimento, dataCadastro;
+					int numcadastro;
+					string nomeCompleto, cpf, rg, email;
+					bool sexo;
+					long telefonePrinc, telefoneAltern, telefoneComercial, telefoneOutro, celular;
 
 					foreach (var celula in linha.Cells)
 					{
@@ -247,80 +261,143 @@ namespace Migração
 							celulaValor = celula.ToString().Trim();
 							tituloColuna = cabecalhos[celula.Address.Column];
 							colunaLetra = excelHelper.GetColumnLetter(celula);
-							int numcadastro = 0;
-							string nomeCompleto = "", cpf = "";
 
 							if (!string.IsNullOrWhiteSpace(celulaValor))
 							{
-								//if (!dados.ContainsKey(tituloColuna))
-								//{
-								//	dados[tituloColuna] = new List<object>();
-								//}
-								//dados[tituloColuna].Add(int.Parse(celulaValor));
-
 								switch (tituloColuna)
 								{
-									case "numcadastro":
-										numcadastro = int.Parse(celulaValor);
+									case "CLIENTE":
+										cliente = celulaValor == "S" ? true : false;
 										break;
-									case "primeironome":
+									case "FORNECEDOR":
+										fornecedor = celulaValor == "S" ? true : false;
+										break;
+									case "NOME":
 										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
 										break;
-									case "cpf":
-										cpf = celulaValor.Contains('.') && celulaValor.Contains('-') && celulaValor.Length <= 14 ? celulaValor 
+									case "CGC_CPF":
+										cpf = celulaValor.Contains('.') && celulaValor.Contains('-') && celulaValor.Length <= 14 ? celulaValor
 											: celulaValor.Length == int.Parse(mascaraCPFLenth) ? Convert.ToUInt64(celulaValor).ToString(mascaraCPF) : "";
+										break;
+									case "INSC_RG":
+										rg = celulaValor.Substring(0, Math.Min(20, celulaValor.Length));
+										break;
+
+									case "SEXO_M_F":
+										var sexoLetra = celulaValor.ToLower();
+										sexo = sexoLetra == "m" || sexoLetra != "f";
+										break;
+									case "EMAIL":
+										email = celulaValor.Contains('@') && celulaValor.Contains('.') ? celulaValor : "";
+										break;
+									case "FONE1":
+										var possivelTel1 = Regex.Replace(celulaValor, "[^0-9]", "");
+										if (possivelTel1.Length >= 8 && possivelTel1.Length <= 16)
+											telefonePrinc = long.Parse(possivelTel1);
+										break;
+									case "FONE2":
+										var possivelTel2 = Regex.Replace(celulaValor, "[^0-9]", "");
+										if (possivelTel2.Length >= 8 && possivelTel2.Length <= 16)
+											telefoneAltern = long.Parse(possivelTel2);
+										break;
+									case "CELULAR":
+										var possivelCelular = celulaValor;
+										if (celulaValor.Length > 15)
+										{
+										}
+										else
+										{
+											possivelCelular = Regex.Replace(possivelCelular, "[^0-9]", "");
+											if (possivelCelular.Length >= 8 && possivelCelular.Length <= 16)
+												celular = long.Parse(possivelCelular);
+										}
+										break;
+									case "":
+										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										break;
+									case "ENDERECO":
+										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										break;
+									case "BAIRRO":
+										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										break;
+									case "NUM_ENDERECO":
+										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										break;
+									case "CIDADE":
+										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										break;
+									case "ESTADO":
+										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										break;
+									case "CEP":
+										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										break;
+									case "OBS1":
+										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										break;
+									case "NUM_CONVENIO":
+										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										break;
+									case "DT_CADASTRO":
+										if (DateTime.TryParse(celulaValor, out dataCadastro))
+										{
+										}
+										else if (double.TryParse(celulaValor, out double codigoData))
+											dataCadastro = DateTime.FromOADate(codigoData);
+										else
+											throw new Exception("Erro na conversão de data");
+										if ((dataCadastro >= dataMinima && dataCadastro <= dataMaxima) == false)
+											dataCadastro = dataHoje;
+										break;
+									case "DT_NASCIMENTO":
+										if (DateTime.TryParse(celulaValor, out dataNascimento))
+										{
+										}
+										else if (double.TryParse(celulaValor, out double codigoData))
+											dataNascimento = DateTime.FromOADate(codigoData);
+										else
+											throw new Exception("Erro na conversão de data");
+										if ((dataNascimento >= dataMinima && dataNascimento <= dataMaxima) == false)
+											dataNascimento = dataHoje;
 										break;
 								}
 							}
 						}
 					}
 
-					pessoas.Add(new Pessoa()
-					{
-						NomeCompleto = "",
-						Apelido = "",
-						CPF = "",
-						AssinaturaDigital = "",
-						CNS = "",
-						ConselhoCodigo = "",
-						ConselhoSigla = "",
-						ConselhoUF = "",
-						DataInclusao = dataHoje,
-						Email = "",
-						FalecimentoCausa = "",
-						FoneticaApelido = "",
-						FoneticaNomeCompleto = "",
-						FoneticaNomeSocial = "",
-						ID = 0,
-						Nacionalidade = "",
-						NascimentoLocal = "",
-						NomeSocial = "",
-						Origem = "",
-						ProfissaoOutra = "",
-						ResumoFormacao = "",
-						RG = "",
-						Sexo = false,
-						SkypeNome = "",
-						TipoSangue = ""
-					});
+					if (cliente)
+						pessoas.Add(new Pessoa()
+						{
+							NomeCompleto = "",
+							Apelido = "",
+							CPF = "",
+							DataInclusao = dataHoje,
+							Email = "",
+							RG = "",
+							Sexo = false
+						});
 				}
 
 				indiceLinha = 0;
 
-				var dados = new Dictionary<string, object[]>
+				var dados1 = new Dictionary<string, object[]>
 				{
 					{ "NomeCompleto", pessoas.ConvertAll(pessoa => (object)pessoa.NomeCompleto).ToArray() },
+					{ "Apelido", pessoas.ConvertAll(pessoa => (object)pessoa.Apelido).ToArray() },
+					{ "CPF", pessoas.ConvertAll(pessoa => (object)pessoa.CPF).ToArray() },
+					{ "DataInclusao", pessoas.ConvertAll(pessoa => (object)pessoa.DataInclusao).ToArray() },
+					{ "Email", pessoas.ConvertAll(pessoa => (object)pessoa.Email).ToArray() },
+					{ "RG", pessoas.ConvertAll(pessoa => (object)pessoa.RG).ToArray() },
+					{ "Sexo", pessoas.ConvertAll(pessoa => (object)pessoa.Sexo).ToArray() }
 				};
 
-				int count = 1;
-				while (File.Exists(salvarArquivo + count + ".sql"))
-					count++;
+				var sqlHelper = new SqlHelper();
 
-				var sqlHelper = new Utils.SqlHelper();
-				var insert = sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", dados);
+				var insert = sqlHelper.GerarSqlInsert(salvarArquivo, dados1);
+				excelHelper.GravarExcel(salvarArquivo, dados1);
 
-				File.WriteAllText($"{salvarArquivo} ({count}).sql", insert);
-				excelHelper.GravarExcel($"{salvarArquivo} ({count})", dados);
+				File.WriteAllText(salvarArquivo + ".sql", insert);
 			}
 
 			catch (Exception error)

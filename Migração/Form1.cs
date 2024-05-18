@@ -57,8 +57,8 @@ namespace Migração
 					{
 						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
 						{
-							var dentalOffice = new DentalOffice();
-							dentalOffice.ImportarPacientes(textBoxExcel1.Text, txtEstabelecimentoID.Text, caminhoDoArquivo);
+							var odontoCompany = new OdontoCompany();
+							odontoCompany.ImportarPacientes(textBoxExcel1.Text, textBoxExcel2.Text, txtEstabelecimentoID.Text, caminhoDoArquivo);
 						}
 					}
 

@@ -1,17 +1,46 @@
 ﻿using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
-namespace Migração.Helpers
+namespace Migração.Utils
 {
     internal class ExcelHelper
     {
         private ISheet sheet;
-        //private Dictionary<string, string> consumidorIdDict = new Dictionary<string, string>();
         private Dictionary<string, string> nomeDict = new Dictionary<string, string>();
         private Dictionary<string, string> cpfDict = new Dictionary<string, string>();
         private Dictionary<string, string> nomeCodDict = new Dictionary<string, string>();
 
-        public void InitializeDictionary(ISheet sheet)
+		private Dictionary<string, string> cidadeDict = new Dictionary<string, string>();
+		private Dictionary<string, string> cidadeEstadoDict = new Dictionary<string, string>();
+
+		public void InitializeDictionaryCidade(ISheet sheet)
+		{
+			this.sheet = sheet;
+			IRow headerRow = sheet.GetRow(0);
+			int cidadeIdColumnIndex = GetColumnIndex(headerRow, "id");
+			int cidadeColumnIndex = GetColumnIndex(headerRow, "nome");
+			int estadoColumnIndex = GetColumnIndex(headerRow, "estado");
+
+			for (int row = 1; row <= sheet.LastRowNum; row++)
+			{
+				if (sheet.GetRow(row) != null)
+				{
+					string cidadeIdCellValue = sheet.GetRow(row).GetCell(cidadeIdColumnIndex) != null ? sheet.GetRow(row).GetCell(cidadeIdColumnIndex).ToString() : "";
+					string cidadeCellValue = sheet.GetRow(row).GetCell(cidadeColumnIndex) != null ? sheet.GetRow(row).GetCell(cidadeColumnIndex).ToString() : "";
+					string estadoCellValue = sheet.GetRow(row).GetCell(estadoColumnIndex) != null ? sheet.GetRow(row).GetCell(estadoColumnIndex).ToString() : "";
+
+					string key = cidadeCellValue;
+					if (!cidadeDict.ContainsKey(key))
+						cidadeDict.Add(key, cidadeIdCellValue);
+
+					key = cidadeCellValue + "|" + estadoCellValue;
+					if (!cidadeEstadoDict.ContainsKey(key))
+						cidadeEstadoDict.Add(key, cidadeIdCellValue);
+				}
+			}
+		}
+
+		public void InitializeDictionaryConsumidor(ISheet sheet)
         {
             this.sheet = sheet;
             IRow headerRow = sheet.GetRow(0);
@@ -28,10 +57,6 @@ namespace Migração.Helpers
                     string nomeCompletoCellValue = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex) != null ? sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString() : "";
                     string codigoCellValue = sheet.GetRow(row).GetCell(codigoColumnIndex) != null ? sheet.GetRow(row).GetCell(codigoColumnIndex).ToString() : "";
                     string consumidorIdCellValue = sheet.GetRow(row).GetCell(consumidorColumnIndex) != null ? sheet.GetRow(row).GetCell(consumidorColumnIndex).ToString() : "";
-
-                    //string key = cpfCellValue + "|" + nomeCompletoCellValue + "|" + codigoCellValue;
-                    //if (!consumidorIdDict.ContainsKey(key))
-                    //	consumidorIdDict.Add(key, consumidorIdCellValue);
 
                     string key = cpfCellValue;
                     if (!cpfDict.ContainsKey(key))
@@ -60,7 +85,33 @@ namespace Migração.Helpers
             throw new Exception($"Coluna {columnName} não encontrada");
         }
 
-        public string GetConsumidorID(string cpf = "", string nomeCompleto = "", string codigo = "")
+		public string GetCidadeID(string cidade, string estado = "")
+		{
+			string key = cidade + "|" + estado;
+			if (cidadeEstadoDict.ContainsKey(key))
+				return cidadeEstadoDict[key];
+
+			key = cidade;
+			if (cidadeDict.ContainsKey(key))
+				return cidadeDict[key];
+
+			return "";
+		}
+
+		public string GetPessoaID(string cpf = "", string nomeCompleto = "")
+		{
+			string key = cpf;
+			if (cpfDict.ContainsKey(key))
+				return cpfDict[key];
+
+			key = nomeCompleto;
+			if (nomeDict.ContainsKey(key))
+				return nomeDict[key];
+
+			return "";
+		}
+
+		public string GetConsumidorID(string cpf = "", string nomeCompleto = "", string codigo = "")
         {
             string key = cpf;
             if (cpfDict.ContainsKey(key))
@@ -86,7 +137,7 @@ namespace Migração.Helpers
             }
             return workbook;
         }
-        //IWorkbook workbook = LerExcel(filePath);
+
         public List<string> GetCabecalhosExcel(IWorkbook workbook)
         {
             ISheet sheet1 = workbook.GetSheetAt(0);
@@ -133,39 +184,6 @@ namespace Migração.Helpers
             }
 
             return columnLetter;
-        }
-
-        public void GravarExcel1(string nomeArquivo, Dictionary<string, object[]> linhas)
-        {
-            // Criando um novo arquivo Excel
-            IWorkbook workbook = new XSSFWorkbook();
-            ISheet sheet = workbook.CreateSheet("Dados");
-
-            // Escrevendo cabeçalhos
-            IRow headerRow = sheet.CreateRow(0);
-
-            var cabecalhos = new List<string>(linhas.Keys);
-            for (int i = 0; i < cabecalhos.Count; i++)
-            {
-                headerRow.CreateCell(i).SetCellValue(cabecalhos[i]);
-            }
-
-            // Escrevendo dados
-            int rowIndex = 1;
-            foreach (var linha in linhas)
-            {
-                IRow row = sheet.CreateRow(rowIndex++);
-                for (int i = 0; i < linha.Value.Length; i++)
-                {
-                    if (linha.Value[i] != null)
-                        row.CreateCell(i).SetCellValue(linha.Value[i].ToString());
-                }
-            }
-
-            using (FileStream stream = new FileStream(nomeArquivo + ".xlsx", FileMode.Create, FileAccess.Write))
-            {
-                workbook.Write(stream);
-            }
         }
 
         public void GravarExcel(string nomeArquivo, Dictionary<string, object[]> linhas)

@@ -259,7 +259,7 @@ namespace Migração
 					{
 						if (celula != null)
 						{
-							celulaValor = celula.ToString().Trim();
+							celulaValor = celula.ToString().Trim().Replace("'", "’");
 							tituloColuna = cabecalhos[celula.Address.Column];
 							colunaLetra = excelHelper.GetColumnLetter(celula);
 
@@ -391,14 +391,19 @@ namespace Migração
 					{ "Sexo", pessoas.ConvertAll(pessoa => (object)pessoa.Sexo).ToArray() }
 				};
 
+				if (File.Exists($"{salvarArquivo}.xlsx"))
+				{
 				int count = 1;
 				while (File.Exists($"{salvarArquivo} ({count}).xlsx"))
-					salvarArquivo = $"{salvarArquivo} ({count++})";
+						count++;
+
+					salvarArquivo = $"{salvarArquivo} ({count})";
+				}
 
 				var sqlHelper = new SqlHelper();
 				var insert = sqlHelper.GerarSqlInsert("_MigracaoConsumidores_Temp", dados);
 
-				File.WriteAllText(salvarArquivo, insert);
+				File.WriteAllText(salvarArquivo + ".sql", insert);
 				excelHelper.GravarExcel(salvarArquivo, dados);
 
 				string argumento = "/select, \"" + salvarArquivo + ".xlsx" + "\"";

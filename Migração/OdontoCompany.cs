@@ -9,6 +9,7 @@ using System.Runtime.ConstrainedExecution;
 using System.Text.RegularExpressions;
 using static NPOI.HSSF.Util.HSSFColor;
 using static OfficeOpenXml.ExcelErrorValue;
+using System.Diagnostics;
 
 namespace Migração
 {
@@ -228,7 +229,7 @@ namespace Migração
 			{
 				var workbookCidades = excelHelper.LerExcel(arquivoExcelCidades);
 				var sheetCidades = workbookCidades.GetSheetAt(0);
-				excelHelper.InitializeDictionaryConsumidor(sheetCidades);
+				excelHelper.InitializeDictionaryCidade(sheetCidades);
 			}
 			catch (Exception ex)
 			{
@@ -250,8 +251,8 @@ namespace Migração
 					bool cliente = false, fornecedor = false;
 					DateTime dataNascimento, dataCadastro;
 					int numcadastro;
-					string nomeCompleto, cpf, rg, email;
-					bool sexo;
+					string nomeCompleto = "", cpf = "", rg = "", email = "", apelido = "";
+					bool sexo = true;
 					long telefonePrinc, telefoneAltern, telefoneComercial, telefoneOutro, celular;
 
 					foreach (var celula in linha.Cells)
@@ -274,6 +275,7 @@ namespace Migração
 										break;
 									case "NOME":
 										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										apelido = celulaValor.Contains(" ") ? celulaValor.Split(' ')[0] : celulaValor;
 										break;
 									case "CGC_CPF":
 										cpf = celulaValor.Contains('.') && celulaValor.Contains('-') && celulaValor.Length <= 14 ? celulaValor
@@ -311,9 +313,6 @@ namespace Migração
 											if (possivelCelular.Length >= 8 && possivelCelular.Length <= 16)
 												celular = long.Parse(possivelCelular);
 										}
-										break;
-									case "":
-										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
 										break;
 									case "ENDERECO":
 										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
@@ -369,19 +368,19 @@ namespace Migração
 					if (cliente)
 						pessoas.Add(new Pessoa()
 						{
-							NomeCompleto = "",
-							Apelido = "",
-							CPF = "",
+							NomeCompleto = nomeCompleto,
+							Apelido = apelido,
+							CPF = cpf,
 							DataInclusao = dataHoje,
-							Email = "",
-							RG = "",
-							Sexo = false
+							Email = email,
+							RG = rg,
+							Sexo = sexo
 						});
 				}
 
 				indiceLinha = 0;
 
-				var dados1 = new Dictionary<string, object[]>
+				var dados = new Dictionary<string, object[]>
 				{
 					{ "NomeCompleto", pessoas.ConvertAll(pessoa => (object)pessoa.NomeCompleto).ToArray() },
 					{ "Apelido", pessoas.ConvertAll(pessoa => (object)pessoa.Apelido).ToArray() },
@@ -392,12 +391,19 @@ namespace Migração
 					{ "Sexo", pessoas.ConvertAll(pessoa => (object)pessoa.Sexo).ToArray() }
 				};
 
+				int count = 1;
+				while (File.Exists($"{salvarArquivo} ({count}).xlsx"))
+					salvarArquivo = $"{salvarArquivo} ({count++})";
+
 				var sqlHelper = new SqlHelper();
+				var insert = sqlHelper.GerarSqlInsert("_MigracaoConsumidores_Temp", dados);
 
-				var insert = sqlHelper.GerarSqlInsert(salvarArquivo, dados1);
-				excelHelper.GravarExcel(salvarArquivo, dados1);
+				File.WriteAllText(salvarArquivo, insert);
+				excelHelper.GravarExcel(salvarArquivo, dados);
 
-				File.WriteAllText(salvarArquivo + ".sql", insert);
+				string argumento = "/select, \"" + salvarArquivo + ".xlsx" + "\"";
+
+				Process.Start("explorer.exe", argumento);
 			}
 
 			catch (Exception error)

@@ -53,7 +53,7 @@ namespace Migração
 							dentalOffice.ImportarRecebidos(textBoxExcel1.Text, textBoxExcel2.Text, txtEstabelecimentoID.Text, txtPessoaID.Text, caminhoDoArquivo);
 						}
 					}
-					else if (comboBoxSistema.Text.Equals("odontocompany"))
+					else if (comboBoxSistema.Text.Equals("odontocompany", StringComparison.CurrentCultureIgnoreCase))
 					{
 						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
 						{
@@ -61,12 +61,6 @@ namespace Migração
 							odontoCompany.ImportarPacientes(textBoxExcel1.Text, textBoxExcel2.Text, txtEstabelecimentoID.Text, caminhoDoArquivo);
 						}
 					}
-
-					// Application.StartupPath
-					caminhoDoArquivo += ".xlsx";
-					string argumento = "/select, \"" + caminhoDoArquivo + "\"";
-
-					Process.Start("explorer.exe", argumento);
 				}
 				catch (Exception ex)
 				{
@@ -119,7 +113,7 @@ namespace Migração
 				if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase)
 					|| comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
 				{
-					labelExcel2.Text = "Pacientes Referência";
+					labelExcel2.Text = "Referência";
 					labelExcel2.Visible = true;
 					textBoxExcel2.Visible = true;
 					btnExcel2.Visible = true;

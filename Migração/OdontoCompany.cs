@@ -1,15 +1,8 @@
 ﻿using Migração.Utils;
 using Migração.Models;
-using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
-using Org.BouncyCastle.Bcpg.OpenPgp;
 using System.Globalization;
-using System.Runtime.ConstrainedExecution;
 using System.Text.RegularExpressions;
-using static NPOI.HSSF.Util.HSSFColor;
-using static OfficeOpenXml.ExcelErrorValue;
-using System.Diagnostics;
 
 namespace Migração
 {

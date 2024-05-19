@@ -1,11 +1,7 @@
 ﻿using Migração.Models;
 using Migração.Utils;
-using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
-using Org.BouncyCastle.Bcpg.OpenPgp;
 using System.Globalization;
-using System.Text.RegularExpressions;
 
 namespace Migração
 {

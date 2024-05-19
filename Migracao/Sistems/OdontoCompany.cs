@@ -440,7 +440,8 @@ namespace Migracao.Sistems
 							NascimentoLocal = nascimentoLocal,
 							ProfissaoOutra = profissaoOutra,
 							EstadoCivilID = estadoCivil,
-                            EstabelecimentoID = estabelecimentoID
+                            EstabelecimentoID = estabelecimentoID,
+                            LoginID = loginID
 						});
 
                         consumidores.Add(new Consumidor()
@@ -535,7 +536,8 @@ namespace Migracao.Sistems
 					{ "NascimentoLocal", pessoas.ConvertAll(pessoa => (object)pessoa.NascimentoLocal).ToArray() },
 					{ "ProfissaoOutra", pessoas.ConvertAll(pessoa => (object)pessoa.ProfissaoOutra).ToArray() },
 					{ "EstadoCivilID", pessoas.ConvertAll(pessoa => (object)pessoa.EstadoCivilID).ToArray() },
-					{ "EstabelecimentoID", pessoas.ConvertAll(pessoa => (object)pessoa.EstabelecimentoID).ToArray() }
+					{ "EstabelecimentoID", pessoas.ConvertAll(pessoa => (object)pessoa.EstabelecimentoID).ToArray() },
+					{ "LoginID", pessoas.ConvertAll(pessoa => (object)pessoa.LoginID).ToArray() }
 				};
 
                 salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_Pessoas");
@@ -572,7 +574,6 @@ namespace Migracao.Sistems
                     { "Bairro", enderecos.ConvertAll(endereco => (object)endereco.Bairro).ToArray() },
                     { "LogradouroNum", enderecos.ConvertAll(endereco => (object)endereco.LogradouroNum).ToArray() },
                     { "Complemento", enderecos.ConvertAll(endereco => (object)endereco.Complemento).ToArray() }
-
 				};
 
 				salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_Enderecos");

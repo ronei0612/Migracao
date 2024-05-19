@@ -72,6 +72,7 @@ namespace Migracao.Models
         CobrancaJudicial = 6,
         Cancelamento = 90
     }
+
     public enum TransacaoTiposID
     {
         All = 0,
@@ -79,4 +80,27 @@ namespace Migracao.Models
         Pagamento = 2
     }
 
+	public enum EnderecoTipos
+	{
+		Residencial = 1,
+		Principal = 2,
+		Comercial = 3,
+		Cobranca = 4,
+		Correspondencia = 8,
+		Outro = 99
+	}
+
+	public enum FoneTipos
+	{
+		Residencial = 1,
+		Principal = 2,
+		Celular = 3,
+		Nextel = 5,
+		Alternativo = 6,
+		Comercial = 7,
+		Cobrança = 8,
+		Fax = 9,
+		Zero800 = 80,
+		Outros = 99
+	}
 }

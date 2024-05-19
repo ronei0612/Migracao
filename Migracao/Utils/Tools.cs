@@ -81,7 +81,25 @@ namespace Migracao.Utils
             return data;
         }
 
-        public static string GerarNomeArquivo(string nomeArquivo)
+		public static int ToNum(this string texto)
+		{
+			return int.Parse(Regex.Replace(texto, "[^0-9]", ""));
+		}
+
+		public static bool ToSexo(this string texto, string masculino, string feminino)
+		{
+			var sexoLetra = texto.ToLower();
+            
+            if (sexoLetra == masculino)
+                return true;
+
+            else if (sexoLetra == feminino)
+				return false;
+
+            return true;
+		}
+
+		public static string GerarNomeArquivo(string nomeArquivo)
         {
             int count = 1;
             while (File.Exists($"{nomeArquivo} ({count}).xlsx"))

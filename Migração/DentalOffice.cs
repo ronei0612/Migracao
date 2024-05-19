@@ -9,7 +9,7 @@ namespace Migração
 	{
 		public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, string estabelecimentoID, string respFinanceiroPessoaID, string salvarArquivo)
 		{
-			DateTime dataMinima = new DateTime(1900, 01, 01), dataMaxima = new DateTime(2079, 06, 06), dataHoje = DateTime.Now;
+			var dataHoje = DateTime.Now;
 			var indiceLinha = 1;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
 
@@ -36,11 +36,12 @@ namespace Migração
 				{
 					indiceLinha++;
 
-					string nomeCompleto = "", dataPagamento, outroSacadoNome = "";
+					string nomeCompleto = "", outroSacadoNome = "";
 					int controle = 0, recibo = 0, codigo = 0, loginID = 1;
 					int? consumidorID = 0;
 					decimal pagoValor = 0;
 					byte titulosEspecies = 0;
+					var dataPagamento = dataHoje;
 					DateTime nascimentoData = dataHoje, data = dataHoje;
 
 					foreach (var celula in linha.Cells)
@@ -56,36 +57,19 @@ namespace Migração
 								switch (tituloColuna)
 								{
 									case "paciente":
-										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
 										break;
 									case "numero_registro":
 										codigo = int.Parse(celulaValor);
 										break;
 									case "data_pagamento":
-										if (DateTime.TryParse(celulaValor, out data))
-										{
-										}
-										else if (double.TryParse(celulaValor, out double codigoData))
-											data = DateTime.FromOADate(codigoData);
-										else
-											throw new Exception("Erro na conversão de data");
-										if ((data >= dataMinima && data <= dataMaxima) == false)
-											data = dataHoje;
-										dataPagamento = data.ToString("yyyy-MM-dd HH:mm:ss.f");
+										dataPagamento = celulaValor.ToData();
 										break;
 									case "forma_pagamento":
-										titulosEspecies = (byte)(celulaValor.ToLower() == "dinheiro" ? TitulosEspeciesID.Dinheiro
-											: celulaValor.ToLower() == "cheque" ? TitulosEspeciesID.Cheque
-											: celulaValor.ToLower() == "boleto bancário" ? TitulosEspeciesID.BoletoBancario
-											: celulaValor.ToLower() == "cartão de crédito" ? TitulosEspeciesID.CartaoCredito
-											: celulaValor.ToLower() == "debito" ? TitulosEspeciesID.CartaoDebito
-											: celulaValor.ToLower() == "cartão de débito" ? TitulosEspeciesID.CartaoDebito
-											: celulaValor.ToLower() == "pix" ? TitulosEspeciesID.CreditoEmConta
-											: celulaValor.ToLower() == "débito automático" ? TitulosEspeciesID.CartaoCreditoRecorrente
-											: TitulosEspeciesID.DepositoEmConta);
+										titulosEspecies = celulaValor.ToTipoPagamento();
 										break;
 									case "valor":
-										pagoValor = decimal.Parse(celulaValor.Replace(",", "."), CultureInfo.InvariantCulture);
+										pagoValor = celulaValor.ToMoeda();
 										break;
 								}
 							}
@@ -112,7 +96,7 @@ namespace Migração
 							DevidoValor = pagoValor,
 							PagoValor = pagoValor,
 							EstabelecimentoID = int.Parse(estabelecimentoID),
-							LoginID = 1,
+							LoginID = loginID,
 							DataInclusao = data,
 							FinanceiroID = int.Parse(respFinanceiroPessoaID)
 						});
@@ -120,11 +104,11 @@ namespace Migração
 					else
 					{
 						consumidorID = null;
-						outroSacadoNome = nomeCompleto.Substring(0, Math.Min(50, nomeCompleto.Length));
+						outroSacadoNome = nomeCompleto.GetPrimeirosCaracteres(50);
 
 						fluxoCaixas.Add(new FluxoCaixa()
 						{
-							OutroSacadoNome = nomeCompleto.Substring(0, Math.Min(50, nomeCompleto.Length)),
+							OutroSacadoNome = nomeCompleto.GetPrimeirosCaracteres(50),
 							SituacaoID = 1,
 							PagoMulta = 0,
 							PagoJuros = 0,
@@ -176,7 +160,7 @@ namespace Migração
 		}
 		public void ImportarPacientes(string arquivoExcel, string estabelecimentoID, string salvarArquivo)
 		{
-			DateTime dataMinima = new DateTime(1900, 01, 01), dataMaxima = new DateTime(2079, 06, 06), dataHoje = DateTime.Now;
+			var dataHoje = DateTime.Now;
 			var indiceLinha = 1;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
 			var excelHelper = new ExcelHelper(arquivoExcel);
@@ -216,7 +200,7 @@ namespace Migração
 										numcadastro = int.Parse(celulaValor);
 										break;
 									case "primeironome":
-										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
 										break;
 									case "cpf":
 										cpf = celulaValor.ToCPF();

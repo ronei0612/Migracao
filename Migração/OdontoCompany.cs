@@ -2,15 +2,14 @@
 using Migração.Utils;
 using NPOI.SS.UserModel;
 using System.Globalization;
-using System.Text.RegularExpressions;
 
 namespace Migração
 {
-	internal class OdontoCompany
+    internal class OdontoCompany
 	{
 		public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, string estabelecimentoID, string respFinanceiroPessoaID, string salvarArquivo)
 		{
-			DateTime dataMinima = new DateTime(1900, 01, 01), dataMaxima = new DateTime(2079, 06, 06), dataHoje = DateTime.Now;
+			var dataHoje = DateTime.Now;
 			var indiceLinha = 1;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
 			var excelHelper = new ExcelHelper(arquivoExcel);
@@ -36,12 +35,13 @@ namespace Migração
 				{
 					indiceLinha++;
 
-					string nomeCompleto = "", dataPagamento, outroSacadoNome = "";
+					string nomeCompleto = "", outroSacadoNome = "";
 					int controle = 0, recibo = 0, codigo = 0, loginID = 1;
 					int? consumidorID = 0;
 					decimal pagoValor = 0;
 					byte titulosEspecies = 0;
-					DateTime nascimentoData = dataHoje, data = dataHoje;
+					var dataPagamento = dataHoje;
+					var nascimentoData = dataHoje;
 
 					foreach (var celula in linha.Cells)
 					{
@@ -56,36 +56,19 @@ namespace Migração
 								switch (tituloColuna)
 								{
 									case "paciente":
-										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
 										break;
 									case "numero_registro":
 										codigo = int.Parse(celulaValor);
 										break;
 									case "data_pagamento":
-										if (DateTime.TryParse(celulaValor, out data))
-										{
-										}
-										else if (double.TryParse(celulaValor, out double codigoData))
-											data = DateTime.FromOADate(codigoData);
-										else
-											throw new Exception("Erro na conversão de data");
-										if ((data >= dataMinima && data <= dataMaxima) == false)
-											data = dataHoje;
-										dataPagamento = data.ToString("yyyy-MM-dd HH:mm:ss.f");
+										dataPagamento = celulaValor.ToData();
 										break;
 									case "forma_pagamento":
-										titulosEspecies = (byte)(celulaValor.ToLower() == "dinheiro" ? TitulosEspeciesID.Dinheiro
-											: celulaValor.ToLower() == "cheque" ? TitulosEspeciesID.Cheque
-											: celulaValor.ToLower() == "boleto bancário" ? TitulosEspeciesID.BoletoBancario
-											: celulaValor.ToLower() == "cartão de crédito" ? TitulosEspeciesID.CartaoCredito
-											: celulaValor.ToLower() == "debito" ? TitulosEspeciesID.CartaoDebito
-											: celulaValor.ToLower() == "cartão de débito" ? TitulosEspeciesID.CartaoDebito
-											: celulaValor.ToLower() == "pix" ? TitulosEspeciesID.CreditoEmConta
-											: celulaValor.ToLower() == "débito automático" ? TitulosEspeciesID.CartaoCreditoRecorrente
-											: TitulosEspeciesID.DepositoEmConta);
+										celulaValor.ToTipoPagamento();
 										break;
 									case "valor":
-										pagoValor = decimal.Parse(celulaValor.Replace(",", "."), CultureInfo.InvariantCulture);
+										pagoValor = celulaValor.ToMoeda();
 										break;
 								}
 							}
@@ -105,39 +88,39 @@ namespace Migração
 							PagoMulta = 0,
 							PagoJuros = 0,
 							TipoID = (byte)TransacaoTiposID.Recebimento,
-							Data = data,
+							Data = dataPagamento,
 							TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
 							EspecieID = titulosEspecies,
-							DataBaseCalculo = data,
+							DataBaseCalculo = dataPagamento,
 							DevidoValor = pagoValor,
 							PagoValor = pagoValor,
 							EstabelecimentoID = int.Parse(estabelecimentoID),
 							LoginID = 1,
-							DataInclusao = data,
+							DataInclusao = dataPagamento,
 							FinanceiroID = int.Parse(respFinanceiroPessoaID)
 						});
 					}
 					else
 					{
 						consumidorID = null;
-						outroSacadoNome = nomeCompleto.Substring(0, Math.Min(50, nomeCompleto.Length));
+						outroSacadoNome = nomeCompleto.GetPrimeirosCaracteres(50);
 
 						fluxoCaixas.Add(new FluxoCaixa()
 						{
-							OutroSacadoNome = nomeCompleto.Substring(0, Math.Min(50, nomeCompleto.Length)),
+							OutroSacadoNome = nomeCompleto.GetPrimeirosCaracteres(50),
 							SituacaoID = 1,
 							PagoMulta = 0,
 							PagoJuros = 0,
 							TipoID = (byte)TransacaoTiposID.Recebimento,
-							Data = data,
+							Data = dataPagamento,
 							TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
 							EspecieID = titulosEspecies,
-							DataBaseCalculo = data,
+							DataBaseCalculo = dataPagamento,
 							DevidoValor = pagoValor,
 							PagoValor = pagoValor,
 							EstabelecimentoID = int.Parse(estabelecimentoID),
 							LoginID = 1,
-							DataInclusao = data,
+							DataInclusao = dataPagamento,
 							FinanceiroID = int.Parse(respFinanceiroPessoaID)
 						});
 					}
@@ -177,7 +160,7 @@ namespace Migração
 
         public void ImportarFornecedores(string arquivoExcel, string arquivoExcelCidades, string estabelecimentoID, string salvarArquivo)
         {
-            DateTime dataMinima = new DateTime(1900, 01, 01), dataMaxima = new DateTime(2079, 06, 06), dataHoje = DateTime.Now;
+            var dataHoje = DateTime.Now;
             var indiceLinha = 1;
             string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
             var excelHelper = new ExcelHelper(arquivoExcel);
@@ -229,14 +212,14 @@ namespace Migração
                                         fornecedor = celulaValor == "S" ? true : false;
                                         break;
                                     case "NOME":
-                                        nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
-                                        apelido = celulaValor.Contains(" ") ? celulaValor.Split(' ')[0] : celulaValor;
+                                        nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
+                                        apelido = celulaValor.GetPrimeiroNome();
                                         break;
                                     case "CGC_CPF":
 										cpf = celulaValor.ToCPF();
                                         break;
                                     case "INSC_RG":
-                                        rg = celulaValor.Substring(0, Math.Min(20, celulaValor.Length));
+                                        rg = celulaValor.GetPrimeirosCaracteres(20);
                                         break;
 
                                     case "SEXO_M_F":
@@ -244,75 +227,46 @@ namespace Migração
                                         sexo = sexoLetra == "m" || sexoLetra != "f";
                                         break;
                                     case "EMAIL":
-                                        email = celulaValor.Contains('@') && celulaValor.Contains('.') ? celulaValor : "";
+                                        email = celulaValor.ToEmail();
                                         break;
                                     case "FONE1":
-                                        var possivelTel1 = Regex.Replace(celulaValor, "[^0-9]", "");
-                                        if (possivelTel1.Length >= 8 && possivelTel1.Length <= 16)
-                                            telefonePrinc = long.Parse(possivelTel1);
+										telefonePrinc = celulaValor.ToFone();
                                         break;
                                     case "FONE2":
-                                        var possivelTel2 = Regex.Replace(celulaValor, "[^0-9]", "");
-                                        if (possivelTel2.Length >= 8 && possivelTel2.Length <= 16)
-                                            telefoneAltern = long.Parse(possivelTel2);
+										telefoneAltern = celulaValor.ToFone();
                                         break;
                                     case "CELULAR":
-                                        var possivelCelular = celulaValor;
-                                        if (celulaValor.Length > 15)
-                                        {
-                                        }
-                                        else
-                                        {
-                                            possivelCelular = Regex.Replace(possivelCelular, "[^0-9]", "");
-                                            if (possivelCelular.Length >= 8 && possivelCelular.Length <= 16)
-                                                celular = long.Parse(possivelCelular);
-                                        }
+										celular = celulaValor.ToFone();
                                         break;
                                     //case "ENDERECO":
-                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
                                     //    break;
                                     //case "BAIRRO":
-                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
                                     //    break;
                                     //case "NUM_ENDERECO":
-                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
                                     //    break;
                                     //case "CIDADE":
-                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
                                     //    break;
                                     //case "ESTADO":
-                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
                                     //    break;
                                     //case "CEP":
-                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
                                     //    break;
                                     //case "OBS1":
-                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
                                     //    break;
                                     //case "NUM_CONVENIO":
-                                    //    nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
                                     //    break;
                                     case "DT_CADASTRO":
-                                        if (DateTime.TryParse(celulaValor, out dataCadastro))
-                                        {
-                                        }
-                                        else if (double.TryParse(celulaValor, out double codigoData))
-                                            dataCadastro = DateTime.FromOADate(codigoData);
-                                        else
-                                            throw new Exception("Erro na conversão de data");
-                                        if ((dataCadastro >= dataMinima && dataCadastro <= dataMaxima) == false)
-                                            dataCadastro = dataHoje;
+                                        dataCadastro = celulaValor.ToData();
                                         break;
                                     case "DT_NASCIMENTO":
-                                        if (DateTime.TryParse(celulaValor, out dataNascimento))
-                                        {
-                                        }
-                                        else if (double.TryParse(celulaValor, out double codigoData))
-                                            dataNascimento = DateTime.FromOADate(codigoData);
-                                        else
-                                            throw new Exception("Erro na conversão de data");
-                                        if ((dataNascimento >= dataMinima && dataNascimento <= dataMaxima) == false)
-                                            dataNascimento = dataHoje;
+                                        dataNascimento = celulaValor.ToData();
                                         break;
                                 }
                             }
@@ -437,25 +391,25 @@ namespace Migração
 										nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
 										break;
 									case "BAIRRO":
-										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
 										break;
 									case "NUM_ENDERECO":
-										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
 										break;
 									case "CIDADE":
-										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
 										break;
 									case "ESTADO":
-										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
 										break;
 									case "CEP":
-										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
 										break;
 									case "OBS1":
-										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
 										break;
 									case "NUM_CONVENIO":
-										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
+										nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
 										break;
 									case "DT_CADASTRO":
 										dataCadastro = celulaValor.ToData();

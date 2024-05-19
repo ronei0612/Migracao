@@ -1,5 +1,5 @@
-﻿using Migração.Utils;
-using Migração.Models;
+﻿using Migração.Models;
+using Migração.Utils;
 using NPOI.SS.UserModel;
 using System.Globalization;
 using System.Text.RegularExpressions;

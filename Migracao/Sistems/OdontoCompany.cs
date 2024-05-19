@@ -46,7 +46,7 @@ namespace Migracao.Sistems
                     {
                         if (celula != null)
                         {
-                            celulaValor = celula.ToString().Trim();
+                            celulaValor = celula.ToString().Trim().Replace("'", "’");
                             tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
                             colunaLetra = excelHelper.GetColumnLetter(celula);
 
@@ -197,7 +197,7 @@ namespace Migracao.Sistems
                     {
                         if (celula != null)
                         {
-                            celulaValor = celula.ToString().Trim();
+                            celulaValor = celula.ToString().Trim().Replace("'", "’");
                             tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
                             colunaLetra = excelHelper.GetColumnLetter(celula);
 
@@ -351,7 +351,7 @@ namespace Migracao.Sistems
                     {
                         if (celula != null)
                         {
-                            celulaValor = celula.ToString().Trim();
+                            celulaValor = celula.ToString().Trim().Replace("'", "’");
                             tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
                             colunaLetra = excelHelper.GetColumnLetter(celula);
 

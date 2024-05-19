@@ -104,9 +104,13 @@ namespace Migracao.Utils
 			var pasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Desktop");
 			var caminhoDoArquivo = Path.Combine(pasta, nomeArquivo);
 
-			int count = 1;
-            while (File.Exists($"{caminhoDoArquivo} ({count}).xlsx"))
+            if (File.Exists(caminhoDoArquivo + ".xlsx")) {
+                int count = 1;
+                while (File.Exists($"{caminhoDoArquivo} ({count}).xlsx"))
+                    count++;
+
 				caminhoDoArquivo = $"{caminhoDoArquivo} ({count++})";
+			}
 
             return caminhoDoArquivo;
         }

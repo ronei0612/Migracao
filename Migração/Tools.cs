@@ -97,5 +97,18 @@ namespace Migração
 
 			Process.Start("explorer.exe", argumento);
 		}
+
+		public static string TratarMensagemErro(string erroMensagem, int indiceLinha, string colunaLetra, string tituloColuna, string celulaValor, string variaveisValor = "")
+		{
+			var mensagemErro = $"Falha na linha {indiceLinha}, coluna {colunaLetra}, Valor esperado: {tituloColuna}, valor da célula: \"{celulaValor}\": {erroMensagem}";
+
+			if (!string.IsNullOrWhiteSpace(variaveisValor))
+				mensagemErro += Environment.NewLine + "Variáveis" + Environment.NewLine + variaveisValor;
+
+			if (indiceLinha <= 0)
+				mensagemErro = erroMensagem;
+
+			return mensagemErro;
+		}
 	}
 }

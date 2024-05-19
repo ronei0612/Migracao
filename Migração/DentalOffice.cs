@@ -172,14 +172,7 @@ namespace Migração
 			}
 			catch (Exception error)
 			{
-				var mensagemErro = $"Falha na linha {indiceLinha}, coluna {colunaLetra}, Valor esperado: {tituloColuna}, valor da célula: \"{celulaValor}\": {error.Message}";
-				if (!string.IsNullOrWhiteSpace(variaveisValor))
-					mensagemErro += Environment.NewLine + "Variáveis" + Environment.NewLine + variaveisValor;
-
-				if (indiceLinha <= 0)
-					mensagemErro = error.Message;
-
-				throw new Exception(mensagemErro);
+				throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha, colunaLetra, tituloColuna, celulaValor, variaveisValor));
 			}
 		}
 		public void ImportarPacientes(string arquivoExcel, string estabelecimentoID, string salvarArquivo)
@@ -293,15 +286,7 @@ namespace Migração
 
 			catch (Exception error)
 			{
-				var mensagemErro = $"Falha na linha {indiceLinha}, coluna {colunaLetra}, Valor esperado: {tituloColuna}, valor da célula: \"{celulaValor}\": {error.Message}";
-
-				if (!string.IsNullOrWhiteSpace(variaveisValor))
-					mensagemErro += Environment.NewLine + "Variáveis" + Environment.NewLine + variaveisValor;
-
-				if (indiceLinha <= 0)
-					mensagemErro = error.Message;
-
-				throw new Exception(mensagemErro);
+				throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha, colunaLetra, tituloColuna, celulaValor, variaveisValor));
 			}
 		}
 	}

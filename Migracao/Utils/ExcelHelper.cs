@@ -49,11 +49,11 @@ namespace Migracao.Utils
 					string cidadeCellValue = sheet.GetRow(row).GetCell(cidadeColumnIndex) != null ? sheet.GetRow(row).GetCell(cidadeColumnIndex).ToString() : "";
 					string estadoCellValue = sheet.GetRow(row).GetCell(estadoColumnIndex) != null ? sheet.GetRow(row).GetCell(estadoColumnIndex).ToString() : "";
 
-					string key = cidadeCellValue;
+					string key = cidadeCellValue.ToLower();
 					if (!cidadeDict.ContainsKey(key))
 						cidadeDict.Add(key, cidadeIdCellValue);
 
-					key = cidadeCellValue + "|" + estadoCellValue;
+					key = cidadeCellValue.ToLower() + "|" + estadoCellValue.ToLower();
 					if (!cidadeEstadoDict.ContainsKey(key))
 						cidadeEstadoDict.Add(key, cidadeIdCellValue);
 				}
@@ -105,17 +105,22 @@ namespace Migracao.Utils
             throw new Exception($"Coluna {columnName} não encontrada");
         }
 
-		public string GetCidadeID(string cidade, string estado = "")
+		public int GetCidadeID(string cidade, string estado = "")
 		{
-			string key = cidade + "|" + estado;
-			if (cidadeEstadoDict.ContainsKey(key))
-				return cidadeEstadoDict[key];
+            if (!string.IsNullOrWhiteSpace(cidade))
+            {
+                cidade = cidade.ToLower();
 
-			key = cidade;
-			if (cidadeDict.ContainsKey(key))
-				return cidadeDict[key];
+				string key = cidade + "|" + estado.ToLower();
+                if (cidadeEstadoDict.ContainsKey(key))
+                    return int.Parse(cidadeEstadoDict[key]);
 
-			return "";
+                key = cidade;
+                if (cidadeDict.ContainsKey(key))
+                    return int.Parse(cidadeDict[key]);
+            }
+
+			return 1;
 		}
 
 		public string GetPessoaID(string cpf = "", string nomeCompleto = "")

@@ -26,7 +26,9 @@ namespace Migracao.Utils
                     {
                         if (valueArray[i] == null)
                             sql.Append($"NULL, ");
-                        else
+                        else if (valueArray[i].ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
+							sql.Append($"NULL, ");
+						else
                             sql.Append($"'{VerificarSeDateTime(valueArray[i])}', ");
                     }
                     catch

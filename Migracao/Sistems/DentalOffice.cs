@@ -1,13 +1,12 @@
 ﻿using Migracao.Models;
 using Migracao.Utils;
 using NPOI.SS.UserModel;
-using System.Globalization;
 
 namespace Migracao.Sistems
 {
     internal class DentalOffice
     {
-        public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, string estabelecimentoID, string respFinanceiroPessoaID, string salvarArquivo)
+        public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID)
         {
             var dataHoje = DateTime.Now;
             var indiceLinha = 1;
@@ -95,10 +94,10 @@ namespace Migracao.Sistems
                             DataBaseCalculo = data,
                             DevidoValor = pagoValor,
                             PagoValor = pagoValor,
-                            EstabelecimentoID = int.Parse(estabelecimentoID),
+                            EstabelecimentoID = estabelecimentoID,
                             LoginID = loginID,
                             DataInclusao = data,
-                            FinanceiroID = int.Parse(respFinanceiroPessoaID)
+                            FinanceiroID = respFinanceiroPessoaID
                         });
                     }
                     else
@@ -119,10 +118,10 @@ namespace Migracao.Sistems
                             DataBaseCalculo = data,
                             DevidoValor = pagoValor,
                             PagoValor = pagoValor,
-                            EstabelecimentoID = int.Parse(estabelecimentoID),
+                            EstabelecimentoID = estabelecimentoID,
                             LoginID = 1,
                             DataInclusao = data,
-                            FinanceiroID = int.Parse(respFinanceiroPessoaID)
+                            FinanceiroID = respFinanceiroPessoaID
                         });
                     }
                 }
@@ -149,16 +148,17 @@ namespace Migracao.Sistems
                     { "OutroSacadoNome", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.OutroSacadoNome).ToArray() }
                 };
 
-                salvarArquivo = Tools.GerarNomeArquivo(salvarArquivo);
-                sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", salvarArquivo, dados);
-                excelHelper.GravarExcel(salvarArquivo, dados);
+				var salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_DentalOffice_FluxoCaixa");
+				sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", salvarArquivo, dados);
+				excelHelper.GravarExcel(salvarArquivo, dados);
+				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo);
             }
             catch (Exception error)
             {
                 throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha, colunaLetra, tituloColuna, celulaValor, variaveisValor));
             }
         }
-        public void ImportarPacientes(string arquivoExcel, string estabelecimentoID, string salvarArquivo)
+        public void ImportarPacientes(string arquivoExcel, int estabelecimentoID)
         {
             var dataHoje = DateTime.Now;
             var indiceLinha = 1;
@@ -247,9 +247,10 @@ namespace Migracao.Sistems
                     { "NomeCompleto", pessoas.ConvertAll(pessoa => (object)pessoa.NomeCompleto).ToArray() },
                 };
 
-                salvarArquivo = Tools.GerarNomeArquivo(salvarArquivo);
-                sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", salvarArquivo, dados);
-                excelHelper.GravarExcel(salvarArquivo, dados);
+				var salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_DentalOffice_FluxoCaixa");
+				sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", salvarArquivo, dados);
+				excelHelper.GravarExcel(salvarArquivo, dados);
+				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo);
             }
 
             catch (Exception error)

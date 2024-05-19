@@ -35,22 +35,18 @@ namespace Migracao
 			{
 				try
 				{
-					var pasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Desktop");
-					var arquivo = "Migracao_" + txtEstabelecimentoID.Text + "_DentalOffice_Pacientes";
-					string caminhoDoArquivo = Path.Combine(pasta, arquivo);
-
 					if (comboBoxSistema.Text.Equals("dentaloffice", StringComparison.CurrentCultureIgnoreCase))
 					{
 						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
 						{
 							var dentalOffice = new DentalOffice();
-							dentalOffice.ImportarPacientes(textBoxExcel1.Text, txtEstabelecimentoID.Text, caminhoDoArquivo);
+							dentalOffice.ImportarPacientes(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text));
 						}
 
 						else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
 						{
 							var dentalOffice = new DentalOffice();
-							dentalOffice.ImportarRecebidos(textBoxExcel1.Text, textBoxExcel2.Text, txtEstabelecimentoID.Text, txtPessoaID.Text, caminhoDoArquivo);
+							dentalOffice.ImportarRecebidos(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text));
 						}
                     }
 					else if (comboBoxSistema.Text.Equals("odontocompany", StringComparison.CurrentCultureIgnoreCase))
@@ -58,13 +54,13 @@ namespace Migracao
 						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
 						{
 							var odontoCompany = new OdontoCompany();
-							odontoCompany.ImportarPacientes(textBoxExcel1.Text, textBoxExcel2.Text, txtEstabelecimentoID.Text, caminhoDoArquivo);
+							odontoCompany.ImportarPacientes(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text));
 						}
 
 						else if (comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase))
                         {
                             var odontoCompany = new OdontoCompany();
-                            odontoCompany.ImportarFornecedores(textBoxExcel1.Text, textBoxExcel2.Text, txtEstabelecimentoID.Text, caminhoDoArquivo);
+                            odontoCompany.ImportarFornecedores(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text));
                         }
                     }
 				}

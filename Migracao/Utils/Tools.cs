@@ -101,11 +101,14 @@ namespace Migracao.Utils
 
 		public static string GerarNomeArquivo(string nomeArquivo)
         {
-            int count = 1;
-            while (File.Exists($"{nomeArquivo} ({count}).xlsx"))
-                nomeArquivo = $"{nomeArquivo} ({count++})";
+			var pasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Desktop");
+			var caminhoDoArquivo = Path.Combine(pasta, nomeArquivo);
 
-            return nomeArquivo;
+			int count = 1;
+            while (File.Exists($"{caminhoDoArquivo} ({count}).xlsx"))
+				caminhoDoArquivo = $"{caminhoDoArquivo} ({count++})";
+
+            return caminhoDoArquivo;
         }
 
         public static void AbrirPastaSelecionandoArquivo(string nomeArquivo)

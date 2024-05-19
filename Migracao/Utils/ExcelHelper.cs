@@ -235,8 +235,10 @@ namespace Migracao.Utils
                 {
                     row = sheet1.GetRow(linha) ?? sheet1.CreateRow(linha);
                     ICell cell = row.CreateCell(coluna);
-                    if (valor != null)
-                        cell.SetCellValue(valor.ToString());
+                    if (valor == null)
+						cell.SetCellValue("null");
+                    else
+					    cell.SetCellValue(valor.ToString());
                     linha++;
                 }
                 coluna++;

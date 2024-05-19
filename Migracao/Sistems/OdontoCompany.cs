@@ -6,7 +6,7 @@ namespace Migracao.Sistems
 {
     internal class OdontoCompany
     {
-        public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, string respFinanceiroPessoaID)
+        public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
         {
             var dataHoje = DateTime.Now;
             var indiceLinha = 1;
@@ -35,7 +35,7 @@ namespace Migracao.Sistems
                     indiceLinha++;
 
                     string nomeCompleto = "", outroSacadoNome = "";
-                    int controle = 0, recibo = 0, codigo = 0, loginID = 1;
+                    int controle = 0, recibo = 0, codigo = 0;
                     int? consumidorID = 0;
                     decimal pagoValor = 0;
                     byte titulosEspecies = 0;
@@ -94,9 +94,9 @@ namespace Migracao.Sistems
                             DevidoValor = pagoValor,
                             PagoValor = pagoValor,
                             EstabelecimentoID = estabelecimentoID,
-                            LoginID = 1,
+                            LoginID = loginID,
                             DataInclusao = dataPagamento,
-                            FinanceiroID = int.Parse(respFinanceiroPessoaID)
+                            FinanceiroID = respFinanceiroPessoaID
                         });
                     }
                     else
@@ -118,9 +118,9 @@ namespace Migracao.Sistems
                             DevidoValor = pagoValor,
                             PagoValor = pagoValor,
                             EstabelecimentoID = estabelecimentoID,
-                            LoginID = 1,
+                            LoginID = loginID,
                             DataInclusao = dataPagamento,
-                            FinanceiroID = int.Parse(respFinanceiroPessoaID)
+                            FinanceiroID = respFinanceiroPessoaID
                         });
                     }
                 }
@@ -158,7 +158,7 @@ namespace Migracao.Sistems
             }
         }
 
-        public void ImportarFornecedores(string arquivoExcel, string arquivoExcelCidades, int estabelecimentoID)
+        public void ImportarFornecedores(string arquivoExcel, string arquivoExcelCidades, int estabelecimentoID, int loginID)
         {
             var dataHoje = DateTime.Now;
             var indiceLinha = 1;
@@ -279,7 +279,7 @@ namespace Migracao.Sistems
                             DataInclusao = dataCadastro,
                             EstabelecimentoID = estabelecimentoID,
                             NomeFantasia = nomeCompleto,
-                            LoginID = 1
+                            LoginID = loginID
                         });
                 }
 
@@ -306,10 +306,9 @@ namespace Migracao.Sistems
             }
         }
 
-        public void ImportarPacientes(string arquivoExcel, string arquivoExcelCidades, int estabelecimentoID)
+        public void ImportarPacientes(string arquivoExcel, string arquivoExcelCidades, int estabelecimentoID, int loginID)
         {
             var indiceLinha = 1;
-            var loginID = 1;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
             DateTime dataHoje = DateTime.Now;
             var excelHelper = new ExcelHelper(arquivoExcel);
@@ -343,7 +342,7 @@ namespace Migracao.Sistems
                     int pessoaID = 0, cep = 0;
                     string nomeCompleto = "null", cpf = "null", rg = "null", email = "null", apelido = "null", nascimentoLocal = "null", profissaoOutra = "null", logradouro = "null", complemento = "null", bairro = "null",
                         logradouroNum = "null", numcadastro = "null", cidade = "null", estado = "null";
-					byte estadoCivil = (byte)EstadoCivilIDs.Solteiro;
+					byte? estadoCivil = null;
 					bool sexo = true;
                     long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
 

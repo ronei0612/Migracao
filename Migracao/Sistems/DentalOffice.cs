@@ -6,7 +6,7 @@ namespace Migracao.Sistems
 {
     internal class DentalOffice
     {
-        public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID)
+        public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
         {
             var dataHoje = DateTime.Now;
             var indiceLinha = 1;
@@ -36,7 +36,7 @@ namespace Migracao.Sistems
                     indiceLinha++;
 
                     string nomeCompleto = "", outroSacadoNome = "";
-                    int controle = 0, recibo = 0, codigo = 0, loginID = 1;
+                    int controle = 0, recibo = 0, codigo = 0;
                     int? consumidorID = 0;
                     decimal pagoValor = 0;
                     byte titulosEspecies = 0;
@@ -119,7 +119,7 @@ namespace Migracao.Sistems
                             DevidoValor = pagoValor,
                             PagoValor = pagoValor,
                             EstabelecimentoID = estabelecimentoID,
-                            LoginID = 1,
+                            LoginID = loginID,
                             DataInclusao = data,
                             FinanceiroID = respFinanceiroPessoaID
                         });

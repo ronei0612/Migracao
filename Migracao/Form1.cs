@@ -1,4 +1,6 @@
-namespace Migração
+using Migracao.Sistems;
+
+namespace Migracao
 {
 	public partial class Form1 : Form
 	{

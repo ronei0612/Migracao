@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text;
 
-namespace Migração.Utils
+namespace Migracao.Utils
 {
     internal class SqlHelper
     {

@@ -2,7 +2,7 @@
 using OfficeOpenXml;
 using System.Data;
 
-namespace Migração.Utils
+namespace Migracao.Utils
 {
     internal class ConverterHelper
     {

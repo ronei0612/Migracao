@@ -1,4 +1,4 @@
-namespace Migração
+namespace Migracao
 {
 	internal static class Program
 	{

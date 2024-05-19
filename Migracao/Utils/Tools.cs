@@ -1,9 +1,9 @@
-﻿using Migração.Models;
+﻿using Migracao.Models;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace Migração.Utils
+namespace Migracao.Utils
 {
     internal static class Tools
     {

@@ -1,4 +1,4 @@
-﻿namespace Migração.Models
+﻿namespace Migracao.Models
 {
     internal class Consumidor
     {

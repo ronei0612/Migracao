@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Migração.Models
+namespace Migracao.Models
 {
     public enum TitulosEspeciesID
     {

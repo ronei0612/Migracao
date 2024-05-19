@@ -2,7 +2,7 @@
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
-namespace Migração.Utils
+namespace Migracao.Utils
 {
     internal class ExcelHelper
     {

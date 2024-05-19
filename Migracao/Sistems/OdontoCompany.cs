@@ -343,7 +343,7 @@ namespace Migracao.Sistems
                     int pessoaID = 0, cep = 0;
                     string nomeCompleto = "null", cpf = "null", rg = "null", email = "null", apelido = "null", nascimentoLocal = "null", profissaoOutra = "null", logradouro = "null", complemento = "null", bairro = "null",
                         logradouroNum = "null", numcadastro = "null", cidade = "null", estado = "null";
-					byte estadoCivil = 0;
+					byte estadoCivil = (byte)EstadoCivilIDs.Solteiro;
 					bool sexo = true;
                     long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
 

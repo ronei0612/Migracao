@@ -90,6 +90,15 @@ namespace Migracao.Models
 		Outro = 99
 	}
 
+	public enum EstadoCivilIDs
+	{
+		Solteiro = 1,
+		Casado = 2,
+		Separado = 3,
+		Divorciado = 4,
+		Viuvo = 7
+	}
+
 	public enum FoneTipos
 	{
 		Residencial = 1,

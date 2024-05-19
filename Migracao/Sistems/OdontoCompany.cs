@@ -541,7 +541,6 @@ namespace Migracao.Sistems
                 salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_Pessoas");
                 sqlHelper.GerarSqlInsert("_MigracaoPessoas_Temp", salvarArquivo, pessoasDict);
                 excelHelper.GravarExcel(salvarArquivo, pessoasDict);
-                Tools.AbrirPastaSelecionandoArquivo(salvarArquivo);
 
 
 				var consumidoresDict = new Dictionary<string, object[]>
@@ -558,7 +557,6 @@ namespace Migracao.Sistems
 				salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_Consumidores");
 				sqlHelper.GerarSqlInsert("_MigracaoConsumidores_Temp", salvarArquivo, consumidoresDict);
 				excelHelper.GravarExcel(salvarArquivo, consumidoresDict);
-				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo);
 
 
 				var enderecosDict = new Dictionary<string, object[]>

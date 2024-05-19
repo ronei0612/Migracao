@@ -1,4 +1,5 @@
-﻿using NPOI.SS.UserModel;
+﻿using NPOI.SS.Formula.Functions;
+using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
 namespace Migração.Utils
@@ -6,12 +7,31 @@ namespace Migração.Utils
     internal class ExcelHelper
     {
         private ISheet sheet;
-        private Dictionary<string, string> nomeDict = new Dictionary<string, string>();
+		private IWorkbook workbook;
+		public List<string> cabecalhos;
+		public List<IRow> linhas;
+
+		private Dictionary<string, string> nomeDict = new Dictionary<string, string>();
         private Dictionary<string, string> cpfDict = new Dictionary<string, string>();
         private Dictionary<string, string> nomeCodDict = new Dictionary<string, string>();
 
 		private Dictionary<string, string> cidadeDict = new Dictionary<string, string>();
 		private Dictionary<string, string> cidadeEstadoDict = new Dictionary<string, string>();
+
+        public ExcelHelper(string arquivoExcel)
+        {
+			try
+			{
+				this.workbook = LerExcel(arquivoExcel);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcel}\": {ex.Message}");
+			}
+
+			this.cabecalhos = GetCabecalhosExcel(workbook);
+			this.linhas = GetLinhasExcel(workbook);
+		}
 
 		public void InitializeDictionaryCidade(ISheet sheet)
 		{

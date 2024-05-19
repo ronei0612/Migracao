@@ -306,7 +306,7 @@ namespace Migracao.Sistems
             }
         }
 
-        public void ImportarPacientes(string arquivoExcel, string arquivoExcelCidades, int estabelecimentoID, int loginID)
+		public void ImportarPacientes(string arquivoExcel, string arquivoExcelCidades, int estabelecimentoID, int loginID)
         {
             var indiceLinha = 1;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
@@ -340,13 +340,13 @@ namespace Migracao.Sistems
                     bool cliente = false, fornecedor = false;
                     DateTime dataNascimento = dataHoje, dataCadastro = dataHoje;
                     int pessoaID = 0, cep = 0;
-                    string nomeCompleto = "null", cpf = "null", rg = "null", email = "null", apelido = "null", nascimentoLocal = "null", profissaoOutra = "null", logradouro = "null", complemento = "null", bairro = "null",
-                        logradouroNum = "null", numcadastro = "null", cidade = "null", estado = "null";
 					byte? estadoCivil = null;
 					bool sexo = true;
                     long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
+					string nomeCompleto = "null", cpf = "null", rg = "null", email = "null", apelido = "null", nascimentoLocal = "null", profissaoOutra = "null", logradouro = "null",
+						 complemento = "null", bairro = "null", logradouroNum = "null", numcadastro = "null", cidade = "null", estado = "null";
 
-                    foreach (var celula in linha.Cells)
+					foreach (var celula in linha.Cells)
                     {
                         if (celula != null)
                         {
@@ -429,7 +429,7 @@ namespace Migracao.Sistems
                     {
                         pessoas.Add(new Pessoa()
                         {
-                            NomeCompleto = nomeCompleto,
+							NomeCompleto = nomeCompleto,
                             Apelido = apelido,
                             CPF = cpf,
                             DataInclusao = dataCadastro,
@@ -446,76 +446,80 @@ namespace Migracao.Sistems
 
                         consumidores.Add(new Consumidor()
                         {
-                            Ativo = true,
+							Ativo = true,
                             DataInclusao = dataCadastro,
                             EstabelecimentoID = estabelecimentoID,
                             LGPDSituacaoID = 0,
                             LoginID = loginID,
-                            PessoaID = 0,
+                            PessoaID = indiceLinha,
                             CodigoAntigo = numcadastro
 						});
 
-						var cidadeID = excelHelper.GetCidadeID(cidade, estado);
+						if (string.IsNullOrWhiteSpace(logradouro))
+						{
+							var cidadeID = excelHelper.GetCidadeID(cidade, estado);
+							enderecos.Add(new ConsumidorEndereco()
+							{
+								Ativo = true,
+								ConsumidorID = indiceLinha,
+								EnderecoTipoID = (short)EnderecoTipos.Residencial,
+								LogradouroTipoID = 81,
+								Logradouro = logradouro,
+								CidadeID = cidadeID,
+								Cep = cep,
+								DataInclusao = dataCadastro,
+								Bairro = bairro,
+								LogradouroNum = logradouroNum,
+								Complemento = complemento,
+								LoginID = loginID,
+							});
+						}
 
-						enderecos.Add(new ConsumidorEndereco() 
-                        {
-							Ativo = true,
-							ConsumidorID = 0,
-							EnderecoTipoID = (short)EnderecoTipos.Residencial,
-							LogradouroTipoID = 81,
-							Logradouro = logradouro,
-							CidadeID = cidadeID,
-							Cep = cep,
-							DataInclusao = dataCadastro,
-							Bairro = bairro,
-							LogradouroNum = logradouroNum,
-							Complemento = complemento
-                        });
+						if (celular > 0)
+							telefones.Add(new PessoaFone()
+							{
+								PessoaID = indiceLinha,
+								FoneTipoID = (short)FoneTipos.Celular,
+								Telefone = celular,
+								DataInclusao = dataCadastro,
+								LoginID = loginID,
+							});
 
-						//if (celular > 0)
-						//	telefones.Add(new PessoaFone()
-						//	{
-						//		PessoaID = pessoaID,
-						//		FoneTipoID = (short)FoneTipos.Celular,
-						//		Telefone = celular,
-						//		DataInclusao = dataCadastro
-						//	});
+						if (telefonePrinc > 0)
+							telefones.Add(new PessoaFone()
+							{
+								PessoaID = indiceLinha,
+								FoneTipoID = (short)FoneTipos.Principal,
+								Telefone = telefonePrinc,
+								DataInclusao = dataCadastro
+							});
 
-						//if (telefonePrinc > 0)
-						//	telefones.Add(new PessoaFone()
-						//	{
-						//		PessoaID = pessoaID,
-						//		FoneTipoID = (short)FoneTipos.Principal,
-						//		Telefone = telefonePrinc,
-						//		DataInclusao = dataCadastro
-						//	});
+						if (telefoneAltern > 0)
+							telefones.Add(new PessoaFone()
+							{
+								PessoaID = indiceLinha,
+								FoneTipoID = (short)FoneTipos.Alternativo,
+								Telefone = telefoneAltern,
+								DataInclusao = dataCadastro
+							});
 
-						//if (telefoneAltern > 0)
-						//	telefones.Add(new PessoaFone()
-						//	{
-						//		PessoaID = pessoaID,
-						//		FoneTipoID = (short)FoneTipos.Alternativo,
-						//		Telefone = telefoneAltern,
-						//		DataInclusao = dataCadastro
-						//	});
+						if (telefoneComercial > 0)
+							telefones.Add(new PessoaFone()
+							{
+								PessoaID = indiceLinha,
+								FoneTipoID = (short)FoneTipos.Comercial,
+								Telefone = telefoneComercial,
+								DataInclusao = dataCadastro
+							});
 
-						//if (telefoneComercial > 0)
-						//	telefones.Add(new PessoaFone()
-						//	{
-						//		PessoaID = pessoaID,
-						//		FoneTipoID = (short)FoneTipos.Comercial,
-						//		Telefone = telefoneComercial,
-						//		DataInclusao = dataCadastro
-						//	});
-
-						//if (telefoneOutro > 0)
-						//	telefones.Add(new PessoaFone()
-						//	{
-						//		PessoaID = pessoaID,
-						//		FoneTipoID = (short)FoneTipos.Outros,
-						//		Telefone = telefoneOutro,
-						//		DataInclusao = dataCadastro
-						//	});
+						if (telefoneOutro > 0)
+							telefones.Add(new PessoaFone()
+							{
+								PessoaID = indiceLinha,
+								FoneTipoID = (short)FoneTipos.Outros,
+								Telefone = telefoneOutro,
+								DataInclusao = dataCadastro
+							});
 					}
 				}
 
@@ -543,6 +547,7 @@ namespace Migracao.Sistems
                 salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_Pessoas");
                 sqlHelper.GerarSqlInsert("_MigracaoPessoas_Temp", salvarArquivo, pessoasDict);
                 excelHelper.GravarExcel(salvarArquivo, pessoasDict);
+				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo);
 
 
 				var consumidoresDict = new Dictionary<string, object[]>
@@ -579,7 +584,20 @@ namespace Migracao.Sistems
 				salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_Enderecos");
 				sqlHelper.GerarSqlInsert("_MigracaoConsumidorEnderecos_Temp", salvarArquivo, consumidoresDict);
 				excelHelper.GravarExcel(salvarArquivo, consumidoresDict);
-				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo);
+				
+
+				var telefonesDict = new Dictionary<string, object[]>
+				{
+					{ "PessoaID", telefones.ConvertAll(telefone => (object)telefone.PessoaID).ToArray() },
+					{ "FoneTipoID", telefones.ConvertAll(telefone => (object)telefone.FoneTipoID).ToArray() },
+					{ "Telefone", telefones.ConvertAll(telefone => (object)telefone.Telefone).ToArray() },
+					{ "DataInclusao", telefones.ConvertAll(telefone => (object)telefone.DataInclusao).ToArray() },
+					{ "LoginID", telefones.ConvertAll(telefone => (object)telefone.LoginID).ToArray() }
+				};
+
+				salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_Telefones");
+				sqlHelper.GerarSqlInsert("_MigracaoPessoaFones_Temp", salvarArquivo, telefonesDict);
+				excelHelper.GravarExcel(salvarArquivo, telefonesDict);
 			}
 
             catch (Exception error)

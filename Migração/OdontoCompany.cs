@@ -21,6 +21,7 @@ namespace Migração
 			var indiceLinha = 1;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
 			var excelHelper = new ExcelHelper(arquivoExcel);
+			var sqlHelper = new SqlHelper();
 
 			ISheet sheetConsumidores;
 			try
@@ -171,9 +172,8 @@ namespace Migração
 					{ "OutroSacadoNome", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.OutroSacadoNome).ToArray() }
 				};
 
-				var sqlHelper = new SqlHelper();
-				var insert = sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", dados);
-				File.WriteAllText(salvarArquivo + ".sql", insert);
+				salvarArquivo = Tools.GerarNomeArquivo(salvarArquivo);
+				sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", salvarArquivo, dados);
 				excelHelper.GravarExcel(salvarArquivo, dados);
 			}
 			catch (Exception error)
@@ -188,6 +188,7 @@ namespace Migração
             var indiceLinha = 1;
             string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
             var excelHelper = new ExcelHelper(arquivoExcel);
+			var sqlHelper = new SqlHelper();
 
             try
             {
@@ -347,8 +348,10 @@ namespace Migração
                     { "NomeFantasia", fornecedores.ConvertAll(fornecedor => (object)fornecedor.NomeFantasia).ToArray() }
                 };
 
-				Tools.SalvarArquivos("_MigracaoConsumidores_Temp", salvarArquivo, excelHelper, dados);
-            }
+				salvarArquivo = Tools.GerarNomeArquivo(salvarArquivo);
+				sqlHelper.GerarSqlInsert("_MigracaoConsumidores_Temp", salvarArquivo, dados);
+				excelHelper.GravarExcel(salvarArquivo, dados);
+			}
 
             catch (Exception error)
             {
@@ -362,6 +365,7 @@ namespace Migração
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
 			DateTime dataHoje = DateTime.Now;
 			var excelHelper = new ExcelHelper(arquivoExcel);
+			var sqlHelper = new SqlHelper();
 
 			try
 			{
@@ -497,7 +501,9 @@ namespace Migração
 					{ "Sexo", pessoas.ConvertAll(pessoa => (object)pessoa.Sexo).ToArray() }
 				};
 
-				Tools.SalvarArquivos("_MigracaoConsumidores_Temp", salvarArquivo, excelHelper, dados);
+				salvarArquivo = Tools.GerarNomeArquivo(salvarArquivo);
+				sqlHelper.GerarSqlInsert("_MigracaoConsumidores_Temp", salvarArquivo, dados);
+				excelHelper.GravarExcel(salvarArquivo, dados);
 			}
 
 			catch (Exception error)

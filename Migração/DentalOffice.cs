@@ -18,6 +18,7 @@ namespace Migração
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
 
 			var excelHelper = new ExcelHelper(arquivoExcel);
+			var sqlHelper = new SqlHelper();
 
 			ISheet sheetConsumidores;
 			try
@@ -168,7 +169,9 @@ namespace Migração
 					{ "OutroSacadoNome", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.OutroSacadoNome).ToArray() }
 				};
 
-				Tools.SalvarArquivos("_MigracaoFluxoCaixa_Temp", salvarArquivo, excelHelper, dados);
+				salvarArquivo = Tools.GerarNomeArquivo(salvarArquivo);
+				sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", salvarArquivo, dados);
+				excelHelper.GravarExcel(salvarArquivo, dados);
 			}
 			catch (Exception error)
 			{
@@ -180,32 +183,16 @@ namespace Migração
 			DateTime dataMinima = new DateTime(1900, 01, 01), dataMaxima = new DateTime(2079, 06, 06), dataHoje = DateTime.Now;
 			var indiceLinha = 1;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
-
-			var mascaraCPF = "000.000.000-00";
-			mascaraCPF = mascaraCPF.Split('.')[0].Replace(".", @"\.").Replace("-", @"\-");
-			var mascaraCPFLenth = Regex.Replace(mascaraCPF, "[^0-9]", "").Length.ToString();
-
-			IWorkbook workbook;
 			var excelHelper = new ExcelHelper(arquivoExcel);
-			try
-			{
-				workbook = excelHelper.LerExcel(arquivoExcel);
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Erro ao ler o arquivo Excel: " + ex.Message);
-			}
-
-			var cabecalhos = excelHelper.GetCabecalhosExcel(workbook);
-			var linhas = excelHelper.GetLinhasExcel(workbook);
+			var sqlHelper = new SqlHelper();
 
 			try
 			{
-				var linhasCount = linhas.Count;
+				var linhasCount = excelHelper.linhas.Count;
 				var consumidores = new List<Consumidor>();
 				var pessoas = new List<Pessoa>();
 
-				foreach (var linha in linhas)
+				foreach (var linha in excelHelper.linhas)
 				{
 					indiceLinha++;
 
@@ -214,7 +201,7 @@ namespace Migração
 						if (celula != null)
 						{
 							celulaValor = celula.ToString().Trim();
-							tituloColuna = cabecalhos[celula.Address.Column];
+							tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
 							colunaLetra = excelHelper.GetColumnLetter(celula);
 							int numcadastro = 0;
 							string nomeCompleto = "", cpf = "";
@@ -236,8 +223,7 @@ namespace Migração
 										nomeCompleto = celulaValor.Substring(0, Math.Min(70, celulaValor.Length));
 										break;
 									case "cpf":
-										cpf = celulaValor.Contains('.') && celulaValor.Contains('-') && celulaValor.Length <= 14 ? celulaValor 
-											: celulaValor.Length == int.Parse(mascaraCPFLenth) ? Convert.ToUInt64(celulaValor).ToString(mascaraCPF) : "";
+										cpf = celulaValor.ToCPF();
 										break;
 								}
 							}
@@ -281,7 +267,9 @@ namespace Migração
 					{ "NomeCompleto", pessoas.ConvertAll(pessoa => (object)pessoa.NomeCompleto).ToArray() },
 				};
 
-				Tools.SalvarArquivos("_MigracaoFluxoCaixa_Temp", salvarArquivo, excelHelper, dados);
+				salvarArquivo = Tools.GerarNomeArquivo(salvarArquivo);
+				sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", salvarArquivo, dados);
+				excelHelper.GravarExcel(salvarArquivo, dados);
 			}
 
 			catch (Exception error)

@@ -5,7 +5,7 @@ namespace Migração.Utils
 {
     internal class SqlHelper
     {
-        public string GerarSqlInsert(string tableName, Dictionary<string, object[]> dataDict)
+        public void GerarSqlInsert(string tableName, string salvarArquivo, Dictionary<string, object[]> dataDict)
         {
             var sql = new StringBuilder($"INSERT INTO {tableName} (");
 
@@ -40,7 +40,7 @@ namespace Migração.Utils
             // Remove a última quebra de linha e vírgula e espaço e adiciona um ponto e vírgula
             sql.Remove(sql.Length - 4, 4).Append(';');
 
-            return sql.ToString();
+			File.WriteAllText(salvarArquivo + ".sql", sql.ToString());
         }
 
         public object VerificarSeDateTime(object input)

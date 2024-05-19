@@ -81,18 +81,17 @@ namespace Migração
 			return data;
 		}
 
-		public static void SalvarArquivos(string tabelaBanco, string nomeArquivo, ExcelHelper excelHelper, Dictionary<string, object[]> dados)
+		public static string GerarNomeArquivo(string nomeArquivo)
 		{
 			int count = 1;
 			while (File.Exists($"{nomeArquivo} ({count}).xlsx"))
 				nomeArquivo = $"{nomeArquivo} ({count++})";
 
-			var sqlHelper = new SqlHelper();
-			var insert = sqlHelper.GerarSqlInsert(tabelaBanco, dados);
+			return nomeArquivo;
+		}
 
-			File.WriteAllText(nomeArquivo + ".sql", insert);
-			excelHelper.GravarExcel(nomeArquivo, dados);
-
+		public static void AbrirPastaSelecionandoArquivo(string nomeArquivo)
+		{
 			string argumento = "/select, \"" + nomeArquivo + ".xlsx" + "\"";
 
 			Process.Start("explorer.exe", argumento);

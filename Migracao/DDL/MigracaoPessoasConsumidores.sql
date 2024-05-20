@@ -2,7 +2,7 @@ CREATE PROCEDURE dbo.MigracaoPessoasConsumidores
 AS
 BEGIN
     SET NOCOUNT ON;
- 
+   
     -- Variável para armazenar o ID da pessoa inserida
     DECLARE @PrimeiroID INT;
     -- Tabela temporária para armazenar os IDs das pessoas inseridas
@@ -18,22 +18,17 @@ BEGIN
     SELECT @PrimeiroID = MIN(PessoaID) FROM @IDs;
  
     -- Atualizar a tabela _MigracaoConsumidores_Temp com os números em ordem crescente a partir do primeiro ID gerado
-    DECLARE @i INT = 0;
-    WHILE @i < (SELECT COUNT(*) FROM [_MigracaoConsumidores_Temp])
-    BEGIN
-
-        UPDATE [_MigracaoPessoaFones_Temp]
-        SET PessoaID = @PrimeiroID + @i 
-        WHERE PessoaID = (SELECT PessoaID FROM [_MigracaoConsumidores_Temp] WHERE ID = @i + 1);
-	    
-        UPDATE [_MigracaoConsumidores_Temp]
-        SET PessoaID = @PrimeiroID + @i
-        WHERE ID = @i + 1;
+    UPDATE t
+    SET PessoaID = p.PessoaID
+    FROM [_MigracaoPessoaFones_Temp] t
+    JOIN @IDs p ON t.PessoaID = p.ID;
+    
+    UPDATE t
+    SET PessoaID = p.PessoaID
+    FROM [_MigracaoConsumidores_Temp] t
+    JOIN @IDs p ON t.ID = p.ID;
  
-        SET @i = @i + 1;
-    END
-   
-   -- Inserção dos dados na tabela Pessoas e armazenamento dos IDs inseridos
+    -- Inserção dos dados na tabela Pessoas e armazenamento dos IDs inseridos
     INSERT INTO PessoaFones (PessoaID, FoneTipoID, Telefone, DataInclusao, LoginID)
     SELECT PessoaID, FoneTipoID, Telefone, DataInclusao, LoginID
     FROM [_MigracaoPessoaFones_Temp];
@@ -54,20 +49,14 @@ BEGIN
     SELECT @PrimeiroConsudmidorID = MIN(ConsumidorID) FROM @IDConsumidores;
  
     -- Atualizar a tabela _MigracaoConsumidores_Temp com os números em ordem crescente a partir do primeiro ID gerado
-    DECLARE @j INT = 0;
-    WHILE @j < (SELECT COUNT(*) FROM [_MigracaoConsumidores_Temp])
-    BEGIN
-	    UPDATE [_MigracaoConsumidorEnderecos_Temp]
-        SET ConsumidorID = @PrimeiroConsudmidorID + @j
-        WHERE ConsumidorID = (SELECT ID FROM [_MigracaoConsumidores_Temp] WHERE ID = @j + 1);
- 
-        SET @j = @j + 1;
-    END
-    
+    UPDATE t
+    SET ConsumidorID = c.ConsumidorID
+    FROM [_MigracaoConsumidorEnderecos_Temp] t
+    JOIN @IDConsumidores c ON t.ConsumidorID = c.ID;
+   
     INSERT INTO ConsumidorEnderecos (Ativo, ConsumidorID, EnderecoTipoID, LogradouroTipoID, Logradouro, CidadeID, Cep, DataInclusao, Bairro, LogradouroNum, Complemento)
     OUTPUT INSERTED.ID INTO @IDConsumidores
     SELECT Ativo, ConsumidorID, EnderecoTipoID, LogradouroTipoID, Logradouro, CidadeID, Cep, DataInclusao, Bairro, LogradouroNum, Complemento
     FROM [_MigracaoConsumidorEnderecos_Temp];
- 
     SET NOCOUNT OFF;
 END;

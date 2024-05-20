@@ -55,31 +55,27 @@ namespace Migracao
 
 					else if (comboBoxSistema.Text.Equals("dentaloffice", StringComparison.CurrentCultureIgnoreCase))
 					{
-						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
-						{
-							var dentalOffice = new DentalOffice();
+						var dentalOffice = new DentalOffice();
+
+						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))							
 							dentalOffice.ImportarPacientes(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text));
-						}
 
 						else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
-						{
-							var dentalOffice = new DentalOffice();
 							dentalOffice.ImportarRecebidos(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
-						}
+
+						else if (comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase))
+							dentalOffice.ImportarPagos(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
 					}
+
 					else if (comboBoxSistema.Text.Equals("odontocompany", StringComparison.CurrentCultureIgnoreCase))
 					{
+						var odontoCompany = new OdontoCompany();
+
 						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
-						{
-							var odontoCompany = new OdontoCompany();
 							odontoCompany.ImportarPacientes(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
-						}
 
 						else if (comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase))
-						{
-							var odontoCompany = new OdontoCompany();
 							odontoCompany.ImportarFornecedores(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
-						}
 					}
 				}
 				catch (Exception ex)
@@ -144,7 +140,7 @@ namespace Migracao
 			comboBoxImportacao.Visible = true;
 		}
 
-		void MostrarCamposExcel()
+		void MostrarCampos()
 		{
 			OcultarElementos();
 
@@ -157,39 +153,49 @@ namespace Migracao
 					btnDelFromList.Visible = true;
 					btnImportar.Visible = true;
 				}
-			}
 
-			else if (comboBoxSistema.SelectedIndex > -1 && comboBoxImportacao.SelectedIndex > -1 && !string.IsNullOrEmpty(txtEstabelecimentoID.Text))
-			{
-				labelExcel1.Text = comboBoxImportacao.Text;
-				labelExcel1.Visible = true;
-				textBoxExcel1.Visible = true;
-				btnExcel.Visible = true;
+				else {
+					comboBoxSistema.Visible = true;
+					txtEstabelecimentoID.Visible = true;
+					label1.Visible = true;
+					label3.Visible = true;
+					label5.Visible = true;
+					txtLoginID.Visible = true;
 
-				if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase)
-					|| comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase)
-					|| comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase))
-				{
-					labelExcel2.Text = "Referência";
-					labelExcel2.Visible = true;
-					textBoxExcel2.Visible = true;
-					btnExcel2.Visible = true;
-					label2.Visible = true;
-					txtPessoaID.Visible = true;
+					if (comboBoxSistema.SelectedIndex > -1 && comboBoxImportacao.SelectedIndex > -1 && !string.IsNullOrEmpty(txtEstabelecimentoID.Text) && !string.IsNullOrEmpty(txtLoginID.Text))
+					{
+						labelExcel1.Text = comboBoxImportacao.Text;
+						labelExcel1.Visible = true;
+						textBoxExcel1.Visible = true;
+						btnExcel.Visible = true;
+
+						if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase)
+							|| comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase)
+							|| comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
+							|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase))
+						{
+							labelExcel2.Text = "Referência";
+							labelExcel2.Visible = true;
+							textBoxExcel2.Visible = true;
+							btnExcel2.Visible = true;
+							label2.Visible = true;
+							txtPessoaID.Visible = true;
+						}
+
+						btnImportar.Visible = true;
+					}
 				}
-
-				btnImportar.Visible = true;
 			}
 		}
 
 		private void comboBoxSistema_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			MostrarCamposExcel();
+			MostrarCampos();
 		}
 
 		private void comboBoxImportacao_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			MostrarCamposExcel();
+			MostrarCampos();
 		}
 
 		private void txtPessoaID_KeyPress(object sender, KeyPressEventArgs e)
@@ -204,12 +210,12 @@ namespace Migracao
 
 		private void txtEstabelecimentoID_TextChanged(object sender, EventArgs e)
 		{
-			MostrarCamposExcel();
+			MostrarCampos();
 		}
 
 		private void txtPessoaID_TextChanged(object sender, EventArgs e)
 		{
-			//MostrarCamposExcel();
+			//MostrarCampos();
 		}
 
 		private void txtLoginID_KeyPress(object sender, KeyPressEventArgs e)

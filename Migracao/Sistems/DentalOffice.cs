@@ -6,7 +6,143 @@ namespace Migracao.Sistems
 {
     internal class DentalOffice
     {
-        public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
+		public void ImportarPagos(string arquivoExcel, string arquivoExcelFuncionarios, int estabelecimentoID, int responsavelPessoaID, int loginID)
+		{
+			var indiceLinha = 1;
+			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
+			DateTime dataHoje = DateTime.Now;
+			var excelHelper = new ExcelHelper(arquivoExcel);
+			var sqlHelper = new SqlHelper();
+
+			string clinicaNome = "Viotto Odontologia";
+
+			try
+			{
+				var workbookFuncionarios = excelHelper.LerExcel(arquivoExcelFuncionarios);
+				var sheetFuncionarios = workbookFuncionarios.GetSheetAt(0);
+				excelHelper.InitializeDictionary(sheetFuncionarios);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelFuncionarios}\": {ex.Message}");
+			}
+
+			try
+			{
+				var linhasCount = excelHelper.linhas.Count;
+				var exigiveis = new List<Exigiveis>();
+				var fluxosCaixa = new List<FluxoCaixa>();
+
+				foreach (var linha in excelHelper.linhas)
+				{
+					indiceLinha++;
+
+					bool clinica = false;
+					string dentista = "", categoria = "", codigo = "";
+					byte formaPagamento = 0;
+					decimal valor = 0, pagoValor = 0;
+					DateTime dataVencimento = dataHoje, dataPagamento = dataHoje;
+
+					foreach (var celula in linha.Cells)
+					{
+						if (celula != null)
+						{
+							celulaValor = celula.ToString().Trim().Replace("'", "’");
+							tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
+							colunaLetra = excelHelper.GetColumnLetter(celula);
+
+							if (!string.IsNullOrWhiteSpace(celulaValor))
+							{
+								switch (tituloColuna)
+								{
+									case "clinica":
+										if (celulaValor == clinicaNome)
+											clinica = true;
+										break;
+									case "cir_dentista":
+										dentista = celulaValor;
+										break;
+									case "fornecedor":
+									case "cpf":
+									case "cnpj":
+										break;
+									case "categoria":
+										categoria = celulaValor;
+										break;
+									case "codigo":
+										codigo = celulaValor;
+										break;
+									case "data_vencimento":
+										dataVencimento = celulaValor.ToData();
+										break;
+									case "valor_pago":
+										valor = celulaValor.ToMoeda();
+										break;
+									case "data_pagamento":
+										dataPagamento = celulaValor.ToData();
+										break;
+									case "forma_pagamento":
+										formaPagamento = celulaValor.ToTipoPagamento();
+										break;
+									case "valor":
+										break;
+								}
+							}
+						}
+					}
+
+					if (clinica)
+					{
+						fluxosCaixa.Add(new FluxoCaixa()
+						{
+							Data = dataPagamento,
+							DataBaseCalculo = dataPagamento,
+							DataInclusao = dataPagamento,
+							DevidoValor = valor,
+							EspecieID = formaPagamento,
+							FinanceiroID = estabelecimentoID,
+							PagoValor = pagoValor,
+							TipoID = (byte)TransacaoTiposID.Pagamento,
+							TransacaoID = 1,
+							EstabelecimentoID = estabelecimentoID,
+							LoginID = loginID
+						});
+					}
+				}
+
+				indiceLinha = 0;
+				var salvarArquivo = "";
+
+
+				var fluxosCaixaDict = new Dictionary<string, object[]>
+				{
+					{ "Data", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.Data).ToArray() },
+					{ "Data", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.Data).ToArray() },
+                    { "DataBaseCalculo", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DataBaseCalculo).ToArray() },
+                    { "DataInclusao", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DataInclusao).ToArray() },
+                    { "DevidoValor", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DevidoValor).ToArray() },
+                    { "EspecieID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.EspecieID).ToArray() },
+                    { "FinanceiroID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.FinanceiroID).ToArray() },
+                    { "PagoValor", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.PagoValor).ToArray() },
+                    { "TipoID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.TipoID).ToArray() },
+                    { "TransacaoID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.TransacaoID).ToArray() },
+                    { "EstabelecimentoID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.EstabelecimentoID).ToArray() },
+                    { "LoginID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.LoginID).ToArray() }
+				};
+
+				salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_DentalOffice_FluxoCaixa");
+				sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", salvarArquivo, fluxosCaixaDict);
+				excelHelper.GravarExcel(salvarArquivo, fluxosCaixaDict);
+				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo + ".xlsx");
+			}
+
+			catch (Exception error)
+			{
+				throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha, colunaLetra, tituloColuna, celulaValor, variaveisValor));
+			}
+		}
+
+		public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
         {
             var dataHoje = DateTime.Now;
             var indiceLinha = 1;

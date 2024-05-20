@@ -9,7 +9,7 @@ namespace Migracao.Sistems
 		public void ImportarPagos(string arquivoExcel, string arquivoExcelFuncionarios, int estabelecimentoID, int responsavelPessoaID, int loginID)
 		{
 			var indiceLinha = 1;
-			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
+            string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "", nome = "";
 			DateTime dataHoje = DateTime.Now;
 			var excelHelper = new ExcelHelper(arquivoExcel);
 			var sqlHelper = new SqlHelper();
@@ -76,7 +76,7 @@ namespace Migracao.Sistems
 										dataVencimento = celulaValor.ToData();
 										break;
 									case "valor_pago":
-										valor = celulaValor.ToMoeda();
+										pagoValor = celulaValor.ToMoeda();
 										break;
 									case "data_pagamento":
 										dataPagamento = celulaValor.ToData();
@@ -91,43 +91,99 @@ namespace Migracao.Sistems
 						}
 					}
 
-					if (clinica)
+					if (clinica && pagoValor > 0)
 					{
-						fluxosCaixa.Add(new FluxoCaixa()
-						{
-							Data = dataPagamento,
-							DataBaseCalculo = dataPagamento,
-							DataInclusao = dataPagamento,
-							DevidoValor = valor,
-							EspecieID = formaPagamento,
-							FinanceiroID = estabelecimentoID,
-							PagoValor = pagoValor,
-							TipoID = (byte)TransacaoTiposID.Pagamento,
-							TransacaoID = 1,
-							EstabelecimentoID = estabelecimentoID,
-							LoginID = loginID
-						});
+                        if (!string.IsNullOrEmpty(dentista))
+                        {
+							var funcionarioID = excelHelper.GetFuncionarioID(nomeCompleto: dentista);
+							if (!string.IsNullOrEmpty(funcionarioID))
+								fluxosCaixa.Add(new FluxoCaixa()
+								{
+									Data = dataPagamento,
+									DataBaseCalculo = dataPagamento,
+									DataInclusao = dataPagamento,
+									DevidoValor = valor,
+									EspecieID = formaPagamento,
+									FinanceiroID = responsavelPessoaID,
+									PagoValor = pagoValor,
+									TipoID = (byte)TransacaoTiposID.Pagamento,
+									TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
+									EstabelecimentoID = estabelecimentoID,
+									LoginID = loginID,
+									PlanoContasID = 55,
+									OutroCedenteNome = null,
+                                    ColaboradorID = int.Parse(funcionarioID),
+									ConsumidorID = null,
+									FornecedorID = null
+								});
+
+                            else
+								fluxosCaixa.Add(new FluxoCaixa()
+								{
+									Data = dataPagamento,
+									DataBaseCalculo = dataPagamento,
+									DataInclusao = dataPagamento,
+									DevidoValor = valor,
+									EspecieID = formaPagamento,
+									FinanceiroID = responsavelPessoaID,
+									PagoValor = pagoValor,
+									TipoID = (byte)TransacaoTiposID.Pagamento,
+									TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
+									EstabelecimentoID = estabelecimentoID,
+									LoginID = loginID,
+									PlanoContasID = 55,
+									OutroCedenteNome = dentista,
+									ColaboradorID = null,
+									ConsumidorID = null,
+									FornecedorID = null
+								});
+						}
+
+                        else
+                        {
+							fluxosCaixa.Add(new FluxoCaixa()
+							{
+								Data = dataPagamento,
+								DataBaseCalculo = dataPagamento,
+								DataInclusao = dataPagamento,
+								DevidoValor = valor,
+								EspecieID = formaPagamento,
+								FinanceiroID = responsavelPessoaID,
+								PagoValor = pagoValor,
+								TipoID = (byte)TransacaoTiposID.Pagamento,
+								TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
+								EstabelecimentoID = estabelecimentoID,
+								LoginID = loginID,
+								PlanoContasID = 55,
+								OutroCedenteNome = "Outro",
+								ColaboradorID = null,
+								ConsumidorID = null,
+								FornecedorID = null
+							});
+						}
 					}
 				}
 
 				indiceLinha = 0;
 				var salvarArquivo = "";
 
-
 				var fluxosCaixaDict = new Dictionary<string, object[]>
 				{
-					{ "Data", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.Data).ToArray() },
-					{ "Data", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.Data).ToArray() },
-                    { "DataBaseCalculo", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DataBaseCalculo).ToArray() },
-                    { "DataInclusao", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DataInclusao).ToArray() },
-                    { "DevidoValor", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DevidoValor).ToArray() },
-                    { "EspecieID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.EspecieID).ToArray() },
-                    { "FinanceiroID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.FinanceiroID).ToArray() },
-                    { "PagoValor", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.PagoValor).ToArray() },
                     { "TipoID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.TipoID).ToArray() },
-                    { "TransacaoID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.TransacaoID).ToArray() },
-                    { "EstabelecimentoID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.EstabelecimentoID).ToArray() },
-                    { "LoginID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.LoginID).ToArray() }
+					{ "Data", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.Data).ToArray() },
+					{ "OutroCedenteNome", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.OutroCedenteNome).ToArray() },
+					{ "ConsumidorID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.ConsumidorID).ToArray() },
+					{ "FornecedorID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.FornecedorID).ToArray() },
+					{ "TransacaoID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.TransacaoID).ToArray() },
+					{ "EspecieID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.EspecieID).ToArray() },
+					{ "DataBaseCalculo", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DataBaseCalculo).ToArray() },
+					{ "DevidoValor", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DevidoValor).ToArray() },
+					{ "PagoValor", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.PagoValor).ToArray() },
+					{ "PlanoContasID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.PlanoContasID).ToArray() },
+					{ "FinanceiroID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.FinanceiroID).ToArray() },
+					{ "EstabelecimentoID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.EstabelecimentoID).ToArray() },
+					{ "LoginID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.LoginID).ToArray() },
+					{ "DataInclusao", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DataInclusao).ToArray() },
 				};
 
 				salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_DentalOffice_FluxoCaixa");

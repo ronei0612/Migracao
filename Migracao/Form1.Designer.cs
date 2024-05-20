@@ -68,7 +68,7 @@
 			btnImportar.Margin = new Padding(3, 2, 3, 2);
 			btnImportar.Name = "btnImportar";
 			btnImportar.Size = new Size(88, 22);
-			btnImportar.TabIndex = 6;
+			btnImportar.TabIndex = 8;
 			btnImportar.Text = "⚙ Executar";
 			btnImportar.UseVisualStyleBackColor = true;
 			btnImportar.Visible = false;
@@ -94,7 +94,7 @@
 			btnExcel.Margin = new Padding(3, 2, 3, 2);
 			btnExcel.Name = "btnExcel";
 			btnExcel.Size = new Size(31, 22);
-			btnExcel.TabIndex = 3;
+			btnExcel.TabIndex = 5;
 			btnExcel.Text = "📂";
 			btnExcel.UseVisualStyleBackColor = true;
 			btnExcel.Visible = false;
@@ -106,7 +106,7 @@
 			textBoxExcel1.Margin = new Padding(3, 2, 3, 2);
 			textBoxExcel1.Name = "textBoxExcel1";
 			textBoxExcel1.Size = new Size(501, 23);
-			textBoxExcel1.TabIndex = 7;
+			textBoxExcel1.TabIndex = 90;
 			textBoxExcel1.Visible = false;
 			// 
 			// labelExcel1
@@ -128,7 +128,7 @@
 			comboBoxImportacao.Margin = new Padding(3, 2, 3, 2);
 			comboBoxImportacao.Name = "comboBoxImportacao";
 			comboBoxImportacao.Size = new Size(214, 23);
-			comboBoxImportacao.TabIndex = 1;
+			comboBoxImportacao.TabIndex = 0;
 			comboBoxImportacao.SelectedIndexChanged += comboBoxImportacao_SelectedIndexChanged;
 			// 
 			// label4
@@ -156,7 +156,7 @@
 			textBoxExcel2.Margin = new Padding(3, 2, 3, 2);
 			textBoxExcel2.Name = "textBoxExcel2";
 			textBoxExcel2.Size = new Size(501, 23);
-			textBoxExcel2.TabIndex = 12;
+			textBoxExcel2.TabIndex = 91;
 			textBoxExcel2.Visible = false;
 			// 
 			// btnExcel2
@@ -165,7 +165,7 @@
 			btnExcel2.Margin = new Padding(3, 2, 3, 2);
 			btnExcel2.Name = "btnExcel2";
 			btnExcel2.Size = new Size(31, 22);
-			btnExcel2.TabIndex = 4;
+			btnExcel2.TabIndex = 6;
 			btnExcel2.Text = "📂";
 			btnExcel2.UseVisualStyleBackColor = true;
 			btnExcel2.Visible = false;
@@ -190,7 +190,7 @@
 			comboBoxSistema.Margin = new Padding(3, 2, 3, 2);
 			comboBoxSistema.Name = "comboBoxSistema";
 			comboBoxSistema.Size = new Size(211, 23);
-			comboBoxSistema.TabIndex = 0;
+			comboBoxSistema.TabIndex = 1;
 			comboBoxSistema.Visible = false;
 			comboBoxSistema.SelectedIndexChanged += comboBoxSistema_SelectedIndexChanged;
 			// 
@@ -211,7 +211,7 @@
 			txtPessoaID.Margin = new Padding(3, 2, 3, 2);
 			txtPessoaID.Name = "txtPessoaID";
 			txtPessoaID.Size = new Size(110, 23);
-			txtPessoaID.TabIndex = 5;
+			txtPessoaID.TabIndex = 4;
 			txtPessoaID.Visible = false;
 			txtPessoaID.TextChanged += txtPessoaID_TextChanged;
 			txtPessoaID.KeyPress += txtPessoaID_KeyPress;
@@ -222,7 +222,7 @@
 			txtLoginID.Margin = new Padding(3, 2, 3, 2);
 			txtLoginID.Name = "txtLoginID";
 			txtLoginID.Size = new Size(110, 23);
-			txtLoginID.TabIndex = 17;
+			txtLoginID.TabIndex = 3;
 			txtLoginID.Text = "1";
 			txtLoginID.Visible = false;
 			txtLoginID.KeyPress += txtLoginID_KeyPress;
@@ -253,7 +253,7 @@
 			btnAddToList.Margin = new Padding(3, 2, 3, 2);
 			btnAddToList.Name = "btnAddToList";
 			btnAddToList.Size = new Size(31, 22);
-			btnAddToList.TabIndex = 19;
+			btnAddToList.TabIndex = 7;
 			btnAddToList.Text = "➕";
 			btnAddToList.UseVisualStyleBackColor = true;
 			btnAddToList.Visible = false;

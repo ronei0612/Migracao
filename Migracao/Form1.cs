@@ -61,10 +61,12 @@ namespace Migracao
 							dentalOffice.ImportarPacientes(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text));
 
 						else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
-							dentalOffice.ImportarRecebidos(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
+							if (!string.IsNullOrEmpty(txtPessoaID.Text))
+								dentalOffice.ImportarRecebidos(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
 
 						else if (comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase))
-							dentalOffice.ImportarPagos(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
+							if (!string.IsNullOrEmpty(txtPessoaID.Text))
+								dentalOffice.ImportarPagos(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
 					}
 
 					else if (comboBoxSistema.Text.Equals("odontocompany", StringComparison.CurrentCultureIgnoreCase))
@@ -100,7 +102,7 @@ namespace Migracao
 			else
 			{
 				if (comboBoxSistema.SelectedIndex == -1 || comboBoxSistema.SelectedIndex == -1 || string.IsNullOrWhiteSpace(txtEstabelecimentoID.Text)
-					 || string.IsNullOrWhiteSpace(textBoxExcel1.Text))
+					 || string.IsNullOrWhiteSpace(textBoxExcel1.Text) || string.IsNullOrEmpty(txtLoginID.Text))
 					return false;
 
 				if (!File.Exists(textBoxExcel1.Text))
@@ -162,7 +164,7 @@ namespace Migracao
 					label5.Visible = true;
 					txtLoginID.Visible = true;
 
-					if (comboBoxSistema.SelectedIndex > -1 && comboBoxImportacao.SelectedIndex > -1 && !string.IsNullOrEmpty(txtEstabelecimentoID.Text) && !string.IsNullOrEmpty(txtLoginID.Text))
+					if (comboBoxSistema.SelectedIndex > -1 && comboBoxImportacao.SelectedIndex > -1)
 					{
 						labelExcel1.Text = comboBoxImportacao.Text;
 						labelExcel1.Visible = true;
@@ -210,7 +212,6 @@ namespace Migracao
 
 		private void txtEstabelecimentoID_TextChanged(object sender, EventArgs e)
 		{
-			MostrarCampos();
 		}
 
 		private void txtPessoaID_TextChanged(object sender, EventArgs e)

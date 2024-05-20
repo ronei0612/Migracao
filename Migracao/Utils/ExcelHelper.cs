@@ -11,14 +11,21 @@ namespace Migracao.Utils
 		public List<string> cabecalhos;
 		public List<IRow> linhas;
 
-		private Dictionary<string, string> nomeDict = new Dictionary<string, string>();
-        private Dictionary<string, string> cpfDict = new Dictionary<string, string>();
-        private Dictionary<string, string> nomeCodDict = new Dictionary<string, string>();
+		private Dictionary<string, string> nomeConsumidorDict = new Dictionary<string, string>();
+        private Dictionary<string, string> cpfConsumidorDict = new Dictionary<string, string>();
+        private Dictionary<string, string> nomeCodConsumidorDict = new Dictionary<string, string>();
+		private Dictionary<string, string> nomePessoaDict = new Dictionary<string, string>();
+		private Dictionary<string, string> cpfPessoaDict = new Dictionary<string, string>();
+		private Dictionary<string, string> cpfFuncionarioDict = new Dictionary<string, string>();
+		private Dictionary<string, string> nomeFuncionarioDict = new Dictionary<string, string>();
 
 		private Dictionary<string, string> cidadeDict = new Dictionary<string, string>();
 		private Dictionary<string, string> cidadeEstadoDict = new Dictionary<string, string>();
 
-        public ExcelHelper(string arquivoExcel)
+		private Dictionary<string, string> cpfKeyDict = new Dictionary<string, string>();
+		private Dictionary<string, string> nomeKeyDict = new Dictionary<string, string>();
+		
+		public ExcelHelper(string arquivoExcel)
         {
 			try
 			{
@@ -31,6 +38,56 @@ namespace Migracao.Utils
 
 			this.cabecalhos = GetCabecalhosExcel(workbook);
 			this.linhas = GetLinhasExcel(workbook);
+		}
+
+		public void InitializeDictionary(ISheet sheet)
+		{
+			this.sheet = sheet;
+			IRow headerRow = sheet.GetRow(0);
+
+			int cpfColumnIndex = GetColumnIndex(headerRow, "cpf");
+			int nomeCompletoColumnIndex = GetColumnIndex(headerRow, "nomecompleto");
+			int pessoaidColumnIndex = GetColumnIndex(headerRow, "pessoaid");
+			int funcionarioidColumnIndex = GetColumnIndex(headerRow, "funcionarioid");
+			int fornecedoridColumnIndex = GetColumnIndex(headerRow, "fornecedorid");
+			int nomefantasiaColumnIndex = GetColumnIndex(headerRow, "nomefantasia");
+			int consumidoridColumnIndex = GetColumnIndex(headerRow, "consumidorid");
+			int codigoantigoColumnIndex = GetColumnIndex(headerRow, "codigoantigo");
+
+			for (int row = 1; row <= sheet.LastRowNum; row++)
+			{
+				if (sheet.GetRow(row) != null)
+				{
+					string cpfCellValue = sheet.GetRow(row).GetCell(cpfColumnIndex) != null ? sheet.GetRow(row).GetCell(cpfColumnIndex).ToString() : "";
+					string nomeCompletoCellValue = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex) != null ? sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString() : "";
+					string pessoaidCellValue = sheet.GetRow(row).GetCell(pessoaidColumnIndex) != null ? sheet.GetRow(row).GetCell(pessoaidColumnIndex).ToString() : "";
+					string funcionarioidCellValue = sheet.GetRow(row).GetCell(funcionarioidColumnIndex) != null ? sheet.GetRow(row).GetCell(funcionarioidColumnIndex).ToString() : "";
+					string fornecedoridCellValue = sheet.GetRow(row).GetCell(fornecedoridColumnIndex) != null ? sheet.GetRow(row).GetCell(fornecedoridColumnIndex).ToString() : "";
+					string nomefantasiaCellValue = sheet.GetRow(row).GetCell(nomefantasiaColumnIndex) != null ? sheet.GetRow(row).GetCell(nomefantasiaColumnIndex).ToString() : "";
+					string consumidoridCellValue = sheet.GetRow(row).GetCell(consumidoridColumnIndex) != null ? sheet.GetRow(row).GetCell(consumidoridColumnIndex).ToString() : "";
+					string codigoantigoCellValue = sheet.GetRow(row).GetCell(codigoantigoColumnIndex) != null ? sheet.GetRow(row).GetCell(codigoantigoColumnIndex).ToString() : "";
+
+					string key = cpfCellValue;
+					if (!cpfConsumidorDict.ContainsKey(key))
+						cpfConsumidorDict.Add(key, consumidoridCellValue);
+
+					if (!cpfPessoaDict.ContainsKey(key))
+						cpfPessoaDict.Add(key, pessoaidCellValue);
+
+					if (!cpfFuncionarioDict.ContainsKey(key))
+						cpfFuncionarioDict.Add(key, funcionarioidCellValue);
+
+					key = nomeCompletoCellValue;
+					if (!nomeConsumidorDict.ContainsKey(key))
+						nomeConsumidorDict.Add(key, consumidoridCellValue);
+
+					if (!nomePessoaDict.ContainsKey(key))
+						nomePessoaDict.Add(key, pessoaidCellValue);
+
+					if (!nomeFuncionarioDict.ContainsKey(key))
+						nomeFuncionarioDict.Add(key, funcionarioidCellValue);
+				}
+			}
 		}
 
 		public void InitializeDictionaryCidade(ISheet sheet)
@@ -59,39 +116,6 @@ namespace Migracao.Utils
 				}
 			}
 		}
-
-		public void InitializeDictionaryConsumidor(ISheet sheet)
-        {
-            this.sheet = sheet;
-            IRow headerRow = sheet.GetRow(0);
-            int cpfColumnIndex = GetColumnIndex(headerRow, "cpf");
-            int nomeCompletoColumnIndex = GetColumnIndex(headerRow, "nomecompleto");
-            int codigoColumnIndex = GetColumnIndex(headerRow, "codigoantigo");
-            int consumidorColumnIndex = GetColumnIndex(headerRow, "consumidorid");
-
-            for (int row = 1; row <= sheet.LastRowNum; row++)
-            {
-                if (sheet.GetRow(row) != null)
-                {
-                    string cpfCellValue = sheet.GetRow(row).GetCell(cpfColumnIndex) != null ? sheet.GetRow(row).GetCell(cpfColumnIndex).ToString() : "";
-                    string nomeCompletoCellValue = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex) != null ? sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString() : "";
-                    string codigoCellValue = sheet.GetRow(row).GetCell(codigoColumnIndex) != null ? sheet.GetRow(row).GetCell(codigoColumnIndex).ToString() : "";
-                    string consumidorIdCellValue = sheet.GetRow(row).GetCell(consumidorColumnIndex) != null ? sheet.GetRow(row).GetCell(consumidorColumnIndex).ToString() : "";
-
-                    string key = cpfCellValue;
-                    if (!cpfDict.ContainsKey(key))
-                        cpfDict.Add(key, consumidorIdCellValue);
-
-                    key = nomeCompletoCellValue + "|" + codigoCellValue;
-                    if (!nomeCodDict.ContainsKey(key))
-                        nomeCodDict.Add(key, consumidorIdCellValue);
-
-                    key = nomeCompletoCellValue;
-                    if (!nomeDict.ContainsKey(key))
-                        nomeDict.Add(key, consumidorIdCellValue);
-                }
-            }
-        }
 
         private int GetColumnIndex(IRow headerRow, string columnName)
         {
@@ -125,35 +149,68 @@ namespace Migracao.Utils
 
 		public string GetPessoaID(string cpf = "", string nomeCompleto = "")
 		{
-			string key = cpf;
-			if (cpfDict.ContainsKey(key))
-				return cpfDict[key];
+			if (!string.IsNullOrWhiteSpace(cpf))
+				if (cpfPessoaDict.ContainsKey(cpf))
+					return cpfPessoaDict[cpf];
 
-			key = nomeCompleto;
-			if (nomeDict.ContainsKey(key))
-				return nomeDict[key];
+			if (!string.IsNullOrWhiteSpace(nomeCompleto))
+				if (nomePessoaDict.ContainsKey(nomeCompleto))
+					return nomePessoaDict[nomeCompleto];
 
 			return "";
 		}
 
 		public string GetConsumidorID(string cpf = "", string nomeCompleto = "", string codigo = "")
         {
-            string key = cpf;
-            if (cpfDict.ContainsKey(key))
-                return cpfDict[key];
+			if (!string.IsNullOrWhiteSpace(cpf))
+				if (cpfConsumidorDict.ContainsKey(cpf))
+					return cpfConsumidorDict[cpf];
 
-            key = nomeCompleto + "|" + codigo;
-            if (nomeCodDict.ContainsKey(key))
-                return nomeCodDict[key];
+			if (!string.IsNullOrWhiteSpace(nomeCompleto) && !string.IsNullOrWhiteSpace(codigo))
+			{
+				string key = nomeCompleto + "|" + codigo;
+				if (nomeCodConsumidorDict.ContainsKey(key))
+					return nomeCodConsumidorDict[key];
+			}
 
-            key = nomeCompleto;
-            if (nomeDict.ContainsKey(key))
-                return nomeDict[key];
+			if (!string.IsNullOrWhiteSpace(nomeCompleto))
+				if (nomeConsumidorDict.ContainsKey(nomeCompleto))
+					return nomeConsumidorDict[nomeCompleto];
 
             return "";
         }
 
-        public IWorkbook LerExcel(string filePath)
+		public string GetFuncionarioID(string cpf = "", string nomeCompleto = "")
+		{
+			string key = cpf;
+			if (cpfConsumidorDict.ContainsKey(key))
+				return cpfConsumidorDict[key];
+
+			key = nomeCompleto;
+			if (nomeConsumidorDict.ContainsKey(key))
+				return nomeConsumidorDict[key];
+
+			return "";
+		}
+
+		public string GetFornecedorID(string cpf = "", string nomeCompleto = "", string codigo = "")
+		{
+			string key = cpf;
+			if (cpfConsumidorDict.ContainsKey(key))
+				return cpfConsumidorDict[key];
+
+			key = nomeCompleto + "|" + codigo;
+			if (nomeCodConsumidorDict.ContainsKey(key))
+				return nomeCodConsumidorDict[key];
+
+			key = nomeCompleto;
+			if (nomeConsumidorDict.ContainsKey(key))
+				return nomeConsumidorDict[key];
+
+			return "";
+		}
+
+		public IWorkbook LerExcel(string filePath)
         {
             IWorkbook workbook;
             using (FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read))

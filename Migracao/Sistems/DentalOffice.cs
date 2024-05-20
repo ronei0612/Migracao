@@ -151,7 +151,7 @@ namespace Migracao.Sistems
 				var salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_DentalOffice_FluxoCaixa");
 				sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", salvarArquivo, dados);
 				excelHelper.GravarExcel(salvarArquivo, dados);
-				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo);
+				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo + ".xlsx");
             }
             catch (Exception error)
             {
@@ -250,7 +250,7 @@ namespace Migracao.Sistems
 				var salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_DentalOffice_FluxoCaixa");
 				sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", salvarArquivo, dados);
 				excelHelper.GravarExcel(salvarArquivo, dados);
-				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo);
+				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo + ".xlsx");
             }
 
             catch (Exception error)

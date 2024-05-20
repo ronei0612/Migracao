@@ -1,4 +1,5 @@
 using Migracao.Sistems;
+using Migracao.Utils;
 
 namespace Migracao
 {
@@ -35,7 +36,24 @@ namespace Migracao
 			{
 				try
 				{
-					if (comboBoxSistema.Text.Equals("dentaloffice", StringComparison.CurrentCultureIgnoreCase))
+					if (listView1.Visible == true)
+					{
+						ConverterHelper converterHelper = new ConverterHelper();
+						var nomeArquivo = "";
+
+						foreach (ListViewItem item in listView1.Items)
+						{
+							nomeArquivo = Tools.TratarCaracteres(Path.GetFileNameWithoutExtension(item.Text));
+							var pastaArquivo = Path.GetDirectoryName(item.Text);
+							nomeArquivo = Path.Combine(pastaArquivo, nomeArquivo) + ".xlsx";
+
+							converterHelper.JsonExcel(item.Text, nomeArquivo);
+						}
+
+						Tools.AbrirPastaSelecionandoArquivo(nomeArquivo);
+					}
+
+					else if (comboBoxSistema.Text.Equals("dentaloffice", StringComparison.CurrentCultureIgnoreCase))
 					{
 						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
 						{
@@ -73,39 +91,75 @@ namespace Migracao
 
 		private bool ValidarCampos()
 		{
-			if (comboBoxSistema.SelectedIndex == -1 || comboBoxSistema.SelectedIndex == -1 || string.IsNullOrWhiteSpace(txtEstabelecimentoID.Text)
-				 || string.IsNullOrWhiteSpace(textBoxExcel1.Text))
-				return false;
-
-			if (!File.Exists(textBoxExcel1.Text))
+			if (listView1.Visible == true)
 			{
-				MessageBox.Show("Arquivo não existe:" + Environment.NewLine + textBoxExcel1.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-				return false;
-			}
-			else if (!Path.GetExtension(textBoxExcel1.Text).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
-			{
-				MessageBox.Show("Arquivo não é um Excel (.xlsx):" + Environment.NewLine + textBoxExcel1.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-				return false;
+				foreach (ListViewItem item in listView1.SelectedItems)
+					if (!File.Exists(item.Text))
+					{
+						MessageBox.Show("Arquivo não existe:" + Environment.NewLine + item.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+						return false;
+					}
 			}
 
-			if (textBoxExcel2.Visible == true)
-				if (!File.Exists(textBoxExcel2.Text))
+			else
+			{
+				if (comboBoxSistema.SelectedIndex == -1 || comboBoxSistema.SelectedIndex == -1 || string.IsNullOrWhiteSpace(txtEstabelecimentoID.Text)
+					 || string.IsNullOrWhiteSpace(textBoxExcel1.Text))
+					return false;
+
+				if (!File.Exists(textBoxExcel1.Text))
 				{
-					MessageBox.Show("Arquivo não existe:" + Environment.NewLine + textBoxExcel2.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+					MessageBox.Show("Arquivo não existe:" + Environment.NewLine + textBoxExcel1.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 					return false;
 				}
-				else if (!Path.GetExtension(textBoxExcel2.Text).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+
+				else if (!Path.GetExtension(textBoxExcel1.Text).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
 				{
-					MessageBox.Show("Arquivo não é um Excel (.xlsx):" + Environment.NewLine + textBoxExcel2.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+					MessageBox.Show("Arquivo não é um Excel (.xlsx):" + Environment.NewLine + textBoxExcel1.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 					return false;
 				}
+
+				if (textBoxExcel2.Visible == true)
+					if (!File.Exists(textBoxExcel2.Text))
+					{
+						MessageBox.Show("Arquivo não existe:" + Environment.NewLine + textBoxExcel2.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+						return false;
+					}
+					else if (!Path.GetExtension(textBoxExcel2.Text).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+					{
+						MessageBox.Show("Arquivo não é um Excel (.xlsx):" + Environment.NewLine + textBoxExcel2.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+						return false;
+					}
+			}
 
 			return true;
 		}
 
+		void OcultarElementos()
+		{
+			foreach (Control control in this.Controls)
+				control.Visible = false;
+
+			label4.Visible = true;
+			comboBoxImportacao.Visible = true;
+		}
+
 		void MostrarCamposExcel()
 		{
-			if (comboBoxSistema.SelectedIndex > -1 && comboBoxImportacao.SelectedIndex > -1 && !string.IsNullOrEmpty(txtEstabelecimentoID.Text))
+			OcultarElementos();
+
+			if (comboBoxImportacao.SelectedIndex > -1)
+			{
+				if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "JSON")
+				{
+					listView1.Visible = true;
+					btnAddToList.Visible = true;
+					btnDelFromList.Visible = true;
+					btnImportar.Visible = true;
+				}
+			}
+
+			else if (comboBoxSistema.SelectedIndex > -1 && comboBoxImportacao.SelectedIndex > -1 && !string.IsNullOrEmpty(txtEstabelecimentoID.Text))
 			{
 				labelExcel1.Text = comboBoxImportacao.Text;
 				labelExcel1.Visible = true;
@@ -123,13 +177,8 @@ namespace Migracao
 					label2.Visible = true;
 					txtPessoaID.Visible = true;
 				}
-			}
-			else
-			{
-				textBoxExcel1.Visible = false;
-				textBoxExcel2.Visible = false;
-				btnExcel.Visible = false;
-				btnExcel2.Visible = false;
+
+				btnImportar.Visible = true;
 			}
 		}
 
@@ -166,6 +215,22 @@ namespace Migracao
 		private void txtLoginID_KeyPress(object sender, KeyPressEventArgs e)
 		{
 			e.Handled = !(char.IsNumber(e.KeyChar) || e.KeyChar == (char)Keys.Back);
+		}
+
+		private void btnDelFromList_Click(object sender, EventArgs e)
+		{
+			foreach (ListViewItem item in listView1.SelectedItems)
+				listView1.Items.Remove(item);
+		}
+
+		private void btnAddToList_Click(object sender, EventArgs e)
+		{
+			var openFileDialog = new OpenFileDialog();
+			openFileDialog.Filter = "Arquivo Json |*.json";
+			openFileDialog.Title = "Selecione um arquivo";
+
+			if (openFileDialog.ShowDialog() == DialogResult.OK)
+				listView1.Items.Add(openFileDialog.FileName);
 		}
 	}
 }

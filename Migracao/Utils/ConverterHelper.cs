@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OfficeOpenXml;
 using System.Data;
+using System.Text.RegularExpressions;
 
 namespace Migracao.Utils
 {

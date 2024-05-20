@@ -150,7 +150,7 @@ namespace Migracao.Sistems
 				var salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_FluxoCaixa");
 				sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", salvarArquivo, dados);
 				excelHelper.GravarExcel(salvarArquivo, dados);
-				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo);
+				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo + ".xlsx");
             }
             catch (Exception error)
             {
@@ -297,7 +297,7 @@ namespace Migracao.Sistems
 				var salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_Consumidores");
 				sqlHelper.GerarSqlInsert("_MigracaoConsumidores_Temp", salvarArquivo, dados);
 				excelHelper.GravarExcel(salvarArquivo, dados);
-				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo);
+				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo + ".xlsx");
             }
 
             catch (Exception error)
@@ -547,7 +547,7 @@ namespace Migracao.Sistems
                 salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_Pessoas");
                 sqlHelper.GerarSqlInsert("_MigracaoPessoas_Temp", salvarArquivo, pessoasDict);
                 excelHelper.GravarExcel(salvarArquivo, pessoasDict);
-				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo);
+				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo + ".xlsx");
 
 
 				var consumidoresDict = new Dictionary<string, object[]>

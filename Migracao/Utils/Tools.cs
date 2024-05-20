@@ -117,7 +117,7 @@ namespace Migracao.Utils
 
         public static void AbrirPastaSelecionandoArquivo(string nomeArquivo)
         {
-            string argumento = "/select, \"" + nomeArquivo + ".xlsx" + "\"";
+            string argumento = "/select, \"" + nomeArquivo + "\"";
 
             Process.Start("explorer.exe", argumento);
         }
@@ -152,5 +152,14 @@ namespace Migracao.Utils
 		{
 			return decimal.Parse(texto.Replace(",", "."), CultureInfo.InvariantCulture);
 		}
+
+
+		public static string TratarCaracteres(string texto)
+		{
+			var regex = new Regex("[^a-zA-Z0-9 -_]");
+			texto = regex.Replace(texto, "");
+			return texto;
+		}
+
 	}
 }

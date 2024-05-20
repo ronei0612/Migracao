@@ -455,7 +455,7 @@ namespace Migracao.Sistems
                             CodigoAntigo = numcadastro
 						});
 
-						if (string.IsNullOrWhiteSpace(logradouro))
+						if (!string.IsNullOrWhiteSpace(logradouro))
 						{
 							var cidadeID = excelHelper.GetCidadeID(cidade, estado);
 							enderecos.Add(new ConsumidorEndereco()
@@ -582,8 +582,8 @@ namespace Migracao.Sistems
 				};
 
 				salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_Enderecos");
-				sqlHelper.GerarSqlInsert("_MigracaoConsumidorEnderecos_Temp", salvarArquivo, consumidoresDict);
-				excelHelper.GravarExcel(salvarArquivo, consumidoresDict);
+				sqlHelper.GerarSqlInsert("_MigracaoConsumidorEnderecos_Temp", salvarArquivo, enderecosDict);
+				excelHelper.GravarExcel(salvarArquivo, enderecosDict);
 				
 
 				var telefonesDict = new Dictionary<string, object[]>

@@ -19,7 +19,7 @@ namespace Migracao.Sistems
             {
                 IWorkbook workbookConsumidores = excelHelper.LerExcel(arquivoExcelConsumidores);
                 sheetConsumidores = workbookConsumidores.GetSheetAt(0);
-                excelHelper.InitializeDictionaryConsumidor(sheetConsumidores);
+                excelHelper.InitializeDictionary(sheetConsumidores);
             }
             catch (Exception ex)
             {

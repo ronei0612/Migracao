@@ -161,5 +161,22 @@ namespace Migracao.Utils
 			return texto;
 		}
 
+		public static bool IsCPF(this string texto)
+		{
+            texto = Regex.Replace(texto, "[^0-9]", "");
+			if (texto.Length == 11)
+				return true;
+
+            return false;
+		}
+
+		public static bool IsCNPJ_CGC(this string texto)
+		{
+			texto = Regex.Replace(texto, "[^0-9]", "");
+			if (texto.Length == 14)
+				return true;
+
+			return false;
+		}
 	}
 }

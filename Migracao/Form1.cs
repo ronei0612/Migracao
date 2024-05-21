@@ -117,7 +117,7 @@ namespace Migracao
 					return false;
 				}
 
-				if (textBoxExcel2.Visible == true)
+				if (textBoxExcel2.Visible == true && !string.IsNullOrWhiteSpace(textBoxExcel2.Text))
 					if (!File.Exists(textBoxExcel2.Text))
 					{
 						MessageBox.Show("Arquivo não existe:" + Environment.NewLine + textBoxExcel2.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);

@@ -1,13 +1,14 @@
 ﻿using Migracao.Models;
 using Migracao.Utils;
 using NPOI.SS.UserModel;
-using System.Runtime.ConstrainedExecution;
 
 namespace Migracao.Sistems
 {
     internal class OdontoCompany
-    {
-        public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
+	{
+        string arquivoExcelCidades = "EnderecosCidades.xlsx";
+
+		public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
         {
             var dataHoje = DateTime.Now;
             var indiceLinha = 0;
@@ -159,7 +160,7 @@ namespace Migracao.Sistems
             }
         }
 
-        public void ImportarFornecedores(string arquivoExcel, string arquivoExcelCidades, int estabelecimentoID, int loginID)
+        public void ImportarFornecedores(string arquivoExcel, string arquivo2, int estabelecimentoID, int loginID)
         {
             var dataHoje = DateTime.Now;
             var indiceLinha = 0;
@@ -307,7 +308,7 @@ namespace Migracao.Sistems
             }
         }
 
-		public void ImportarPacientes(string arquivoExcel, string arquivoExcelCidades, int estabelecimentoID, int loginID)
+		public void ImportarPacientes(string arquivoExcel, string arquivo2, int estabelecimentoID, int loginID)
         {
             var indiceLinha = 1;
             var consumidorID = 1;

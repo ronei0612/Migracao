@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <Folder Include="DDL\" />
+    <Folder Include="Files\" />
   </ItemGroup>
 
 </Project>

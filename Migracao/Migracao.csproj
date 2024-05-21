@@ -11,6 +11,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Scripts\ExportPessoas.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Scripts\ExportPessoas.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="engrenagem.ico" />
   </ItemGroup>
 

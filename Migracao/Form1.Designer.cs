@@ -296,9 +296,9 @@
 			Controls.Add(label2);
 			Controls.Add(btnImportar);
 			Controls.Add(label1);
-			FormBorderStyle = FormBorderStyle.FixedToolWindow;
 			Icon = (Icon)resources.GetObject("$this.Icon");
 			Margin = new Padding(3, 2, 3, 2);
+			MaximizeBox = false;
 			Name = "Form1";
 			StartPosition = FormStartPosition.CenterScreen;
 			Text = "Migração";

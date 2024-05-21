@@ -1,6 +1,7 @@
 ﻿using Migracao.Models;
 using Migracao.Utils;
 using NPOI.SS.UserModel;
+using System.Runtime.ConstrainedExecution;
 
 namespace Migracao.Sistems
 {
@@ -9,7 +10,7 @@ namespace Migracao.Sistems
         public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
         {
             var dataHoje = DateTime.Now;
-            var indiceLinha = 1;
+            var indiceLinha = 0;
             string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
             var excelHelper = new ExcelHelper(arquivoExcel);
             var sqlHelper = new SqlHelper();
@@ -154,14 +155,14 @@ namespace Migracao.Sistems
             }
             catch (Exception error)
             {
-                throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha, colunaLetra, tituloColuna, celulaValor, variaveisValor));
+                throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha++, colunaLetra, tituloColuna, celulaValor, variaveisValor));
             }
         }
 
         public void ImportarFornecedores(string arquivoExcel, string arquivoExcelCidades, int estabelecimentoID, int loginID)
         {
             var dataHoje = DateTime.Now;
-            var indiceLinha = 1;
+            var indiceLinha = 0;
             string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
             var excelHelper = new ExcelHelper(arquivoExcel);
             var sqlHelper = new SqlHelper();
@@ -302,7 +303,7 @@ namespace Migracao.Sistems
 
             catch (Exception error)
             {
-                throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha, colunaLetra, tituloColuna, celulaValor, variaveisValor));
+                throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha++, colunaLetra, tituloColuna, celulaValor, variaveisValor));
             }
         }
 
@@ -330,8 +331,8 @@ namespace Migracao.Sistems
                 var linhasCount = excelHelper.linhas.Count;
                 var consumidores = new List<Consumidor>();
                 var pessoas = new List<Pessoa>();
-                var consumidresEnderecos = new List<ConsumidorEndereco>();
-                var telefones = new List<PessoaFone>();
+                var consumidoresEnderecos = new List<ConsumidorEndereco>();
+                var pessoaFones = new List<PessoaFone>();
 				var fornecedores = new List<Fornecedor>();
 				var empresas = new List<Empresa>();
                 var empresasEnderecos = new List<Endereco>();
@@ -339,8 +340,6 @@ namespace Migracao.Sistems
 
 				foreach (var linha in excelHelper.linhas)
                 {
-                    indiceLinha++;
-
                     bool cliente = false, fornecedor = false;
                     DateTime dataNascimento = dataHoje, dataCadastro = dataHoje;
                     int pessoaID = 0, cep = 0;
@@ -430,159 +429,29 @@ namespace Migracao.Sistems
                         }
                     }
 
-                    if (cliente)
+                    if (documento.IsCPF())
                     {
                         pessoas.Add(new Pessoa()
                         {
-							NomeCompleto = nomeCompleto,
+                            NomeCompleto = nomeCompleto,
                             Apelido = apelido,
                             CPF = documento,
                             DataInclusao = dataCadastro,
                             Email = email,
                             RG = rg,
                             Sexo = sexo,
-							NascimentoData = dataNascimento,
-							NascimentoLocal = nascimentoLocal,
-							ProfissaoOutra = profissaoOutra,
-							EstadoCivilID = estadoCivil,
+                            NascimentoData = dataNascimento,
+                            NascimentoLocal = nascimentoLocal,
+                            ProfissaoOutra = profissaoOutra,
+                            EstadoCivilID = estadoCivil,
                             EstabelecimentoID = estabelecimentoID,
                             LoginID = loginID,
-                            Guid = new Guid()
-						});
+                            Guid = new Guid(),
+                            ConselhoCodigo = indiceLinha.ToString()
+                        });
 
-                        consumidores.Add(new Consumidor()
+                        if (fornecedor)
                         {
-							Ativo = true,
-                            DataInclusao = dataCadastro,
-                            EstabelecimentoID = estabelecimentoID,
-                            LGPDSituacaoID = 0,
-                            LoginID = loginID,
-                            PessoaID = indiceLinha,
-                            CodigoAntigo = numcadastro,
-                            Observacoes = observacao
-						});
-
-						if (!string.IsNullOrWhiteSpace(logradouro))
-						{
-							var cidadeID = excelHelper.GetCidadeID(cidade, estado);
-							consumidresEnderecos.Add(new ConsumidorEndereco()
-							{
-								Ativo = true,
-								ConsumidorID = indiceLinha,
-								EnderecoTipoID = (short)EnderecoTipos.Residencial,
-								LogradouroTipoID = (int)LogradouroTipos.Outros,
-								Logradouro = logradouro,
-								CidadeID = cidadeID,
-								Cep = cep,
-								DataInclusao = dataCadastro,
-								Bairro = bairro,
-								LogradouroNum = logradouroNum,
-								Complemento = complemento,
-								LoginID = loginID
-							});
-						}
-
-						if (celular > 0)
-							telefones.Add(new PessoaFone()
-							{
-								PessoaID = indiceLinha,
-								FoneTipoID = (short)FoneTipos.Celular,
-								Telefone = celular,
-								DataInclusao = dataCadastro,
-								LoginID = loginID
-							});
-
-						if (telefonePrinc > 0)
-							telefones.Add(new PessoaFone()
-							{
-								PessoaID = indiceLinha,
-								FoneTipoID = (short)FoneTipos.Principal,
-								Telefone = telefonePrinc,
-								DataInclusao = dataCadastro,
-								LoginID = loginID
-							});
-
-						if (telefoneAltern > 0)
-							telefones.Add(new PessoaFone()
-							{
-								PessoaID = indiceLinha,
-								FoneTipoID = (short)FoneTipos.Alternativo,
-								Telefone = telefoneAltern,
-								DataInclusao = dataCadastro,
-								LoginID = loginID
-							});
-
-						if (telefoneComercial > 0)
-							telefones.Add(new PessoaFone()
-							{
-								PessoaID = indiceLinha,
-								FoneTipoID = (short)FoneTipos.Comercial,
-								Telefone = telefoneComercial,
-								DataInclusao = dataCadastro,
-								LoginID = loginID
-							});
-
-						if (telefoneOutro > 0)
-							telefones.Add(new PessoaFone()
-							{
-								PessoaID = indiceLinha,
-								FoneTipoID = (short)FoneTipos.Outros,
-								Telefone = telefoneOutro,
-								DataInclusao = dataCadastro,
-								LoginID = loginID
-							});
-					}
-
-                    else if (fornecedor)
-                    {
-                        if (documento.IsCPF())
-                        {
-                            pessoas.Add(new Pessoa()
-                            {
-                                NomeCompleto = nomeCompleto,
-                                Apelido = apelido,
-                                CPF = documento,
-                                DataInclusao = dataCadastro,
-                                Email = email,
-                                RG = rg,
-                                Sexo = sexo,
-                                NascimentoData = dataNascimento,
-                                NascimentoLocal = nascimentoLocal,
-                                ProfissaoOutra = profissaoOutra,
-                                EstadoCivilID = estadoCivil,
-                                EstabelecimentoID = estabelecimentoID,
-                                LoginID = loginID,
-                                Guid = new Guid()
-                            });
-
-                            fornecedores.Add(new Fornecedor()
-                            {
-                                Ativo = true,
-                                DataInclusao = dataCadastro,
-                                EstabelecimentoID = estabelecimentoID,
-                                LoginID = loginID,
-                                Email = email,
-                                PessoaID = indiceLinha,
-                                Observacoes = observacao
-							});
-                        }
-
-                        else if (documento.IsCNPJ_CGC())
-                        {
-                            empresas.Add(new Empresa()
-                            {
-                                Ativo = true,
-                                CNPJ = documento,
-                                DataInclusao = dataCadastro,
-                                LoginID = loginID,
-                                Marca = "",
-                                NomeFantasia = "",
-                                RazaoSocial = "",
-                                RegimeTribID = 0,
-                                InscricaoMunicipal = rg,
-                                EstabelecimentoID = estabelecimentoID
-                            });
-
 							fornecedores.Add(new Fornecedor()
 							{
 								Ativo = true,
@@ -591,77 +460,184 @@ namespace Migracao.Sistems
 								LoginID = loginID,
 								Email = email,
 								EmpresaID = indiceLinha,
-                                Observacoes = observacao
+								Observacoes = observacao
 							});
+
+							if (!string.IsNullOrWhiteSpace(cidade))
+							{
+								var cidadeID = excelHelper.GetCidadeID(cidade, estado);
+								empresasEnderecos.Add(new Endereco()
+								{
+									Ativo = true,
+									Cep = cep,
+									CidadeID = cidadeID,
+									DataInclusao = dataCadastro,
+									EnderecoTipoID = (byte)EnderecoTipos.Residencial,
+									Logradouro = logradouro,
+									LogradouroNum = logradouroNum,
+									Bairro = bairro,
+									LogradouroTipoID = (int)LogradouroTipos.Outros,
+									Complemento = complemento,
+									ParentID = indiceLinha,
+									TableID = 1,
+								});
+							}
+
+							if (celular > 0)
+								fornecedorFones.Add(new FornecedorFone()
+								{
+									FornecedorID = indiceLinha,
+									FoneTipoID = (short)FoneTipos.Celular,
+									Telefone = celular,
+									DataInclusao = dataCadastro,
+									LoginID = loginID
+								});
+
+							if (telefonePrinc > 0)
+								fornecedorFones.Add(new FornecedorFone()
+								{
+									FornecedorID = indiceLinha,
+									FoneTipoID = (short)FoneTipos.Principal,
+									Telefone = telefonePrinc,
+									DataInclusao = dataCadastro,
+									LoginID = loginID
+								});
+
+							if (telefoneAltern > 0)
+								fornecedorFones.Add(new FornecedorFone()
+								{
+									FornecedorID = indiceLinha,
+									FoneTipoID = (short)FoneTipos.Alternativo,
+									Telefone = telefoneAltern,
+									DataInclusao = dataCadastro,
+									LoginID = loginID
+								});
+
+							if (telefoneComercial > 0)
+								fornecedorFones.Add(new FornecedorFone()
+								{
+									FornecedorID = indiceLinha,
+									FoneTipoID = (short)FoneTipos.Comercial,
+									Telefone = telefoneComercial,
+									DataInclusao = dataCadastro,
+									LoginID = loginID
+								});
+
+							if (telefoneOutro > 0)
+								fornecedorFones.Add(new FornecedorFone()
+								{
+									FornecedorID = indiceLinha,
+									FoneTipoID = (short)FoneTipos.Outros,
+									Telefone = telefoneOutro,
+									DataInclusao = dataCadastro,
+									LoginID = loginID
+								});
 						}
 
-						if (!string.IsNullOrWhiteSpace(logradouro))
+                        else if (!fornecedor)
 						{
-							var cidadeID = excelHelper.GetCidadeID(cidade, estado);
-							empresasEnderecos.Add(new Endereco()
+							consumidores.Add(new Consumidor()
 							{
 								Ativo = true,
-								Cep = cep,
-								CidadeID = cidadeID,
 								DataInclusao = dataCadastro,
-								EnderecoTipoID = (byte)EnderecoTipos.Residencial,
-								Logradouro = logradouro,
-								LogradouroTipoID = (int)LogradouroTipos.Outros,
-								ParentID = indiceLinha,
-								TableID = 1,
+								EstabelecimentoID = estabelecimentoID,
+								LGPDSituacaoID = 0,
+								LoginID = loginID,
+								PessoaID = indiceLinha,
+								CodigoAntigo = numcadastro,
+								Observacoes = observacao
 							});
+
+							if (!string.IsNullOrWhiteSpace(cidade))
+							{
+								var cidadeID = excelHelper.GetCidadeID(cidade, estado);
+								consumidoresEnderecos.Add(new ConsumidorEndereco()
+								{
+									Ativo = true,
+									ConsumidorID = indiceLinha,
+									EnderecoTipoID = (short)EnderecoTipos.Residencial,
+									LogradouroTipoID = (int)LogradouroTipos.Outros,
+									Logradouro = logradouro,
+									CidadeID = cidadeID,
+									Cep = cep,
+									DataInclusao = dataCadastro,
+									Bairro = bairro,
+									LogradouroNum = logradouroNum,
+									Complemento = complemento,
+									LoginID = loginID
+								});
+							}
+
+							if (celular > 0)
+                                pessoaFones.Add(new PessoaFone()
+                                {
+                                    PessoaID = indiceLinha,
+                                    FoneTipoID = (short)FoneTipos.Celular,
+                                    Telefone = celular,
+                                    DataInclusao = dataCadastro,
+                                    LoginID = loginID
+                                });
+
+                            if (telefonePrinc > 0)
+                                pessoaFones.Add(new PessoaFone()
+                                {
+                                    PessoaID = indiceLinha,
+                                    FoneTipoID = (short)FoneTipos.Principal,
+                                    Telefone = telefonePrinc,
+                                    DataInclusao = dataCadastro,
+                                    LoginID = loginID
+                                });
+
+                            if (telefoneAltern > 0)
+                                pessoaFones.Add(new PessoaFone()
+                                {
+                                    PessoaID = indiceLinha,
+                                    FoneTipoID = (short)FoneTipos.Alternativo,
+                                    Telefone = telefoneAltern,
+                                    DataInclusao = dataCadastro,
+                                    LoginID = loginID
+                                });
+
+                            if (telefoneComercial > 0)
+                                pessoaFones.Add(new PessoaFone()
+                                {
+                                    PessoaID = indiceLinha,
+                                    FoneTipoID = (short)FoneTipos.Comercial,
+                                    Telefone = telefoneComercial,
+                                    DataInclusao = dataCadastro,
+                                    LoginID = loginID
+                                });
+
+                            if (telefoneOutro > 0)
+                                pessoaFones.Add(new PessoaFone()
+                                {
+                                    PessoaID = indiceLinha,
+                                    FoneTipoID = (short)FoneTipos.Outros,
+                                    Telefone = telefoneOutro,
+                                    DataInclusao = dataCadastro,
+                                    LoginID = loginID
+                                });
 						}
-
-						if (celular > 0)
-							fornecedorFones.Add(new FornecedorFone()
-							{
-								FornecedorID = indiceLinha,
-								FoneTipoID = (short)FoneTipos.Celular,
-								Telefone = celular,
-								DataInclusao = dataCadastro,
-								LoginID = loginID
-							});
-
-						if (telefonePrinc > 0)
-							fornecedorFones.Add(new FornecedorFone()
-							{
-								FornecedorID = indiceLinha,
-								FoneTipoID = (short)FoneTipos.Principal,
-								Telefone = telefonePrinc,
-								DataInclusao = dataCadastro,
-                                LoginID = loginID
-							});
-
-						if (telefoneAltern > 0)
-							fornecedorFones.Add(new FornecedorFone()
-							{
-								FornecedorID = indiceLinha,
-								FoneTipoID = (short)FoneTipos.Alternativo,
-								Telefone = telefoneAltern,
-								DataInclusao = dataCadastro,
-								LoginID = loginID
-							});
-
-						if (telefoneComercial > 0)
-							fornecedorFones.Add(new FornecedorFone()
-							{
-								FornecedorID = indiceLinha,
-								FoneTipoID = (short)FoneTipos.Comercial,
-								Telefone = telefoneComercial,
-								DataInclusao = dataCadastro,
-								LoginID = loginID
-							});
-
-						if (telefoneOutro > 0)
-							fornecedorFones.Add(new FornecedorFone()
-							{
-								FornecedorID = indiceLinha,
-								FoneTipoID = (short)FoneTipos.Outros,
-								Telefone = telefoneOutro,
-								DataInclusao = dataCadastro,
-								LoginID = loginID
-							});
 					}
+                    else if (documento.IsCNPJ_CGC())
+                    {
+						empresas.Add(new Empresa()
+						{
+							Ativo = true,
+							CNPJ = documento,
+							DataInclusao = dataCadastro,
+							LoginID = loginID,
+							Marca = "",
+							NomeFantasia = "",
+							RazaoSocial = "",
+							RegimeTribID = 0,
+							InscricaoMunicipal = rg,
+							EstabelecimentoID = estabelecimentoID,
+                            Guid = new Guid()
+						});
+					}
+
+					indiceLinha++;
 				}
 
                 indiceLinha = 0;
@@ -683,7 +659,8 @@ namespace Migracao.Sistems
 					{ "EstadoCivilID", pessoas.ConvertAll(pessoa => (object)pessoa.EstadoCivilID).ToArray() },
 					{ "EstabelecimentoID", pessoas.ConvertAll(pessoa => (object)pessoa.EstabelecimentoID).ToArray() },
 					{ "LoginID", pessoas.ConvertAll(pessoa => (object)pessoa.LoginID).ToArray() },
-					{ "Guid", pessoas.ConvertAll(pessoa => (object)pessoa.Guid).ToArray() }
+					{ "Guid", pessoas.ConvertAll(pessoa => (object)pessoa.Guid).ToArray() },
+					{ "ConselhoCodigo", pessoas.ConvertAll(pessoa => (object)pessoa.ConselhoCodigo).ToArray() }
 				};
 
                 salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_Pessoas");
@@ -708,43 +685,98 @@ namespace Migracao.Sistems
 				excelHelper.GravarExcel(salvarArquivo, consumidoresDict);
 
 
-				var enderecosDict = new Dictionary<string, object[]>
+				var consumidoresEnderecosDict = new Dictionary<string, object[]>
 				{
-					{ "Ativo", consumidresEnderecos.ConvertAll(endereco => (object)endereco.Ativo).ToArray() },
-                    { "ConsumidorID", consumidresEnderecos.ConvertAll(endereco => (object)endereco.ConsumidorID).ToArray() },
-                    { "EnderecoTipoID", consumidresEnderecos.ConvertAll(endereco => (object)endereco.EnderecoTipoID).ToArray() },
-                    { "LogradouroTipoID", consumidresEnderecos.ConvertAll(endereco => (object)endereco.LogradouroTipoID).ToArray() },
-                    { "Logradouro", consumidresEnderecos.ConvertAll(endereco => (object)endereco.Logradouro).ToArray() },
-                    { "CidadeID", consumidresEnderecos.ConvertAll(endereco => (object)endereco.CidadeID).ToArray() },
-                    { "Cep", consumidresEnderecos.ConvertAll(endereco => (object)endereco.Cep).ToArray() },
-                    { "DataInclusao", consumidresEnderecos.ConvertAll(endereco => (object)endereco.DataInclusao).ToArray() },
-                    { "Bairro", consumidresEnderecos.ConvertAll(endereco => (object)endereco.Bairro).ToArray() },
-                    { "LogradouroNum", consumidresEnderecos.ConvertAll(endereco => (object)endereco.LogradouroNum).ToArray() },
-                    { "Complemento", consumidresEnderecos.ConvertAll(endereco => (object)endereco.Complemento).ToArray() }
+					{ "Ativo", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.Ativo).ToArray() },
+                    { "ConsumidorID", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.ConsumidorID).ToArray() },
+                    { "EnderecoTipoID", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.EnderecoTipoID).ToArray() },
+                    { "LogradouroTipoID", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.LogradouroTipoID).ToArray() },
+                    { "Logradouro", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.Logradouro).ToArray() },
+                    { "CidadeID", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.CidadeID).ToArray() },
+                    { "Cep", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.Cep).ToArray() },
+                    { "DataInclusao", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.DataInclusao).ToArray() },
+                    { "Bairro", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.Bairro).ToArray() },
+                    { "LogradouroNum", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.LogradouroNum).ToArray() },
+                    { "Complemento", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.Complemento).ToArray() }
+				};
+
+				salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_ConsumidorEnderecos");
+				sqlHelper.GerarSqlInsert("_MigracaoConsumidorEnderecos_Temp", salvarArquivo, consumidoresEnderecosDict);
+				excelHelper.GravarExcel(salvarArquivo, consumidoresEnderecosDict);
+				
+
+				var pessoaFonesDict = new Dictionary<string, object[]>
+				{
+					{ "PessoaID", pessoaFones.ConvertAll(pessoaFone => (object)pessoaFone.PessoaID).ToArray() },
+					{ "FoneTipoID", pessoaFones.ConvertAll(pessoaFone => (object)pessoaFone.FoneTipoID).ToArray() },
+					{ "Telefone", pessoaFones.ConvertAll(pessoaFone => (object)pessoaFone.Telefone).ToArray() },
+					{ "DataInclusao", pessoaFones.ConvertAll(pessoaFone => (object)pessoaFone.DataInclusao).ToArray() },
+					{ "LoginID", pessoaFones.ConvertAll(pessoaFone => (object)pessoaFone.LoginID).ToArray() }
+				};
+
+				salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_PessoaFones");
+				sqlHelper.GerarSqlInsert("_MigracaoPessoaFones_Temp", salvarArquivo, pessoaFonesDict);
+				excelHelper.GravarExcel(salvarArquivo, pessoaFonesDict);
+
+
+				var fornecedorFonesDict = new Dictionary<string, object[]>
+				{
+					{ "FornecedorID", fornecedorFones.ConvertAll(fornecedorFone => (object)fornecedorFone.FornecedorID).ToArray() },
+					{ "FoneTipoID", fornecedorFones.ConvertAll(fornecedorFone => (object)fornecedorFone.FoneTipoID).ToArray() },
+					{ "Telefone", fornecedorFones.ConvertAll(fornecedorFone => (object)fornecedorFone.Telefone).ToArray() },
+					{ "DataInclusao", fornecedorFones.ConvertAll(fornecedorFone => (object)fornecedorFone.DataInclusao).ToArray() },
+					{ "LoginID", fornecedorFones.ConvertAll(fornecedorFone => (object)fornecedorFone.LoginID).ToArray() }
+				};
+
+				salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_FornecedorFones");
+				sqlHelper.GerarSqlInsert("_MigracaoFornecedorFones_Temp", salvarArquivo, fornecedorFonesDict);
+				excelHelper.GravarExcel(salvarArquivo, fornecedorFonesDict);
+
+
+				var empresasDict = new Dictionary<string, object[]>
+                {
+                    { "Ativo", empresas.ConvertAll(empresa => (object)empresa.Ativo).ToArray() },
+                    { "CNPJ", empresas.ConvertAll(empresa => (object)empresa.CNPJ).ToArray() },
+                    { "DataInclusao", empresas.ConvertAll(empresa => (object)empresa.DataInclusao).ToArray() },
+                    { "LoginID", empresas.ConvertAll(empresa => (object)empresa.LoginID).ToArray() },
+                    { "Marca", empresas.ConvertAll(empresa => (object)empresa.Marca).ToArray() },
+                    { "NomeFantasia", empresas.ConvertAll(empresa => (object)empresa.NomeFantasia).ToArray() },
+                    { "RazaoSocial", empresas.ConvertAll(empresa => (object)empresa.RazaoSocial).ToArray() },
+                    { "RegimeTribID", empresas.ConvertAll(empresa => (object)empresa.RegimeTribID).ToArray() },
+                    { "InscricaoMunicipal", empresas.ConvertAll(empresa => (object)empresa.InscricaoMunicipal).ToArray() },
+                    { "EstabelecimentoID", empresas.ConvertAll(empresa => (object)empresa.EstabelecimentoID).ToArray() },
+                    { "Guid", empresas.ConvertAll(empresa => (object)empresa.Guid).ToArray() }
+                };
+
+				salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_Empresas");
+				sqlHelper.GerarSqlInsert("_MigracaoEmpresas_Temp", salvarArquivo, empresasDict);
+				excelHelper.GravarExcel(salvarArquivo, empresasDict);
+
+
+				var empresasEnderecosDict = new Dictionary<string, object[]>
+				{
+	                { "Ativo", empresasEnderecos.ConvertAll(endereco => (object)endereco.Ativo).ToArray() },
+	                { "Cep", empresasEnderecos.ConvertAll(endereco => (object)endereco.Cep).ToArray() },
+	                { "CidadeID", empresasEnderecos.ConvertAll(endereco => (object)endereco.CidadeID).ToArray() },
+	                { "DataInclusao", empresasEnderecos.ConvertAll(endereco => (object)endereco.DataInclusao).ToArray() },
+	                { "EnderecoTipoID", empresasEnderecos.ConvertAll(endereco => (object)endereco.EnderecoTipoID).ToArray() },
+	                { "Logradouro", empresasEnderecos.ConvertAll(endereco => (object)endereco.Logradouro).ToArray() },
+	                { "LogradouroNum", empresasEnderecos.ConvertAll(endereco => (object)endereco.LogradouroNum).ToArray() },
+	                { "Bairro", empresasEnderecos.ConvertAll(endereco => (object)endereco.Bairro).ToArray() },
+	                { "LogradouroTipoID", empresasEnderecos.ConvertAll(endereco => (object)endereco.LogradouroTipoID).ToArray() },
+	                { "Complemento", empresasEnderecos.ConvertAll(endereco => (object)endereco.Complemento).ToArray() },
+	                { "ParentID", empresasEnderecos.ConvertAll(endereco => (object)endereco.ParentID).ToArray() },
+	                { "TableID", empresasEnderecos.ConvertAll(endereco => (object)endereco.TableID).ToArray() }
 				};
 
 				salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_Enderecos");
-				sqlHelper.GerarSqlInsert("_MigracaoConsumidorEnderecos_Temp", salvarArquivo, enderecosDict);
-				excelHelper.GravarExcel(salvarArquivo, enderecosDict);
-				
-
-				var telefonesDict = new Dictionary<string, object[]>
-				{
-					{ "PessoaID", telefones.ConvertAll(telefone => (object)telefone.PessoaID).ToArray() },
-					{ "FoneTipoID", telefones.ConvertAll(telefone => (object)telefone.FoneTipoID).ToArray() },
-					{ "Telefone", telefones.ConvertAll(telefone => (object)telefone.Telefone).ToArray() },
-					{ "DataInclusao", telefones.ConvertAll(telefone => (object)telefone.DataInclusao).ToArray() },
-					{ "LoginID", telefones.ConvertAll(telefone => (object)telefone.LoginID).ToArray() }
-				};
-
-				salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_Telefones");
-				sqlHelper.GerarSqlInsert("_MigracaoPessoaFones_Temp", salvarArquivo, telefonesDict);
-				excelHelper.GravarExcel(salvarArquivo, telefonesDict);
+				sqlHelper.GerarSqlInsert("_MigracaoEnderecos_Temp", salvarArquivo, empresasEnderecosDict);
+				excelHelper.GravarExcel(salvarArquivo, empresasEnderecosDict);
 			}
 
             catch (Exception error)
             {
-                throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha, colunaLetra, tituloColuna, celulaValor, variaveisValor));
+				throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha + 2, colunaLetra, tituloColuna, celulaValor, variaveisValor));
             }
         }
     }

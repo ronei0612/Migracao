@@ -94,7 +94,13 @@ namespace Migracao.Sistems
 
 					if (clinica)// && pagoValor > 0)
 					{
-                        if (!string.IsNullOrEmpty(dentista))
+                        if (pagoValor <= 0)
+                        {
+							pagoValor = valor;
+                            dataPagamento = dataVencimento;
+						}
+
+						if (!string.IsNullOrEmpty(dentista))
                         {
 							var funcionarioID = excelHelper.GetFuncionarioID(nomeCompleto: dentista);
 							if (!string.IsNullOrEmpty(funcionarioID))
@@ -108,7 +114,7 @@ namespace Migracao.Sistems
 									FinanceiroID = responsavelPessoaID,
 									PagoValor = pagoValor > 0 ? pagoValor : valor,
 									TipoID = (byte)TransacaoTiposID.Pagamento,
-									TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
+									TransacaoID = (byte)TituloTransacoes.Liquidacao,
 									EstabelecimentoID = estabelecimentoID,
 									LoginID = loginID,
 									PlanoContasID = 55,
@@ -129,7 +135,7 @@ namespace Migracao.Sistems
 									FinanceiroID = responsavelPessoaID,
 									PagoValor = pagoValor > 0 ? pagoValor : valor,
 									TipoID = (byte)TransacaoTiposID.Pagamento,
-									TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
+									TransacaoID = (byte)TituloTransacoes.Liquidacao,
 									EstabelecimentoID = estabelecimentoID,
 									LoginID = loginID,
 									PlanoContasID = 55,
@@ -174,6 +180,7 @@ namespace Migracao.Sistems
 					{ "Data", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.Data).ToArray() },
 					{ "OutroCedenteNome", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.OutroCedenteNome).ToArray() },
 					{ "ConsumidorID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.ConsumidorID).ToArray() },
+					{ "ColaboradorID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.ColaboradorID).ToArray() },
 					{ "FornecedorID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.FornecedorID).ToArray() },
 					{ "TransacaoID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.TransacaoID).ToArray() },
 					{ "EspecieID", fluxosCaixa.ConvertAll(fluxoCaixa => (object)fluxoCaixa.EspecieID).ToArray() },
@@ -282,7 +289,7 @@ namespace Migracao.Sistems
                             PagoJuros = 0,
                             TipoID = (byte)TransacaoTiposID.Recebimento,
                             Data = data,
-                            TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
+                            TransacaoID = (byte)TituloTransacoes.Liquidacao,
                             EspecieID = titulosEspecies,
                             DataBaseCalculo = data,
                             DevidoValor = pagoValor,
@@ -306,7 +313,7 @@ namespace Migracao.Sistems
                             PagoJuros = 0,
                             TipoID = (byte)TransacaoTiposID.Recebimento,
                             Data = data,
-                            TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
+                            TransacaoID = (byte)TituloTransacoes.Liquidacao,
                             EspecieID = titulosEspecies,
                             DataBaseCalculo = data,
                             DevidoValor = pagoValor,

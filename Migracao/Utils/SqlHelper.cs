@@ -28,6 +28,8 @@ namespace Migracao.Utils
 							sql.Append($"NULL, ");
 						else if (valueArray[i].ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
 							sql.Append($"NULL, ");
+						else if (valueArray[i] is decimal)
+							sql.Append($"'{valueArray[i].ToString().Replace(',', '.')}', ");
 						else
 							sql.Append($"'{VerificarSeDateTime(valueArray[i])}', ");
 					}

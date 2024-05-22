@@ -99,6 +99,11 @@ namespace Migracao.Utils
             return true;
 		}
 
+        public static string GetLetras(string texto)
+        {
+			return Regex.Replace(texto, @"[^a-zA-Z\s]", "");
+		}
+
 		public static string GerarNomeArquivo(string nomeArquivo)
         {
 			var pasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Desktop");

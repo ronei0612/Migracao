@@ -452,7 +452,9 @@ namespace Migracao.Sistems
                             EstadoCivilID = estadoCivil,
                             EstabelecimentoID = estabelecimentoID,
                             LoginID = loginID,
-                            Guid = new Guid()
+                            Guid = new Guid(),
+							FoneticaApelido = apelido.Fonetizar(),
+						    FoneticaNomeCompleto = nomeCompleto.Fonetizar()
                         });
                     }
 

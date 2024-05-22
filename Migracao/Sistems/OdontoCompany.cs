@@ -7,6 +7,7 @@ namespace Migracao.Sistems
     internal class OdontoCompany
 	{
         string arquivoExcelCidades = "EnderecosCidades.xlsx";
+		string arquivoExcelNomesUTF8 = "NomesUTF8.xlsx";
 
 		public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
         {
@@ -168,16 +169,17 @@ namespace Migracao.Sistems
             var excelHelper = new ExcelHelper(arquivoExcel);
             var sqlHelper = new SqlHelper();
 
-            try
-            {
-                var workbookCidades = excelHelper.LerExcel(arquivoExcelCidades);
-                var sheetCidades = workbookCidades.GetSheetAt(0);
-                excelHelper.InitializeDictionaryCidade(sheetCidades);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
-            }
+            if (File.Exists(arquivoExcelCidades))
+                try
+                {
+                    var workbookCidades = excelHelper.LerExcel(arquivoExcelCidades);
+                    var sheetCidades = workbookCidades.GetSheetAt(0);
+                    excelHelper.InitializeDictionaryCidade(sheetCidades);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
+                }
 
             try
             {
@@ -318,18 +320,31 @@ namespace Migracao.Sistems
             var excelHelper = new ExcelHelper(arquivoExcel);
             var sqlHelper = new SqlHelper();
 
-            try
-            {
-                var workbookCidades = excelHelper.LerExcel(arquivoExcelCidades);
-                var sheetCidades = workbookCidades.GetSheetAt(0);
-                excelHelper.InitializeDictionaryCidade(sheetCidades);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
-            }
+            if (File.Exists(arquivoExcelCidades))
+                try
+                {
+                    var workbookCidades = excelHelper.LerExcel(arquivoExcelCidades);
+                    var sheetCidades = workbookCidades.GetSheetAt(0);
+                    excelHelper.InitializeDictionaryCidade(sheetCidades);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
+                }
 
-            if (!string.IsNullOrEmpty(arquivoPacientesAtuais))
+            if (File.Exists(arquivoExcelNomesUTF8))
+			    try
+			    {
+				    var workbookCidades = excelHelper.LerExcel(arquivoExcelNomesUTF8);
+				    var sheetCidades = workbookCidades.GetSheetAt(0);
+				    excelHelper.InitializeDictionaryNomesUTF8(sheetCidades);
+			    }
+			    catch (Exception ex)
+			    {
+				    throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelNomesUTF8}\": {ex.Message}");
+			    }
+
+			if (!string.IsNullOrEmpty(arquivoPacientesAtuais))
 			    try
 			    {
 				    var workbook = excelHelper.LerExcel(arquivoPacientesAtuais);

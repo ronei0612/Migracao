@@ -9,12 +9,6 @@ namespace Migracao.Utils
     {
         private static string mascaraCPF = "000.000.000-00";
 
-        //public Tools(string celulaValor)
-        //{
-        //	mascaraCPF = "000.000.000-00";
-        //	this.celulaValor = celulaValor;
-        //}
-
         public static string ToCPF(this string possivelCpf)
         {
             if (possivelCpf.Contains('.') && possivelCpf.Contains('-') && possivelCpf.Length <= 14)

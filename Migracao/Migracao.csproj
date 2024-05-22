@@ -24,11 +24,13 @@
 
   <ItemGroup>
     <Folder Include="DDL\" />
-    <Folder Include="Files\" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="EnderecosCidades.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Files\NomesUTF8.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

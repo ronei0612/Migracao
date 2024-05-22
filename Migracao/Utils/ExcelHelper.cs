@@ -1,5 +1,4 @@
-﻿using NPOI.SS.Formula.Functions;
-using NPOI.SS.UserModel;
+﻿using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
 namespace Migracao.Utils
@@ -24,7 +23,8 @@ namespace Migracao.Utils
 
 		private Dictionary<string, string> cpfKeyDict = new Dictionary<string, string>();
 		private Dictionary<string, string> nomeKeyDict = new Dictionary<string, string>();
-		
+		private Dictionary<string, string> nomesUTF8Dict = new Dictionary<string, string>();
+
 		public ExcelHelper(string arquivoExcel)
         {
 			try
@@ -117,7 +117,28 @@ namespace Migracao.Utils
 			}
 		}
 
-        private int GetColumnIndex(IRow headerRow, string columnName)
+		public void InitializeDictionaryNomesUTF8(ISheet sheet)
+		{
+			this.sheet = sheet;
+			IRow headerRow = sheet.GetRow(0);
+			int nomeErradoColumnIndex = GetColumnIndex(headerRow, "nomeErrado");
+			int nomeCorrigidoColumnIndex = GetColumnIndex(headerRow, "nomeCorrigido");
+
+			for (int row = 1; row <= sheet.LastRowNum; row++)
+			{
+				if (sheet.GetRow(row) != null)
+				{
+					string nomeErradoCellValue = sheet.GetRow(row).GetCell(nomeErradoColumnIndex) != null ? sheet.GetRow(row).GetCell(nomeErradoColumnIndex).ToString() : "";
+					string nomeCorrigidoCellValue = sheet.GetRow(row).GetCell(nomeCorrigidoColumnIndex) != null ? sheet.GetRow(row).GetCell(nomeCorrigidoColumnIndex).ToString() : "";
+
+					string key = nomeErradoCellValue.ToLower();
+					if (!nomesUTF8Dict.ContainsKey(key))
+						nomesUTF8Dict.Add(key, nomeCorrigidoCellValue);
+				}
+			}
+		}
+
+		private int GetColumnIndex(IRow headerRow, string columnName)
         {
             for (int column = 0; column < headerRow.LastCellNum; column++)
             {
@@ -305,5 +326,18 @@ namespace Migracao.Utils
             workbook.Write(sw);
             sw.Close();
         }
-    }
+
+		public string CorrigirNomeUTF8(string nome)
+		{
+			string[] palavras = nome.Split(' ');
+			for (int i = 0; i < palavras.Length; i++)
+			{
+				if (nomesUTF8Dict.ContainsKey(palavras[i]))
+				{
+					palavras[i] = nomesUTF8Dict[palavras[i]];
+				}
+			}
+			return string.Join(" ", palavras);
+		}
+	}
 }

@@ -672,7 +672,7 @@ namespace Migracao.Sistems
 
 				var pessoasDict = new Dictionary<string, object[]>
                 {
-					{ "ID", pessoas.ConvertAll(pessoa => (object)pessoa.ID).ToArray() },
+					//{ "ID", pessoas.ConvertAll(pessoa => (object)pessoa.ID).ToArray() },
 					{ "NomeCompleto", pessoas.ConvertAll(pessoa => (object)pessoa.NomeCompleto).ToArray() },
                     { "Apelido", pessoas.ConvertAll(pessoa => (object)pessoa.Apelido).ToArray() },
                     { "CPF", pessoas.ConvertAll(pessoa => (object)pessoa.CPF).ToArray() },

@@ -39,7 +39,7 @@ namespace Migracao.Sistems
 
 					bool clinica = false;
 					string dentista = "", categoria = "", codigo = "";
-					byte formaPagamento = 0;
+					byte formaPagamento = (byte)TitulosEspeciesID.DepositoEmConta;
 					decimal valor = 0, pagoValor = 0;
 					DateTime dataVencimento = dataHoje, dataPagamento = dataHoje;
 
@@ -85,13 +85,14 @@ namespace Migracao.Sistems
 										formaPagamento = celulaValor.ToTipoPagamento();
 										break;
 									case "valor":
+										valor = celulaValor.ToMoeda();
 										break;
 								}
 							}
 						}
 					}
 
-					if (clinica && pagoValor > 0)
+					if (clinica)// && pagoValor > 0)
 					{
                         if (!string.IsNullOrEmpty(dentista))
                         {
@@ -105,7 +106,7 @@ namespace Migracao.Sistems
 									DevidoValor = valor,
 									EspecieID = formaPagamento,
 									FinanceiroID = responsavelPessoaID,
-									PagoValor = pagoValor,
+									PagoValor = pagoValor > 0 ? pagoValor : valor,
 									TipoID = (byte)TransacaoTiposID.Pagamento,
 									TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
 									EstabelecimentoID = estabelecimentoID,
@@ -126,7 +127,7 @@ namespace Migracao.Sistems
 									DevidoValor = valor,
 									EspecieID = formaPagamento,
 									FinanceiroID = responsavelPessoaID,
-									PagoValor = pagoValor,
+									PagoValor = pagoValor > 0 ? pagoValor : valor,
 									TipoID = (byte)TransacaoTiposID.Pagamento,
 									TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
 									EstabelecimentoID = estabelecimentoID,
@@ -149,7 +150,7 @@ namespace Migracao.Sistems
 								DevidoValor = valor,
 								EspecieID = formaPagamento,
 								FinanceiroID = responsavelPessoaID,
-								PagoValor = pagoValor,
+								PagoValor = pagoValor > 0 ? pagoValor : valor,
 								TipoID = (byte)TransacaoTiposID.Pagamento,
 								TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
 								EstabelecimentoID = estabelecimentoID,

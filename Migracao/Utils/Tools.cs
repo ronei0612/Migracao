@@ -150,7 +150,10 @@ namespace Migracao.Utils
 
 		public static decimal ToMoeda(this string texto)
 		{
-			return decimal.Parse(texto.Replace(",", "."), CultureInfo.InvariantCulture);
+            if (texto.Contains(',') && texto.Contains('.'))
+			    return decimal.Parse(texto.Replace(".", "").Replace(",", "."), CultureInfo.InvariantCulture);
+            else
+				return decimal.Parse(texto.Replace(",", "."), CultureInfo.InvariantCulture);
 		}
 
 

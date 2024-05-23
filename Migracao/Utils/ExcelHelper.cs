@@ -154,13 +154,11 @@ namespace Migracao.Utils
 		{
             if (!string.IsNullOrWhiteSpace(cidade))
             {
-                cidade = cidade.ToLower();
-
-				string key = cidade + "|" + estado.ToLower();
+				string key = cidade.ToLower() + "|" + estado.ToLower();
                 if (cidadeEstadoDict.ContainsKey(key))
                     return int.Parse(cidadeEstadoDict[key]);
 
-                key = cidade;
+                key = cidade.ToLower();
                 if (cidadeDict.ContainsKey(key))
                     return int.Parse(cidadeDict[key]);
             }

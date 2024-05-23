@@ -1,5 +1,6 @@
 ﻿using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+using System.Text.RegularExpressions;
 
 namespace Migracao.Utils
 {
@@ -59,7 +60,7 @@ namespace Migracao.Utils
 				if (sheet.GetRow(row) != null)
 				{
 					string cpfCellValue = sheet.GetRow(row).GetCell(cpfColumnIndex) != null ? sheet.GetRow(row).GetCell(cpfColumnIndex).ToString() : "";
-					string nomeCompletoCellValue = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex) != null ? sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString() : "";
+					string nomeCompletoCellValue = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex) != null ? sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString().ToLower() : "";
 					string pessoaidCellValue = sheet.GetRow(row).GetCell(pessoaidColumnIndex) != null ? sheet.GetRow(row).GetCell(pessoaidColumnIndex).ToString() : "";
 					string funcionarioidCellValue = sheet.GetRow(row).GetCell(funcionarioidColumnIndex) != null ? sheet.GetRow(row).GetCell(funcionarioidColumnIndex).ToString() : "";
 					string fornecedoridCellValue = sheet.GetRow(row).GetCell(fornecedoridColumnIndex) != null ? sheet.GetRow(row).GetCell(fornecedoridColumnIndex).ToString() : "";
@@ -331,13 +332,13 @@ namespace Migracao.Utils
 			{
 				//string[] palavras = nome.Split(' ');
 				string[] palavras = Regex.Split(nome, @"[\s\(\)/:\-,]");
-			for (int i = 0; i < palavras.Length; i++)
-			{
+				for (int i = 0; i < palavras.Length; i++)
+				{
 					if (nomesUTF8Dict.ContainsKey(palavras[i].ToLower()))
 						palavras[i] = nomesUTF8Dict[palavras[i].ToLower()];
+				}
+				return string.Join(" ", palavras);
 			}
-			return string.Join(" ", palavras);
-		}
 
 			return nome;
 		}

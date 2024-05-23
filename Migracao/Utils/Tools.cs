@@ -1,4 +1,5 @@
 ﻿using Migracao.Models;
+using NPOI.SS.UserModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -7,7 +8,7 @@ namespace Migracao.Utils
 {
     internal static class Tools
     {
-        private static string mascaraCPF = "000.000.000-00";
+        public static string mascaraCPF = "000.000.000-00";
 
         public static string ToCPF(this string possivelCpf)
         {
@@ -186,6 +187,58 @@ namespace Migracao.Utils
 				return true;
 
 			return false;
+		}
+
+
+		// Função auxiliar para obter valores inteiros de uma célula, tratando células vazias
+		public static int? GetIntValueFromCell(ICell cell)
+		{
+			if (cell == null || cell.CellType == CellType.Blank)
+				return null;
+			return (int)cell.NumericCellValue;
+		}
+
+		// Função auxiliar para obter valores decimais de uma célula, tratando células vazias
+		public static decimal? GetDecimalValueFromCell(ICell cell)
+		{
+			if (cell == null || cell.CellType == CellType.Blank)
+				return null;
+			if (cell is decimal)
+				return (decimal)cell.NumericCellValue;
+			else
+				return decimal.Parse(cell.StringCellValue);
+		}
+
+		// Função auxiliar para obter valores de data/hora de uma célula, tratando células vazias
+		public static DateTime? GetDateTimeValueFromCell(ICell cell)
+		{
+			if (cell == null || cell.CellType == CellType.Blank)
+				return DateTime.Now;
+			if (cell is DateTime)
+				return cell.DateCellValue;
+			else
+				return DateTime.Parse(cell.ToString());
+
+			//.ToString("yyyy-MM-dd HH:mm:ss.f");
+		}
+
+		// Função auxiliar para obter valores de TimeSpan de uma célula, tratando células vazias
+		public static TimeSpan? GetTimeSpanValueFromCell(ICell cell)
+		{
+			if (cell == null || cell.CellType == CellType.Blank)
+				return null;
+
+			// Converte o valor da célula (que pode ser um DateTime ou um double) para TimeSpan
+			if (cell.CellType == CellType.Numeric)
+			{
+				// Se for um número, assume que é um valor de tempo em dias (como o Excel armazena)
+				return TimeSpan.FromDays(cell.NumericCellValue);
+			}
+			else
+			{
+				// Se for um DateTime, converte para TimeSpan
+				return TimeSpan.Parse(cell.DateCellValue.ToString());//.TimeOfDay;
+			}
 		}
 	}
 }

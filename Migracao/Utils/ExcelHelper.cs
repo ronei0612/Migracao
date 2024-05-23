@@ -25,6 +25,10 @@ namespace Migracao.Utils
 		private Dictionary<string, string> cpfKeyDict = new Dictionary<string, string>();
 		private Dictionary<string, string> nomeKeyDict = new Dictionary<string, string>();
 		private Dictionary<string, string> nomesUTF8Dict = new Dictionary<string, string>();
+		private Dictionary<string, string> cpfTelefonesDict = new Dictionary<string, string>();
+		private Dictionary<string, string> cpfEnderecosDict = new Dictionary<string, string>();
+		private Dictionary<string, string> nomeTelefonesDict = new Dictionary<string, string>();
+		private Dictionary<string, string> nomeEnderecosDict = new Dictionary<string, string>();
 
 		public ExcelHelper(string arquivoExcel)
         {
@@ -54,39 +58,65 @@ namespace Migracao.Utils
 			int nomefantasiaColumnIndex = GetColumnIndex(headerRow, "nomefantasia");
 			int consumidoridColumnIndex = GetColumnIndex(headerRow, "consumidorid");
 			int codigoantigoColumnIndex = GetColumnIndex(headerRow, "codigoantigo");
+			int logradouroColumnIndex = GetColumnIndex(headerRow, "logradouro");
+			int telefoneColumnIndex = GetColumnIndex(headerRow, "telefone");
 
 			for (int row = 1; row <= sheet.LastRowNum; row++)
 			{
 				if (sheet.GetRow(row) != null)
 				{
-					string cpfCellValue = sheet.GetRow(row).GetCell(cpfColumnIndex) != null ? sheet.GetRow(row).GetCell(cpfColumnIndex).ToString() : "";
-					string nomeCompletoCellValue = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex) != null ? sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString().ToLower() : "";
-					string pessoaidCellValue = sheet.GetRow(row).GetCell(pessoaidColumnIndex) != null ? sheet.GetRow(row).GetCell(pessoaidColumnIndex).ToString() : "";
-					string funcionarioidCellValue = sheet.GetRow(row).GetCell(funcionarioidColumnIndex) != null ? sheet.GetRow(row).GetCell(funcionarioidColumnIndex).ToString() : "";
-					string fornecedoridCellValue = sheet.GetRow(row).GetCell(fornecedoridColumnIndex) != null ? sheet.GetRow(row).GetCell(fornecedoridColumnIndex).ToString() : "";
-					string nomefantasiaCellValue = sheet.GetRow(row).GetCell(nomefantasiaColumnIndex) != null ? sheet.GetRow(row).GetCell(nomefantasiaColumnIndex).ToString() : "";
-					string consumidoridCellValue = sheet.GetRow(row).GetCell(consumidoridColumnIndex) != null ? sheet.GetRow(row).GetCell(consumidoridColumnIndex).ToString() : "";
-					string codigoantigoCellValue = sheet.GetRow(row).GetCell(codigoantigoColumnIndex) != null ? sheet.GetRow(row).GetCell(codigoantigoColumnIndex).ToString() : "";
+					string cpf = sheet.GetRow(row).GetCell(cpfColumnIndex) != null ? sheet.GetRow(row).GetCell(cpfColumnIndex).ToString() : "";
+					string nomeCompleto = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex) != null ? sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString().ToLower() : "";
+					string pessoaid = sheet.GetRow(row).GetCell(pessoaidColumnIndex) != null ? sheet.GetRow(row).GetCell(pessoaidColumnIndex).ToString() : "";
+					string funcionarioid = sheet.GetRow(row).GetCell(funcionarioidColumnIndex) != null ? sheet.GetRow(row).GetCell(funcionarioidColumnIndex).ToString() : "";
+					string fornecedorid = sheet.GetRow(row).GetCell(fornecedoridColumnIndex) != null ? sheet.GetRow(row).GetCell(fornecedoridColumnIndex).ToString() : "";
+					string nomefantasia = sheet.GetRow(row).GetCell(nomefantasiaColumnIndex) != null ? sheet.GetRow(row).GetCell(nomefantasiaColumnIndex).ToString() : "";
+					string consumidorid = sheet.GetRow(row).GetCell(consumidoridColumnIndex) != null ? sheet.GetRow(row).GetCell(consumidoridColumnIndex).ToString() : "";
+					string codigoantigo = sheet.GetRow(row).GetCell(codigoantigoColumnIndex) != null ? sheet.GetRow(row).GetCell(codigoantigoColumnIndex).ToString() : "";
+					string logradouro = sheet.GetRow(row).GetCell(logradouroColumnIndex) != null ? sheet.GetRow(row).GetCell(logradouroColumnIndex).ToString() : "";
+					string telefone = sheet.GetRow(row).GetCell(telefoneColumnIndex) != null ? sheet.GetRow(row).GetCell(telefoneColumnIndex).ToString() : "";
 
-					string key = cpfCellValue;
+					string key = cpf;
+
 					if (!cpfConsumidorDict.ContainsKey(key))
-						cpfConsumidorDict.Add(key, consumidoridCellValue);
+						cpfConsumidorDict.Add(key, consumidorid);
 
 					if (!cpfPessoaDict.ContainsKey(key))
-						cpfPessoaDict.Add(key, pessoaidCellValue);
+						cpfPessoaDict.Add(key, pessoaid);
 
 					if (!cpfFuncionarioDict.ContainsKey(key))
-						cpfFuncionarioDict.Add(key, funcionarioidCellValue);
+						cpfFuncionarioDict.Add(key, funcionarioid);
 
-					key = nomeCompletoCellValue;
+					key = cpf + "|" + telefone;
+					if (!cpfTelefonesDict.ContainsKey(key))
+						cpfTelefonesDict.Add(key, telefone);
+
+					key = cpf + "|" + logradouro;
+					if (!cpfEnderecosDict.ContainsKey(key))
+						cpfEnderecosDict.Add(key, logradouro);
+
+					key = nomeCompleto + "|" + codigoantigo;
+					if (!nomeCodConsumidorDict.ContainsKey(key))
+						nomeCodConsumidorDict.Add(key, consumidorid);
+
+					key = nomeCompleto;
+
 					if (!nomeConsumidorDict.ContainsKey(key))
-						nomeConsumidorDict.Add(key, consumidoridCellValue);
+						nomeConsumidorDict.Add(key, consumidorid);
 
 					if (!nomePessoaDict.ContainsKey(key))
-						nomePessoaDict.Add(key, pessoaidCellValue);
+						nomePessoaDict.Add(key, pessoaid);
 
 					if (!nomeFuncionarioDict.ContainsKey(key))
-						nomeFuncionarioDict.Add(key, funcionarioidCellValue);
+						nomeFuncionarioDict.Add(key, funcionarioid);
+
+					key = nomeCompleto + "|" + telefone;
+					if (!nomeTelefonesDict.ContainsKey(key))
+						nomeTelefonesDict.Add(key, funcionarioid);
+
+					key = nomeCompleto + "|" + logradouro;
+					if (!nomeEnderecosDict.ContainsKey(key))
+						nomeEnderecosDict.Add(key, funcionarioid);
 				}
 			}
 		}
@@ -164,7 +194,7 @@ namespace Migracao.Utils
                     return int.Parse(cidadeDict[key]);
             }
 
-			return 1;
+			return 0;
 		}
 
 		public string GetPessoaID(string cpf = "", string nomeCompleto = "")
@@ -199,6 +229,40 @@ namespace Migracao.Utils
 
             return "";
         }
+
+		public bool PessoaFoneExists(string cpf = "", string nomeCompleto = "", string telefone = "")
+		{
+			string key = cpf + "|" + telefone;
+			if (!string.IsNullOrWhiteSpace(key))
+				if (cpfTelefonesDict.ContainsKey(key))
+					return true;
+
+			if (!string.IsNullOrWhiteSpace(nomeCompleto) && !string.IsNullOrWhiteSpace(telefone))
+			{
+				key = nomeCompleto + "|" + telefone;
+				if (nomeTelefonesDict.ContainsKey(key))
+					return true;
+			}
+
+			return false;
+		}
+
+		public bool ConsumidorEnderecoExists(string cpf = "", string nomeCompleto = "", string logradouro = "")
+		{
+			string key = cpf + "|" + logradouro;
+			if (!string.IsNullOrWhiteSpace(cpf))
+				if (cpfEnderecosDict.ContainsKey(key))
+					return true;
+
+			if (!string.IsNullOrWhiteSpace(nomeCompleto) && !string.IsNullOrWhiteSpace(logradouro))
+			{
+				key = nomeCompleto + "|" + logradouro;
+				if (nomeEnderecosDict.ContainsKey(key))
+					return true;
+			}
+
+			return false;
+		}
 
 		public string GetFuncionarioID(string cpf = "", string nomeCompleto = "")
 		{

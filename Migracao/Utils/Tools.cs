@@ -99,9 +99,10 @@ namespace Migracao.Utils
 		}
 
 
-        public static string GetLetras(this string texto)
+		public static string GetLetras(this string texto)
         {
-			return Regex.Replace(texto, @"[^a-zA-Z\s]", "").Trim();
+			return Regex.Replace(texto, @"[^a-zA-Z\?\s]", "").Trim();
+			//return Regex.Replace(texto, @"[^\p{L}\s]", "").Trim();
 		}
 
 		public static string GerarNomeArquivo(string nomeArquivo)

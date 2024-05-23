@@ -1,6 +1,11 @@
 ﻿using Migracao.Models;
 using Migracao.Utils;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
+using System.Data;
+using System.Text;
 
 namespace Migracao.Sistems
 {
@@ -9,9 +14,13 @@ namespace Migracao.Sistems
         string arquivoExcelCidades = "EnderecosCidades.xlsx";
 		string arquivoExcelNomesUTF8 = "Files\\NomesUTF8.xlsx";
 
+		
+
 		public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
         {
-            var dataHoje = DateTime.Now;
+			//BXD111
+            //CRD111
+			var dataHoje = DateTime.Now;
             var indiceLinha = 0;
             string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
             var excelHelper = new ExcelHelper(arquivoExcel);
@@ -37,15 +46,14 @@ namespace Migracao.Sistems
                 {
                     indiceLinha++;
 
-                    string nomeCompleto = "", outroSacadoNome = "";
+                    string nomeCompleto = "", outroSacadoNome = "", cpf = "";
                     int controle = 0, recibo = 0, codigo = 0;
                     int? consumidorID = 0;
                     decimal pagoValor = 0;
                     byte titulosEspecies = 0;
-                    var dataPagamento = dataHoje;
-                    var nascimentoData = dataHoje;
+                    DateTime dataPagamento = dataHoje, nascimentoData = dataHoje, dataVencimento = dataHoje, dataInclusao = dataHoje;
 
-                    foreach (var celula in linha.Cells)
+					foreach (var celula in linha.Cells)
                     {
                         if (celula != null)
                         {
@@ -57,23 +65,23 @@ namespace Migracao.Sistems
                             {
                                 switch (tituloColuna)
                                 {
-                                    case "paciente":
-                                        nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
-                                        break;
-                                    case "numero_registro":
-                                        codigo = int.Parse(celulaValor);
-                                        break;
-                                    case "data_pagamento":
-                                        dataPagamento = celulaValor.ToData();
-                                        break;
-                                    case "forma_pagamento":
-                                        celulaValor.ToTipoPagamento();
-                                        break;
-                                    case "valor":
+                                    case "VR_CALCULADO":
                                         pagoValor = celulaValor.ToMoeda();
                                         break;
-                                }
-                            }
+                                    case "BAIXA":
+                                        dataPagamento = celulaValor.ToData();
+                                        break;
+                                    case "VENCTO":
+                                        dataVencimento = celulaValor.ToData();
+                                        break;
+                                    case "CGC_CPF":
+                                        cpf = celulaValor.ToCPF();
+                                        break;
+									case "EMISSAO":
+										dataInclusao = celulaValor.ToData();
+										break;
+								}
+							}
                         }
                     }
 
@@ -312,7 +320,8 @@ namespace Migracao.Sistems
 
 		public void ImportarPacientes(string arquivoExcel, string arquivoPacientesAtuais, int estabelecimentoID, int loginID)
         {
-            var indiceLinha = 1;
+			//EMD101
+			var indiceLinha = 1;
             var consumidorID = 1;
 			var pessoaID = 1;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
@@ -400,7 +409,7 @@ namespace Migracao.Sistems
                                         break;
                                     case "NOME":
                                         nomeCompleto = excelHelper.CorrigirNomeUTF8(celulaValor.GetLetras().GetPrimeirosCaracteres(70)).ToNomeCompleto();
-                                        apelido = excelHelper.CorrigirNomeUTF8(celulaValor.GetLetras().GetPrimeiroNome());
+                                        apelido = excelHelper.CorrigirNomeUTF8(celulaValor.GetLetras().GetPrimeiroNome()).ToNomeCompleto();
                                         break;
                                     case "CGC_CPF":
 										documento = celulaValor.ToCPF();
@@ -424,10 +433,10 @@ namespace Migracao.Sistems
                                         celular = celulaValor.ToFone();
                                         break;
                                     case "ENDERECO":
-                                        logradouro = excelHelper.CorrigirNomeUTF8(celulaValor);
+                                        logradouro = excelHelper.CorrigirNomeUTF8(celulaValor).ToNomeCompleto();
                                         break;
                                     case "BAIRRO":
-                                        bairro = excelHelper.CorrigirNomeUTF8(celulaValor);
+                                        bairro = excelHelper.CorrigirNomeUTF8(celulaValor).ToNomeCompleto();
                                         break;
                                     case "NUM_ENDERECO":
                                         logradouroNum = celulaValor;
@@ -461,12 +470,19 @@ namespace Migracao.Sistems
                     }
 
                     pessoaID = indiceLinha;
+					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento);
+					if (!string.IsNullOrEmpty(pessoaIDValue))
+						pessoaID = int.Parse(pessoaIDValue);
 
-                    if (!string.IsNullOrWhiteSpace(nomeCompleto))
+					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: documento);
+                    if (!string.IsNullOrEmpty(consumidorIDValue))
+                        consumidorID = int.Parse(consumidorIDValue);
+
+					if (!string.IsNullOrWhiteSpace(nomeCompleto))
                     {
                         if (documento.IsCPF())
                         {
-                            if (string.IsNullOrEmpty(excelHelper.GetPessoaID(documento, nomeCompleto)))
+							if (string.IsNullOrEmpty(pessoaIDValue))
 							    pessoas.Add(new Pessoa()
                                 {
                                     ID = indiceLinha,
@@ -540,7 +556,7 @@ namespace Migracao.Sistems
                                 });
                             }
 
-                            if (celular > 0)
+                            if (celular > 0 && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, celular.ToString()))
                                 fornecedorFones.Add(new FornecedorFone()
                                 {
                                     FornecedorID = indiceLinha,
@@ -550,8 +566,8 @@ namespace Migracao.Sistems
                                     LoginID = loginID
                                 });
 
-                            if (telefonePrinc > 0)
-                                fornecedorFones.Add(new FornecedorFone()
+                            if (telefonePrinc > 0 && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefonePrinc.ToString()))
+								fornecedorFones.Add(new FornecedorFone()
                                 {
                                     FornecedorID = indiceLinha,
                                     FoneTipoID = (short)FoneTipos.Principal,
@@ -560,8 +576,8 @@ namespace Migracao.Sistems
                                     LoginID = loginID
                                 });
 
-                            if (telefoneAltern > 0)
-                                fornecedorFones.Add(new FornecedorFone()
+                            if (telefoneAltern > 0 && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefoneAltern.ToString()))
+								fornecedorFones.Add(new FornecedorFone()
                                 {
                                     FornecedorID = indiceLinha,
                                     FoneTipoID = (short)FoneTipos.Alternativo,
@@ -570,8 +586,8 @@ namespace Migracao.Sistems
                                     LoginID = loginID
                                 });
 
-                            if (telefoneComercial > 0)
-                                fornecedorFones.Add(new FornecedorFone()
+                            if (telefoneComercial > 0 && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefoneComercial.ToString()))
+								fornecedorFones.Add(new FornecedorFone()
                                 {
                                     FornecedorID = indiceLinha,
                                     FoneTipoID = (short)FoneTipos.Comercial,
@@ -580,8 +596,8 @@ namespace Migracao.Sistems
                                     LoginID = loginID
                                 });
 
-                            if (telefoneOutro > 0)
-                                fornecedorFones.Add(new FornecedorFone()
+                            if (telefoneOutro > 0 && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefoneOutro.ToString()))
+								fornecedorFones.Add(new FornecedorFone()
                                 {
                                     FornecedorID = indiceLinha,
                                     FoneTipoID = (short)FoneTipos.Outros,
@@ -593,25 +609,22 @@ namespace Migracao.Sistems
 
                         else if (!fornecedor)
                         {
-                            if (!string.IsNullOrEmpty(arquivoPacientesAtuais))
+                            if (string.IsNullOrEmpty(arquivoPacientesAtuais) == false)
                             {
-                                var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento);
-                                if (!string.IsNullOrEmpty(pessoaIDValue))
-									consumidores.Add(new Consumidor()
-									{
-										Ativo = true,
-										DataInclusao = dataCadastro,
-										EstabelecimentoID = estabelecimentoID,
-										LGPDSituacaoID = 0,
-										LoginID = loginID,
-										PessoaID = int.Parse(pessoaIDValue),
-										CodigoAntigo = numcadastro,
-										Observacoes = observacao
-									});
+                                if (string.IsNullOrEmpty(consumidorIDValue) == false)
+                                    consumidores.Add(new Consumidor()
+                                    {
+                                        Ativo = true,
+                                        DataInclusao = dataCadastro,
+                                        EstabelecimentoID = estabelecimentoID,
+                                        LGPDSituacaoID = 0,
+                                        LoginID = loginID,
+                                        PessoaID = pessoaID,
+                                        CodigoAntigo = numcadastro,
+                                        Observacoes = observacao
+                                    });
                             }
-
                             else
-                            {
                                 consumidores.Add(new Consumidor()
                                 {
                                     Ativo = true,
@@ -623,20 +636,18 @@ namespace Migracao.Sistems
                                     CodigoAntigo = numcadastro,
                                     Observacoes = observacao
                                 });
-                            }
 
                             if (!string.IsNullOrWhiteSpace(cidade) && !string.IsNullOrWhiteSpace(logradouro))
                             {
                                 var cidadeID = excelHelper.GetCidadeID(cidade, estado);
 
-                                if (!string.IsNullOrEmpty(arquivoPacientesAtuais))
+                                if (string.IsNullOrEmpty(arquivoPacientesAtuais) == false)
                                 {
-                                    var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: documento);
-                                    if (!string.IsNullOrEmpty(consumidorIDValue))
+                                    if (string.IsNullOrEmpty(consumidorIDValue) == false && cidadeID > 0)
                                         consumidoresEnderecos.Add(new ConsumidorEndereco()
                                         {
                                             Ativo = true,
-                                            ConsumidorID = int.Parse(consumidorIDValue),
+                                            ConsumidorID = consumidorID,
                                             EnderecoTipoID = (short)EnderecoTipos.Residencial,
                                             LogradouroTipoID = (int)LogradouroTipos.Outros,
                                             Logradouro = logradouro,
@@ -650,138 +661,85 @@ namespace Migracao.Sistems
                                         });
                                 }
                                 else
+									consumidoresEnderecos.Add(new ConsumidorEndereco()
+									{
+										Ativo = true,
+										ConsumidorID = consumidorID,
+										EnderecoTipoID = (short)EnderecoTipos.Residencial,
+										LogradouroTipoID = (int)LogradouroTipos.Outros,
+										Logradouro = logradouro,
+										CidadeID = cidadeID,
+										Cep = cep,
+										DataInclusao = dataCadastro,
+										Bairro = bairro,
+										LogradouroNum = logradouroNum,
+										Complemento = complemento,
+										LoginID = loginID
+									});
+							}
+
+							if (string.IsNullOrEmpty(arquivoPacientesAtuais) == false)
+							    consumidorID++;
+
+                            if (celular > 0)
+                                if (string.IsNullOrEmpty(arquivoPacientesAtuais) ||
+                                    (!string.IsNullOrEmpty(arquivoPacientesAtuais) && !string.IsNullOrEmpty(pessoaIDValue) && !excelHelper.PessoaFoneExists(documento, nomeCompleto, celular.ToString())))
+                                pessoaFones.Add(new PessoaFone()
                                 {
-                                    consumidoresEnderecos.Add(new ConsumidorEndereco()
-                                    {
-                                        Ativo = true,
-                                        ConsumidorID = consumidorID,
-                                        EnderecoTipoID = (short)EnderecoTipos.Residencial,
-                                        LogradouroTipoID = (int)LogradouroTipos.Outros,
-                                        Logradouro = logradouro,
-                                        CidadeID = cidadeID,
-                                        Cep = cep,
-                                        DataInclusao = dataCadastro,
-                                        Bairro = bairro,
-                                        LogradouroNum = logradouroNum,
-                                        Complemento = complemento,
-                                        LoginID = loginID
-                                    });
-                                }
-                            }
+                                    PessoaID = pessoaID,
+                                    FoneTipoID = (short)FoneTipos.Celular,
+                                    Telefone = celular,
+                                    DataInclusao = dataCadastro,
+                                    LoginID = loginID
+                                });
 
-                            consumidorID++;
-
-                            if (!string.IsNullOrEmpty(arquivoPacientesAtuais))
-                            {
-                                var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento);
-                                if (!string.IsNullOrEmpty(pessoaIDValue))
+                            if (telefonePrinc > 0)
+								if (string.IsNullOrEmpty(arquivoPacientesAtuais) ||
+									(!string.IsNullOrEmpty(arquivoPacientesAtuais) && !string.IsNullOrEmpty(pessoaIDValue) && !excelHelper.PessoaFoneExists(documento, nomeCompleto, telefonePrinc.ToString())))
+								pessoaFones.Add(new PessoaFone()
                                 {
-                                    pessoaID = int.Parse(pessoaIDValue);
+                                    PessoaID = pessoaID,
+                                    FoneTipoID = (short)FoneTipos.Principal,
+                                    Telefone = telefonePrinc,
+                                    DataInclusao = dataCadastro,
+                                    LoginID = loginID
+                                });
 
-                                    if (celular > 0)
-                                        pessoaFones.Add(new PessoaFone()
-                                        {
-                                            PessoaID = pessoaID,
-                                            FoneTipoID = (short)FoneTipos.Celular,
-                                            Telefone = celular,
-                                            DataInclusao = dataCadastro,
-                                            LoginID = loginID
-                                        });
+                            if (telefoneAltern > 0)
+								if (string.IsNullOrEmpty(arquivoPacientesAtuais) ||
+									(!string.IsNullOrEmpty(arquivoPacientesAtuais) && !string.IsNullOrEmpty(pessoaIDValue) && !excelHelper.PessoaFoneExists(documento, nomeCompleto, telefoneAltern.ToString())))
+								pessoaFones.Add(new PessoaFone()
+                                {
+                                    PessoaID = pessoaID,
+                                    FoneTipoID = (short)FoneTipos.Alternativo,
+                                    Telefone = telefoneAltern,
+                                    DataInclusao = dataCadastro,
+                                    LoginID = loginID
+                                });
 
-                                    if (telefonePrinc > 0)
-                                        pessoaFones.Add(new PessoaFone()
-                                        {
-                                            PessoaID = pessoaID,
-                                            FoneTipoID = (short)FoneTipos.Principal,
-                                            Telefone = telefonePrinc,
-                                            DataInclusao = dataCadastro,
-                                            LoginID = loginID
-                                        });
+                            if (telefoneComercial > 0)
+								if (string.IsNullOrEmpty(arquivoPacientesAtuais) ||
+									(!string.IsNullOrEmpty(arquivoPacientesAtuais) && !string.IsNullOrEmpty(pessoaIDValue) && !excelHelper.PessoaFoneExists(documento, nomeCompleto, telefoneComercial.ToString())))
+								pessoaFones.Add(new PessoaFone()
+                                {
+                                    PessoaID = pessoaID,
+                                    FoneTipoID = (short)FoneTipos.Comercial,
+                                    Telefone = telefoneComercial,
+                                    DataInclusao = dataCadastro,
+                                    LoginID = loginID
+                                });
 
-                                    if (telefoneAltern > 0)
-                                        pessoaFones.Add(new PessoaFone()
-                                        {
-                                            PessoaID = pessoaID,
-                                            FoneTipoID = (short)FoneTipos.Alternativo,
-                                            Telefone = telefoneAltern,
-                                            DataInclusao = dataCadastro,
-                                            LoginID = loginID
-                                        });
-
-                                    if (telefoneComercial > 0)
-                                        pessoaFones.Add(new PessoaFone()
-                                        {
-                                            PessoaID = pessoaID,
-                                            FoneTipoID = (short)FoneTipos.Comercial,
-                                            Telefone = telefoneComercial,
-                                            DataInclusao = dataCadastro,
-                                            LoginID = loginID
-                                        });
-
-                                    if (telefoneOutro > 0)
-                                        pessoaFones.Add(new PessoaFone()
-                                        {
-                                            PessoaID = pessoaID,
-                                            FoneTipoID = (short)FoneTipos.Outros,
-                                            Telefone = telefoneOutro,
-                                            DataInclusao = dataCadastro,
-                                            LoginID = loginID
-                                        });
-                                }
-                            }
-
-                            else
-                            {
-                                if (celular > 0)
-                                    pessoaFones.Add(new PessoaFone()
-                                    {
-                                        PessoaID = pessoaID,
-                                        FoneTipoID = (short)FoneTipos.Celular,
-                                        Telefone = celular,
-                                        DataInclusao = dataCadastro,
-                                        LoginID = loginID
-                                    });
-
-                                if (telefonePrinc > 0)
-                                    pessoaFones.Add(new PessoaFone()
-                                    {
-                                        PessoaID = pessoaID,
-                                        FoneTipoID = (short)FoneTipos.Principal,
-                                        Telefone = telefonePrinc,
-                                        DataInclusao = dataCadastro,
-                                        LoginID = loginID
-                                    });
-
-                                if (telefoneAltern > 0)
-                                    pessoaFones.Add(new PessoaFone()
-                                    {
-                                        PessoaID = pessoaID,
-                                        FoneTipoID = (short)FoneTipos.Alternativo,
-                                        Telefone = telefoneAltern,
-                                        DataInclusao = dataCadastro,
-                                        LoginID = loginID
-                                    });
-
-                                if (telefoneComercial > 0)
-                                    pessoaFones.Add(new PessoaFone()
-                                    {
-                                        PessoaID = pessoaID,
-                                        FoneTipoID = (short)FoneTipos.Comercial,
-                                        Telefone = telefoneComercial,
-                                        DataInclusao = dataCadastro,
-                                        LoginID = loginID
-                                    });
-
-                                if (telefoneOutro > 0)
-                                    pessoaFones.Add(new PessoaFone()
-                                    {
-                                        PessoaID = pessoaID,
-                                        FoneTipoID = (short)FoneTipos.Outros,
-                                        Telefone = telefoneOutro,
-                                        DataInclusao = dataCadastro,
-                                        LoginID = loginID
-                                    });
-                            }
+                            if (telefoneOutro > 0)
+								if (string.IsNullOrEmpty(arquivoPacientesAtuais) ||
+									(!string.IsNullOrEmpty(arquivoPacientesAtuais) && !string.IsNullOrEmpty(pessoaIDValue) && !excelHelper.PessoaFoneExists(documento, nomeCompleto, telefoneOutro.ToString())))
+								pessoaFones.Add(new PessoaFone()
+                                {
+                                    PessoaID = pessoaID,
+                                    FoneTipoID = (short)FoneTipos.Outros,
+                                    Telefone = telefoneOutro,
+                                    DataInclusao = dataCadastro,
+                                    LoginID = loginID
+                                });
                         }
                     }
 
@@ -837,8 +795,9 @@ namespace Migracao.Sistems
 
 				var consumidoresEnderecosDict = new Dictionary<string, object[]>
 				{
+					{ "LoginID", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.LoginID).ToArray() },
 					{ "Ativo", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.Ativo).ToArray() },
-                    //{ "ConsumidorID", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.ConsumidorID).ToArray() },
+                    { "ConsumidorID", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.ConsumidorID).ToArray() },
                     { "EnderecoTipoID", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.EnderecoTipoID).ToArray() },
                     { "LogradouroTipoID", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.LogradouroTipoID).ToArray() },
                     { "Logradouro", consumidoresEnderecos.ConvertAll(endereco => (object)endereco.Logradouro).ToArray() },

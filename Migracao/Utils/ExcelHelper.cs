@@ -329,15 +329,19 @@ namespace Migracao.Utils
 
 		public string CorrigirNomeUTF8(string nome)
 		{
-			string[] palavras = nome.Split(' ');
+			if (nome.Contains('?'))
+			{
+				//string[] palavras = nome.Split(' ');
+				string[] palavras = Regex.Split(nome, @"[\s\(\)/:\-,]");
 			for (int i = 0; i < palavras.Length; i++)
 			{
-				if (nomesUTF8Dict.ContainsKey(palavras[i]))
-				{
-					palavras[i] = nomesUTF8Dict[palavras[i]];
-				}
+					if (nomesUTF8Dict.ContainsKey(palavras[i].ToLower()))
+						palavras[i] = nomesUTF8Dict[palavras[i].ToLower()];
 			}
 			return string.Join(" ", palavras);
+		}
+
+			return nome;
 		}
 	}
 }

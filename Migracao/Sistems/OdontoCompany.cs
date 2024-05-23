@@ -7,7 +7,7 @@ namespace Migracao.Sistems
     internal class OdontoCompany
 	{
         string arquivoExcelCidades = "EnderecosCidades.xlsx";
-		string arquivoExcelNomesUTF8 = "NomesUTF8.xlsx";
+		string arquivoExcelNomesUTF8 = "Files\\NomesUTF8.xlsx";
 
 		public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
         {
@@ -399,8 +399,8 @@ namespace Migracao.Sistems
                                         fornecedor = celulaValor == "S" ? true : false;
                                         break;
                                     case "NOME":
-                                        nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70);
-                                        apelido = celulaValor.GetLetras().GetPrimeiroNome();
+                                        nomeCompleto = excelHelper.CorrigirNomeUTF8(celulaValor.GetLetras().GetPrimeirosCaracteres(70)).ToNomeCompleto();
+                                        apelido = excelHelper.CorrigirNomeUTF8(celulaValor.GetLetras().GetPrimeiroNome());
                                         break;
                                     case "CGC_CPF":
 										documento = celulaValor.ToCPF();
@@ -424,16 +424,16 @@ namespace Migracao.Sistems
                                         celular = celulaValor.ToFone();
                                         break;
                                     case "ENDERECO":
-                                        logradouro = celulaValor;
+                                        logradouro = excelHelper.CorrigirNomeUTF8(celulaValor);
                                         break;
                                     case "BAIRRO":
-                                        bairro = celulaValor;
+                                        bairro = excelHelper.CorrigirNomeUTF8(celulaValor);
                                         break;
                                     case "NUM_ENDERECO":
                                         logradouroNum = celulaValor;
                                         break;
                                     case "CIDADE":
-                                        cidade = celulaValor;
+                                        cidade = excelHelper.CorrigirNomeUTF8(celulaValor);
                                         break;
                                     case "ESTADO":
                                         estado = celulaValor;
@@ -442,7 +442,7 @@ namespace Migracao.Sistems
                                         cep = celulaValor.ToNum();
                                         break;
                                     case "OBS1":
-                                        observacao = celulaValor;
+                                        observacao = excelHelper.CorrigirNomeUTF8(celulaValor);
 										break;
                                     case "NUM_CONVENIO":
                                         break;
@@ -466,26 +466,27 @@ namespace Migracao.Sistems
                     {
                         if (documento.IsCPF())
                         {
-                            pessoas.Add(new Pessoa()
-                            {
-                                ID = indiceLinha,
-                                NomeCompleto = nomeCompleto,
-                                Apelido = apelido,
-                                CPF = documento,
-                                DataInclusao = dataCadastro,
-                                Email = email,
-                                RG = rg,
-                                Sexo = sexo,
-                                NascimentoData = dataNascimento,
-                                NascimentoLocal = nascimentoLocal,
-                                ProfissaoOutra = profissaoOutra,
-                                EstadoCivilID = estadoCivil,
-                                EstabelecimentoID = estabelecimentoID,
-                                LoginID = loginID,
-                                Guid = new Guid(),
-                                FoneticaApelido = apelido.Fonetizar(),
-                                FoneticaNomeCompleto = nomeCompleto.Fonetizar()
-                            });
+                            if (string.IsNullOrEmpty(excelHelper.GetPessoaID(documento, nomeCompleto)))
+							    pessoas.Add(new Pessoa()
+                                {
+                                    ID = indiceLinha,
+                                    NomeCompleto = nomeCompleto,
+                                    Apelido = apelido,
+                                    CPF = documento,
+                                    DataInclusao = dataCadastro,
+                                    Email = email,
+                                    RG = rg,
+                                    Sexo = sexo,
+                                    NascimentoData = dataNascimento,
+                                    NascimentoLocal = nascimentoLocal,
+                                    ProfissaoOutra = profissaoOutra,
+                                    EstadoCivilID = estadoCivil,
+                                    EstabelecimentoID = estabelecimentoID,
+                                    LoginID = loginID,
+                                    Guid = new Guid(),
+                                    FoneticaApelido = apelido.Fonetizar(),
+                                    FoneticaNomeCompleto = nomeCompleto.Fonetizar()
+                                });
                         }
 
                         else if (documento.IsCNPJ_CGC())

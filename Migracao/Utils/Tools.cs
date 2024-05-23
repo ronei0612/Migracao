@@ -93,6 +93,12 @@ namespace Migracao.Utils
             return true;
 		}
 
+		public static string ToNomeCompleto(this string texto)
+        {
+			return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(texto.ToLower());
+		}
+
+
         public static string GetLetras(this string texto)
         {
 			return Regex.Replace(texto, @"[^a-zA-Z\s]", "").Trim();

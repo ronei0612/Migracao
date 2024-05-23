@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Data;
+using System.Text;
 
 namespace Migracao.Utils
 {
@@ -41,7 +42,7 @@ namespace Migracao.Utils
 				sql.Remove(sql.Length - 2, 2).Append("), " + Environment.NewLine);
 
 				count++;
-				if (count == 1000)
+				if (count == 200)
 				{
 					sql.Remove(sql.Length - 4, 4).Append(';');
 					sql.Append(Environment.NewLine + $"INSERT INTO {tableName} (");
@@ -54,6 +55,62 @@ namespace Migracao.Utils
 
 			// Remove a última quebra de linha e vírgula e espaço e adiciona um ponto e vírgula
 			sql.Remove(sql.Length - 4, 4).Append(';');
+
+			File.WriteAllText(salvarArquivo + ".sql", sql.ToString());
+		}
+
+		private void GerarSqlInsert(string tableName, string salvarArquivo, DataTable dataTable)
+		{
+			var sql = new StringBuilder();
+			var values = new StringBuilder();
+			var insertCount = 0;
+
+			sql.AppendLine($"INSERT INTO {tableName} ({string.Join(", ", dataTable.Columns.Cast<DataColumn>().Select(c => $"[{c.ColumnName}]"))}) VALUES ");
+
+			foreach (DataRow row in dataTable.Rows)
+			{
+				var rowValues = new List<string>();
+
+				foreach (DataColumn column in dataTable.Columns)
+				{
+					object value = row[column];
+					if (value == null || (value is DBNull))
+					{
+						rowValues.Add("NULL");
+					}
+					else if (column.DataType == typeof(string) || column.DataType == typeof(DateTime) || column.DataType == typeof(TimeSpan))
+					{
+						if (column.DataType == typeof(DateTime))
+							rowValues.Add($"'{((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss").Replace("'", "''")}'");
+						else if (column.DataType == typeof(TimeSpan))
+							rowValues.Add($"'{((TimeSpan)value).TotalSeconds.ToString().Split(',')[0].Replace("'", "''")}'");
+						else
+							rowValues.Add($"'{value.ToString().Replace("'", "''")}'");
+					}
+					else
+					{
+						rowValues.Add(value.ToString());
+					}
+				}
+
+				values.AppendLine($"({string.Join(", ", rowValues)}),");
+				insertCount++;
+
+				// A cada 1000 inserts, adiciona um novo bloco INSERT INTO
+				if (insertCount % 200 == 0)
+				{
+					sql.Append(values.ToString().TrimEnd(',', '\r', '\n') + ";"); // Remove a última virgula e quebra de linha
+					sql.AppendLine();
+					sql.AppendLine($"INSERT INTO {tableName} ({string.Join(", ", dataTable.Columns.Cast<DataColumn>().Select(c => $"[{c.ColumnName}]"))}) VALUES ");
+					values.Clear(); // Limpa o StringBuilder de values
+				}
+			}
+
+			// Adiciona o último bloco de inserts, caso haja algum
+			if (values.Length > 0)
+			{
+				sql.Append(values.ToString().TrimEnd(',', '\r', '\n') + ";");
+			}
 
 			File.WriteAllText(salvarArquivo + ".sql", sql.ToString());
 		}

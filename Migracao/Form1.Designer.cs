@@ -38,9 +38,9 @@
 			labelExcel1 = new Label();
 			comboBoxImportacao = new ComboBox();
 			label4 = new Label();
-			labelExcel2 = new Label();
-			textBoxExcel2 = new TextBox();
-			btnExcel2 = new Button();
+			lbReferencia = new Label();
+			txtReferencia = new TextBox();
+			btnReferencia = new Button();
 			label3 = new Label();
 			comboBoxSistema = new ComboBox();
 			txtEstabelecimentoID = new TextBox();
@@ -54,6 +54,9 @@
 			configuraçõesToolStripMenuItem = new ToolStripMenuItem();
 			salvarNaPastaToolStripMenuItem = new ToolStripMenuItem();
 			folderBrowserDialog1 = new FolderBrowserDialog();
+			lbExcel2 = new Label();
+			txtExcel2 = new TextBox();
+			btnExcel2 = new Button();
 			menuStrip1.SuspendLayout();
 			SuspendLayout();
 			// 
@@ -69,7 +72,7 @@
 			// 
 			// btnImportar
 			// 
-			btnImportar.Location = new Point(295, 227);
+			btnImportar.Location = new Point(295, 231);
 			btnImportar.Margin = new Padding(3, 2, 3, 2);
 			btnImportar.Name = "btnImportar";
 			btnImportar.Size = new Size(88, 22);
@@ -98,7 +101,7 @@
 			btnExcel.Location = new Point(638, 93);
 			btnExcel.Margin = new Padding(3, 2, 3, 2);
 			btnExcel.Name = "btnExcel";
-			btnExcel.Size = new Size(31, 22);
+			btnExcel.Size = new Size(31, 23);
 			btnExcel.TabIndex = 5;
 			btnExcel.Text = "📂";
 			btnExcel.UseVisualStyleBackColor = true;
@@ -119,9 +122,9 @@
 			labelExcel1.AutoSize = true;
 			labelExcel1.Location = new Point(10, 97);
 			labelExcel1.Name = "labelExcel1";
-			labelExcel1.Size = new Size(108, 15);
+			labelExcel1.Size = new Size(43, 15);
 			labelExcel1.TabIndex = 8;
-			labelExcel1.Text = "EstabelecimentoID:";
+			labelExcel1.Text = "Excel1:";
 			labelExcel1.Visible = false;
 			// 
 			// comboBoxImportacao
@@ -145,36 +148,36 @@
 			label4.TabIndex = 10;
 			label4.Text = "Importação de:";
 			// 
-			// labelExcel2
+			// lbReferencia
 			// 
-			labelExcel2.AutoSize = true;
-			labelExcel2.Location = new Point(10, 124);
-			labelExcel2.Name = "labelExcel2";
-			labelExcel2.Size = new Size(108, 15);
-			labelExcel2.TabIndex = 11;
-			labelExcel2.Text = "EstabelecimentoID:";
-			labelExcel2.Visible = false;
+			lbReferencia.AutoSize = true;
+			lbReferencia.Location = new Point(10, 151);
+			lbReferencia.Name = "lbReferencia";
+			lbReferencia.Size = new Size(65, 15);
+			lbReferencia.TabIndex = 11;
+			lbReferencia.Text = "Referência:";
+			lbReferencia.Visible = false;
 			// 
-			// textBoxExcel2
+			// txtReferencia
 			// 
-			textBoxExcel2.Location = new Point(131, 121);
-			textBoxExcel2.Margin = new Padding(3, 2, 3, 2);
-			textBoxExcel2.Name = "textBoxExcel2";
-			textBoxExcel2.Size = new Size(501, 23);
-			textBoxExcel2.TabIndex = 91;
-			textBoxExcel2.Visible = false;
+			txtReferencia.Location = new Point(131, 148);
+			txtReferencia.Margin = new Padding(3, 2, 3, 2);
+			txtReferencia.Name = "txtReferencia";
+			txtReferencia.Size = new Size(501, 23);
+			txtReferencia.TabIndex = 91;
+			txtReferencia.Visible = false;
 			// 
-			// btnExcel2
+			// btnReferencia
 			// 
-			btnExcel2.Location = new Point(638, 120);
-			btnExcel2.Margin = new Padding(3, 2, 3, 2);
-			btnExcel2.Name = "btnExcel2";
-			btnExcel2.Size = new Size(31, 22);
-			btnExcel2.TabIndex = 6;
-			btnExcel2.Text = "📂";
-			btnExcel2.UseVisualStyleBackColor = true;
-			btnExcel2.Visible = false;
-			btnExcel2.Click += btnExcel2_Click;
+			btnReferencia.Location = new Point(638, 148);
+			btnReferencia.Margin = new Padding(3, 2, 3, 2);
+			btnReferencia.Name = "btnReferencia";
+			btnReferencia.Size = new Size(31, 23);
+			btnReferencia.TabIndex = 6;
+			btnReferencia.Text = "📂";
+			btnReferencia.UseVisualStyleBackColor = true;
+			btnReferencia.Visible = false;
+			btnReferencia.Click += btnReferencia_Click;
 			// 
 			// label3
 			// 
@@ -244,9 +247,9 @@
 			// 
 			// listView1
 			// 
-			listView1.Location = new Point(12, 149);
+			listView1.Location = new Point(12, 176);
 			listView1.Name = "listView1";
-			listView1.Size = new Size(620, 73);
+			listView1.Size = new Size(620, 48);
 			listView1.TabIndex = 18;
 			listView1.UseCompatibleStateImageBehavior = false;
 			listView1.View = View.List;
@@ -254,10 +257,10 @@
 			// 
 			// btnAddToList
 			// 
-			btnAddToList.Location = new Point(638, 149);
+			btnAddToList.Location = new Point(638, 175);
 			btnAddToList.Margin = new Padding(3, 2, 3, 2);
 			btnAddToList.Name = "btnAddToList";
-			btnAddToList.Size = new Size(31, 22);
+			btnAddToList.Size = new Size(31, 23);
 			btnAddToList.TabIndex = 7;
 			btnAddToList.Text = "➕";
 			btnAddToList.UseVisualStyleBackColor = true;
@@ -266,10 +269,10 @@
 			// 
 			// btnDelFromList
 			// 
-			btnDelFromList.Location = new Point(638, 175);
+			btnDelFromList.Location = new Point(638, 201);
 			btnDelFromList.Margin = new Padding(3, 2, 3, 2);
 			btnDelFromList.Name = "btnDelFromList";
-			btnDelFromList.Size = new Size(31, 22);
+			btnDelFromList.Size = new Size(31, 23);
 			btnDelFromList.TabIndex = 20;
 			btnDelFromList.Text = "🗑";
 			btnDelFromList.UseVisualStyleBackColor = true;
@@ -299,11 +302,45 @@
 			salvarNaPastaToolStripMenuItem.Text = "Salvar na pasta...";
 			salvarNaPastaToolStripMenuItem.Click += salvarNaPastaToolStripMenuItem_Click;
 			// 
+			// lbExcel2
+			// 
+			lbExcel2.AutoSize = true;
+			lbExcel2.Location = new Point(10, 124);
+			lbExcel2.Name = "lbExcel2";
+			lbExcel2.Size = new Size(43, 15);
+			lbExcel2.TabIndex = 97;
+			lbExcel2.Text = "Excel2:";
+			lbExcel2.Visible = false;
+			// 
+			// txtExcel2
+			// 
+			txtExcel2.Location = new Point(131, 121);
+			txtExcel2.Margin = new Padding(3, 2, 3, 2);
+			txtExcel2.Name = "txtExcel2";
+			txtExcel2.Size = new Size(501, 23);
+			txtExcel2.TabIndex = 98;
+			txtExcel2.Visible = false;
+			// 
+			// btnExcel2
+			// 
+			btnExcel2.Location = new Point(638, 120);
+			btnExcel2.Margin = new Padding(3, 2, 3, 2);
+			btnExcel2.Name = "btnExcel2";
+			btnExcel2.Size = new Size(31, 23);
+			btnExcel2.TabIndex = 96;
+			btnExcel2.Text = "📂";
+			btnExcel2.UseVisualStyleBackColor = true;
+			btnExcel2.Visible = false;
+			btnExcel2.Click += btnExcel2_Click_1;
+			// 
 			// Form1
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
-			ClientSize = new Size(679, 261);
+			ClientSize = new Size(679, 264);
+			Controls.Add(lbExcel2);
+			Controls.Add(txtExcel2);
+			Controls.Add(btnExcel2);
 			Controls.Add(btnDelFromList);
 			Controls.Add(btnAddToList);
 			Controls.Add(listView1);
@@ -313,9 +350,9 @@
 			Controls.Add(txtEstabelecimentoID);
 			Controls.Add(label3);
 			Controls.Add(comboBoxSistema);
-			Controls.Add(btnExcel2);
-			Controls.Add(textBoxExcel2);
-			Controls.Add(labelExcel2);
+			Controls.Add(btnReferencia);
+			Controls.Add(txtReferencia);
+			Controls.Add(lbReferencia);
 			Controls.Add(label4);
 			Controls.Add(comboBoxImportacao);
 			Controls.Add(labelExcel1);
@@ -350,9 +387,9 @@
 		private Label labelExcel1;
 		private ComboBox comboBoxImportacao;
 		private Label label4;
-		private Label labelExcel2;
-		private TextBox textBoxExcel2;
-		private Button btnExcel2;
+		private Label lbReferencia;
+		private TextBox txtReferencia;
+		private Button btnReferencia;
 		private Label label3;
 		private ComboBox comboBoxSistema;
 		private TextBox txtEstabelecimentoID;
@@ -366,5 +403,8 @@
 		private ToolStripMenuItem configuraçõesToolStripMenuItem;
 		private ToolStripMenuItem salvarNaPastaToolStripMenuItem;
 		private FolderBrowserDialog folderBrowserDialog1;
+		private Label lbExcel2;
+		private TextBox txtExcel2;
+		private Button btnExcel2;
 	}
 }

@@ -11,6 +11,7 @@ namespace Migracao.Utils
 	{
 		public static string mascaraCPF = "000.000.000-00";
 		public static string salvarNaPasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Documents");
+		public static string ultimaPasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Documents");
 
 		public static string ToCPF(this string possivelCpf)
 		{

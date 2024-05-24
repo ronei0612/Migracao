@@ -20,11 +20,16 @@ namespace Migracao
 			{
 				Filter = "Arquivo Excel |*.xlsx",
 				Title = janelaArquivoExcel,
-				FileName = nomeArquivoExcel
+				FileName = nomeArquivoExcel,
+				InitialDirectory = Tools.ultimaPasta
 			};
 
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
+			{
 				textBoxExcel1.Text = openFileDialog.FileName;
+				Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
+				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta);
+			}
 		}
 
 		private void btnExcel2_Click(object sender, EventArgs e)
@@ -32,11 +37,16 @@ namespace Migracao
 			var openFileDialog = new OpenFileDialog()
 			{
 				Filter = "Arquivo Excel |*.xlsx",
-				Title = "Selecione um arquivo"
+				Title = "Selecione um arquivo",
+				InitialDirectory = Tools.ultimaPasta
 			};
 
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
+			{
 				textBoxExcel2.Text = openFileDialog.FileName;
+				Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
+				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta);
+			}
 		}
 
 		private void btnImportar_Click(object sender, EventArgs e)
@@ -152,6 +162,7 @@ namespace Migracao
 
 			label4.Visible = true;
 			comboBoxImportacao.Visible = true;
+			menuStrip1.Visible = true;
 		}
 
 		void MostrarCampos()
@@ -275,9 +286,12 @@ namespace Migracao
 		private void Form1_Load(object sender, EventArgs e)
 		{
 			if (!File.Exists(arquivoConfig))
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta);
+				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta);
 
-			Tools.salvarNaPasta = File.ReadAllText(arquivoConfig);
+			var textoLinhas = File.ReadAllLines(arquivoConfig);
+
+			Tools.salvarNaPasta = textoLinhas[0];
+			Tools.ultimaPasta = textoLinhas[1];
 		}
 
 		private void salvarNaPastaToolStripMenuItem_Click(object sender, EventArgs e)
@@ -287,7 +301,7 @@ namespace Migracao
 			if (!string.IsNullOrEmpty(pasta))
 			{
 				Tools.salvarNaPasta = pasta;
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta);
+				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta);
 			}
 		}
 

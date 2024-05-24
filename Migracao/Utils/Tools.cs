@@ -341,7 +341,7 @@ namespace Migracao.Utils
 			return d[s.Length, t.Length];
 		}
 
-		public static decimal ArredondarValor(string input)
+		public static decimal ArredondarValor(this string input)
 		{
 			input = input.Replace(" ", "").Replace(",", "");
 

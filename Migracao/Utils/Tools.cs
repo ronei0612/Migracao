@@ -339,5 +339,21 @@ namespace Migracao.Utils
 
 			return d[s.Length, t.Length];
 		}
+
+		public static decimal ArredondarValor(string input)
+		{
+			input = input.Replace(" ", "").Replace(",", "");
+
+			if (decimal.TryParse(input, out decimal valor))
+				return valor;
+			else
+			{
+				string modificado = input.Substring(0, input.Length - 3);
+				modificado = modificado.TrimStart('0');
+				decimal valorResult = decimal.Parse(modificado);
+
+				return valorResult / 100;
+			}
+		}
 	}
 }

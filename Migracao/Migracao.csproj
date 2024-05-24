@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="EnderecosCidades.xlsx">
+    <None Update="Files\EnderecosCidades.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Files\NomesUTF8.xlsx">

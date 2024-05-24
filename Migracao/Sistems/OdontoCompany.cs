@@ -11,7 +11,7 @@ namespace Migracao.Sistems
 {
     internal class OdontoCompany
 	{
-        string arquivoExcelCidades = "EnderecosCidades.xlsx";
+        string arquivoExcelCidades = "Files\\EnderecosCidades.xlsx";
 		string arquivoExcelNomesUTF8 = "Files\\NomesUTF8.xlsx";
 
 		

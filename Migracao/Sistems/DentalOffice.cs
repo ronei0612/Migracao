@@ -158,7 +158,7 @@ namespace Migracao.Sistems
 								FinanceiroID = responsavelPessoaID,
 								PagoValor = pagoValor > 0 ? pagoValor : valor,
 								TipoID = (byte)TransacaoTiposID.Pagamento,
-								TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
+								TransacaoID = (byte)TituloTransacoes.Liquidacao,
 								EstabelecimentoID = estabelecimentoID,
 								LoginID = loginID,
 								PlanoContasID = 55,
@@ -216,16 +216,17 @@ namespace Migracao.Sistems
             var sqlHelper = new SqlHelper();
 
             ISheet sheetConsumidores;
-            try
-            {
-                IWorkbook workbookConsumidores = excelHelper.LerExcel(arquivoExcelConsumidores);
-                sheetConsumidores = workbookConsumidores.GetSheetAt(0);
-                excelHelper.InitializeDictionary(sheetConsumidores);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Erro ao ler o arquivo Excel: " + ex.Message);
-            }
+            if (string.IsNullOrEmpty(arquivoExcelConsumidores) == false)
+                try
+                {
+                    IWorkbook workbookConsumidores = excelHelper.LerExcel(arquivoExcelConsumidores);
+                    sheetConsumidores = workbookConsumidores.GetSheetAt(0);
+                    excelHelper.InitializeDictionary(sheetConsumidores);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Erro ao ler o arquivo Excel: " + ex.Message);
+                }
 
             var fluxoCaixas = new List<FluxoCaixa>();
 

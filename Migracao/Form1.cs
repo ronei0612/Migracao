@@ -6,6 +6,8 @@ namespace Migracao
 	public partial class Form1 : Form
 	{
 		string arquivoConfig = "config.config";
+		string nomeArquivoExcel = "";
+		string janelaArquivoExcel = "Selecione um arquivo";
 
 		public Form1()
 		{
@@ -14,9 +16,12 @@ namespace Migracao
 
 		private void btnExcel_Click(object sender, EventArgs e)
 		{
-			var openFileDialog = new OpenFileDialog();
-			openFileDialog.Filter = "Arquivo Excel |*.xlsx";
-			openFileDialog.Title = "Selecione um arquivo";
+			var openFileDialog = new OpenFileDialog()
+			{
+				Filter = "Arquivo Excel |*.xlsx",
+				Title = janelaArquivoExcel,
+				FileName = nomeArquivoExcel
+			};
 
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
 				textBoxExcel1.Text = openFileDialog.FileName;
@@ -24,9 +29,11 @@ namespace Migracao
 
 		private void btnExcel2_Click(object sender, EventArgs e)
 		{
-			var openFileDialog = new OpenFileDialog();
-			openFileDialog.Filter = "Arquivo Excel |*.xlsx";
-			openFileDialog.Title = "Selecione um arquivo";
+			var openFileDialog = new OpenFileDialog()
+			{
+				Filter = "Arquivo Excel |*.xlsx",
+				Title = "Selecione um arquivo"
+			};
 
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
 				textBoxExcel2.Text = openFileDialog.FileName;
@@ -80,6 +87,9 @@ namespace Migracao
 
 						else if (comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase))
 							odontoCompany.ImportarFornecedores(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
+
+						else if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
+							odontoCompany.ImportarRecebiveis(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
 					}
 				}
 				catch (Exception ex)
@@ -177,7 +187,8 @@ namespace Migracao
 						if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
-							|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase))
+							|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
+							|| comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
 						{
 							labelExcel2.Text = "Referência";
 							labelExcel2.Visible = true;
@@ -193,14 +204,32 @@ namespace Migracao
 			}
 		}
 
+		void NomeArquivoOpenFile()
+		{
+			nomeArquivoExcel = "";
+
+			if (comboBoxSistema.Text.Equals("odontocompany", StringComparison.CurrentCultureIgnoreCase)) {
+				if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
+					nomeArquivoExcel = "CRD111";
+				else if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
+					nomeArquivoExcel = "EMD101";
+				else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
+					nomeArquivoExcel = "BXD111";
+			}
+		}
+
 		private void comboBoxSistema_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			MostrarCampos();
+			NomeArquivoOpenFile();
 		}
 
 		private void comboBoxImportacao_SelectedIndexChanged(object sender, EventArgs e)
 		{
+			janelaArquivoExcel = comboBoxImportacao.Text;
+
 			MostrarCampos();
+			NomeArquivoOpenFile();
 		}
 
 		private void txtPessoaID_KeyPress(object sender, KeyPressEventArgs e)

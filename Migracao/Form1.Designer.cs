@@ -128,7 +128,7 @@
 			// 
 			comboBoxImportacao.DropDownStyle = ComboBoxStyle.DropDownList;
 			comboBoxImportacao.FormattingEnabled = true;
-			comboBoxImportacao.Items.AddRange(new object[] { "JSON", "Fornecedores", "Pacientes", "Pagos", "Recebidos" });
+			comboBoxImportacao.Items.AddRange(new object[] { "JSON", "Fornecedores", "Pacientes", "Pagos", "Recebíveis", "Recebidos" });
 			comboBoxImportacao.Location = new Point(131, 33);
 			comboBoxImportacao.Margin = new Padding(3, 2, 3, 2);
 			comboBoxImportacao.Name = "comboBoxImportacao";
@@ -295,7 +295,7 @@
 			// salvarNaPastaToolStripMenuItem
 			// 
 			salvarNaPastaToolStripMenuItem.Name = "salvarNaPastaToolStripMenuItem";
-			salvarNaPastaToolStripMenuItem.Size = new Size(180, 22);
+			salvarNaPastaToolStripMenuItem.Size = new Size(161, 22);
 			salvarNaPastaToolStripMenuItem.Text = "Salvar na pasta...";
 			salvarNaPastaToolStripMenuItem.Click += salvarNaPastaToolStripMenuItem_Click;
 			// 

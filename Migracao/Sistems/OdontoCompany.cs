@@ -161,8 +161,6 @@ namespace Migracao.Sistems
 
 		public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
         {
-			//BXD111
-            //CRD111
 			var dataHoje = DateTime.Now;
             var indiceLinha = 0;
             string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
@@ -463,7 +461,6 @@ namespace Migracao.Sistems
 
 		public void ImportarPacientes(string arquivoExcel, string arquivoPacientesAtuais, int estabelecimentoID, int loginID)
         {
-			//EMD101
 			var indiceLinha = 1;
             var consumidorID = 1;
 			var pessoaID = 1;

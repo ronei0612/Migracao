@@ -1,4 +1,4 @@
-DECLARE @EstabelecimentoID INT = 17742;
+DECLARE @EstabelecimentoID INT = 999999999;
 
 SELECT 
     p.CPF, 
@@ -10,13 +10,18 @@ SELECT
     c.ID as ConsumidorID, 
     c.CodigoAntigo 
 FROM Pessoas p
-LEFT JOIN Consumidores c 
+LEFT JOIN Consumidores c
     ON c.PessoaID = p.ID AND c.EstabelecimentoID = @EstabelecimentoID
-LEFT JOIN Funcionarios f 
+LEFT JOIN Funcionarios f
     ON f.PessoaID = p.ID AND p.EstabelecimentoID = @EstabelecimentoID
-LEFT JOIN Fornecedores fo 
+LEFT JOIN Fornecedores fo
     ON fo.PessoaID = p.ID AND fo.EstabelecimentoID = @EstabelecimentoID
+LEFT JOIN ConsumidorEnderecos ce
+    ON ce.ConsumidorID = c.ID
+LEFT JOIN PessoaFones pf
+    ON pf.PessoaID = p.ID
 WHERE 
     c.PessoaID IS NOT NULL OR 
     f.PessoaID IS NOT NULL OR 
-    fo.PessoaID IS NOT NULL;
+    fo.PessoaID IS NOT NULL OR
+    pf.PessoaID IS NOT NULL;

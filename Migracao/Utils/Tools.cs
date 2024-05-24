@@ -10,6 +10,7 @@ namespace Migracao.Utils
 	internal static class Tools
 	{
 		public static string mascaraCPF = "000.000.000-00";
+		public static string salvarNaPasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Documents");
 
 		public static string ToCPF(this string possivelCpf)
 		{
@@ -109,8 +110,7 @@ namespace Migracao.Utils
 
 		public static string GerarNomeArquivo(string nomeArquivo)
 		{
-			var pasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Desktop");
-			var caminhoDoArquivo = Path.Combine(pasta, nomeArquivo);
+			var caminhoDoArquivo = Path.Combine(Tools.salvarNaPasta, nomeArquivo);
 
 			if (File.Exists(caminhoDoArquivo + ".xlsx"))
 			{

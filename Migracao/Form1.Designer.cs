@@ -50,12 +50,17 @@
 			listView1 = new ListView();
 			btnAddToList = new Button();
 			btnDelFromList = new Button();
+			menuStrip1 = new MenuStrip();
+			configuraçõesToolStripMenuItem = new ToolStripMenuItem();
+			salvarNaPastaToolStripMenuItem = new ToolStripMenuItem();
+			folderBrowserDialog1 = new FolderBrowserDialog();
+			menuStrip1.SuspendLayout();
 			SuspendLayout();
 			// 
 			// label1
 			// 
 			label1.AutoSize = true;
-			label1.Location = new Point(8, 44);
+			label1.Location = new Point(10, 67);
 			label1.Name = "label1";
 			label1.Size = new Size(108, 15);
 			label1.TabIndex = 0;
@@ -64,7 +69,7 @@
 			// 
 			// btnImportar
 			// 
-			btnImportar.Location = new Point(295, 204);
+			btnImportar.Location = new Point(295, 227);
 			btnImportar.Margin = new Padding(3, 2, 3, 2);
 			btnImportar.Name = "btnImportar";
 			btnImportar.Size = new Size(88, 22);
@@ -77,7 +82,7 @@
 			// label2
 			// 
 			label2.AutoSize = true;
-			label2.Location = new Point(447, 44);
+			label2.Location = new Point(449, 67);
 			label2.Name = "label2";
 			label2.Size = new Size(104, 15);
 			label2.TabIndex = 4;
@@ -90,7 +95,7 @@
 			// 
 			// btnExcel
 			// 
-			btnExcel.Location = new Point(636, 70);
+			btnExcel.Location = new Point(638, 93);
 			btnExcel.Margin = new Padding(3, 2, 3, 2);
 			btnExcel.Name = "btnExcel";
 			btnExcel.Size = new Size(31, 22);
@@ -102,7 +107,7 @@
 			// 
 			// textBoxExcel1
 			// 
-			textBoxExcel1.Location = new Point(129, 71);
+			textBoxExcel1.Location = new Point(131, 94);
 			textBoxExcel1.Margin = new Padding(3, 2, 3, 2);
 			textBoxExcel1.Name = "textBoxExcel1";
 			textBoxExcel1.Size = new Size(501, 23);
@@ -112,7 +117,7 @@
 			// labelExcel1
 			// 
 			labelExcel1.AutoSize = true;
-			labelExcel1.Location = new Point(8, 74);
+			labelExcel1.Location = new Point(10, 97);
 			labelExcel1.Name = "labelExcel1";
 			labelExcel1.Size = new Size(108, 15);
 			labelExcel1.TabIndex = 8;
@@ -124,7 +129,7 @@
 			comboBoxImportacao.DropDownStyle = ComboBoxStyle.DropDownList;
 			comboBoxImportacao.FormattingEnabled = true;
 			comboBoxImportacao.Items.AddRange(new object[] { "JSON", "Fornecedores", "Pacientes", "Pagos", "Recebidos" });
-			comboBoxImportacao.Location = new Point(129, 13);
+			comboBoxImportacao.Location = new Point(131, 33);
 			comboBoxImportacao.Margin = new Padding(3, 2, 3, 2);
 			comboBoxImportacao.Name = "comboBoxImportacao";
 			comboBoxImportacao.Size = new Size(214, 23);
@@ -134,7 +139,7 @@
 			// label4
 			// 
 			label4.AutoSize = true;
-			label4.Location = new Point(8, 16);
+			label4.Location = new Point(12, 36);
 			label4.Name = "label4";
 			label4.Size = new Size(87, 15);
 			label4.TabIndex = 10;
@@ -143,7 +148,7 @@
 			// labelExcel2
 			// 
 			labelExcel2.AutoSize = true;
-			labelExcel2.Location = new Point(8, 101);
+			labelExcel2.Location = new Point(10, 124);
 			labelExcel2.Name = "labelExcel2";
 			labelExcel2.Size = new Size(108, 15);
 			labelExcel2.TabIndex = 11;
@@ -152,7 +157,7 @@
 			// 
 			// textBoxExcel2
 			// 
-			textBoxExcel2.Location = new Point(129, 98);
+			textBoxExcel2.Location = new Point(131, 121);
 			textBoxExcel2.Margin = new Padding(3, 2, 3, 2);
 			textBoxExcel2.Name = "textBoxExcel2";
 			textBoxExcel2.Size = new Size(501, 23);
@@ -161,7 +166,7 @@
 			// 
 			// btnExcel2
 			// 
-			btnExcel2.Location = new Point(636, 97);
+			btnExcel2.Location = new Point(638, 120);
 			btnExcel2.Margin = new Padding(3, 2, 3, 2);
 			btnExcel2.Name = "btnExcel2";
 			btnExcel2.Size = new Size(31, 22);
@@ -174,7 +179,7 @@
 			// label3
 			// 
 			label3.AutoSize = true;
-			label3.Location = new Point(349, 18);
+			label3.Location = new Point(353, 38);
 			label3.Name = "label3";
 			label3.Size = new Size(89, 15);
 			label3.TabIndex = 15;
@@ -186,17 +191,17 @@
 			comboBoxSistema.DropDownStyle = ComboBoxStyle.DropDownList;
 			comboBoxSistema.FormattingEnabled = true;
 			comboBoxSistema.Items.AddRange(new object[] { "DentalOffice", "OdontoCompany" });
-			comboBoxSistema.Location = new Point(459, 14);
+			comboBoxSistema.Location = new Point(463, 34);
 			comboBoxSistema.Margin = new Padding(3, 2, 3, 2);
 			comboBoxSistema.Name = "comboBoxSistema";
-			comboBoxSistema.Size = new Size(211, 23);
+			comboBoxSistema.Size = new Size(206, 23);
 			comboBoxSistema.TabIndex = 1;
 			comboBoxSistema.Visible = false;
 			comboBoxSistema.SelectedIndexChanged += comboBoxSistema_SelectedIndexChanged;
 			// 
 			// txtEstabelecimentoID
 			// 
-			txtEstabelecimentoID.Location = new Point(129, 41);
+			txtEstabelecimentoID.Location = new Point(131, 64);
 			txtEstabelecimentoID.Margin = new Padding(3, 2, 3, 2);
 			txtEstabelecimentoID.Name = "txtEstabelecimentoID";
 			txtEstabelecimentoID.Size = new Size(113, 23);
@@ -207,7 +212,7 @@
 			// 
 			// txtPessoaID
 			// 
-			txtPessoaID.Location = new Point(557, 41);
+			txtPessoaID.Location = new Point(559, 64);
 			txtPessoaID.Margin = new Padding(3, 2, 3, 2);
 			txtPessoaID.Name = "txtPessoaID";
 			txtPessoaID.Size = new Size(110, 23);
@@ -218,7 +223,7 @@
 			// 
 			// txtLoginID
 			// 
-			txtLoginID.Location = new Point(321, 41);
+			txtLoginID.Location = new Point(323, 64);
 			txtLoginID.Margin = new Padding(3, 2, 3, 2);
 			txtLoginID.Name = "txtLoginID";
 			txtLoginID.Size = new Size(110, 23);
@@ -230,7 +235,7 @@
 			// label5
 			// 
 			label5.AutoSize = true;
-			label5.Location = new Point(264, 44);
+			label5.Location = new Point(266, 67);
 			label5.Name = "label5";
 			label5.Size = new Size(51, 15);
 			label5.TabIndex = 16;
@@ -239,7 +244,7 @@
 			// 
 			// listView1
 			// 
-			listView1.Location = new Point(10, 126);
+			listView1.Location = new Point(12, 149);
 			listView1.Name = "listView1";
 			listView1.Size = new Size(620, 73);
 			listView1.TabIndex = 18;
@@ -249,7 +254,7 @@
 			// 
 			// btnAddToList
 			// 
-			btnAddToList.Location = new Point(636, 126);
+			btnAddToList.Location = new Point(638, 149);
 			btnAddToList.Margin = new Padding(3, 2, 3, 2);
 			btnAddToList.Name = "btnAddToList";
 			btnAddToList.Size = new Size(31, 22);
@@ -261,7 +266,7 @@
 			// 
 			// btnDelFromList
 			// 
-			btnDelFromList.Location = new Point(636, 152);
+			btnDelFromList.Location = new Point(638, 175);
 			btnDelFromList.Margin = new Padding(3, 2, 3, 2);
 			btnDelFromList.Name = "btnDelFromList";
 			btnDelFromList.Size = new Size(31, 22);
@@ -271,11 +276,34 @@
 			btnDelFromList.Visible = false;
 			btnDelFromList.Click += btnDelFromList_Click;
 			// 
+			// menuStrip1
+			// 
+			menuStrip1.Items.AddRange(new ToolStripItem[] { configuraçõesToolStripMenuItem });
+			menuStrip1.Location = new Point(0, 0);
+			menuStrip1.Name = "menuStrip1";
+			menuStrip1.Size = new Size(679, 24);
+			menuStrip1.TabIndex = 95;
+			menuStrip1.Text = "menuStrip1";
+			// 
+			// configuraçõesToolStripMenuItem
+			// 
+			configuraçõesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { salvarNaPastaToolStripMenuItem });
+			configuraçõesToolStripMenuItem.Name = "configuraçõesToolStripMenuItem";
+			configuraçõesToolStripMenuItem.Size = new Size(96, 20);
+			configuraçõesToolStripMenuItem.Text = "Configurações";
+			// 
+			// salvarNaPastaToolStripMenuItem
+			// 
+			salvarNaPastaToolStripMenuItem.Name = "salvarNaPastaToolStripMenuItem";
+			salvarNaPastaToolStripMenuItem.Size = new Size(180, 22);
+			salvarNaPastaToolStripMenuItem.Text = "Salvar na pasta...";
+			salvarNaPastaToolStripMenuItem.Click += salvarNaPastaToolStripMenuItem_Click;
+			// 
 			// Form1
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
-			ClientSize = new Size(679, 237);
+			ClientSize = new Size(679, 261);
 			Controls.Add(btnDelFromList);
 			Controls.Add(btnAddToList);
 			Controls.Add(listView1);
@@ -296,12 +324,17 @@
 			Controls.Add(label2);
 			Controls.Add(btnImportar);
 			Controls.Add(label1);
+			Controls.Add(menuStrip1);
 			Icon = (Icon)resources.GetObject("$this.Icon");
+			MainMenuStrip = menuStrip1;
 			Margin = new Padding(3, 2, 3, 2);
 			MaximizeBox = false;
 			Name = "Form1";
 			StartPosition = FormStartPosition.CenterScreen;
 			Text = "Migração";
+			Load += Form1_Load;
+			menuStrip1.ResumeLayout(false);
+			menuStrip1.PerformLayout();
 			ResumeLayout(false);
 			PerformLayout();
 		}
@@ -329,5 +362,9 @@
 		private ListView listView1;
 		private Button btnAddToList;
 		private Button btnDelFromList;
+		private MenuStrip menuStrip1;
+		private ToolStripMenuItem configuraçõesToolStripMenuItem;
+		private ToolStripMenuItem salvarNaPastaToolStripMenuItem;
+		private FolderBrowserDialog folderBrowserDialog1;
 	}
 }

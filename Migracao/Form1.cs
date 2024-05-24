@@ -5,6 +5,8 @@ namespace Migracao
 {
 	public partial class Form1 : Form
 	{
+		string arquivoConfig = "config.config";
+
 		public Form1()
 		{
 			InitializeComponent();
@@ -62,11 +64,11 @@ namespace Migracao
 
 						else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase)
 							&& !string.IsNullOrEmpty(txtPessoaID.Text))
-								dentalOffice.ImportarRecebidos(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
+							dentalOffice.ImportarRecebidos(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
 
 						else if (comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
 							&& !string.IsNullOrEmpty(txtPessoaID.Text))
-								dentalOffice.ImportarPagos(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
+							dentalOffice.ImportarPagos(textBoxExcel1.Text, textBoxExcel2.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
 					}
 
 					else if (comboBoxSistema.Text.Equals("odontocompany", StringComparison.CurrentCultureIgnoreCase))
@@ -156,7 +158,8 @@ namespace Migracao
 					btnImportar.Visible = true;
 				}
 
-				else {
+				else
+				{
 					comboBoxSistema.Visible = true;
 					txtEstabelecimentoID.Visible = true;
 					label1.Visible = true;
@@ -239,5 +242,41 @@ namespace Migracao
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
 				listView1.Items.Add(openFileDialog.FileName);
 		}
+
+		private void Form1_Load(object sender, EventArgs e)
+		{
+			if (!File.Exists(arquivoConfig))
+				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta);
+
+			Tools.salvarNaPasta = File.ReadAllText(arquivoConfig);
+		}
+
+		private void salvarNaPastaToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			string pasta = AbrirPasta();
+
+			if (!string.IsNullOrEmpty(pasta))
+			{
+				Tools.salvarNaPasta = pasta;
+				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta);
+			}
+		}
+
+		private string AbrirPasta(string titulo = "Abrir")
+		{
+			string retorno = "";
+			var folderBrowser = new OpenFileDialog();
+			folderBrowser.ValidateNames = false;
+			folderBrowser.InitialDirectory = Tools.salvarNaPasta;
+			folderBrowser.CheckFileExists = false;
+			folderBrowser.CheckPathExists = true;
+			folderBrowser.Filter = "|Pasta";
+			folderBrowser.FileName = "Abrir Pasta";
+			folderBrowser.Title = titulo;
+			if (folderBrowser.ShowDialog() == DialogResult.OK)
+				retorno = Path.GetDirectoryName(folderBrowser.FileName);
+			return retorno;
+		}
+
 	}
 }

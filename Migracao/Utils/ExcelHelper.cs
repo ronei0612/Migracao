@@ -406,5 +406,39 @@ namespace Migracao.Utils
 
 			return nome;
 		}
+
+		public static void CreateExcelFile(string salvarArquivo, List<string> cabecalhos, List<List<string>> dados)
+		{
+			// Crie um novo livro de trabalho
+			IWorkbook workbook = new XSSFWorkbook();
+
+			// Crie uma nova planilha
+			ISheet sheet = workbook.CreateSheet("Planilha1");
+
+			// Crie a linha de cabeçalho
+			IRow headerRow = sheet.CreateRow(0);
+			for (int i = 0; i < cabecalhos.Count; i++)
+			{
+				ICell headerCell = headerRow.CreateCell(i);
+				headerCell.SetCellValue(cabecalhos[i]);
+			}
+
+			// Adicione os dados
+			for (int i = 0; i < dados.Count; i++)
+			{
+				IRow dataRow = sheet.CreateRow(i + 1);
+				for (int j = 0; j < dados[i].Count; j++)
+				{
+					ICell dataCell = dataRow.CreateCell(j);
+					dataCell.SetCellValue(dados[i][j]);
+				}
+			}
+
+			// Salve o arquivo Excel
+			using (var fileStream = new FileStream(salvarArquivo, FileMode.Create, FileAccess.Write))
+			{
+				workbook.Write(fileStream);
+			}
+		}
 	}
 }

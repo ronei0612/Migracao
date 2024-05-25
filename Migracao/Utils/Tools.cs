@@ -132,6 +132,13 @@ namespace Migracao.Utils
 			Process.Start("explorer.exe", argumento);
 		}
 
+		public static void AbrirPastaExplorer(string pasta)
+		{
+			string argumento = "\"" + pasta + "\"";
+
+			Process.Start("explorer.exe", argumento);
+		}
+
 		public static string TratarMensagemErro(string erroMensagem, int indiceLinha, string colunaLetra, string tituloColuna, string celulaValor, string variaveisValor = "")
 		{
 			var mensagemErro = $"Falha na linha {indiceLinha}, coluna {colunaLetra}, Valor esperado: {tituloColuna}, valor da célula: \"{celulaValor}\": {erroMensagem}";
@@ -341,19 +348,46 @@ namespace Migracao.Utils
 			return d[s.Length, t.Length];
 		}
 
-		public static decimal ArredondarValor(this string input)
-		{
-			input = input.Replace(" ", "").Replace(",", "");
+		//public static decimal ArredondarValor(this string input)
+		//{
+		//	input = input.Replace(" ", "").Replace(",", "");
 
-			if (decimal.TryParse(input, out decimal valor))
-				return valor;
+		//	if (decimal.TryParse(input, out decimal valor))
+		//		return valor;
+		//	else
+		//	{
+		//		string modificado = input.Substring(0, input.Length - 3);
+		//		modificado = modificado.TrimStart('0');
+		//		decimal valorResult = decimal.Parse(modificado);
+
+		//		return valorResult / 100;
+		//	}
+		//}
+
+		public static decimal ArredondarValor(this string valor)
+		{
+			if (decimal.TryParse(valor, out decimal valorDecimal))
+			{
+				if (valorDecimal >= 1000000000)
+				{
+					return Math.Round(valorDecimal / 10000000000, 2);
+				}
+				else if (valorDecimal >= 1000000)
+				{
+					return Math.Round(valorDecimal / 1000000, 2);
+				}
+				else if (valorDecimal >= 1000)
+				{
+					return Math.Round(valorDecimal / 1000, 2);
+				}
+				else
+				{
+					return Math.Round(valorDecimal, 2);
+				}
+			}
 			else
 			{
-				string modificado = input.Substring(0, input.Length - 3);
-				modificado = modificado.TrimStart('0');
-				decimal valorResult = decimal.Parse(modificado);
-
-				return valorResult / 100;
+				return 0; // Retorna 0 se a conversão falhar
 			}
 		}
 	}

@@ -363,5 +363,10 @@ namespace Migracao
 				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta);
 			}
 		}
+
+		private void abrirPastaToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Tools.AbrirPastaExplorer(Tools.salvarNaPasta);
+		}
 	}
 }

@@ -57,6 +57,7 @@
 			lbExcel2 = new Label();
 			txtExcel2 = new TextBox();
 			btnExcel2 = new Button();
+			abrirPastaToolStripMenuItem = new ToolStripMenuItem();
 			menuStrip1.SuspendLayout();
 			SuspendLayout();
 			// 
@@ -281,7 +282,7 @@
 			// 
 			// menuStrip1
 			// 
-			menuStrip1.Items.AddRange(new ToolStripItem[] { configuraçõesToolStripMenuItem });
+			menuStrip1.Items.AddRange(new ToolStripItem[] { configuraçõesToolStripMenuItem, abrirPastaToolStripMenuItem });
 			menuStrip1.Location = new Point(0, 0);
 			menuStrip1.Name = "menuStrip1";
 			menuStrip1.Size = new Size(679, 24);
@@ -332,6 +333,13 @@
 			btnExcel2.UseVisualStyleBackColor = true;
 			btnExcel2.Visible = false;
 			btnExcel2.Click += btnExcel2_Click_1;
+			// 
+			// abrirPastaToolStripMenuItem
+			// 
+			abrirPastaToolStripMenuItem.Name = "abrirPastaToolStripMenuItem";
+			abrirPastaToolStripMenuItem.Size = new Size(76, 20);
+			abrirPastaToolStripMenuItem.Text = "Abrir Pasta";
+			abrirPastaToolStripMenuItem.Click += abrirPastaToolStripMenuItem_Click;
 			// 
 			// Form1
 			// 
@@ -406,5 +414,6 @@
 		private Label lbExcel2;
 		private TextBox txtExcel2;
 		private Button btnExcel2;
+		private ToolStripMenuItem abrirPastaToolStripMenuItem;
 	}
 }

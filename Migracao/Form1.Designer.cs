@@ -31,7 +31,7 @@
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
 			label1 = new Label();
 			btnImportar = new Button();
-			label2 = new Label();
+			lbPessoaID = new Label();
 			openFileDialog1 = new OpenFileDialog();
 			btnExcel = new Button();
 			textBoxExcel1 = new TextBox();
@@ -53,11 +53,11 @@
 			menuStrip1 = new MenuStrip();
 			configuraçõesToolStripMenuItem = new ToolStripMenuItem();
 			salvarNaPastaToolStripMenuItem = new ToolStripMenuItem();
+			abrirPastaToolStripMenuItem = new ToolStripMenuItem();
 			folderBrowserDialog1 = new FolderBrowserDialog();
 			lbExcel2 = new Label();
 			txtExcel2 = new TextBox();
 			btnExcel2 = new Button();
-			abrirPastaToolStripMenuItem = new ToolStripMenuItem();
 			menuStrip1.SuspendLayout();
 			SuspendLayout();
 			// 
@@ -83,15 +83,15 @@
 			btnImportar.Visible = false;
 			btnImportar.Click += btnImportar_Click;
 			// 
-			// label2
+			// lbPessoaID
 			// 
-			label2.AutoSize = true;
-			label2.Location = new Point(449, 67);
-			label2.Name = "label2";
-			label2.Size = new Size(104, 15);
-			label2.TabIndex = 4;
-			label2.Text = "PessoaID Resp Fin:";
-			label2.Visible = false;
+			lbPessoaID.AutoSize = true;
+			lbPessoaID.Location = new Point(449, 67);
+			lbPessoaID.Name = "lbPessoaID";
+			lbPessoaID.Size = new Size(104, 15);
+			lbPessoaID.TabIndex = 4;
+			lbPessoaID.Text = "PessoaID Resp Fin:";
+			lbPessoaID.Visible = false;
 			// 
 			// openFileDialog1
 			// 
@@ -303,6 +303,13 @@
 			salvarNaPastaToolStripMenuItem.Text = "Salvar na pasta...";
 			salvarNaPastaToolStripMenuItem.Click += salvarNaPastaToolStripMenuItem_Click;
 			// 
+			// abrirPastaToolStripMenuItem
+			// 
+			abrirPastaToolStripMenuItem.Name = "abrirPastaToolStripMenuItem";
+			abrirPastaToolStripMenuItem.Size = new Size(76, 20);
+			abrirPastaToolStripMenuItem.Text = "Abrir Pasta";
+			abrirPastaToolStripMenuItem.Click += abrirPastaToolStripMenuItem_Click;
+			// 
 			// lbExcel2
 			// 
 			lbExcel2.AutoSize = true;
@@ -334,13 +341,6 @@
 			btnExcel2.Visible = false;
 			btnExcel2.Click += btnExcel2_Click_1;
 			// 
-			// abrirPastaToolStripMenuItem
-			// 
-			abrirPastaToolStripMenuItem.Name = "abrirPastaToolStripMenuItem";
-			abrirPastaToolStripMenuItem.Size = new Size(76, 20);
-			abrirPastaToolStripMenuItem.Text = "Abrir Pasta";
-			abrirPastaToolStripMenuItem.Click += abrirPastaToolStripMenuItem_Click;
-			// 
 			// Form1
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
@@ -366,7 +366,7 @@
 			Controls.Add(labelExcel1);
 			Controls.Add(textBoxExcel1);
 			Controls.Add(btnExcel);
-			Controls.Add(label2);
+			Controls.Add(lbPessoaID);
 			Controls.Add(btnImportar);
 			Controls.Add(label1);
 			Controls.Add(menuStrip1);
@@ -388,7 +388,7 @@
 
 		private Label label1;
 		private Button btnImportar;
-		private Label label2;
+		private Label lbPessoaID;
 		private OpenFileDialog openFileDialog1;
 		private Button btnExcel;
 		private TextBox textBoxExcel1;

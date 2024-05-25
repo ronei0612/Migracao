@@ -94,7 +94,7 @@ namespace Migracao.Sistems
 			}
 		}
 
-		public void ImportarRecebiveis(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID, string arquivoExcelBaixa)
+		public void ImportarRecebiveis(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
         {
 			var dataHoje = DateTime.Now;
 			var indiceLinha = 0;
@@ -243,7 +243,7 @@ namespace Migracao.Sistems
 			}
 		}
 
-        public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID, string arquivoExcelRecebiveis)
+        public void ImportarRecebidos(string arquivoExcel, string arquivoExcelFormaPagamento, int estabelecimentoID, int respFinanceiroPessoaID, int loginID, string arquivoExcelRecebiveis)
         {
             //CRD013 Forma de Pagamento
             var dataHoje = DateTime.Now;
@@ -252,21 +252,10 @@ namespace Migracao.Sistems
             var excelHelper = new ExcelHelper(arquivoExcel);
             var sqlHelper = new SqlHelper();
 
-            ISheet sheetConsumidores;
-            try
-            {
-                IWorkbook workbookConsumidores = excelHelper.LerExcel(arquivoExcelConsumidores);
-                sheetConsumidores = workbookConsumidores.GetSheetAt(0);
-                excelHelper.InitializeDictionary(sheetConsumidores);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelConsumidores}\": {ex.Message}");
-            }
-
             var excelRecebidosDict = ExcelRecebiveisToDictionary(arquivoExcelRecebiveis);
+			var excelFormaPagamentoDict = ExcelFormaPagamentoToDictionary(arquivoExcelFormaPagamento);
 
-            var fluxoCaixas = new List<FluxoCaixa>();
+			var fluxoCaixas = new List<FluxoCaixa>();
 
             try
             {
@@ -275,7 +264,8 @@ namespace Migracao.Sistems
                     indiceLinha++;
 
                     string documento = "";
-                    string? observacao = null;
+                    int? tipoPagamento = null;
+					string? observacao = null;
                     decimal pagoValor = 0;
                     byte formaPagamento = (byte)TitulosEspeciesID.DepositoEmConta;
                     DateTime dataBaixa = DateTime.Now;
@@ -300,10 +290,16 @@ namespace Migracao.Sistems
                             case "MOTIVO":
                                 observacao = celulaValor;
                                 break;
-                        }
+                            case "TIPO_DOC":
+								tipoPagamento = int.Parse(celulaValor);
+								break;
+						}
                     }
 
-                    if (!string.IsNullOrEmpty(documento) && excelRecebidosDict.ContainsKey(documento))
+                    if (tipoPagamento != null && excelFormaPagamentoDict.ContainsKey((int)tipoPagamento))
+                        formaPagamento = (byte)excelFormaPagamentoDict[(int)tipoPagamento];
+
+					if (!string.IsNullOrEmpty(documento) && excelRecebidosDict.ContainsKey(documento))
                         fluxoCaixas.Add(new FluxoCaixa()
                         {
                             RecebivelID = int.Parse(excelRecebidosDict[documento][0]),
@@ -1072,6 +1068,9 @@ namespace Migracao.Sistems
 			var dataDictionary = new Dictionary<string, string[]>();
 			var excelHelper = new ExcelHelper(arquivoExcel);
 
+			if (!excelHelper.cabecalhos.Contains("ExclusaoMotivo") && !excelHelper.cabecalhos.Contains("ID") && !excelHelper.cabecalhos.Contains("ConsumidorID"))
+				throw new Exception($"Arquivo Excel \"{arquivoExcel}\" não contém as colunas ID, ConsumidorID e/ou ExclusaoMotivo");
+
 			try
 			{
                 foreach (var linha in excelHelper.linhas)
@@ -1081,10 +1080,7 @@ namespace Migracao.Sistems
                     foreach (var celula in linha.Cells)
                     {
                         var celulaValor = celula.ToString().Trim();
-                        var tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
-
-                        if (!tituloColuna.Contains("ExclusaoMotivo") && !tituloColuna.Contains("ID") && !tituloColuna.Contains("ConsumidorID"))
-							throw new Exception($"Arquivo Excel \"{arquivoExcel}\" não contém as colunas ID, ConsumidorID e/ou ExclusaoMotivo");
+                        var tituloColuna = excelHelper.cabecalhos[celula.Address.Column];							
 
 						switch (tituloColuna)
                         {
@@ -1102,6 +1098,62 @@ namespace Migracao.Sistems
 
                     if (!string.IsNullOrEmpty(documento) && !string.IsNullOrEmpty(recebivelID) && !string.IsNullOrEmpty(consumidorID))
 					    dataDictionary.Add(documento, new string[] { recebivelID, consumidorID });
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcel}\": {ex.Message}");
+			}
+
+			return dataDictionary;
+		}
+
+		public static Dictionary<int, TitulosEspeciesID> ExcelFormaPagamentoToDictionary(string arquivoExcel)
+        {
+			var dataDictionary = new Dictionary<int, TitulosEspeciesID>();
+			var excelHelper = new ExcelHelper(arquivoExcel);
+
+			if (!excelHelper.cabecalhos.Contains("CODIGO") && !excelHelper.cabecalhos.Contains("NOME"))
+				throw new Exception($"Arquivo Excel \"{arquivoExcel}\" não contém as colunas CODIGO e/ou NOME");
+
+			try
+			{
+				foreach (var linha in excelHelper.linhas)
+				{
+					int? codigo = null;
+					string formaPagamento = "";
+					TitulosEspeciesID titulosEspeciesID = TitulosEspeciesID.DepositoEmConta;
+
+					foreach (var celula in linha.Cells)
+					{
+						var celulaValor = celula.ToString().Trim();
+						var tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
+
+						switch (tituloColuna)
+						{
+							case "CODIGO":
+								codigo = int.Parse(celulaValor);
+								break;
+							case "NOME":
+								formaPagamento = celulaValor;
+								break;
+						}
+					}
+
+					if (codigo != null && !string.IsNullOrEmpty(formaPagamento))
+                    {
+                        if (formaPagamento.ToLower().Contains("dinheiro"))
+							titulosEspeciesID = TitulosEspeciesID.Dinheiro;
+                        else if (formaPagamento.ToLower().Contains("cheque"))
+							titulosEspeciesID = TitulosEspeciesID.Cheque;
+						else if (formaPagamento.ToLower().Contains("master card") || formaPagamento.ToLower().Contains("visa") || formaPagamento.ToLower().Contains("elo")
+                            || formaPagamento.ToLower().Contains("american express") || formaPagamento.ToLower().Contains("hipercard"))
+							titulosEspeciesID = TitulosEspeciesID.CartaoCredito;
+						else if (formaPagamento.ToLower().Contains("debito"))
+							titulosEspeciesID = TitulosEspeciesID.CartaoDebito;
+					}
+
+					dataDictionary.Add((int)codigo, titulosEspeciesID);
 				}
 			}
 			catch (Exception ex)

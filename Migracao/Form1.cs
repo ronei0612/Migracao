@@ -82,7 +82,7 @@ namespace Migracao
 							odontoCompany.ImportarFornecedores(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
 
 						else if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
-							odontoCompany.ImportarRecebiveis(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text), txtExcel2.Text);
+							odontoCompany.ImportarRecebiveis(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
 
 						else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
 							odontoCompany.ImportarRecebidos(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text), txtExcel2.Text);
@@ -146,12 +146,18 @@ namespace Migracao
 						MessageBox.Show("Arquivo não existe:" + Environment.NewLine + txtExcel2.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 						return false;
 					}
+
+				if (txtPessoaID.Visible == true && string.IsNullOrWhiteSpace(txtPessoaID.Text))
+				{
+					MessageBox.Show("Preencher campo Responsável Financeiro (PessoaID):", "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+					return false;
+				}
 			}
 
 			return true;
 		}
 
-		void OcultarElementos()
+		void OcultarCampos()
 		{
 			foreach (Control control in this.Controls)
 				control.Visible = false;
@@ -161,9 +167,24 @@ namespace Migracao
 			menuStrip1.Visible = true;
 		}
 
+		void AlterarNomesCampos()
+		{
+			if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
+			{
+				lbExcel2.Text = "Recebíveis (Prod):";
+				lbReferencia.Text = "Form Pgto (CRD013):";
+			}
+			else if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase) || comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
+				lbReferencia.Text = "Pessoas (Prod):";
+							//|| comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
+							//|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
+							
+							//|| comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
+		}
+
 		void MostrarCampos()
 		{
-			OcultarElementos();
+			OcultarCampos();
 
 			if (comboBoxImportacao.SelectedIndex > -1)
 			{
@@ -186,7 +207,7 @@ namespace Migracao
 
 					if (comboBoxSistema.SelectedIndex > -1 && comboBoxImportacao.SelectedIndex > -1)
 					{
-						labelExcel1.Text = comboBoxImportacao.Text;
+						labelExcel1.Text = comboBoxImportacao.Text + ":";
 						labelExcel1.Visible = true;
 						textBoxExcel1.Visible = true;
 						btnExcel.Visible = true;
@@ -198,23 +219,24 @@ namespace Migracao
 							|| comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
 						{
-							lbReferencia.Text = "Referência";
 							lbReferencia.Visible = true;
 							txtReferencia.Visible = true;
 							btnReferencia.Visible = true;
-							label2.Visible = true;
-							txtPessoaID.Visible = true;
 
-							if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase)
-								|| comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
+							if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase) || comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
 							{
 								lbExcel2.Visible = true;
-								lbExcel2.Text = "Baixa:";
 								txtExcel2.Visible = true;
 								btnExcel2.Visible = true;
 							}
+							else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase) || comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
+							{
+								lbPessoaID.Visible = true;
+								txtPessoaID.Visible = true;
+							}
 						}
 
+						AlterarNomesCampos();
 						btnImportar.Visible = true;
 					}
 				}

@@ -368,18 +368,6 @@ namespace Migracao.Sistems
             var excelHelper = new ExcelHelper(arquivoExcel);
             var sqlHelper = new SqlHelper();
 
-            if (File.Exists(arquivoExcelCidades))
-                try
-                {
-                    var workbookCidades = excelHelper.LerExcel(arquivoExcelCidades);
-                    var sheetCidades = workbookCidades.GetSheetAt(0);
-                    excelHelper.InitializeDictionaryCidade(sheetCidades);
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
-                }
-
             try
             {
                 var linhasCount = excelHelper.linhas.Count;
@@ -531,17 +519,17 @@ namespace Migracao.Sistems
                     throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
                 }
 
-            if (File.Exists(arquivoExcelNomesUTF8))
-			    try
-			    {
-				    var workbookCidades = excelHelper.LerExcel(arquivoExcelNomesUTF8);
-				    var sheetCidades = workbookCidades.GetSheetAt(0);
-				    excelHelper.InitializeDictionaryNomesUTF8(sheetCidades);
-			    }
-			    catch (Exception ex)
-			    {
-				    throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelNomesUTF8}\": {ex.Message}");
-			    }
+       //     if (File.Exists(arquivoExcelNomesUTF8))
+			    //try
+			    //{
+				   // var workbookCidades = excelHelper.LerExcel(arquivoExcelNomesUTF8);
+				   // var sheetCidades = workbookCidades.GetSheetAt(0);
+				   // excelHelper.InitializeDictionaryNomesUTF8(sheetCidades);
+			    //}
+			    //catch (Exception ex)
+			    //{
+				   // throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelNomesUTF8}\": {ex.Message}");
+			    //}
 
 			if (!string.IsNullOrEmpty(arquivoPacientesAtuais))
 			    try
@@ -598,8 +586,8 @@ namespace Migracao.Sistems
                                         fornecedor = celulaValor == "S" ? true : false;
                                         break;
                                     case "NOME":
-                                        nomeCompleto = excelHelper.CorrigirNomeUTF8(celulaValor.GetLetras().GetPrimeirosCaracteres(70)).ToNomeCompleto();
-                                        apelido = excelHelper.CorrigirNomeUTF8(celulaValor.GetLetras().GetPrimeiroNome()).ToNomeCompleto();
+                                        nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).ToNomeCompleto();
+                                        apelido = celulaValor.GetLetras().GetPrimeiroNome().ToNomeCompleto();
                                         break;
                                     case "CGC_CPF":
 										documento = celulaValor.ToCPF();
@@ -623,16 +611,16 @@ namespace Migracao.Sistems
                                         celular = celulaValor.ToFone();
                                         break;
                                     case "ENDERECO":
-                                        logradouro = excelHelper.CorrigirNomeUTF8(celulaValor).ToNomeCompleto();
+                                        logradouro = celulaValor.ToNomeCompleto();
                                         break;
                                     case "BAIRRO":
-                                        bairro = excelHelper.CorrigirNomeUTF8(celulaValor).ToNomeCompleto();
+                                        bairro = celulaValor.ToNomeCompleto();
                                         break;
                                     case "NUM_ENDERECO":
                                         logradouroNum = celulaValor;
                                         break;
                                     case "CIDADE":
-                                        cidade = excelHelper.CorrigirNomeUTF8(celulaValor);
+                                        cidade = celulaValor;
                                         break;
                                     case "ESTADO":
                                         estado = celulaValor;
@@ -641,7 +629,7 @@ namespace Migracao.Sistems
                                         cep = celulaValor.ToNum();
                                         break;
                                     case "OBS1":
-                                        observacao = excelHelper.CorrigirNomeUTF8(celulaValor);
+                                        observacao = celulaValor;
 										break;
                                     case "NUM_CONVENIO":
                                         break;

@@ -161,6 +161,7 @@ namespace Migracao.Sistems
 
         public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID, string arquivoExcelRecebiveis)
         {
+            //CRD013 Forma de Pagamento
             var dataHoje = DateTime.Now;
             var indiceLinha = 0;
             string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";

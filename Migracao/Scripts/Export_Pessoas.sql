@@ -11,17 +11,14 @@ SELECT
     c.CodigoAntigo 
 FROM Pessoas p
 LEFT JOIN Consumidores c
-    ON c.PessoaID = p.ID AND c.EstabelecimentoID = @EstabelecimentoID
+    ON c.PessoaID = p.ID
 LEFT JOIN Funcionarios f
-    ON f.PessoaID = p.ID AND p.EstabelecimentoID = @EstabelecimentoID
+    ON f.PessoaID = p.ID
 LEFT JOIN Fornecedores fo
-    ON fo.PessoaID = p.ID AND fo.EstabelecimentoID = @EstabelecimentoID
+    ON fo.PessoaID = p.ID
 LEFT JOIN ConsumidorEnderecos ce
     ON ce.ConsumidorID = c.ID
 LEFT JOIN PessoaFones pf
     ON pf.PessoaID = p.ID
 WHERE 
-    c.PessoaID IS NOT NULL OR 
-    f.PessoaID IS NOT NULL OR 
-    fo.PessoaID IS NOT NULL OR
-    pf.PessoaID IS NOT NULL;
+    p.EstabelecimentoID = @EstabelecimentoID;

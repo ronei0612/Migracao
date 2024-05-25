@@ -273,14 +273,14 @@ namespace Migracao.Utils
 		//	return cidadeEncontrada;
 		//}
 
-		public static string EncontrarCidadeSemelhante(string textoCidade, string[] cidades)
+		public static string EncontrarCidadeSemelhante(this string textoCidade)
 		{
 			textoCidade = RemoverAcentos(textoCidade).ToLower();
 
 			string cidadeEncontrada = null;
 			int menorDistancia = int.MaxValue;
 
-			foreach (string cidade in cidades)
+			foreach (string cidade in Cidade.cidades)
 			{
 				string cidadeNormalizada = RemoverAcentos(cidade).ToLower();
 				int distancia = DistanciaLevenshtein(textoCidade, cidadeNormalizada);
@@ -295,7 +295,7 @@ namespace Migracao.Utils
 			return cidadeEncontrada;
 		}
 
-		private static string RemoverAcentos(string texto)
+		public static string RemoverAcentos(string texto)
 		{
 			return new string(texto
 				.Normalize(NormalizationForm.FormD)
@@ -348,47 +348,12 @@ namespace Migracao.Utils
 			return d[s.Length, t.Length];
 		}
 
-		//public static decimal ArredondarValor(this string input)
-		//{
-		//	input = input.Replace(" ", "").Replace(",", "");
-
-		//	if (decimal.TryParse(input, out decimal valor))
-		//		return valor;
-		//	else
-		//	{
-		//		string modificado = input.Substring(0, input.Length - 3);
-		//		modificado = modificado.TrimStart('0');
-		//		decimal valorResult = decimal.Parse(modificado);
-
-		//		return valorResult / 100;
-		//	}
-		//}
-
-		public static decimal ArredondarValor(this string valor)
+		public static decimal ArredondarValor(this string input)
 		{
-			if (decimal.TryParse(valor, out decimal valorDecimal))
-			{
-				if (valorDecimal >= 1000000000)
-				{
-					return Math.Round(valorDecimal / 10000000000, 2);
-				}
-				else if (valorDecimal >= 1000000)
-				{
-					return Math.Round(valorDecimal / 1000000, 2);
-				}
-				else if (valorDecimal >= 1000)
-				{
-					return Math.Round(valorDecimal / 1000, 2);
-				}
-				else
-				{
-					return Math.Round(valorDecimal, 2);
-				}
-			}
-			else
-			{
-				return 0; // Retorna 0 se a conversão falhar
-			}
+			if (decimal.TryParse(input, out decimal valorDecimal))
+				return Math.Round(valorDecimal, 2);
+
+			return 0;
 		}
 	}
 }

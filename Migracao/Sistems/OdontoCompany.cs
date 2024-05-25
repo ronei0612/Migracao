@@ -1,5 +1,4 @@
-﻿using ExcelDataReader;
-using Migracao.Models;
+﻿using Migracao.Models;
 using Migracao.Utils;
 using NPOI.SS.UserModel;
 
@@ -9,6 +8,68 @@ namespace Migracao.Sistems
 	{
         string arquivoExcelCidades = "Files\\EnderecosCidades.xlsx";
 		string arquivoExcelNomesUTF8 = "Files\\NomesUTF8.xlsx";
+
+        public void ImportarPrecos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID, string arquivoExcelGruposProcedimentos)
+        {
+			//CED001
+			//CED002 Categoria
+			var dataHoje = DateTime.Now;
+			var indiceLinha = 0;
+			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
+			var excelHelper = new ExcelHelper(arquivoExcel);
+            var sqlHelper = new SqlHelper();
+
+            var gruposProcedimentosToDictionary = GruposProcedimentosToDictionary(arquivoExcelGruposProcedimentos);
+
+			try
+            {
+                foreach (var linha in excelHelper.linhas)
+                {
+                    indiceLinha++;
+
+                    string? titulo = null;
+                    decimal? valor = null;
+                    int? grupo = null;
+                    byte categoria = (byte)ProcedimentosCategoriasID.Outros;
+
+                    foreach (var celula in linha.Cells)
+                    {
+                        if (celula != null)
+                        {
+                            celulaValor = celula.ToString().Trim().Replace("'", "’");
+                            tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
+                            colunaLetra = excelHelper.GetColumnLetter(celula);
+
+                            if (!string.IsNullOrWhiteSpace(celulaValor))
+                            {
+                                switch (tituloColuna)
+                                {
+                                    case "NOME":
+                                        titulo = celulaValor.ToNomeCompleto();
+                                        break;
+                                    case "VRVENDA":
+										valor = celulaValor.ArredondarValor();
+                                        break;
+                                    case "GRUPO":
+										grupo = int.Parse(celulaValor);
+                                        break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (grupo != null)
+                        if (gruposProcedimentosToDictionary.ContainsKey((int)grupo))
+                            categoria = (byte)gruposProcedimentosToDictionary[(int)grupo];
+
+
+				}
+            }
+			catch (Exception error)
+			{
+				throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha++, colunaLetra, tituloColuna, celulaValor, variaveisValor));
+			}
+		}
 
 		public void ImportarRecebiveis(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID, string arquivoExcelBaixa)
         {
@@ -1029,7 +1090,78 @@ namespace Migracao.Sistems
                     }
 
                     if (!string.IsNullOrEmpty(documento) && !string.IsNullOrEmpty(recebivelID) && !string.IsNullOrEmpty(consumidorID))
-					    dataDictionary.Add(documento, { recebivelID, consumidorID });
+					    dataDictionary.Add(documento, new string[] { recebivelID, consumidorID });
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcel}\": {ex.Message}");
+			}
+
+			return dataDictionary;
+		}
+
+		public static Dictionary<int, ProcedimentosCategoriasID> GruposProcedimentosToDictionary(string arquivoExcel)
+        {
+			var dataDictionary = new Dictionary<int, ProcedimentosCategoriasID>();
+			var excelHelper = new ExcelHelper(arquivoExcel);
+
+            var grupoCategoriaDict = new Dictionary<string, ProcedimentosCategoriasID>()
+            {
+				{ "CIRURGIA", ProcedimentosCategoriasID.Cirurgia },
+                { "ENDODONTIA", ProcedimentosCategoriasID.Endodontia },
+                { "PERIODONTIA", ProcedimentosCategoriasID.Periodontia },
+                { "PROTESE", ProcedimentosCategoriasID.Prótese },
+                { "CLINICO", ProcedimentosCategoriasID.Outros }, // Assumindo que "CLINICO" seja uma categoria genérica
+                { "MANUTENCAO", ProcedimentosCategoriasID.Prevenção }, // Assumindo que "MANUTENCAO" seja sinônimo de "PREVENÇÃO"
+                { "ORTODONTIA", ProcedimentosCategoriasID.Ortodontia },
+                { "AMIL", ProcedimentosCategoriasID.Outros }, // Assumindo que "AMIL" seja um tipo de convênio
+                { "PREVENÇÃO ODC", ProcedimentosCategoriasID.Prevenção },
+                { "INSTITUTO ODONTOCOMPANY", ProcedimentosCategoriasID.Outros }, // Assumindo que "INSTITUTO ODONTOCOMPANY" seja um tipo de convênio
+                { "UNIMED", ProcedimentosCategoriasID.Outros }, // Assumindo que "UNIMED" seja um tipo de convênio
+                { "PRIMAVIDA", ProcedimentosCategoriasID.Outros }, // Assumindo que "PRIMAVIDA" seja um tipo de convênio
+                { "HARMONIZAÇÃO OROFACIAL", ProcedimentosCategoriasID.Orofacial },
+                { "ODONTOMAXI", ProcedimentosCategoriasID.Outros }, // Assumindo que "ODONTOMAXI" seja um tipo de convênio
+                { "RODRIGUES LEIRA", ProcedimentosCategoriasID.Outros }, // Assumindo que "RODRIGUES LEIRA" seja um tipo de convênio
+                { "PORTO SEGURO", ProcedimentosCategoriasID.Outros }, // Assumindo que "PORTO SEGURO" seja um tipo de convênio
+                { "INPAO", ProcedimentosCategoriasID.Outros }, // Assumindo que "INPAO" seja um tipo de convênio
+                { "DENTAL byteEGRAL", ProcedimentosCategoriasID.Outros }, // Assumindo que "DENTAL byteEGRAL" seja um tipo de convênio
+                { "AESP", ProcedimentosCategoriasID.Outros }, // Assumindo que "AESP" seja um tipo de convênio
+                { "PROASA", ProcedimentosCategoriasID.Outros }, // Assumindo que "PROASA" seja um tipo de convênio
+                { "IDEAL ODONTO", ProcedimentosCategoriasID.Outros }, // Assumindo que "IDEAL ODONTO" seja um tipo de convênio
+                { "ODONTOART", ProcedimentosCategoriasID.Outros }, // Assumindo que "ODONTOART" seja um tipo de convênio
+                { "BRAZIL DENTAL", ProcedimentosCategoriasID.Outros }, // Assumindo que "BRAZIL DENTAL" seja um tipo de convênio
+			};
+
+			try
+			{
+				foreach (var linha in excelHelper.linhas)
+				{
+                    int? codigo = null;
+                    string procedimentoNome = "";
+
+					foreach (var celula in linha.Cells)
+					{
+						var celulaValor = celula.ToString().Trim();
+						var tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
+
+						if (!tituloColuna.Contains("CODIGO") && !tituloColuna.Contains("NOME"))
+							throw new Exception($"Arquivo Excel \"{arquivoExcel}\" não contém as colunas CODIGO e/ou NOME");
+
+						switch (tituloColuna)
+						{
+							case "CODIGO":
+								codigo = int.Parse(celulaValor);
+								break;
+							case "NOME":
+								procedimentoNome = celulaValor;
+								break;
+						}
+					}
+
+					if (codigo != null && !string.IsNullOrEmpty(procedimentoNome))
+						if (grupoCategoriaDict.ContainsKey(procedimentoNome))
+						    dataDictionary.Add((int)codigo, grupoCategoriaDict[procedimentoNome]);
 				}
 			}
 			catch (Exception ex)

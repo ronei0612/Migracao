@@ -9,7 +9,7 @@ namespace Migracao.Sistems
         string arquivoExcelCidades = "Files\\EnderecosCidades.xlsx";
 		string arquivoExcelNomesUTF8 = "Files\\NomesUTF8.xlsx";
 
-        public void ImportarPrecos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID, string arquivoExcelGruposProcedimentos)
+        public void ImportarPrecos(string arquivoExcel, int estabelecimentoID, string arquivoExcelGruposProcedimentos)
         {
 			//CED001
 			//CED002 Categoria
@@ -17,9 +17,18 @@ namespace Migracao.Sistems
 			var indiceLinha = 0;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
 			var excelHelper = new ExcelHelper(arquivoExcel);
-            var sqlHelper = new SqlHelper();
 
-            var gruposProcedimentosToDictionary = GruposProcedimentosToDictionary(arquivoExcelGruposProcedimentos);
+			var cabecalhos = new List<string> { "Especialidade", "PROCEDIMENTOS", "PREÇO", "TUSS" };			
+
+			//var categorias = new List<string>();
+			//var titulos = new List<string>();
+			//var valores = new List<string>();
+			//var tuss = new List<string>();
+
+            //var celulas = new List<string>();
+            List<List<string>> listaDados = new List<List<string>>();
+
+			var gruposProcedimentosToDictionary = GruposProcedimentosToDictionary(arquivoExcelGruposProcedimentos);
 
 			try
             {
@@ -27,7 +36,7 @@ namespace Migracao.Sistems
                 {
                     indiceLinha++;
 
-                    string? titulo = null;
+                    string? titulo = null, tuss = "0";
                     decimal? valor = null;
                     int? grupo = null;
                     byte categoria = (byte)ProcedimentosCategoriasID.Outros;
@@ -58,13 +67,27 @@ namespace Migracao.Sistems
                         }
                     }
 
-                    if (grupo != null)
+                    if (grupo != null && !string.IsNullOrEmpty(titulo))
+                    {
                         if (gruposProcedimentosToDictionary.ContainsKey((int)grupo))
                             categoria = (byte)gruposProcedimentosToDictionary[(int)grupo];
 
-
+						listaDados.Add(new List<string> { categoria.ToString(), titulo, valor.ToString(), tuss });
+					}
 				}
-            }
+
+				//var listaDados = new List<List<string>>()
+				//{
+				//	titulos,
+				//	categorias,
+				//	valores,
+    //                tuss
+				//};
+
+				var salvarArquivo = Tools.GerarNomeArquivo($"Precos_{estabelecimentoID}_OdontoCompany_Migração");
+				excelHelper.CreateExcelFile(salvarArquivo + ".xlsx", cabecalhos, listaDados);
+				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo + ".xlsx");
+			}
 			catch (Exception error)
 			{
 				throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha++, colunaLetra, tituloColuna, celulaValor, variaveisValor));
@@ -1106,7 +1129,10 @@ namespace Migracao.Sistems
 			var dataDictionary = new Dictionary<int, ProcedimentosCategoriasID>();
 			var excelHelper = new ExcelHelper(arquivoExcel);
 
-            var grupoCategoriaDict = new Dictionary<string, ProcedimentosCategoriasID>()
+			if (!excelHelper.cabecalhos.Contains("CODIGO") && !excelHelper.cabecalhos.Contains("NOME"))
+				throw new Exception($"Arquivo Excel \"{arquivoExcel}\" não contém as colunas CODIGO e/ou NOME");
+
+			var grupoCategoriaDict = new Dictionary<string, ProcedimentosCategoriasID>()
             {
 				{ "CIRURGIA", ProcedimentosCategoriasID.Cirurgia },
                 { "ENDODONTIA", ProcedimentosCategoriasID.Endodontia },
@@ -1144,9 +1170,6 @@ namespace Migracao.Sistems
 					{
 						var celulaValor = celula.ToString().Trim();
 						var tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
-
-						if (!tituloColuna.Contains("CODIGO") && !tituloColuna.Contains("NOME"))
-							throw new Exception($"Arquivo Excel \"{arquivoExcel}\" não contém as colunas CODIGO e/ou NOME");
 
 						switch (tituloColuna)
 						{

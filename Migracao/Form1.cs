@@ -32,11 +32,6 @@ namespace Migracao
 			}
 		}
 
-		private void btnExcel2_Click(object sender, EventArgs e)
-		{
-			
-		}
-
 		private void btnImportar_Click(object sender, EventArgs e)
 		{
 			if (ValidarCampos())
@@ -91,6 +86,9 @@ namespace Migracao
 
 						else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
 							odontoCompany.ImportarRecebidos(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text), txtExcel2.Text);
+
+						else if (comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
+							odontoCompany.ImportarPrecos(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), txtReferencia.Text);
 					}
 				}
 				catch (Exception ex)
@@ -197,7 +195,8 @@ namespace Migracao
 							|| comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
-							|| comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
+							|| comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase)
+							|| comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
 						{
 							lbReferencia.Text = "Referência";
 							lbReferencia.Visible = true;
@@ -206,7 +205,8 @@ namespace Migracao
 							label2.Visible = true;
 							txtPessoaID.Visible = true;
 
-							if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
+							if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase)
+								|| comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
 							{
 								lbExcel2.Visible = true;
 								lbExcel2.Text = "Baixa:";
@@ -233,6 +233,8 @@ namespace Migracao
 					nomeArquivoExcel = "EMD101";
 				else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
 					nomeArquivoExcel = "BXD111";
+				else if (comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
+					nomeArquivoExcel = "CED001";
 			}
 		}
 

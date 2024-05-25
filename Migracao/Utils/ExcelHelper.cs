@@ -407,7 +407,7 @@ namespace Migracao.Utils
 			return nome;
 		}
 
-		public static void CreateExcelFile(string salvarArquivo, List<string> cabecalhos, List<List<string>> dados)
+		public void CreateExcelFile(string salvarArquivo, List<string> cabecalhos, List<List<string>> dados)
 		{
 			// Crie um novo livro de trabalho
 			IWorkbook workbook = new XSSFWorkbook();

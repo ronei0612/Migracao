@@ -1011,7 +1011,10 @@ namespace Migracao.Sistems
                         var celulaValor = celula.ToString().Trim();
                         var tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
 
-                        switch (tituloColuna)
+                        if (!tituloColuna.Contains("ExclusaoMotivo") && !tituloColuna.Contains("ID") && !tituloColuna.Contains("ConsumidorID"))
+							throw new Exception($"Arquivo Excel \"{arquivoExcel}\" não contém as colunas ID, ConsumidorID e/ou ExclusaoMotivo");
+
+						switch (tituloColuna)
                         {
                             case "ExclusaoMotivo":
                                 documento = celulaValor;
@@ -1026,7 +1029,7 @@ namespace Migracao.Sistems
                     }
 
                     if (!string.IsNullOrEmpty(documento) && !string.IsNullOrEmpty(recebivelID) && !string.IsNullOrEmpty(consumidorID))
-					    dataDictionary.Add(documento, new string[] { recebivelID, consumidorID });
+					    dataDictionary.Add(documento, { recebivelID, consumidorID });
 				}
 			}
 			catch (Exception ex)

@@ -88,6 +88,9 @@ namespace Migracao
 
 						else if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
 							odontoCompany.ImportarRecebiveis(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text), txtExcel2.Text);
+
+						else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
+							odontoCompany.ImportarRecebidos(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text), txtExcel2.Text);
 					}
 				}
 				catch (Exception ex)

@@ -59,6 +59,118 @@ namespace Migracao.Utils
 			File.WriteAllText(salvarArquivo + ".sql", sql.ToString());
 		}
 
+		//public void GerarSqlUpdate(string tableName, string salvarArquivo, Dictionary<string, object[]> dataDict)
+		//{
+		//	var sql = new StringBuilder();
+
+		//	// Adiciona os nomes das colunas e valores para cada linha
+		//	int count = 0;
+		//	for (int i = 0; i < dataDict.Values.First().Length; i++)
+		//	{
+		//		sql.Append($"UPDATE {tableName} SET ");
+
+		//		// Adiciona as colunas e seus valores
+		//		int columnCount = 0;
+		//		foreach (var key in dataDict.Keys)
+		//		{
+		//			try
+		//			{
+		//				if (dataDict[key][i] == null)
+		//					sql.Append($"{key} = NULL, ");
+		//				else if (dataDict[key][i].ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
+		//					sql.Append($"{key} = NULL, ");
+		//				else if (dataDict[key][i] is decimal)
+		//					sql.Append($"{key} = '{dataDict[key][i].ToString().Replace(',', '.')}', ");
+		//				else
+		//					sql.Append($"{key} = '{VerificarSeDateTime(dataDict[key][i])}', ");
+		//			}
+		//			catch
+		//			{
+		//				sql.Append($"{key} = NULL, ");
+		//			}
+
+		//			columnCount++;
+		//		}
+
+		//		// Remove a última vírgula e espaço
+		//		sql.Remove(sql.Length - 2, 2);
+
+		//		// Adiciona a cláusula WHERE com a coluna de chave primária
+		//		// (assuma que a primeira coluna é a chave primária, você pode precisar ajustar isso)
+		//		sql.Append($" WHERE {dataDict.Keys.First()} = '{dataDict[dataDict.Keys.First()][i]}';" + Environment.NewLine);
+
+		//		count++;
+		//		if (count == 200)
+		//		{
+		//			count = 0;
+		//		}
+		//	}
+
+		//	File.WriteAllText(salvarArquivo + ".sql", sql.ToString());
+		//}
+
+		public void GerarSqlUpdate(string tableName, string salvarArquivo, Dictionary<string, object[]> dataDict)
+		{
+			var sql = new StringBuilder();
+
+			// Adiciona os nomes das colunas e valores para cada linha
+			int count = 0;
+			for (int i = 0; i < dataDict.Values.First().Length; i++)
+			{
+				sql.Append($"UPDATE {tableName} SET ");
+
+				// Adiciona as colunas e seus valores, ignorando ID
+				int columnCount = 0;
+				foreach (var key in dataDict.Keys)
+				{
+					if (key.Equals("ID", StringComparison.OrdinalIgnoreCase))
+					{
+						continue; // Ignora a coluna ID
+					}
+
+					try
+					{
+						if (dataDict[key][i] == null)
+							sql.Append($"{key} = NULL, ");
+						else if (dataDict[key][i].ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
+							sql.Append($"{key} = NULL, ");
+						else if (dataDict[key][i] is decimal)
+							sql.Append($"{key} = '{dataDict[key][i].ToString().Replace(',', '.')}', ");
+						else
+							sql.Append($"{key} = '{VerificarSeDateTime(dataDict[key][i])}', ");
+					}
+					catch
+					{
+						sql.Append($"{key} = NULL, ");
+					}
+
+					columnCount++;
+				}
+
+				// Remove a última vírgula e espaço
+				if (columnCount > 0) // Verifica se alguma coluna foi atualizada
+				{
+					sql.Remove(sql.Length - 2, 2);
+
+					// Adiciona a cláusula WHERE com a coluna de chave primária
+					sql.Append($" WHERE ID = '{dataDict["ID"][i]}';" + Environment.NewLine);
+				}
+				else
+				{
+					// Se nenhuma coluna foi atualizada, ignora a linha
+					sql.Clear();
+				}
+
+				count++;
+				if (count == 200)
+				{
+					count = 0;
+				}
+			}
+
+			File.WriteAllText(salvarArquivo + ".sql", sql.ToString());
+		}
+
 		private void GerarSqlInsert(string tableName, string salvarArquivo, DataTable dataTable)
 		{
 			var sql = new StringBuilder();

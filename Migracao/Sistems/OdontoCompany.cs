@@ -243,7 +243,7 @@ namespace Migracao.Sistems
 			}
 		}
 
-        public void ImportarRecebidos(string arquivoExcel, string arquivoExcelFormaPagamento, int estabelecimentoID, int respFinanceiroPessoaID, int loginID, string arquivoExcelRecebiveis)
+        public void ImportarRecebidos(string arquivoExcel, int estabelecimentoID, int respFinanceiroPessoaID, int loginID, string arquivoExcelRecebiveis, string arquivoExcelFormaPagamento = "")
         {
             //CRD013 Forma de Pagamento
             var dataHoje = DateTime.Now;
@@ -253,17 +253,19 @@ namespace Migracao.Sistems
             var sqlHelper = new SqlHelper();
 
             var excelRecebidosDict = ExcelRecebiveisToDictionary(arquivoExcelRecebiveis);
-			var excelFormaPagamentoDict = ExcelFormaPagamentoToDictionary(arquivoExcelFormaPagamento);
+			//var excelFormaPagamentoDict = ExcelFormaPagamentoToDictionary(arquivoExcelFormaPagamento);
 
 			var fluxoCaixas = new List<FluxoCaixa>();
+			var recebiveis = new List<Recebivel>();
 
-            try
+			try
             {
                 foreach (var linha in excelHelper.linhas)
                 {
                     indiceLinha++;
 
                     string documento = "";
+                    string? pagamento = null;
                     int? tipoPagamento = null;
 					string? observacao = null;
                     decimal pagoValor = 0;
@@ -290,16 +292,20 @@ namespace Migracao.Sistems
                             case "MOTIVO":
                                 observacao = celulaValor;
                                 break;
-                            case "TIPO_DOC":
-								tipoPagamento = int.Parse(celulaValor);
+                            //case "TIPO_DOC":
+								//tipoPagamento = int.Parse(celulaValor);
+								//break;
+							case "NOME_GRUPO":
+								pagamento = celulaValor;
 								break;
 						}
-                    }
+					}
 
-                    if (tipoPagamento != null && excelFormaPagamentoDict.ContainsKey((int)tipoPagamento))
-                        formaPagamento = (byte)excelFormaPagamentoDict[(int)tipoPagamento];
+                    //if (tipoPagamento != null && excelFormaPagamentoDict.ContainsKey((int)tipoPagamento))
+                    //    formaPagamento = (byte)excelFormaPagamentoDict[(int)tipoPagamento];
 
-					if (!string.IsNullOrEmpty(documento) && excelRecebidosDict.ContainsKey(documento))
+                    if (!string.IsNullOrEmpty(documento) && excelRecebidosDict.ContainsKey(documento))
+                    {
                         fluxoCaixas.Add(new FluxoCaixa()
                         {
                             RecebivelID = int.Parse(excelRecebidosDict[documento][0]),
@@ -307,9 +313,11 @@ namespace Migracao.Sistems
                             SituacaoID = 1,
                             PagoMulta = 0,
                             PagoJuros = 0,
-                            TipoID = (byte)TransacaoTiposID.Recebimento,
+							PagoDescontos = 0,
+                            PagoDespesas = 0,
+							TipoID = (byte)TransacaoTiposID.Recebimento,
                             Data = dataBaixa,
-                            TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
+                            TransacaoID = (byte)TituloTransacoes.Liquidacao,
                             EspecieID = formaPagamento,
                             DataBaseCalculo = dataBaixa,
                             DevidoValor = pagoValor,
@@ -320,6 +328,15 @@ namespace Migracao.Sistems
                             FinanceiroID = respFinanceiroPessoaID,
                             Observacoes = observacao
                         });
+
+						recebiveis.Add(new Recebivel()
+						{
+                            ID = int.Parse(excelRecebidosDict[documento][0]),
+                            DataBaixa = dataBaixa,
+                            ValorDevido = 0
+						});
+
+					}
                 }
 
                 indiceLinha = 0;
@@ -348,8 +365,18 @@ namespace Migracao.Sistems
                 var salvarArquivo = Tools.GerarNomeArquivo($"Recebidos_{estabelecimentoID}_OdontoCompany_Migração");
                 sqlHelper.GerarSqlInsert("FluxoCaixa", salvarArquivo, dados);
                 excelHelper.GravarExcel(salvarArquivo, dados);
-                //Tools.AbrirPastaSelecionandoArquivo(salvarArquivo + ".xlsx");
-            }
+
+
+				var dadosRecebivel = new Dictionary<string, object[]>
+				{
+					{ "ID", recebiveis.ConvertAll(recebivel => (object)recebivel.ID).ToArray() },
+					{ "DataBaixa", recebiveis.ConvertAll(recebivel => (object)recebivel.DataBaixa).ToArray() },
+					{ "ValorDevido", recebiveis.ConvertAll(recebivel => (object)recebivel.ValorDevido).ToArray() }
+				};
+
+				salvarArquivo = Tools.GerarNomeArquivo($"Recebidos_{estabelecimentoID}_Update_OdontoCompany_Migração");
+				sqlHelper.GerarSqlUpdate("Recebiveis", salvarArquivo, dadosRecebivel);
+			}
             catch (Exception error)
             {
                 throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha++, colunaLetra, tituloColuna, celulaValor, variaveisValor));
@@ -1096,7 +1123,7 @@ namespace Migracao.Sistems
 						}
                     }
 
-                    if (!string.IsNullOrEmpty(documento) && !string.IsNullOrEmpty(recebivelID) && !string.IsNullOrEmpty(consumidorID))
+                    if (!string.IsNullOrEmpty(documento) && !string.IsNullOrEmpty(recebivelID) && !string.IsNullOrEmpty(consumidorID) && !dataDictionary.ContainsKey(documento))
 					    dataDictionary.Add(documento, new string[] { recebivelID, consumidorID });
 				}
 			}

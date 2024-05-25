@@ -6,33 +6,33 @@
         public long? Documento { get; set; }
         public short? Sequencia { get; set; }
         public short? Parcelas { get; set; }
-        public required int EspecieID { get; set; }
+        public int EspecieID { get; set; }
         public int? ConsumidorID { get; set; }
         public int? FornecedorID { get; set; }
         public string SacadoNome { get; set; }
         public int? FuncionarioID { get; set; }
-        public required DateTime DataEmissao { get; set; }
-        public required DateTime DataVencimento { get; set; }
-        public required DateTime DataBaseCalculo { get; set; }
+        public DateTime DataEmissao { get; set; }
+        public DateTime DataVencimento { get; set; }
+        public DateTime DataBaseCalculo { get; set; }
         public DateTime? DataBaixa { get; set; }
-        public required decimal ValorOriginal { get; set; }
-        public required decimal ValorDevido { get; set; }
+        public decimal ValorOriginal { get; set; }
+        public decimal ValorDevido { get; set; }
         public short? BancoID { get; set; }
         public int? PlanoContasID { get; set; }
         public int? ContaBancariaID { get; set; }
         public int? BoletoID { get; set; }
-        public required int FinanceiroID { get; set; }
+        public int FinanceiroID { get; set; }
         public bool? Ortodontia { get; set; }
         public bool? Manutencao { get; set; }
         public int? AtendimentoID { get; set; }
-        public required short SituacaoID { get; set; }
+        public short SituacaoID { get; set; }
         public int? EstabelecimentoID { get; set; }
         public int? EmpresaID { get; set; }
         public int? ContratoID { get; set; }
         public int? NotaFiscalID { get; set; }
         public string Observacoes { get; set; }
-        public required int LoginID { get; set; }
-        public required DateTime DataInclusao { get; set; }
+        public int LoginID { get; set; }
+        public DateTime DataInclusao { get; set; }
         public DateTime? DataUltAlteracao { get; set; }
         public int? ConvenioID { get; set; }
         public int? ClienteID { get; set; }

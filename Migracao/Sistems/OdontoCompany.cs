@@ -1,8 +1,7 @@
-﻿using Migracao.Models;
+﻿using ExcelDataReader;
+using Migracao.Models;
 using Migracao.Utils;
 using NPOI.SS.UserModel;
-using System.Windows.Forms;
-using System;
 
 namespace Migracao.Sistems
 {
@@ -11,7 +10,7 @@ namespace Migracao.Sistems
         string arquivoExcelCidades = "Files\\EnderecosCidades.xlsx";
 		string arquivoExcelNomesUTF8 = "Files\\NomesUTF8.xlsx";
 
-		public void ImportarRecebiveis(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
+		public void ImportarRecebiveis(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID, string arquivoExcelBaixa)
         {
 			var dataHoje = DateTime.Now;
 			var indiceLinha = 0;
@@ -31,7 +30,9 @@ namespace Migracao.Sistems
 				throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelConsumidores}\": {ex.Message}");
 			}
 
-			//var fluxoCaixas = new List<FluxoCaixa>();
+            //var excelRecebidosDict = ExcelRecebidosToDictionary(arquivoExcelBaixa);
+
+			var fluxoCaixas = new List<FluxoCaixa>();
 			var recebiveis = new List<Recebivel>();
 
 			try
@@ -45,7 +46,6 @@ namespace Migracao.Sistems
 					int recibo = 0, codigo = 0;
 					int? consumidorID = null, fornecedorID = null, colaboradorID = null, funcionarioID = null, clienteID = null;
 					decimal pagoValor = 0, valor = 0;
-					byte titulosEspecies = 0;
 					byte formaPagamento = (byte)TitulosEspeciesID.DepositoEmConta;
 					DateTime dataPagamento = dataHoje, nascimentoData = dataHoje, dataVencimento = dataHoje, dataInclusao = dataHoje;
 
@@ -159,9 +159,9 @@ namespace Migracao.Sistems
 			}
 		}
 
-		public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
+        public void ImportarRecebidos(string arquivoExcel, string arquivoExcelConsumidores, int estabelecimentoID, int respFinanceiroPessoaID, int loginID, string arquivoExcelRecebiveis)
         {
-			var dataHoje = DateTime.Now;
+            var dataHoje = DateTime.Now;
             var indiceLinha = 0;
             string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
             var excelHelper = new ExcelHelper(arquivoExcel);
@@ -176,8 +176,10 @@ namespace Migracao.Sistems
             }
             catch (Exception ex)
             {
-				throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelConsumidores}\": {ex.Message}");
-			}
+                throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelConsumidores}\": {ex.Message}");
+            }
+
+            var excelRecebidosDict = ExcelRecebiveisToDictionary(arquivoExcelRecebiveis);
 
             var fluxoCaixas = new List<FluxoCaixa>();
 
@@ -187,94 +189,56 @@ namespace Migracao.Sistems
                 {
                     indiceLinha++;
 
-                    string nomeCompleto = "", outroSacadoNome = "", cpf = "";
-                    int controle = 0, recibo = 0, codigo = 0;
-                    int? consumidorID = 0;
+                    string documento = "";
+                    string? observacao = null;
                     decimal pagoValor = 0;
-                    byte titulosEspecies = 0;
-                    DateTime dataPagamento = dataHoje, nascimentoData = dataHoje, dataVencimento = dataHoje, dataInclusao = dataHoje;
+                    byte formaPagamento = (byte)TitulosEspeciesID.DepositoEmConta;
+                    DateTime dataBaixa = DateTime.Now;
 
-					foreach (var celula in linha.Cells)
+                    foreach (var celula in linha.Cells)
                     {
-                        if (celula != null)
-                        {
-                            celulaValor = celula.ToString().Trim().Replace("'", "’");
-                            tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
-                            colunaLetra = excelHelper.GetColumnLetter(celula);
+                        celulaValor = celula.ToString().Trim().Replace("'", "’");
+                        tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
+                        colunaLetra = excelHelper.GetColumnLetter(celula);
 
-                            if (!string.IsNullOrWhiteSpace(celulaValor))
-                            {
-                                switch (tituloColuna)
-                                {
-                                    case "VR_CALCULADO":
-                                        pagoValor = celulaValor.ToMoeda();
-                                        break;
-                                    case "BAIXA":
-                                        dataPagamento = celulaValor.ToData();
-                                        break;
-                                    case "VENCTO":
-                                        dataVencimento = celulaValor.ToData();
-                                        break;
-                                    case "CGC_CPF":
-                                        cpf = celulaValor.ToCPF();
-                                        break;
-									case "EMISSAO":
-										dataInclusao = celulaValor.ToData();
-										break;
-								}
-							}
+                        switch (tituloColuna)
+                        {
+                            case "DOCUMENTO":
+                                documento = celulaValor;
+                                break;
+                            case "VALOR":
+                                pagoValor = celulaValor.ArredondarValor();
+                                break;
+                            case "BAIXA":
+                                dataBaixa = celulaValor.ToData();
+                                break;
+                            case "MOTIVO":
+                                observacao = celulaValor;
+                                break;
                         }
                     }
 
-                    var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, codigo: codigo.ToString());
-                    if (!string.IsNullOrEmpty(consumidorIDValue))
-                    {
-                        consumidorID = int.Parse(consumidorIDValue);
-                        outroSacadoNome = "null";
-
+                    if (!string.IsNullOrEmpty(documento) && excelRecebidosDict.ContainsKey(documento))
                         fluxoCaixas.Add(new FluxoCaixa()
                         {
-                            ConsumidorID = consumidorID,
+                            RecebivelID = int.Parse(excelRecebidosDict[documento][0]),
+                            ConsumidorID = int.Parse(excelRecebidosDict[documento][1]),
                             SituacaoID = 1,
                             PagoMulta = 0,
                             PagoJuros = 0,
                             TipoID = (byte)TransacaoTiposID.Recebimento,
-                            Data = dataPagamento,
+                            Data = dataBaixa,
                             TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
-                            EspecieID = titulosEspecies,
-                            DataBaseCalculo = dataPagamento,
+                            EspecieID = formaPagamento,
+                            DataBaseCalculo = dataBaixa,
                             DevidoValor = pagoValor,
                             PagoValor = pagoValor,
                             EstabelecimentoID = estabelecimentoID,
                             LoginID = loginID,
-                            DataInclusao = dataPagamento,
-                            FinanceiroID = respFinanceiroPessoaID
+                            DataInclusao = dataBaixa,
+                            FinanceiroID = respFinanceiroPessoaID,
+                            Observacoes = observacao
                         });
-                    }
-                    else
-                    {
-                        consumidorID = null;
-                        outroSacadoNome = nomeCompleto.GetPrimeirosCaracteres(50);
-
-                        fluxoCaixas.Add(new FluxoCaixa()
-                        {
-                            OutroSacadoNome = nomeCompleto.GetPrimeirosCaracteres(50),
-                            SituacaoID = 1,
-                            PagoMulta = 0,
-                            PagoJuros = 0,
-                            TipoID = (byte)TransacaoTiposID.Recebimento,
-                            Data = dataPagamento,
-                            TransacaoID = (byte)TituloTransacoes.PagamentoAvulso,
-                            EspecieID = titulosEspecies,
-                            DataBaseCalculo = dataPagamento,
-                            DevidoValor = pagoValor,
-                            PagoValor = pagoValor,
-                            EstabelecimentoID = estabelecimentoID,
-                            LoginID = loginID,
-                            DataInclusao = dataPagamento,
-                            FinanceiroID = respFinanceiroPessoaID
-                        });
-                    }
                 }
 
                 indiceLinha = 0;
@@ -282,6 +246,7 @@ namespace Migracao.Sistems
                 var dados = new Dictionary<string, object[]>
                 {
                     { "ConsumidorID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.ConsumidorID).ToArray() },
+                    { "RecebivelID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.RecebivelID).ToArray() },
                     { "SituacaoID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.SituacaoID).ToArray() },
                     { "PagoMulta", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.PagoMulta).ToArray() },
                     { "PagoJuros", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.PagoJuros).ToArray() },
@@ -296,13 +261,13 @@ namespace Migracao.Sistems
                     { "LoginID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.LoginID).ToArray() },
                     { "DataInclusao", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DataInclusao).ToArray() },
                     { "FinanceiroID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.FinanceiroID).ToArray() },
-                    { "OutroSacadoNome", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.OutroSacadoNome).ToArray() }
+                    { "Observacoes", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.Observacoes).ToArray() }
                 };
 
-				var salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_FluxoCaixa");
-				sqlHelper.GerarSqlInsert("_MigracaoFluxoCaixa_Temp", salvarArquivo, dados);
-				excelHelper.GravarExcel(salvarArquivo, dados);
-				Tools.AbrirPastaSelecionandoArquivo(salvarArquivo + ".xlsx");
+                var salvarArquivo = Tools.GerarNomeArquivo($"Recebidos_{estabelecimentoID}_OdontoCompany_Migração");
+                sqlHelper.GerarSqlInsert("FluxoCaixa", salvarArquivo, dados);
+                excelHelper.GravarExcel(salvarArquivo, dados);
+                Tools.AbrirPastaSelecionandoArquivo(salvarArquivo + ".xlsx");
             }
             catch (Exception error)
             {
@@ -1028,5 +993,47 @@ namespace Migracao.Sistems
 				throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha + 2, colunaLetra, tituloColuna, celulaValor, variaveisValor));
             }
         }
-    }
+
+		public static Dictionary<string, string[]> ExcelRecebiveisToDictionary(string arquivoExcel)
+		{
+			var dataDictionary = new Dictionary<string, string[]>();
+			var excelHelper = new ExcelHelper(arquivoExcel);
+
+			try
+			{
+                foreach (var linha in excelHelper.linhas)
+                {
+                    string documento = "", recebivelID = "", consumidorID = "";
+
+                    foreach (var celula in linha.Cells)
+                    {
+                        var celulaValor = celula.ToString().Trim();
+                        var tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
+
+                        switch (tituloColuna)
+                        {
+                            case "ExclusaoMotivo":
+                                documento = celulaValor;
+								break;
+							case "ID":
+								recebivelID = celulaValor;
+								break;
+							case "ConsumidorID":
+								consumidorID = celulaValor;
+								break;
+						}
+                    }
+
+                    if (!string.IsNullOrEmpty(documento) && !string.IsNullOrEmpty(recebivelID) && !string.IsNullOrEmpty(consumidorID))
+					    dataDictionary.Add(documento, new string[] { recebivelID, consumidorID });
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcel}\": {ex.Message}");
+			}
+
+			return dataDictionary;
+		}
+	}
 }

@@ -9,7 +9,136 @@ namespace Migracao.Sistems
         string arquivoExcelCidades = "Files\\EnderecosCidades.xlsx";
 		string arquivoExcelNomesUTF8 = "Files\\NomesUTF8.xlsx";
 
-        public void ImportarPrecos(string arquivoExcel, int estabelecimentoID, string arquivoExcelGruposProcedimentos)
+		public void ImportarAgenda(string arquivoExcel, int estabelecimentoID, string arquivoExcelFuncionarios, int loginID)
+		{
+			var dataHoje = DateTime.Now;
+			var indiceLinha = 0;
+			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
+			var excelHelper = new ExcelHelper(arquivoExcel);
+			var sqlHelper = new SqlHelper();
+
+			ISheet sheet;
+			try
+			{
+				IWorkbook workbook = excelHelper.LerExcel(arquivoExcelFuncionarios);
+				sheet = workbook.GetSheetAt(0);
+				excelHelper.InitializeDictionary(sheet);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelFuncionarios}\": {ex.Message}");
+			}
+
+			var agendamentos = new List<Agendamento>();
+
+			try
+			{
+				foreach (var linha in excelHelper.linhas)
+				{
+					indiceLinha++;
+
+					string nomeCompleto = "", cpf = "", hora = "", data = "";
+					bool faltou = false;
+					string? outroSacadoNome = null, observacoes = null, documento = null;
+					int recibo = 0, codigo = 0;
+					int? consumidorID = null, fornecedorID = null, colaboradorID = null, funcionarioID = null, clienteID = null;
+					decimal pagoValor = 0, valor = 0;
+					byte formaPagamento = (byte)TitulosEspeciesID.DepositoEmConta;
+					DateTime dataConsulta = dataHoje;
+
+					foreach (var celula in linha.Cells)
+					{
+						if (celula != null)
+						{
+							celulaValor = celula.ToString().Trim().Replace("'", "’");
+							tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
+							colunaLetra = excelHelper.GetColumnLetter(celula);
+
+							if (!string.IsNullOrWhiteSpace(celulaValor))
+							{
+								switch (tituloColuna)
+								{
+									case "CNPJ_CPF":
+										cpf = celulaValor.ToCPF();
+										break;
+									case "NOME":
+										nomeCompleto = celulaValor;
+										break;
+									case "DATA":
+										data = celulaValor;
+										break;
+									case "HORA":
+										hora = celulaValor;
+										break;
+									case "OBS":
+										observacoes = celulaValor;
+										break;
+									case "FALTOU":
+										faltou = celulaValor == "S";
+										break;
+									case "RESPONSAVEL":
+										valor = celulaValor.ToMoeda();
+										break;
+								}
+							}
+						}
+					}
+
+					dataConsulta = (data + " " + hora).ToData();
+
+					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: cpf, codigo: codigo.ToString());
+					var fornecedorIDValue = excelHelper.GetFornecedorID(nomeCompleto: nomeCompleto, cpf: cpf);
+					var funcionarioIDValue = excelHelper.GetFuncionarioID(nomeCompleto: nomeCompleto, cpf: cpf);
+
+					if (!string.IsNullOrEmpty(consumidorIDValue))
+						consumidorID = int.Parse(consumidorIDValue);
+					else if (!string.IsNullOrEmpty(fornecedorIDValue))
+						fornecedorID = int.Parse(fornecedorIDValue);
+					else if (!string.IsNullOrEmpty(funcionarioIDValue))
+						funcionarioID = int.Parse(funcionarioIDValue);
+					else
+						outroSacadoNome = cpf;
+
+					agendamentos.Add(new Agendamento()
+					{
+						LoginID = loginID,
+						EstabelecimentoID = estabelecimentoID,
+						AtendeTipoID = 1,
+						DataInicio = dataConsulta,
+						DataTermino = dataConsulta.AddMinutes(30),
+						ConsumidorID = (int)consumidorID,
+						Titulo = observacoes,
+						//DataCancelamento = ,
+						//
+						//AtendimentoValor = ,
+						//SecretariaID = ,
+						//FuncionarioID = ,
+						//SalaID = ,
+						DataInclusao = dataConsulta
+					});
+				}
+
+				indiceLinha = 0;
+
+				var dados = new Dictionary<string, object[]>
+				{
+					{ "ConsumidorID", agendamentos.ConvertAll(agendamento => (object)agendamento.ConsumidorID).ToArray() }
+				};
+
+				var salvarArquivo = Tools.GerarNomeArquivo($"Recebiveis_{estabelecimentoID}_OdontoCompany_Migração");
+				sqlHelper.GerarSqlInsert("Recebiveis", salvarArquivo, dados);
+				excelHelper.GravarExcel(salvarArquivo, dados);
+
+				MessageBox.Show("Sucesso!");
+			}
+			catch (Exception error)
+			{
+				throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha++, colunaLetra, tituloColuna, celulaValor, variaveisValor));
+			}
+		}
+
+
+		public void ImportarPrecos(string arquivoExcel, int estabelecimentoID, string arquivoExcelGruposProcedimentos)
         {
 			//CED001
 			//CED002 Categoria
@@ -1842,7 +1971,7 @@ namespace Migracao.Sistems
 				sqlHelper.GerarSqlInsert("_MigracaoPessoaFones_Temp", salvarArquivo, pessoaFonesDict);
 				excelHelper.GravarExcel(salvarArquivo, pessoaFonesDict);
 
-				MessageBox.Show("Sucesso!");
+				MessageBox.Show("Atualize a Base de Pesquisa em: Dados da Clínica => Licença de Uso", "Sucesso!");
 			}
 
             catch (Exception error)

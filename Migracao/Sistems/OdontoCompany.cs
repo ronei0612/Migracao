@@ -583,7 +583,7 @@ namespace Migracao.Sistems
 			}
 		}
 
-		public void ImportarEmpresas(string arquivoExcel, string arquivoPessoasAtuais, int estabelecimentoID, int loginID)
+		public void ImportarEmpresas(string arquivoExcel, string arquivoEmpresasAtuais, int estabelecimentoID, int loginID)
 		{
 			var indiceLinha = 1;
 			var consumidorID = 1;
@@ -593,16 +593,16 @@ namespace Migracao.Sistems
 			var excelHelper = new ExcelHelper(arquivoExcel);
 			var sqlHelper = new SqlHelper();
 
-			if (!string.IsNullOrEmpty(arquivoPessoasAtuais))
+			if (!string.IsNullOrEmpty(arquivoEmpresasAtuais))
 				try
 				{
-					var workbook = excelHelper.LerExcel(arquivoPessoasAtuais);
+					var workbook = excelHelper.LerExcel(arquivoEmpresasAtuais);
 					var sheet = workbook.GetSheetAt(0);
 					excelHelper.InitializeDictionary(sheet);
 				}
 				catch (Exception ex)
 				{
-					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoPessoasAtuais}\": {ex.Message}");
+					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoEmpresasAtuais}\": {ex.Message}");
 				}
 
 
@@ -702,32 +702,49 @@ namespace Migracao.Sistems
 						}
 					}
 
-					pessoaID = indiceLinha;
-					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento);
-					if (!string.IsNullOrEmpty(pessoaIDValue))
-						pessoaID = int.Parse(pessoaIDValue);
-
-					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: documento);
-					if (!string.IsNullOrEmpty(consumidorIDValue))
-						consumidorID = int.Parse(consumidorIDValue);
-
-					if (fornecedor && documento.IsCNPJ_CGC())
-					{
-						empresas.Add(new Empresa()
+					if (string.IsNullOrEmpty(arquivoEmpresasAtuais))
+						if (fornecedor && documento.IsCNPJ_CGC())
+							empresas.Add(new Empresa()
+							{
+								Ativo = true,
+								CNPJ = documento,
+								DataInclusao = dataCadastro,
+								LoginID = loginID,
+								Marca = "",
+								NomeFantasia = "",
+								RazaoSocial = "",
+								RegimeTribID = 0,
+								InscricaoMunicipal = rg,
+								EstabelecimentoID = estabelecimentoID,
+								Guid = new Guid()
+							});
+						else
 						{
-							Ativo = true,
-							CNPJ = documento,
-							DataInclusao = dataCadastro,
-							LoginID = loginID,
-							Marca = "",
-							NomeFantasia = "",
-							RazaoSocial = "",
-							RegimeTribID = 0,
-							InscricaoMunicipal = rg,
-							EstabelecimentoID = estabelecimentoID,
-							Guid = new Guid()
-						});
-					}
+							pessoaID = indiceLinha;
+							var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento);
+							if (!string.IsNullOrEmpty(pessoaIDValue))
+								pessoaID = int.Parse(pessoaIDValue);
+
+							var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: documento);
+							if (!string.IsNullOrEmpty(consumidorIDValue))
+								consumidorID = int.Parse(consumidorIDValue);
+
+							if (fornecedor && documento.IsCNPJ_CGC())
+								empresas.Add(new Empresa()
+								{
+									Ativo = true,
+									CNPJ = documento,
+									DataInclusao = dataCadastro,
+									LoginID = loginID,
+									Marca = "",
+									NomeFantasia = "",
+									RazaoSocial = "",
+									RegimeTribID = 0,
+									InscricaoMunicipal = rg,
+									EstabelecimentoID = estabelecimentoID,
+									Guid = new Guid()
+								});
+						}
 
 					indiceLinha++;
 				}
@@ -847,10 +864,10 @@ namespace Migracao.Sistems
 						}
 					}
 
-					if (!string.IsNullOrWhiteSpace(nomeCompleto))
+					if (!string.IsNullOrWhiteSpace(apelido))
 					{
-						if (string.IsNullOrWhiteSpace(apelido))
-							apelido = nomeCompleto.GetPrimeiroNome().PrimeiraLetraMaiuscula();
+						if (string.IsNullOrWhiteSpace(nomeCompleto))
+							nomeCompleto = apelido;
 
 						var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto);
 

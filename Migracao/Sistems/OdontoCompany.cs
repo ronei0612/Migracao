@@ -643,36 +643,38 @@ namespace Migracao.Sistems
 
 					pessoaID = indiceLinha;
 					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento);
-					if (!string.IsNullOrEmpty(pessoaIDValue))
-						pessoaID = int.Parse(pessoaIDValue);
+					//if (!string.IsNullOrEmpty(pessoaIDValue))
+					//	pessoaID = int.Parse(pessoaIDValue);
 
-					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: documento);
-					if (!string.IsNullOrEmpty(consumidorIDValue))
-						consumidorID = int.Parse(consumidorIDValue);
+					//var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: documento);
+					//if (!string.IsNullOrEmpty(consumidorIDValue))
+					//	consumidorID = int.Parse(consumidorIDValue);
 
-					if (!fornecedor && documento.IsCPF())
+					if (!fornecedor)
 					{
-						if (string.IsNullOrEmpty(pessoaIDValue))
-							pessoas.Add(new Pessoa()
-							{
-								ID = indiceLinha,
-								NomeCompleto = nomeCompleto,
-								Apelido = apelido,
-								CPF = documento,
-								DataInclusao = dataCadastro,
-								Email = email,
-								RG = rg,
-								Sexo = sexo,
-								NascimentoData = dataNascimento,
-								NascimentoLocal = nascimentoLocal,
-								ProfissaoOutra = profissaoOutra,
-								EstadoCivilID = estadoCivil,
-								EstabelecimentoID = estabelecimentoID,
-								LoginID = loginID,
-								Guid = new Guid(),
-								FoneticaApelido = apelido.Fonetizar(),
-								FoneticaNomeCompleto = nomeCompleto.Fonetizar()
-							});
+						if ((!string.IsNullOrEmpty(nomeCompleto) && string.IsNullOrEmpty(documento))
+							|| (!string.IsNullOrEmpty(documento) && documento.IsCPF()))
+							if (string.IsNullOrEmpty(pessoaIDValue))
+								pessoas.Add(new Pessoa()
+								{
+									ID = indiceLinha,
+									NomeCompleto = nomeCompleto,
+									Apelido = apelido,
+									CPF = documento,
+									DataInclusao = dataCadastro,
+									Email = email,
+									RG = rg,
+									Sexo = sexo,
+									NascimentoData = dataNascimento,
+									NascimentoLocal = nascimentoLocal,
+									ProfissaoOutra = profissaoOutra,
+									EstadoCivilID = estadoCivil,
+									EstabelecimentoID = estabelecimentoID,
+									LoginID = loginID,
+									Guid = new Guid(),
+									FoneticaApelido = apelido.Fonetizar(),
+									FoneticaNomeCompleto = nomeCompleto.Fonetizar()
+								});
 					}
 
 					indiceLinha++;

@@ -297,6 +297,9 @@ namespace Migracao.Utils
 
 		public static string RemoverAcentos(string texto)
 		{
+			if (string.IsNullOrEmpty(texto))
+				return texto;
+
 			return new string(texto
 				.Normalize(NormalizationForm.FormD)
 				.Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)

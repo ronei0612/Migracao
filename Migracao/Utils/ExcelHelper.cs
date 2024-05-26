@@ -208,6 +208,9 @@ namespace Migracao.Utils
 
 		public string GetPessoaID(string cpf = "", string nomeCompleto = "")
 		{
+			if (string.IsNullOrWhiteSpace(cpf) && string.IsNullOrWhiteSpace(nomeCompleto))
+				return "";
+
 			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
 			cpf = cpf.Replace(".", "").Replace("-", "");
 

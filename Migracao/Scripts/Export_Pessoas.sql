@@ -8,7 +8,9 @@ SELECT
     fo.ID as FornecedorID, 
     fo.NomeFantasia, 
     c.ID as ConsumidorID, 
-    c.CodigoAntigo 
+    c.CodigoAntigo,
+    ce.Logradouro,
+    pf.Telefone 
 FROM Pessoas p
 LEFT JOIN Consumidores c
     ON c.PessoaID = p.ID

@@ -236,7 +236,8 @@ namespace Migracao.Sistems
 				var salvarArquivo = Tools.GerarNomeArquivo($"Recebiveis_{estabelecimentoID}_OdontoCompany_Migração");
 				sqlHelper.GerarSqlInsert("Recebiveis", salvarArquivo, dados);
 				excelHelper.GravarExcel(salvarArquivo, dados);
-				//Tools.AbrirPastaSelecionandoArquivo(salvarArquivo + ".xlsx");
+
+				MessageBox.Show("Sucesso!");
 			}
 			catch (Exception error)
 			{
@@ -377,6 +378,8 @@ namespace Migracao.Sistems
 
 				salvarArquivo = Tools.GerarNomeArquivo($"Recebidos_{estabelecimentoID}_Update_OdontoCompany_Migração");
 				sqlHelper.GerarSqlUpdate("Recebiveis", salvarArquivo, dadosRecebivel);
+
+				MessageBox.Show("Sucesso!");
 			}
             catch (Exception error)
             {
@@ -427,8 +430,8 @@ namespace Migracao.Sistems
 					byte? estadoCivil = null;
 					bool sexo = true;
 					long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
-					string nomeCompleto = "null", documento = "null", rg = "null", email = "null", apelido = "null", nascimentoLocal = "null", profissaoOutra = "null", logradouro = "",
-						 complemento = "null", bairro = "null", logradouroNum = "null", numcadastro = "null", cidade = "", estado = "null", observacao = "null";
+					string? nomeCompleto = null, documento = null, rg = null, email = null, apelido = null, nascimentoLocal = null, profissaoOutra = null, logradouro = "",
+						 complemento = null, bairro = null, logradouroNum = null, numcadastro = null, cidade = "", estado = null, observacao = null;
 
 					foreach (var celula in linha.Cells)
 					{
@@ -450,7 +453,7 @@ namespace Migracao.Sistems
 										break;
 									case "NOME":
 										nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
-										apelido = celulaValor.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
+										apelido = nomeCompleto.GetPrimeirosCaracteres(20);
 										break;
 									case "CGC_CPF":
 										documento = celulaValor.ToCPF();
@@ -575,6 +578,8 @@ namespace Migracao.Sistems
 				salvarArquivo = Tools.GerarNomeArquivo($"PessoasClientes_{estabelecimentoID}_OdontoCompany_Migração");
 				sqlHelper.GerarSqlInsert("Pessoas", salvarArquivo, pessoasDict);
 				excelHelper.GravarExcel(salvarArquivo, pessoasDict);
+
+				MessageBox.Show("Sucesso!");
 			}
 
 			catch (Exception error)
@@ -619,8 +624,8 @@ namespace Migracao.Sistems
 					byte? estadoCivil = null;
 					bool sexo = true;
 					long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
-					string nomeCompleto = "null", documento = "null", rg = "null", email = "null", apelido = "null", nascimentoLocal = "null", profissaoOutra = "null", logradouro = "",
-						 complemento = "null", bairro = "null", logradouroNum = "null", numcadastro = "null", cidade = "", estado = "null", observacao = "null";
+					string? nomeCompleto = null, documento = null, rg = null, email = null, apelido = null, nascimentoLocal = null, profissaoOutra = null, logradouro = "",
+						 complemento = null, bairro = null, logradouroNum = null, numcadastro = null, cidade = "", estado = null, observacao = null;
 
 					foreach (var celula in linha.Cells)
 					{
@@ -770,6 +775,8 @@ namespace Migracao.Sistems
 				salvarArquivo = Tools.GerarNomeArquivo($"Empresas_{estabelecimentoID}_OdontoCompany_Migração");
 				sqlHelper.GerarSqlInsert("Empresas", salvarArquivo, empresasDict);
 				excelHelper.GravarExcel(salvarArquivo, empresasDict);
+
+				MessageBox.Show("Sucesso!");
 			}
 
 			catch (Exception error)
@@ -833,7 +840,8 @@ namespace Migracao.Sistems
 										codigo = int.Parse(celulaValor);
 										break;
 									case "NOME":
-										apelido = celulaValor.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
+										nomeCompleto = celulaValor.GetLetras().PrimeiraLetraMaiuscula();
+										apelido = nomeCompleto.GetPrimeirosCaracteres(20);
 										break;
 									case "DEPARTAMENTO":
 										departamento = celulaValor;
@@ -845,7 +853,7 @@ namespace Migracao.Sistems
 										ativo = celulaValor == "S" ? true : false;
 										break;
 									case "NOME_COMPLETO":
-										nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+										//nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
 										break;
 									case "EMAIL":
 										email = celulaValor.ToEmail();
@@ -924,6 +932,8 @@ namespace Migracao.Sistems
 				salvarArquivo = Tools.GerarNomeArquivo($"Pessoas_{estabelecimentoID}_OdontoCompany_Migração");
 				sqlHelper.GerarSqlInsert("Pessoas", salvarArquivo, pessoasDict);
 				excelHelper.GravarExcel(salvarArquivo, pessoasDict);
+
+				MessageBox.Show("Sucesso!");
 			}
 
 			catch (Exception error)
@@ -999,7 +1009,8 @@ namespace Migracao.Sistems
 										codigo = int.Parse(celulaValor);
 										break;
 									case "NOME":
-										apelido = celulaValor.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
+										nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+										apelido = nomeCompleto.GetPrimeirosCaracteres(20);
 										break;
 									case "DEPARTAMENTO":
 										departamento = celulaValor;
@@ -1011,7 +1022,7 @@ namespace Migracao.Sistems
 										ativo = celulaValor == "S" ? true : false;
 										break;
 									case "NOME_COMPLETO":
-										nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+										//nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
 										break;
 									case "EMAIL":
 										email = celulaValor.ToEmail();
@@ -1035,7 +1046,7 @@ namespace Migracao.Sistems
 					if (!string.IsNullOrWhiteSpace(nomeCompleto))
 					{
 						if (string.IsNullOrWhiteSpace(apelido))
-							apelido = nomeCompleto.GetPrimeiroNome().PrimeiraLetraMaiuscula();
+							apelido = nomeCompleto.GetPrimeirosCaracteres(20);
 
 						var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto);
 						var funcionarioIDValue = excelHelper.GetFuncionarioID(nomeCompleto: nomeCompleto);
@@ -1119,6 +1130,8 @@ namespace Migracao.Sistems
 				salvarArquivo = Tools.GerarNomeArquivo($"PessoaFones_{estabelecimentoID}_OdontoCompany_Migração");
 				sqlHelper.GerarSqlInsert("_MigracaoPessoaFones_Temp", salvarArquivo, pessoaFonesDict);
 				excelHelper.GravarExcel(salvarArquivo, pessoaFonesDict);
+
+				MessageBox.Show("Sucesso!");
 			}
 
 			catch (Exception error)
@@ -1165,8 +1178,8 @@ namespace Migracao.Sistems
 					byte? estadoCivil = null;
 					bool sexo = true;
 					long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
-					string nomeCompleto = "null", documento = "null", rg = "null", email = "null", apelido = "null", nascimentoLocal = "null", profissaoOutra = "null", logradouro = "",
-						 complemento = "null", bairro = "null", logradouroNum = "null", numcadastro = "null", cidade = "", estado = "null", observacao = "null";
+					string? nomeCompleto = null, documento = null, rg = null, email = null, apelido = null, nascimentoLocal = null, profissaoOutra = null, logradouro = "",
+						 complemento = null, bairro = null, logradouroNum = null, numcadastro = null, cidade = "", estado = null, observacao = null;
 
 					foreach (var celula in linha.Cells)
 					{
@@ -1382,6 +1395,8 @@ namespace Migracao.Sistems
 				salvarArquivo = Tools.GerarNomeArquivo($"Enderecos_{estabelecimentoID}_OdontoCompany_Migração");
 				sqlHelper.GerarSqlInsert("_MigracaoEnderecos_Temp", salvarArquivo, enderecosDict);
 				excelHelper.GravarExcel(salvarArquivo, enderecosDict);
+
+				MessageBox.Show("Sucesso!");
 			}
 
 			catch (Exception error)
@@ -1456,8 +1471,8 @@ namespace Migracao.Sistems
 					byte? estadoCivil = null;
 					bool sexo = true;
                     long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
-					string nomeCompleto = "null", documento = "null", rg = "null", email = "null", apelido = "null", nascimentoLocal = "null", profissaoOutra = "null", logradouro = "",
-						 complemento = "null", bairro = "null", logradouroNum = "null", numcadastro = "null", cidade = "", estado = "null", observacao = "null";
+					string? nomeCompleto = null, documento = null, rg = null, email = null, apelido = null, nascimentoLocal = null, profissaoOutra = null, logradouro = "",
+						 complemento = null, bairro = null, logradouroNum = null, numcadastro = null, cidade = "", estado = null, observacao = null;
 
 					foreach (var celula in linha.Cells)
                     {
@@ -1826,6 +1841,8 @@ namespace Migracao.Sistems
 				salvarArquivo = Tools.GerarNomeArquivo($"PessoaFones_{estabelecimentoID}_OdontoCompany_Migração");
 				sqlHelper.GerarSqlInsert("_MigracaoPessoaFones_Temp", salvarArquivo, pessoaFonesDict);
 				excelHelper.GravarExcel(salvarArquivo, pessoaFonesDict);
+
+				MessageBox.Show("Sucesso!");
 			}
 
             catch (Exception error)

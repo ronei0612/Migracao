@@ -76,6 +76,9 @@ namespace Migracao.Utils
 					string logradouro = sheet.GetRow(row).GetCell(logradouroColumnIndex) != null ? sheet.GetRow(row).GetCell(logradouroColumnIndex).ToString() : "";
 					string telefone = sheet.GetRow(row).GetCell(telefoneColumnIndex) != null ? sheet.GetRow(row).GetCell(telefoneColumnIndex).ToString() : "";
 
+					nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
+					cpf = cpf.Replace(".", "").Replace("-", "");
+
 					string key = cpf;
 
 					if (!cpfConsumidorDict.ContainsKey(key))
@@ -183,9 +186,11 @@ namespace Migracao.Utils
 
 		public int GetCidadeID(string cidade, string estado)
 		{
-            if (!string.IsNullOrWhiteSpace(cidade))
+			cidade = Tools.RemoverAcentos(cidade).ToLower();
+
+			if (!string.IsNullOrWhiteSpace(cidade))
             {
-				string key = Tools.RemoverAcentos(cidade).ToLower() + "|" + estado.ToLower();
+				string key = cidade + "|" + estado.ToLower();
                 if (cidadeEstadoDict.ContainsKey(key))
                     return int.Parse(cidadeEstadoDict[key]);
 
@@ -203,6 +208,9 @@ namespace Migracao.Utils
 
 		public string GetPessoaID(string cpf = "", string nomeCompleto = "")
 		{
+			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
+			cpf = cpf.Replace(".", "").Replace("-", "");
+
 			if (!string.IsNullOrWhiteSpace(cpf))
 				if (cpfPessoaDict.ContainsKey(cpf))
 					return cpfPessoaDict[cpf];
@@ -216,6 +224,9 @@ namespace Migracao.Utils
 
 		public string GetConsumidorID(string cpf = "", string nomeCompleto = "", string codigo = "")
         {
+			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
+			cpf = cpf.Replace(".", "").Replace("-", "");
+
 			if (!string.IsNullOrWhiteSpace(cpf))
 				if (cpfConsumidorDict.ContainsKey(cpf))
 					return cpfConsumidorDict[cpf];
@@ -236,6 +247,9 @@ namespace Migracao.Utils
 
 		public bool PessoaFoneExists(string cpf = "", string nomeCompleto = "", string telefone = "")
 		{
+			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
+			cpf = cpf.Replace(".", "").Replace("-", "");
+
 			string key = cpf + "|" + telefone;
 			if (!string.IsNullOrWhiteSpace(key))
 				if (cpfTelefonesDict.ContainsKey(key))
@@ -253,6 +267,9 @@ namespace Migracao.Utils
 
 		public bool ConsumidorEnderecoExists(string cpf = "", string nomeCompleto = "", string logradouro = "")
 		{
+			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
+			cpf = cpf.Replace(".", "").Replace("-", "");
+
 			string key = cpf + "|" + logradouro;
 			if (!string.IsNullOrWhiteSpace(cpf))
 				if (cpfEnderecosDict.ContainsKey(key))

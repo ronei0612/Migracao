@@ -141,7 +141,7 @@ namespace Migracao.Utils
 
 		public static string TratarMensagemErro(string erroMensagem, int indiceLinha, string colunaLetra, string tituloColuna, string celulaValor, string variaveisValor = "")
 		{
-			var mensagemErro = $"Falha na linha {indiceLinha}, coluna {colunaLetra}, Valor esperado: {tituloColuna}, valor da célula: \"{celulaValor}\": {erroMensagem}";
+			var mensagemErro = $"Falha na linha {indiceLinha}, coluna {colunaLetra}: {tituloColuna}, valor esperado: , valor da célula: \"{celulaValor}\": {erroMensagem}";
 
 			if (!string.IsNullOrWhiteSpace(variaveisValor))
 				mensagemErro += Environment.NewLine + "Variáveis" + Environment.NewLine + variaveisValor;

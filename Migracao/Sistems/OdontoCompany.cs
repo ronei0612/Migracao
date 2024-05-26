@@ -1,7 +1,6 @@
 ﻿using Migracao.Models;
 using Migracao.Utils;
 using NPOI.SS.UserModel;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Migracao.Sistems
 {
@@ -945,7 +944,6 @@ namespace Migracao.Sistems
 		public void ImportarFuncionarios(string arquivoExcel, string arquivoFuncionariosAtuais, int estabelecimentoID, int loginID)
         {
 			var indiceLinha = 1;
-			var consumidorID = 1;
 			var pessoaID = 1;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
 			DateTime dataHoje = DateTime.Now;
@@ -1050,11 +1048,13 @@ namespace Migracao.Sistems
 
 						var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto);
 						var funcionarioIDValue = excelHelper.GetFuncionarioID(nomeCompleto: nomeCompleto);
-						pessoaID = int.Parse(pessoaIDValue);
 
 						if (string.IsNullOrEmpty(arquivoFuncionariosAtuais) 
 							|| (!string.IsNullOrEmpty(arquivoFuncionariosAtuais) && !string.IsNullOrEmpty(pessoaIDValue) && string.IsNullOrEmpty(funcionarioIDValue)))
 						{
+							if (!string.IsNullOrEmpty(pessoaIDValue))
+								pessoaID = int.Parse(pessoaIDValue);
+
 							funcionarios.Add(new Funcionario()
 							{
 								Ativo = ativo,
@@ -1131,7 +1131,7 @@ namespace Migracao.Sistems
 				sqlHelper.GerarSqlInsert("_MigracaoPessoaFones_Temp", salvarArquivo, pessoaFonesDict);
 				excelHelper.GravarExcel(salvarArquivo, pessoaFonesDict);
 
-				MessageBox.Show("Sucesso!");
+				MessageBox.Show("Limpar o Redis" + Environment.NewLine + "redis-cli.exe -h 127.0.0.1 -n 7 del Equipe:017957-Funcionarios", "Sucesso!");
 			}
 
 			catch (Exception error)

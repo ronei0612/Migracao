@@ -287,19 +287,27 @@ namespace Migracao.Utils
 
 		public string GetFuncionarioID(string cpf = "", string nomeCompleto = "")
 		{
+			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
+			cpf = cpf.Replace(".", "").Replace("-", "");
+
 			string key = cpf;
-			if (cpfConsumidorDict.ContainsKey(key))
-				return cpfConsumidorDict[key];
+			if (!string.IsNullOrEmpty(cpf))
+				if (cpfFuncionarioDict.ContainsKey(key))
+					return cpfFuncionarioDict[key];
 
 			key = nomeCompleto;
-			if (nomeConsumidorDict.ContainsKey(key))
-				return nomeConsumidorDict[key];
+			if (!string.IsNullOrEmpty(nomeCompleto))
+				if (nomeFuncionarioDict.ContainsKey(key))
+					return nomeFuncionarioDict[key];
 
 			return "";
 		}
 
 		public string GetFornecedorID(string cpf = "", string nomeCompleto = "", string codigo = "")
 		{
+			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
+			cpf = cpf.Replace(".", "").Replace("-", "");
+
 			string key = cpf;
 			if (cpfConsumidorDict.ContainsKey(key))
 				return cpfConsumidorDict[key];

@@ -383,145 +383,385 @@ namespace Migracao.Sistems
                 throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha++, colunaLetra, tituloColuna, celulaValor, variaveisValor));
             }
         }
-
-        public void ImportarFornecedores(string arquivoExcel, string arquivo2, int estabelecimentoID, int loginID)
-        {
-            var dataHoje = DateTime.Now;
-            var indiceLinha = 0;
-            string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
-            var excelHelper = new ExcelHelper(arquivoExcel);
-            var sqlHelper = new SqlHelper();
-
-            try
-            {
-                var linhasCount = excelHelper.linhas.Count;
-                //var consumidores = new List<Consumidor>();
-                var fornecedores = new List<Fornecedor>();
-
-                foreach (var linha in excelHelper.linhas)
-                {
-                    indiceLinha++;
-                    bool cliente = false, fornecedor = false;
-                    DateTime dataNascimento, dataCadastro = dataHoje;
-                    int numcadastro;
-                    string nomeCompleto = "", cpf = "", rg = "", email = "", apelido = "";
-                    bool sexo = true;
-                    long telefonePrinc, telefoneAltern, telefoneComercial, telefoneOutro, celular;
-
-                    foreach (var celula in linha.Cells)
-                    {
-                        if (celula != null)
-                        {
-                            celulaValor = celula.ToString().Trim().Replace("'", "’");
-                            tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
-                            colunaLetra = excelHelper.GetColumnLetter(celula);
-
-                            if (!string.IsNullOrWhiteSpace(celulaValor))
-                            {
-                                switch (tituloColuna)
-                                {
-                                    case "CLIENTE":
-                                        cliente = celulaValor == "S" ? true : false;
-                                        break;
-                                    case "FORNECEDOR":
-                                        fornecedor = celulaValor == "S" ? true : false;
-                                        break;
-                                    case "NOME":
-                                        nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
-                                        apelido = celulaValor.GetPrimeiroNome();
-                                        break;
-                                    case "CGC_CPF":
-                                        cpf = celulaValor.ToCPF();
-                                        break;
-                                    case "INSC_RG":
-                                        rg = celulaValor.GetPrimeirosCaracteres(20);
-                                        break;
-                                    case "SEXO_M_F":
-                                        var sexoLetra = celulaValor.ToLower();
-                                        sexo = sexoLetra == "m" || sexoLetra != "f";
-                                        break;
-                                    case "EMAIL":
-                                        email = celulaValor.ToEmail();
-                                        break;
-                                    case "FONE1":
-                                        telefonePrinc = celulaValor.ToFone();
-                                        break;
-                                    case "FONE2":
-                                        telefoneAltern = celulaValor.ToFone();
-                                        break;
-                                    case "CELULAR":
-                                        celular = celulaValor.ToFone();
-                                        break;
-                                    //case "ENDERECO":
-                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
-                                    //    break;
-                                    //case "BAIRRO":
-                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
-                                    //    break;
-                                    //case "NUM_ENDERECO":
-                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
-                                    //    break;
-                                    //case "CIDADE":
-                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
-                                    //    break;
-                                    //case "ESTADO":
-                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
-                                    //    break;
-                                    //case "CEP":
-                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
-                                    //    break;
-                                    //case "OBS1":
-                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
-                                    //    break;
-                                    //case "NUM_CONVENIO":
-                                    //    nomeCompleto = celulaValor.GetPrimeirosCaracteres(70);
-                                    //    break;
-                                    case "DT_CADASTRO":
-                                        dataCadastro = celulaValor.ToData();
-                                        break;
-                                    case "DT_NASCIMENTO":
-                                        dataNascimento = celulaValor.ToData();
-                                        break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (fornecedor)
-                        fornecedores.Add(new Fornecedor()
-                        {
-                            Ativo = true,
-                            DataInclusao = dataCadastro,
-                            EstabelecimentoID = estabelecimentoID,
-                            NomeFantasia = nomeCompleto,
-                            LoginID = loginID
-                        });
-                }
-
-                indiceLinha = 0;
-
-                var dados = new Dictionary<string, object[]>
-                {
-                    { "Ativo", fornecedores.ConvertAll(fornecedor => (object)fornecedor.Ativo).ToArray() },
-                    { "DataInclusao", fornecedores.ConvertAll(fornecedor => (object)fornecedor.DataInclusao).ToArray() },
-                    { "EstabelecimentoID", fornecedores.ConvertAll(fornecedor => (object)fornecedor.EstabelecimentoID).ToArray() },
-                    { "LoginID", fornecedores.ConvertAll(fornecedor => (object)fornecedor.LoginID).ToArray() },
-                    { "NomeFantasia", fornecedores.ConvertAll(fornecedor => (object)fornecedor.NomeFantasia).ToArray() }
-                };
-
-				var salvarArquivo = Tools.GerarNomeArquivo($"Migração_{estabelecimentoID}_OdontoCompany_Consumidores");
-				sqlHelper.GerarSqlInsert("_MigracaoConsumidores_Temp", salvarArquivo, dados);
-				excelHelper.GravarExcel(salvarArquivo, dados);
-				//Tools.AbrirPastaSelecionandoArquivo(salvarArquivo + ".xlsx");
-            }
-
-            catch (Exception error)
-            {
-                throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha++, colunaLetra, tituloColuna, celulaValor, variaveisValor));
-            }
-        }
-
 		public void ImportarPessoas(string arquivoExcel, string arquivoPessoasAtuais, int estabelecimentoID, int loginID)
+		{
+			if (Path.GetFileNameWithoutExtension(arquivoExcel).Contains("CED006"))
+				ImportarPessoasDentistas(arquivoExcel, arquivoPessoasAtuais, estabelecimentoID, loginID);
+			else if (Path.GetFileNameWithoutExtension(arquivoExcel).Contains("EMD101"))
+				ImportarPessoasClientes(arquivoExcel, arquivoPessoasAtuais, estabelecimentoID, loginID);
+		}
+
+		public void ImportarPessoasClientes(string arquivoExcel, string arquivoPessoasAtuais, int estabelecimentoID, int loginID)
+		{
+			var indiceLinha = 1;
+			var consumidorID = 1;
+			var pessoaID = 1;
+			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
+			DateTime dataHoje = DateTime.Now;
+			var excelHelper = new ExcelHelper(arquivoExcel);
+			var sqlHelper = new SqlHelper();
+
+			if (!string.IsNullOrEmpty(arquivoPessoasAtuais))
+				try
+				{
+					var workbook = excelHelper.LerExcel(arquivoPessoasAtuais);
+					var sheet = workbook.GetSheetAt(0);
+					excelHelper.InitializeDictionary(sheet);
+				}
+				catch (Exception ex)
+				{
+					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoPessoasAtuais}\": {ex.Message}");
+				}
+
+
+			try
+			{
+				var linhasCount = excelHelper.linhas.Count;
+				var pessoas = new List<Pessoa>();
+
+				foreach (var linha in excelHelper.linhas)
+				{
+					bool cliente = false, fornecedor = false;
+					DateTime dataNascimento = dataHoje, dataCadastro = dataHoje;
+					int cep = 0;
+					byte? estadoCivil = null;
+					bool sexo = true;
+					long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
+					string nomeCompleto = "null", documento = "null", rg = "null", email = "null", apelido = "null", nascimentoLocal = "null", profissaoOutra = "null", logradouro = "",
+						 complemento = "null", bairro = "null", logradouroNum = "null", numcadastro = "null", cidade = "", estado = "null", observacao = "null";
+
+					foreach (var celula in linha.Cells)
+					{
+						if (celula != null)
+						{
+							celulaValor = celula.ToString().Trim().Replace("'", "’");
+							tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
+							colunaLetra = excelHelper.GetColumnLetter(celula);
+
+							if (!string.IsNullOrWhiteSpace(celulaValor))
+							{
+								switch (tituloColuna)
+								{
+									case "CLIENTE":
+										cliente = celulaValor == "S" ? true : false;
+										break;
+									case "FORNECEDOR":
+										fornecedor = celulaValor == "S" ? true : false;
+										break;
+									case "NOME":
+										nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+										apelido = celulaValor.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
+										break;
+									case "CGC_CPF":
+										documento = celulaValor.ToCPF();
+										break;
+									case "INSC_RG":
+										rg = celulaValor.GetPrimeirosCaracteres(20);
+										break;
+									case "SEXO_M_F":
+										sexo = celulaValor.ToSexo("m", "f");
+										break;
+									case "EMAIL":
+										email = celulaValor.ToEmail();
+										break;
+									case "FONE1":
+										telefonePrinc = celulaValor.ToFone();
+										break;
+									case "FONE2":
+										telefoneAltern = celulaValor.ToFone();
+										break;
+									case "CELULAR":
+										celular = celulaValor.ToFone();
+										break;
+									case "ENDERECO":
+										logradouro = celulaValor.PrimeiraLetraMaiuscula();
+										break;
+									case "BAIRRO":
+										bairro = celulaValor.PrimeiraLetraMaiuscula();
+										break;
+									case "NUM_ENDERECO":
+										logradouroNum = celulaValor;
+										break;
+									case "CIDADE":
+										cidade = celulaValor;
+										break;
+									case "ESTADO":
+										estado = celulaValor;
+										break;
+									case "CEP":
+										cep = celulaValor.ToNum();
+										break;
+									case "OBS1":
+										observacao = celulaValor;
+										break;
+									case "NUM_CONVENIO":
+										break;
+									case "DT_CADASTRO":
+										dataCadastro = celulaValor.ToData();
+										break;
+									case "DT_NASCIMENTO":
+										dataNascimento = celulaValor.ToData();
+										break;
+									case "NUM_FICHA":
+										numcadastro = celulaValor;
+										break;
+								}
+							}
+						}
+					}
+
+					pessoaID = indiceLinha;
+					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento);
+					if (!string.IsNullOrEmpty(pessoaIDValue))
+						pessoaID = int.Parse(pessoaIDValue);
+
+					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: documento);
+					if (!string.IsNullOrEmpty(consumidorIDValue))
+						consumidorID = int.Parse(consumidorIDValue);
+
+					if (!fornecedor && documento.IsCPF())
+					{
+						if (string.IsNullOrEmpty(pessoaIDValue))
+							pessoas.Add(new Pessoa()
+							{
+								ID = indiceLinha,
+								NomeCompleto = nomeCompleto,
+								Apelido = apelido,
+								CPF = documento,
+								DataInclusao = dataCadastro,
+								Email = email,
+								RG = rg,
+								Sexo = sexo,
+								NascimentoData = dataNascimento,
+								NascimentoLocal = nascimentoLocal,
+								ProfissaoOutra = profissaoOutra,
+								EstadoCivilID = estadoCivil,
+								EstabelecimentoID = estabelecimentoID,
+								LoginID = loginID,
+								Guid = new Guid(),
+								FoneticaApelido = apelido.Fonetizar(),
+								FoneticaNomeCompleto = nomeCompleto.Fonetizar()
+							});
+					}
+
+					indiceLinha++;
+				}
+
+				indiceLinha = 0;
+				var salvarArquivo = "";
+
+
+				var pessoasDict = new Dictionary<string, object[]>
+				{
+					//{ "ID", pessoas.ConvertAll(pessoa => (object)pessoa.ID).ToArray() },
+					{ "NomeCompleto", pessoas.ConvertAll(pessoa => (object)pessoa.NomeCompleto).ToArray() },
+					{ "Apelido", pessoas.ConvertAll(pessoa => (object)pessoa.Apelido).ToArray() },
+					{ "CPF", pessoas.ConvertAll(pessoa => (object)pessoa.CPF).ToArray() },
+					{ "DataInclusao", pessoas.ConvertAll(pessoa => (object)pessoa.DataInclusao).ToArray() },
+					{ "Email", pessoas.ConvertAll(pessoa => (object)pessoa.Email).ToArray() },
+					{ "RG", pessoas.ConvertAll(pessoa => (object)pessoa.RG).ToArray() },
+					{ "Sexo", pessoas.ConvertAll(pessoa => (object)pessoa.Sexo).ToArray() },
+					{ "NascimentoData", pessoas.ConvertAll(pessoa => (object)pessoa.NascimentoData).ToArray() },
+					{ "NascimentoLocal", pessoas.ConvertAll(pessoa => (object)pessoa.NascimentoLocal).ToArray() },
+					{ "ProfissaoOutra", pessoas.ConvertAll(pessoa => (object)pessoa.ProfissaoOutra).ToArray() },
+					{ "EstadoCivilID", pessoas.ConvertAll(pessoa => (object)pessoa.EstadoCivilID).ToArray() },
+					{ "EstabelecimentoID", pessoas.ConvertAll(pessoa => (object)pessoa.EstabelecimentoID).ToArray() },
+					{ "LoginID", pessoas.ConvertAll(pessoa => (object)pessoa.LoginID).ToArray() },
+					{ "Guid", pessoas.ConvertAll(pessoa => (object)pessoa.Guid).ToArray() },
+					{ "FoneticaApelido", pessoas.ConvertAll(pessoa => (object)pessoa.FoneticaApelido).ToArray() },
+					{ "FoneticaNomeCompleto", pessoas.ConvertAll(pessoa => (object)pessoa.FoneticaNomeCompleto).ToArray() }
+				};
+
+				salvarArquivo = Tools.GerarNomeArquivo($"PessoasClientes_{estabelecimentoID}_OdontoCompany_Migração");
+				sqlHelper.GerarSqlInsert("Pessoas", salvarArquivo, pessoasDict);
+				excelHelper.GravarExcel(salvarArquivo, pessoasDict);
+			}
+
+			catch (Exception error)
+			{
+				throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha + 2, colunaLetra, tituloColuna, celulaValor, variaveisValor));
+			}
+		}
+
+		public void ImportarEmpresas(string arquivoExcel, string arquivoPessoasAtuais, int estabelecimentoID, int loginID)
+		{
+			var indiceLinha = 1;
+			var consumidorID = 1;
+			var pessoaID = 1;
+			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
+			DateTime dataHoje = DateTime.Now;
+			var excelHelper = new ExcelHelper(arquivoExcel);
+			var sqlHelper = new SqlHelper();
+
+			if (!string.IsNullOrEmpty(arquivoPessoasAtuais))
+				try
+				{
+					var workbook = excelHelper.LerExcel(arquivoPessoasAtuais);
+					var sheet = workbook.GetSheetAt(0);
+					excelHelper.InitializeDictionary(sheet);
+				}
+				catch (Exception ex)
+				{
+					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoPessoasAtuais}\": {ex.Message}");
+				}
+
+
+			try
+			{
+				var linhasCount = excelHelper.linhas.Count;
+				var empresas = new List<Empresa>();
+
+				foreach (var linha in excelHelper.linhas)
+				{
+					bool cliente = false, fornecedor = false;
+					DateTime dataNascimento = dataHoje, dataCadastro = dataHoje;
+					int cep = 0;
+					byte? estadoCivil = null;
+					bool sexo = true;
+					long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
+					string nomeCompleto = "null", documento = "null", rg = "null", email = "null", apelido = "null", nascimentoLocal = "null", profissaoOutra = "null", logradouro = "",
+						 complemento = "null", bairro = "null", logradouroNum = "null", numcadastro = "null", cidade = "", estado = "null", observacao = "null";
+
+					foreach (var celula in linha.Cells)
+					{
+						if (celula != null)
+						{
+							celulaValor = celula.ToString().Trim().Replace("'", "’");
+							tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
+							colunaLetra = excelHelper.GetColumnLetter(celula);
+
+							if (!string.IsNullOrWhiteSpace(celulaValor))
+							{
+								switch (tituloColuna)
+								{
+									case "CLIENTE":
+										cliente = celulaValor == "S" ? true : false;
+										break;
+									case "FORNECEDOR":
+										fornecedor = celulaValor == "S" ? true : false;
+										break;
+									case "NOME":
+										nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+										apelido = celulaValor.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
+										break;
+									case "CGC_CPF":
+										documento = celulaValor.ToCPF();
+										break;
+									case "INSC_RG":
+										rg = celulaValor.GetPrimeirosCaracteres(20);
+										break;
+									case "SEXO_M_F":
+										sexo = celulaValor.ToSexo("m", "f");
+										break;
+									case "EMAIL":
+										email = celulaValor.ToEmail();
+										break;
+									case "FONE1":
+										telefonePrinc = celulaValor.ToFone();
+										break;
+									case "FONE2":
+										telefoneAltern = celulaValor.ToFone();
+										break;
+									case "CELULAR":
+										celular = celulaValor.ToFone();
+										break;
+									case "ENDERECO":
+										logradouro = celulaValor.PrimeiraLetraMaiuscula();
+										break;
+									case "BAIRRO":
+										bairro = celulaValor.PrimeiraLetraMaiuscula();
+										break;
+									case "NUM_ENDERECO":
+										logradouroNum = celulaValor;
+										break;
+									case "CIDADE":
+										cidade = celulaValor;
+										break;
+									case "ESTADO":
+										estado = celulaValor;
+										break;
+									case "CEP":
+										cep = celulaValor.ToNum();
+										break;
+									case "OBS1":
+										observacao = celulaValor;
+										break;
+									case "NUM_CONVENIO":
+										break;
+									case "DT_CADASTRO":
+										dataCadastro = celulaValor.ToData();
+										break;
+									case "DT_NASCIMENTO":
+										dataNascimento = celulaValor.ToData();
+										break;
+									case "NUM_FICHA":
+										numcadastro = celulaValor;
+										break;
+								}
+							}
+						}
+					}
+
+					pessoaID = indiceLinha;
+					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento);
+					if (!string.IsNullOrEmpty(pessoaIDValue))
+						pessoaID = int.Parse(pessoaIDValue);
+
+					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: documento);
+					if (!string.IsNullOrEmpty(consumidorIDValue))
+						consumidorID = int.Parse(consumidorIDValue);
+
+					if (fornecedor && documento.IsCNPJ_CGC())
+					{
+						empresas.Add(new Empresa()
+						{
+							Ativo = true,
+							CNPJ = documento,
+							DataInclusao = dataCadastro,
+							LoginID = loginID,
+							Marca = "",
+							NomeFantasia = "",
+							RazaoSocial = "",
+							RegimeTribID = 0,
+							InscricaoMunicipal = rg,
+							EstabelecimentoID = estabelecimentoID,
+							Guid = new Guid()
+						});
+					}
+
+					indiceLinha++;
+				}
+
+				indiceLinha = 0;
+				var salvarArquivo = "";
+
+				var empresasDict = new Dictionary<string, object[]>
+				{
+					{ "Ativo", empresas.ConvertAll(empresa => (object)empresa.Ativo).ToArray() },
+					{ "CNPJ", empresas.ConvertAll(empresa => (object)empresa.CNPJ).ToArray() },
+					{ "DataInclusao", empresas.ConvertAll(empresa => (object)empresa.DataInclusao).ToArray() },
+					{ "LoginID", empresas.ConvertAll(empresa => (object)empresa.LoginID).ToArray() },
+					{ "Marca", empresas.ConvertAll(empresa => (object)empresa.Marca).ToArray() },
+					{ "NomeFantasia", empresas.ConvertAll(empresa => (object)empresa.NomeFantasia).ToArray() },
+					{ "RazaoSocial", empresas.ConvertAll(empresa => (object)empresa.RazaoSocial).ToArray() },
+					{ "RegimeTribID", empresas.ConvertAll(empresa => (object)empresa.RegimeTribID).ToArray() },
+					{ "InscricaoMunicipal", empresas.ConvertAll(empresa => (object)empresa.InscricaoMunicipal).ToArray() },
+					{ "EstabelecimentoID", empresas.ConvertAll(empresa => (object)empresa.EstabelecimentoID).ToArray() },
+					{ "Guid", empresas.ConvertAll(empresa => (object)empresa.Guid).ToArray() }
+				};
+
+				salvarArquivo = Tools.GerarNomeArquivo($"Empresas_{estabelecimentoID}_OdontoCompany_Migração");
+				sqlHelper.GerarSqlInsert("Empresas", salvarArquivo, empresasDict);
+				excelHelper.GravarExcel(salvarArquivo, empresasDict);
+			}
+
+			catch (Exception error)
+			{
+				throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha + 2, colunaLetra, tituloColuna, celulaValor, variaveisValor));
+			}
+		}
+
+		public void ImportarPessoasDentistas(string arquivoExcel, string arquivoPessoasAtuais, int estabelecimentoID, int loginID)
 		{
 			var indiceLinha = 1;
 			var consumidorID = 1;
@@ -548,8 +788,7 @@ namespace Migracao.Sistems
 				var linhasCount = excelHelper.linhas.Count;
 				var pessoas = new List<Pessoa>();
 				var funcionarios = new List<Funcionario>();
-				var pessoaFones = new List<PessoaFone>();
-				var empresasEnderecos = new List<Endereco>();
+				var enderecos = new List<Endereco>();
 
 				foreach (var linha in excelHelper.linhas)
 				{
@@ -559,7 +798,7 @@ namespace Migracao.Sistems
 					int? codigo = null;
 					long telefonePrinc = 0;
 					string? nomeCompleto = null, departamento = null, cro = null, observacao = null, email = null;
-					string apelido = "";
+					string apelido = "", documento = "";
 
 					foreach (var celula in linha.Cells)
 					{
@@ -716,7 +955,6 @@ namespace Migracao.Sistems
 				var linhasCount = excelHelper.linhas.Count;
 				var funcionarios = new List<Funcionario>();
 				var pessoaFones = new List<PessoaFone>();
-				//var empresasEnderecos = new List<Endereco>();
 
 				foreach (var linha in excelHelper.linhas)
 				{
@@ -850,6 +1088,283 @@ namespace Migracao.Sistems
 				salvarArquivo = Tools.GerarNomeArquivo($"Funcionarios_{estabelecimentoID}_OdontoCompany_Migração");
 				sqlHelper.GerarSqlInsert("Funcionarios", salvarArquivo, funcionariosDict);
 				excelHelper.GravarExcel(salvarArquivo, funcionariosDict);
+
+
+				var pessoaFonesDict = new Dictionary<string, object[]>
+				{
+					{ "PessoaID", pessoaFones.ConvertAll(pessoaFone => (object)pessoaFone.PessoaID).ToArray() },
+					{ "FoneTipoID", pessoaFones.ConvertAll(pessoaFone => (object)pessoaFone.FoneTipoID).ToArray() },
+					{ "Telefone", pessoaFones.ConvertAll(pessoaFone => (object)pessoaFone.Telefone).ToArray() },
+					{ "DataInclusao", pessoaFones.ConvertAll(pessoaFone => (object)pessoaFone.DataInclusao).ToArray() },
+					{ "LoginID", pessoaFones.ConvertAll(pessoaFone => (object)pessoaFone.LoginID).ToArray() }
+				};
+
+				salvarArquivo = Tools.GerarNomeArquivo($"PessoaFones_{estabelecimentoID}_OdontoCompany_Migração");
+				sqlHelper.GerarSqlInsert("_MigracaoPessoaFones_Temp", salvarArquivo, pessoaFonesDict);
+				excelHelper.GravarExcel(salvarArquivo, pessoaFonesDict);
+			}
+
+			catch (Exception error)
+			{
+				throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha + 2, colunaLetra, tituloColuna, celulaValor, variaveisValor));
+			}
+		}
+
+		public void ImportarFornecedores(string arquivoExcel, string arquivoFornecedoresAtuais, int estabelecimentoID, int loginID)
+		{
+			var indiceLinha = 1;
+			var consumidorID = 1;
+			var pessoaID = 1;
+			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
+			DateTime dataHoje = DateTime.Now;
+			var excelHelper = new ExcelHelper(arquivoExcel);
+			var sqlHelper = new SqlHelper();
+
+			if (!string.IsNullOrEmpty(arquivoFornecedoresAtuais))
+				try
+				{
+					var workbook = excelHelper.LerExcel(arquivoFornecedoresAtuais);
+					var sheet = workbook.GetSheetAt(0);
+					excelHelper.InitializeDictionary(sheet);
+				}
+				catch (Exception ex)
+				{
+					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoFornecedoresAtuais}\": {ex.Message}");
+				}
+
+			try
+			{
+				var linhasCount = excelHelper.linhas.Count;
+				var fornecedores = new List<Fornecedor>();
+				var empresas = new List<Empresa>();
+				var enderecos = new List<Endereco>();
+				var fornecedorFones = new List<FornecedorFone>();
+
+				foreach (var linha in excelHelper.linhas)
+				{
+					bool cliente = false, fornecedor = false;
+					DateTime dataNascimento = dataHoje, dataCadastro = dataHoje;
+					int cep = 0;
+					byte? estadoCivil = null;
+					bool sexo = true;
+					long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
+					string nomeCompleto = "null", documento = "null", rg = "null", email = "null", apelido = "null", nascimentoLocal = "null", profissaoOutra = "null", logradouro = "",
+						 complemento = "null", bairro = "null", logradouroNum = "null", numcadastro = "null", cidade = "", estado = "null", observacao = "null";
+
+					foreach (var celula in linha.Cells)
+					{
+						if (celula != null)
+						{
+							celulaValor = celula.ToString().Trim().Replace("'", "’");
+							tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
+							colunaLetra = excelHelper.GetColumnLetter(celula);
+
+							if (!string.IsNullOrWhiteSpace(celulaValor))
+							{
+								switch (tituloColuna)
+								{
+									case "CLIENTE":
+										cliente = celulaValor == "S" ? true : false;
+										break;
+									case "FORNECEDOR":
+										fornecedor = celulaValor == "S" ? true : false;
+										break;
+									case "NOME":
+										nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+										apelido = celulaValor.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
+										break;
+									case "CGC_CPF":
+										documento = celulaValor.ToCPF();
+										break;
+									case "INSC_RG":
+										rg = celulaValor.GetPrimeirosCaracteres(20);
+										break;
+									case "SEXO_M_F":
+										sexo = celulaValor.ToSexo("m", "f");
+										break;
+									case "EMAIL":
+										email = celulaValor.ToEmail();
+										break;
+									case "FONE1":
+										telefonePrinc = celulaValor.ToFone();
+										break;
+									case "FONE2":
+										telefoneAltern = celulaValor.ToFone();
+										break;
+									case "CELULAR":
+										celular = celulaValor.ToFone();
+										break;
+									case "ENDERECO":
+										logradouro = celulaValor.PrimeiraLetraMaiuscula();
+										break;
+									case "BAIRRO":
+										bairro = celulaValor.PrimeiraLetraMaiuscula();
+										break;
+									case "NUM_ENDERECO":
+										logradouroNum = celulaValor;
+										break;
+									case "CIDADE":
+										cidade = celulaValor;
+										break;
+									case "ESTADO":
+										estado = celulaValor;
+										break;
+									case "CEP":
+										cep = celulaValor.ToNum();
+										break;
+									case "OBS1":
+										observacao = celulaValor;
+										break;
+									case "NUM_CONVENIO":
+										break;
+									case "DT_CADASTRO":
+										dataCadastro = celulaValor.ToData();
+										break;
+									case "DT_NASCIMENTO":
+										dataNascimento = celulaValor.ToData();
+										break;
+									case "NUM_FICHA":
+										numcadastro = celulaValor;
+										break;
+								}
+							}
+						}
+					}
+
+					pessoaID = indiceLinha;
+					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento);
+					if (!string.IsNullOrEmpty(pessoaIDValue))
+						pessoaID = int.Parse(pessoaIDValue);
+
+					var fornecedorIDValue = excelHelper.GetFornecedorID(nomeCompleto: nomeCompleto, cpf: documento);
+
+					if (!string.IsNullOrWhiteSpace(nomeCompleto))
+					{
+						if (fornecedor && string.IsNullOrEmpty(fornecedorIDValue))
+						{
+							fornecedores.Add(new Fornecedor()
+							{
+								Ativo = true,
+								DataInclusao = dataCadastro,
+								EstabelecimentoID = estabelecimentoID,
+								LoginID = loginID,
+								Email = email,
+								EmpresaID = indiceLinha,
+								Observacoes = observacao
+							});
+
+							if (!string.IsNullOrWhiteSpace(cidade) && !string.IsNullOrWhiteSpace(logradouro))
+							{
+								var cidadeID = excelHelper.GetCidadeID(cidade, estado);
+								enderecos.Add(new Endereco()
+								{
+									Ativo = true,
+									Cep = cep,
+									CidadeID = cidadeID,
+									DataInclusao = dataCadastro,
+									EnderecoTipoID = (byte)EnderecoTipos.Residencial,
+									Logradouro = logradouro,
+									LogradouroNum = logradouroNum,
+									Bairro = bairro,
+									LogradouroTipoID = (int)LogradouroTipos.Outros,
+									Complemento = complemento,
+									ParentID = indiceLinha,
+									TableID = 1,
+								});
+							}
+
+							if (celular > 0 && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, celular.ToString()))
+								fornecedorFones.Add(new FornecedorFone()
+								{
+									FornecedorID = indiceLinha,
+									FoneTipoID = (short)FoneTipos.Celular,
+									Telefone = celular,
+									DataInclusao = dataCadastro,
+									LoginID = loginID
+								});
+
+							if (telefonePrinc > 0 && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefonePrinc.ToString()))
+								fornecedorFones.Add(new FornecedorFone()
+								{
+									FornecedorID = indiceLinha,
+									FoneTipoID = (short)FoneTipos.Principal,
+									Telefone = telefonePrinc,
+									DataInclusao = dataCadastro,
+									LoginID = loginID
+								});
+
+							if (telefoneAltern > 0 && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefoneAltern.ToString()))
+								fornecedorFones.Add(new FornecedorFone()
+								{
+									FornecedorID = indiceLinha,
+									FoneTipoID = (short)FoneTipos.Alternativo,
+									Telefone = telefoneAltern,
+									DataInclusao = dataCadastro,
+									LoginID = loginID
+								});
+
+							if (telefoneComercial > 0 && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefoneComercial.ToString()))
+								fornecedorFones.Add(new FornecedorFone()
+								{
+									FornecedorID = indiceLinha,
+									FoneTipoID = (short)FoneTipos.Comercial,
+									Telefone = telefoneComercial,
+									DataInclusao = dataCadastro,
+									LoginID = loginID
+								});
+
+							if (telefoneOutro > 0 && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefoneOutro.ToString()))
+								fornecedorFones.Add(new FornecedorFone()
+								{
+									FornecedorID = indiceLinha,
+									FoneTipoID = (short)FoneTipos.Outros,
+									Telefone = telefoneOutro,
+									DataInclusao = dataCadastro,
+									LoginID = loginID
+								});
+						}
+					}
+
+					indiceLinha++;
+				}
+
+				indiceLinha = 0;
+				var salvarArquivo = "";
+
+
+				var fornecedorFonesDict = new Dictionary<string, object[]>
+				{
+					{ "FornecedorID", fornecedorFones.ConvertAll(fornecedorFone => (object)fornecedorFone.FornecedorID).ToArray() },
+					{ "FoneTipoID", fornecedorFones.ConvertAll(fornecedorFone => (object)fornecedorFone.FoneTipoID).ToArray() },
+					{ "Telefone", fornecedorFones.ConvertAll(fornecedorFone => (object)fornecedorFone.Telefone).ToArray() },
+					{ "DataInclusao", fornecedorFones.ConvertAll(fornecedorFone => (object)fornecedorFone.DataInclusao).ToArray() },
+					{ "LoginID", fornecedorFones.ConvertAll(fornecedorFone => (object)fornecedorFone.LoginID).ToArray() }
+				};
+
+				salvarArquivo = Tools.GerarNomeArquivo($"FornecedorFones_{estabelecimentoID}_OdontoCompany_Migração");
+				sqlHelper.GerarSqlInsert("_MigracaoFornecedorFones_Temp", salvarArquivo, fornecedorFonesDict);
+				excelHelper.GravarExcel(salvarArquivo, fornecedorFonesDict);
+
+
+				var enderecosDict = new Dictionary<string, object[]>
+				{
+					{ "Ativo", enderecos.ConvertAll(endereco => (object)endereco.Ativo).ToArray() },
+					{ "Cep", enderecos.ConvertAll(endereco => (object)endereco.Cep).ToArray() },
+					{ "CidadeID", enderecos.ConvertAll(endereco => (object)endereco.CidadeID).ToArray() },
+					{ "DataInclusao", enderecos.ConvertAll(endereco => (object)endereco.DataInclusao).ToArray() },
+					{ "EnderecoTipoID", enderecos.ConvertAll(endereco => (object)endereco.EnderecoTipoID).ToArray() },
+					{ "Logradouro", enderecos.ConvertAll(endereco => (object)endereco.Logradouro).ToArray() },
+					{ "LogradouroNum", enderecos.ConvertAll(endereco => (object)endereco.LogradouroNum).ToArray() },
+					{ "Bairro", enderecos.ConvertAll(endereco => (object)endereco.Bairro).ToArray() },
+					{ "LogradouroTipoID", enderecos.ConvertAll(endereco => (object)endereco.LogradouroTipoID).ToArray() },
+					{ "Complemento", enderecos.ConvertAll(endereco => (object)endereco.Complemento).ToArray() },
+					{ "ParentID", enderecos.ConvertAll(endereco => (object)endereco.ParentID).ToArray() },
+					{ "TableID", enderecos.ConvertAll(endereco => (object)endereco.TableID).ToArray() }
+				};
+
+				salvarArquivo = Tools.GerarNomeArquivo($"Enderecos_{estabelecimentoID}_OdontoCompany_Migração");
+				sqlHelper.GerarSqlInsert("_MigracaoEnderecos_Temp", salvarArquivo, enderecosDict);
+				excelHelper.GravarExcel(salvarArquivo, enderecosDict);
 			}
 
 			catch (Exception error)
@@ -909,12 +1424,11 @@ namespace Migracao.Sistems
             {
                 var linhasCount = excelHelper.linhas.Count;
                 var consumidores = new List<Consumidor>();
-                var pessoas = new List<Pessoa>();
                 var consumidoresEnderecos = new List<ConsumidorEndereco>();
                 var pessoaFones = new List<PessoaFone>();
 				var fornecedores = new List<Fornecedor>();
 				var empresas = new List<Empresa>();
-                var empresasEnderecos = new List<Endereco>();
+                var enderecos = new List<Endereco>();
 				var fornecedorFones = new List<FornecedorFone>();
 
 				foreach (var linha in excelHelper.linhas)
@@ -1019,49 +1533,6 @@ namespace Migracao.Sistems
 
 					if (!string.IsNullOrWhiteSpace(nomeCompleto))
                     {
-                        if (documento.IsCPF())
-                        {
-							if (string.IsNullOrEmpty(pessoaIDValue))
-							    pessoas.Add(new Pessoa()
-                                {
-                                    ID = indiceLinha,
-                                    NomeCompleto = nomeCompleto,
-                                    Apelido = apelido,
-                                    CPF = documento,
-                                    DataInclusao = dataCadastro,
-                                    Email = email,
-                                    RG = rg,
-                                    Sexo = sexo,
-                                    NascimentoData = dataNascimento,
-                                    NascimentoLocal = nascimentoLocal,
-                                    ProfissaoOutra = profissaoOutra,
-                                    EstadoCivilID = estadoCivil,
-                                    EstabelecimentoID = estabelecimentoID,
-                                    LoginID = loginID,
-                                    Guid = new Guid(),
-                                    FoneticaApelido = apelido.Fonetizar(),
-                                    FoneticaNomeCompleto = nomeCompleto.Fonetizar()
-                                });
-                        }
-
-                        else if (documento.IsCNPJ_CGC())
-                        {
-                            empresas.Add(new Empresa()
-                            {
-                                Ativo = true,
-                                CNPJ = documento,
-                                DataInclusao = dataCadastro,
-                                LoginID = loginID,
-                                Marca = "",
-                                NomeFantasia = "",
-                                RazaoSocial = "",
-                                RegimeTribID = 0,
-                                InscricaoMunicipal = rg,
-                                EstabelecimentoID = estabelecimentoID,
-                                Guid = new Guid()
-                            });
-                        }
-
                         if (fornecedor)
                         {
                             fornecedores.Add(new Fornecedor()
@@ -1078,7 +1549,7 @@ namespace Migracao.Sistems
                             if (!string.IsNullOrWhiteSpace(cidade) && !string.IsNullOrWhiteSpace(logradouro))
                             {
                                 var cidadeID = excelHelper.GetCidadeID(cidade, estado);
-                                empresasEnderecos.Add(new Endereco()
+                                enderecos.Add(new Endereco()
                                 {
                                     Ativo = true,
                                     Cep = cep,
@@ -1289,33 +1760,6 @@ namespace Migracao.Sistems
                 var salvarArquivo = "";
 
 
-				var pessoasDict = new Dictionary<string, object[]>
-                {
-					//{ "ID", pessoas.ConvertAll(pessoa => (object)pessoa.ID).ToArray() },
-					{ "NomeCompleto", pessoas.ConvertAll(pessoa => (object)pessoa.NomeCompleto).ToArray() },
-                    { "Apelido", pessoas.ConvertAll(pessoa => (object)pessoa.Apelido).ToArray() },
-                    { "CPF", pessoas.ConvertAll(pessoa => (object)pessoa.CPF).ToArray() },
-                    { "DataInclusao", pessoas.ConvertAll(pessoa => (object)pessoa.DataInclusao).ToArray() },
-                    { "Email", pessoas.ConvertAll(pessoa => (object)pessoa.Email).ToArray() },
-                    { "RG", pessoas.ConvertAll(pessoa => (object)pessoa.RG).ToArray() },
-                    { "Sexo", pessoas.ConvertAll(pessoa => (object)pessoa.Sexo).ToArray() },
-					{ "NascimentoData", pessoas.ConvertAll(pessoa => (object)pessoa.NascimentoData).ToArray() },
-					{ "NascimentoLocal", pessoas.ConvertAll(pessoa => (object)pessoa.NascimentoLocal).ToArray() },
-					{ "ProfissaoOutra", pessoas.ConvertAll(pessoa => (object)pessoa.ProfissaoOutra).ToArray() },
-					{ "EstadoCivilID", pessoas.ConvertAll(pessoa => (object)pessoa.EstadoCivilID).ToArray() },
-					{ "EstabelecimentoID", pessoas.ConvertAll(pessoa => (object)pessoa.EstabelecimentoID).ToArray() },
-					{ "LoginID", pessoas.ConvertAll(pessoa => (object)pessoa.LoginID).ToArray() },
-					{ "Guid", pessoas.ConvertAll(pessoa => (object)pessoa.Guid).ToArray() },
-					{ "FoneticaApelido", pessoas.ConvertAll(pessoa => (object)pessoa.FoneticaApelido).ToArray() },
-					{ "FoneticaNomeCompleto", pessoas.ConvertAll(pessoa => (object)pessoa.FoneticaNomeCompleto).ToArray() }
-				};
-
-                salvarArquivo = Tools.GerarNomeArquivo($"Pessoas_{estabelecimentoID}_OdontoCompany_Migração");
-                sqlHelper.GerarSqlInsert("_MigracaoPessoas_Temp", salvarArquivo, pessoasDict);
-                excelHelper.GravarExcel(salvarArquivo, pessoasDict);
-				//Tools.AbrirPastaSelecionandoArquivo(salvarArquivo + ".xlsx");
-
-
 				var consumidoresDict = new Dictionary<string, object[]>
 				{
 					{ "Ativo", consumidores.ConvertAll(consumidor => (object)consumidor.Ativo).ToArray() },
@@ -1365,61 +1809,6 @@ namespace Migracao.Sistems
 				salvarArquivo = Tools.GerarNomeArquivo($"PessoaFones_{estabelecimentoID}_OdontoCompany_Migração");
 				sqlHelper.GerarSqlInsert("_MigracaoPessoaFones_Temp", salvarArquivo, pessoaFonesDict);
 				excelHelper.GravarExcel(salvarArquivo, pessoaFonesDict);
-
-
-				var fornecedorFonesDict = new Dictionary<string, object[]>
-				{
-					{ "FornecedorID", fornecedorFones.ConvertAll(fornecedorFone => (object)fornecedorFone.FornecedorID).ToArray() },
-					{ "FoneTipoID", fornecedorFones.ConvertAll(fornecedorFone => (object)fornecedorFone.FoneTipoID).ToArray() },
-					{ "Telefone", fornecedorFones.ConvertAll(fornecedorFone => (object)fornecedorFone.Telefone).ToArray() },
-					{ "DataInclusao", fornecedorFones.ConvertAll(fornecedorFone => (object)fornecedorFone.DataInclusao).ToArray() },
-					{ "LoginID", fornecedorFones.ConvertAll(fornecedorFone => (object)fornecedorFone.LoginID).ToArray() }
-				};
-
-				salvarArquivo = Tools.GerarNomeArquivo($"FornecedorFones_{estabelecimentoID}_OdontoCompany_Migração");
-				sqlHelper.GerarSqlInsert("_MigracaoFornecedorFones_Temp", salvarArquivo, fornecedorFonesDict);
-				excelHelper.GravarExcel(salvarArquivo, fornecedorFonesDict);
-
-
-				var empresasDict = new Dictionary<string, object[]>
-                {
-                    { "Ativo", empresas.ConvertAll(empresa => (object)empresa.Ativo).ToArray() },
-                    { "CNPJ", empresas.ConvertAll(empresa => (object)empresa.CNPJ).ToArray() },
-                    { "DataInclusao", empresas.ConvertAll(empresa => (object)empresa.DataInclusao).ToArray() },
-                    { "LoginID", empresas.ConvertAll(empresa => (object)empresa.LoginID).ToArray() },
-                    { "Marca", empresas.ConvertAll(empresa => (object)empresa.Marca).ToArray() },
-                    { "NomeFantasia", empresas.ConvertAll(empresa => (object)empresa.NomeFantasia).ToArray() },
-                    { "RazaoSocial", empresas.ConvertAll(empresa => (object)empresa.RazaoSocial).ToArray() },
-                    { "RegimeTribID", empresas.ConvertAll(empresa => (object)empresa.RegimeTribID).ToArray() },
-                    { "InscricaoMunicipal", empresas.ConvertAll(empresa => (object)empresa.InscricaoMunicipal).ToArray() },
-                    { "EstabelecimentoID", empresas.ConvertAll(empresa => (object)empresa.EstabelecimentoID).ToArray() },
-                    { "Guid", empresas.ConvertAll(empresa => (object)empresa.Guid).ToArray() }
-                };
-
-				salvarArquivo = Tools.GerarNomeArquivo($"Empresas_{estabelecimentoID}_OdontoCompany_Migração");
-				sqlHelper.GerarSqlInsert("_MigracaoEmpresas_Temp", salvarArquivo, empresasDict);
-				excelHelper.GravarExcel(salvarArquivo, empresasDict);
-
-
-				var empresasEnderecosDict = new Dictionary<string, object[]>
-				{
-	                { "Ativo", empresasEnderecos.ConvertAll(endereco => (object)endereco.Ativo).ToArray() },
-	                { "Cep", empresasEnderecos.ConvertAll(endereco => (object)endereco.Cep).ToArray() },
-	                { "CidadeID", empresasEnderecos.ConvertAll(endereco => (object)endereco.CidadeID).ToArray() },
-	                { "DataInclusao", empresasEnderecos.ConvertAll(endereco => (object)endereco.DataInclusao).ToArray() },
-	                { "EnderecoTipoID", empresasEnderecos.ConvertAll(endereco => (object)endereco.EnderecoTipoID).ToArray() },
-	                { "Logradouro", empresasEnderecos.ConvertAll(endereco => (object)endereco.Logradouro).ToArray() },
-	                { "LogradouroNum", empresasEnderecos.ConvertAll(endereco => (object)endereco.LogradouroNum).ToArray() },
-	                { "Bairro", empresasEnderecos.ConvertAll(endereco => (object)endereco.Bairro).ToArray() },
-	                { "LogradouroTipoID", empresasEnderecos.ConvertAll(endereco => (object)endereco.LogradouroTipoID).ToArray() },
-	                { "Complemento", empresasEnderecos.ConvertAll(endereco => (object)endereco.Complemento).ToArray() },
-	                { "ParentID", empresasEnderecos.ConvertAll(endereco => (object)endereco.ParentID).ToArray() },
-	                { "TableID", empresasEnderecos.ConvertAll(endereco => (object)endereco.TableID).ToArray() }
-				};
-
-				salvarArquivo = Tools.GerarNomeArquivo($"Enderecos_{estabelecimentoID}_OdontoCompany_Migração");
-				sqlHelper.GerarSqlInsert("_MigracaoEnderecos_Temp", salvarArquivo, empresasEnderecosDict);
-				excelHelper.GravarExcel(salvarArquivo, empresasEnderecosDict);
 			}
 
             catch (Exception error)

@@ -261,9 +261,11 @@ namespace Migracao
 			{
 				if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
 					nomeArquivoExcel = "CRD111";
+				else if (comboBoxImportacao.Text.Equals("funcionarios", StringComparison.CurrentCultureIgnoreCase))
+					nomeArquivoExcel = "CED006";
 				else if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase)
-					|| comboBoxImportacao.Text.Equals("pessoas", StringComparison.CurrentCultureIgnoreCase)
-					|| comboBoxImportacao.Text.Equals("funcionarios", StringComparison.CurrentCultureIgnoreCase))
+					nomeArquivoExcel = "EMD101";
+				else if (comboBoxImportacao.Text.Equals("pessoas", StringComparison.CurrentCultureIgnoreCase))
 					nomeArquivoExcel = "Pacient:EMD101 | Funcion:CED006";
 				else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
 					nomeArquivoExcel = "BXD111";

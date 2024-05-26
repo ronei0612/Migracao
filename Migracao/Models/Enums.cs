@@ -326,4 +326,100 @@ namespace Migracao.Models
 		DTM = 15,
 		Orofacial = 20,
 	}
+
+	public enum CargosID
+	{
+		[Description("Coordenador")]
+		Coordenador = 1,
+		[Description("Secretária")]
+		Secretaria = 2,
+		[Description("Dentista")]
+		Dentista = 3,
+		[Description("Técnico")]
+		Tecnico = 4,
+		[Description("Consultor")]
+		Consultor = 5,
+		[Description("Usuário")]
+		Usuario = 6,
+		[Description("Médico")]
+		Medico = 8,
+		[Description("Administrativo")]
+		Administrativo = 9,
+		[Description("Assistente")]
+		Assistente = 10,
+		[Description("Estagiário")]
+		Estagiario = 11,
+		[Description("Negociador")]
+		Negociador = 12,
+		[Description("Vendedor")]
+		Vendedor = 13,
+		[Description("Coordenador de Suporte")]
+		CoordenadorDeSuporte = 14,
+		[Description("Analista Nível 1")]
+		AnalistaNivel1 = 15,
+		[Description("Gerente Comercial")]
+		GerenteComercial = 16,
+		[Description("Gerente Administrativo")]
+		GerenteAdministrativo = 17,
+		[Description("Analista Nível 2")]
+		AnalistaNivel2 = 18,
+		[Description("Analista Nível 3")]
+		AnalistaNivel3 = 19,
+		[Description("Diretor Geral")]
+		DiretorGeral = 20,
+		[Description("Diretor Financeiro")]
+		DiretorFinanceiro = 21,
+		[Description("Assistente Financeiro")]
+		AssistenteFinanceiro = 22,
+		[Description("Analista de Marketing")]
+		AnalistaDeMarketing = 23,
+		[Description("Engenheiro de Software")]
+		EngenheiroDeSoftware = 25,
+		[Description("Video Maker")]
+		VideoMaker = 26,
+		[Description("Analista de Qualidade")]
+		AnalistaDeQualidade = 29,
+		[Description("Diretor Administrativo")]
+		DiretorAdministrativo = 30,
+		[Description("Coordenador Comercial")]
+		CoordenadorComercial = 31,
+		[Description("Gerente de Suporte")]
+		GerenteDeSuporte = 32,
+		[Description("Treinador Junior")]
+		TreinadorJunior = 33,
+		[Description("Treinador Pleno")]
+		TreinadorPleno = 34,
+		[Description("Treinador Senior")]
+		TreinadorSenior = 35,
+		[Description("Diretor de Qualidade")]
+		DiretorDeQualidade = 36,
+		[Description("Coordenador de Qualidade")]
+		CoordenadorDeQualidade = 37,
+		[Description("Diretor Comercial")]
+		DiretorComercial = 38,
+		[Description("SDR")]
+		SDR = 39,
+		[Description("Serviços Gerais")]
+		ServicosGerais = 40,
+		[Description("Protético")]
+		Protetico = 41,
+		[Description("Gerente de Qualidade")]
+		GerenteDeQualidade = 42,
+		[Description("Diretor Operacional")]
+		DiretorOperacional = 43,
+		[Description("Nutricionista")]
+		Nutricionista = 44,
+		[Description("Biomédico")]
+		Biomedico = 45,
+		[Description("Massoterapeuta")]
+		Massoterapeuta = 46,
+		[Description("Psicólogo")]
+		Psicologo = 47,
+		[Description("Técnico de Saúde Bucal")]
+		TecnicoSaudeBucal = 50,
+		[Description("CEO")]
+		CEO = 109,
+		[Description("Coordenador de Treinamento")]
+		CoordenadorDeTreinamento = 231
+	}
 }

@@ -1,6 +1,7 @@
 ﻿using Migracao.Models;
 using Migracao.Utils;
 using NPOI.SS.UserModel;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Migracao.Sistems
 {
@@ -54,7 +55,7 @@ namespace Migracao.Sistems
                                 switch (tituloColuna)
                                 {
                                     case "NOME":
-                                        titulo = celulaValor.ToNomeCompleto();
+                                        titulo = celulaValor.PrimeiraLetraMaiuscula();
                                         break;
                                     case "VRVENDA":
 										valor = celulaValor.ArredondarValor();
@@ -520,6 +521,343 @@ namespace Migracao.Sistems
             }
         }
 
+		public void ImportarPessoas(string arquivoExcel, string arquivoPessoasAtuais, int estabelecimentoID, int loginID)
+		{
+			var indiceLinha = 1;
+			var consumidorID = 1;
+			var pessoaID = 1;
+			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
+			DateTime dataHoje = DateTime.Now;
+			var excelHelper = new ExcelHelper(arquivoExcel);
+			var sqlHelper = new SqlHelper();
+
+			if (!string.IsNullOrEmpty(arquivoPessoasAtuais))
+				try
+				{
+					var workbook = excelHelper.LerExcel(arquivoPessoasAtuais);
+					var sheet = workbook.GetSheetAt(0);
+					excelHelper.InitializeDictionary(sheet);
+				}
+				catch (Exception ex)
+				{
+					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoPessoasAtuais}\": {ex.Message}");
+				}
+
+			try
+			{
+				var linhasCount = excelHelper.linhas.Count;
+				var pessoas = new List<Pessoa>();
+				var funcionarios = new List<Funcionario>();
+				var pessoaFones = new List<PessoaFone>();
+				var empresasEnderecos = new List<Endereco>();
+
+				foreach (var linha in excelHelper.linhas)
+				{
+					bool ativo = false;
+					DateTime dataNascimento = dataHoje, dataCadastro = dataHoje;
+					int cep = 0;
+					int? codigo = null;
+					long telefonePrinc = 0;
+					string? nomeCompleto = null, departamento = null, cro = null, observacao = null, email = null;
+					string apelido = "";
+
+					foreach (var celula in linha.Cells)
+					{
+						if (celula != null)
+						{
+							celulaValor = celula.ToString().Trim().Replace("'", "’");
+							tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
+							colunaLetra = excelHelper.GetColumnLetter(celula);
+
+							if (!string.IsNullOrWhiteSpace(celulaValor))
+							{
+								switch (tituloColuna)
+								{
+									case "CODIGO":
+										codigo = int.Parse(celulaValor);
+										break;
+									case "NOME":
+										apelido = celulaValor.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
+										break;
+									case "DEPARTAMENTO":
+										departamento = celulaValor;
+										break;
+									case "OBS":
+										observacao = celulaValor;
+										break;
+									case "ATIVO":
+										ativo = celulaValor == "S" ? true : false;
+										break;
+									case "NOME_COMPLETO":
+										nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+										break;
+									case "EMAIL":
+										email = celulaValor.ToEmail();
+										break;
+									case "TELEFONE":
+										telefonePrinc = celulaValor.ToFone();
+										break;
+									case "CRO":
+										cro = celulaValor;
+										break;
+									case "MODIFICADO":
+										dataCadastro = celulaValor.ToData();
+										break;
+								}
+							}
+						}
+					}
+
+					if (!string.IsNullOrWhiteSpace(nomeCompleto))
+					{
+						if (string.IsNullOrWhiteSpace(apelido))
+							apelido = nomeCompleto.GetPrimeiroNome().PrimeiraLetraMaiuscula();
+
+						var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto);
+
+						if (string.IsNullOrEmpty(arquivoPessoasAtuais) 
+							|| (!string.IsNullOrEmpty(arquivoPessoasAtuais) && string.IsNullOrEmpty(pessoaIDValue)))
+						{
+							pessoas.Add(new Pessoa()
+							{
+								ID = indiceLinha,
+								NomeCompleto = nomeCompleto,
+								Apelido = apelido,
+								CPF = "",
+								DataInclusao = dataCadastro,
+								Email = email,
+								NascimentoData = dataNascimento,
+								ProfissaoOutra = departamento,
+								EstabelecimentoID = estabelecimentoID,
+								LoginID = loginID,
+								Guid = new Guid(),
+								FoneticaApelido = apelido.Fonetizar(),
+								FoneticaNomeCompleto = nomeCompleto.Fonetizar(),
+								Sexo = true,
+								ConselhoCodigo = cro
+							});
+						}
+					}
+					indiceLinha++;
+				}
+
+				indiceLinha = 0;
+				var salvarArquivo = "";
+
+				var pessoasDict = new Dictionary<string, object[]>
+				{
+					//{ "ID", pessoas.ConvertAll(pessoa => (object)pessoa.ID).ToArray() },
+					{ "NomeCompleto", pessoas.ConvertAll(pessoa => (object)pessoa.NomeCompleto).ToArray() },
+					{ "Apelido", pessoas.ConvertAll(pessoa => (object)pessoa.Apelido).ToArray() },
+					{ "CPF", pessoas.ConvertAll(pessoa => (object)pessoa.CPF).ToArray() },
+					{ "DataInclusao", pessoas.ConvertAll(pessoa => (object)pessoa.DataInclusao).ToArray() },
+					{ "Email", pessoas.ConvertAll(pessoa => (object)pessoa.Email).ToArray() },
+					{ "RG", pessoas.ConvertAll(pessoa => (object)pessoa.RG).ToArray() },
+					{ "Sexo", pessoas.ConvertAll(pessoa => (object)pessoa.Sexo).ToArray() },
+					{ "NascimentoData", pessoas.ConvertAll(pessoa => (object)pessoa.NascimentoData).ToArray() },
+					{ "NascimentoLocal", pessoas.ConvertAll(pessoa => (object)pessoa.NascimentoLocal).ToArray() },
+					{ "ProfissaoOutra", pessoas.ConvertAll(pessoa => (object)pessoa.ProfissaoOutra).ToArray() },
+					{ "EstadoCivilID", pessoas.ConvertAll(pessoa => (object)pessoa.EstadoCivilID).ToArray() },
+					{ "EstabelecimentoID", pessoas.ConvertAll(pessoa => (object)pessoa.EstabelecimentoID).ToArray() },
+					{ "LoginID", pessoas.ConvertAll(pessoa => (object)pessoa.LoginID).ToArray() },
+					{ "Guid", pessoas.ConvertAll(pessoa => (object)pessoa.Guid).ToArray() },
+					{ "FoneticaApelido", pessoas.ConvertAll(pessoa => (object)pessoa.FoneticaApelido).ToArray() },
+					{ "FoneticaNomeCompleto", pessoas.ConvertAll(pessoa => (object)pessoa.FoneticaNomeCompleto).ToArray() }
+				};
+
+				salvarArquivo = Tools.GerarNomeArquivo($"Pessoas_{estabelecimentoID}_OdontoCompany_Migração");
+				sqlHelper.GerarSqlInsert("Pessoas", salvarArquivo, pessoasDict);
+				excelHelper.GravarExcel(salvarArquivo, pessoasDict);
+			}
+
+			catch (Exception error)
+			{
+				throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha + 2, colunaLetra, tituloColuna, celulaValor, variaveisValor));
+			}
+		}
+
+		public void ImportarFuncionarios(string arquivoExcel, string arquivoFuncionariosAtuais, int estabelecimentoID, int loginID)
+        {
+			var indiceLinha = 1;
+			var consumidorID = 1;
+			var pessoaID = 1;
+			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
+			DateTime dataHoje = DateTime.Now;
+			var excelHelper = new ExcelHelper(arquivoExcel);
+			var sqlHelper = new SqlHelper();
+
+			if (File.Exists(arquivoExcelCidades))
+				try
+				{
+					var workbookCidades = excelHelper.LerExcel(arquivoExcelCidades);
+					var sheetCidades = workbookCidades.GetSheetAt(0);
+					excelHelper.InitializeDictionaryCidade(sheetCidades);
+				}
+				catch (Exception ex)
+				{
+					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
+				}
+
+			if (!string.IsNullOrEmpty(arquivoFuncionariosAtuais))
+				try
+				{
+					var workbook = excelHelper.LerExcel(arquivoFuncionariosAtuais);
+					var sheet = workbook.GetSheetAt(0);
+					excelHelper.InitializeDictionary(sheet);
+				}
+				catch (Exception ex)
+				{
+					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoFuncionariosAtuais}\": {ex.Message}");
+				}
+
+
+			try
+			{
+				var linhasCount = excelHelper.linhas.Count;
+				var funcionarios = new List<Funcionario>();
+				var pessoaFones = new List<PessoaFone>();
+				//var empresasEnderecos = new List<Endereco>();
+
+				foreach (var linha in excelHelper.linhas)
+				{
+					bool ativo = false;
+					DateTime dataNascimento = dataHoje, dataCadastro = dataHoje;
+					int cep = 0;
+					int? codigo = null;
+					long telefonePrinc = 0;
+					string? nomeCompleto = null, departamento = null, cro = null, observacao = null, email = null;
+					string apelido = "";
+
+					foreach (var celula in linha.Cells)
+					{
+						if (celula != null)
+						{
+							celulaValor = celula.ToString().Trim().Replace("'", "’");
+							tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
+							colunaLetra = excelHelper.GetColumnLetter(celula);
+
+							if (!string.IsNullOrWhiteSpace(celulaValor))
+							{
+								switch (tituloColuna)
+								{
+									case "CODIGO":
+										codigo = int.Parse(celulaValor);
+										break;
+									case "NOME":
+										apelido = celulaValor.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
+										break;
+									case "DEPARTAMENTO":
+										departamento = celulaValor;
+										break;
+									case "OBS":
+										observacao = celulaValor;
+										break;
+									case "ATIVO":
+										ativo = celulaValor == "S" ? true : false;
+										break;
+									case "NOME_COMPLETO":
+										nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+										break;
+									case "EMAIL":
+										email = celulaValor.ToEmail();
+										break;
+									case "TELEFONE":
+										telefonePrinc = celulaValor.ToFone();
+										break;
+									case "CRO":
+										cro = celulaValor;
+										break;
+									case "MODIFICADO":
+										dataCadastro = celulaValor.ToData();
+										break;
+								}
+							}
+						}
+					}
+
+					pessoaID = indiceLinha;
+
+					if (!string.IsNullOrWhiteSpace(nomeCompleto))
+					{
+						if (string.IsNullOrWhiteSpace(apelido))
+							apelido = nomeCompleto.GetPrimeiroNome().PrimeiraLetraMaiuscula();
+
+						var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto);
+						var funcionarioIDValue = excelHelper.GetFuncionarioID(nomeCompleto: nomeCompleto);
+						pessoaID = int.Parse(pessoaIDValue);
+
+						if (string.IsNullOrEmpty(arquivoFuncionariosAtuais) 
+							|| (!string.IsNullOrEmpty(arquivoFuncionariosAtuais) && !string.IsNullOrEmpty(pessoaIDValue) && string.IsNullOrEmpty(funcionarioIDValue)))
+						{
+							funcionarios.Add(new Funcionario()
+							{
+								Ativo = ativo,
+								DataInclusao = dataCadastro,
+								EstabelecimentoID = estabelecimentoID,
+								LoginID = loginID,
+								PessoaID = pessoaID,
+								Observacoes = observacao,
+								CargoID = (byte)CargosID.Dentista,
+								PermissaoCoordenacao = false,
+								PermissaoGrupoID = 0,
+								PermissaoModuloAdmin = false,
+								PermissaoModuloAtendimentos = true,
+								PermissaoModuloPacientes = true,
+								PermissaoModuloEstoque = true,
+								PermissaoModuloFinanceiro = false
+							});
+
+							if (telefonePrinc > 0)
+								if (string.IsNullOrEmpty(arquivoFuncionariosAtuais)
+									|| (!string.IsNullOrEmpty(arquivoFuncionariosAtuais) && !excelHelper.PessoaFoneExists(nomeCompleto, telefonePrinc.ToString())))
+								{
+									pessoaFones.Add(new PessoaFone()
+									{
+										PessoaID = pessoaID,
+										FoneTipoID = (short)FoneTipos.Principal,
+										Telefone = telefonePrinc,
+										DataInclusao = dataCadastro,
+										LoginID = loginID
+									});
+								}
+						}
+					}
+
+					indiceLinha++;
+				}
+
+				indiceLinha = 0;
+				var salvarArquivo = "";
+
+				var funcionariosDict = new Dictionary<string, object[]>
+				{
+					{ "CargoID", funcionarios.ConvertAll(funcionario => (object)funcionario.CargoID).ToArray() },
+					{ "Ativo", funcionarios.ConvertAll(funcionario => (object)funcionario.Ativo).ToArray() },
+					{ "DataInclusao", funcionarios.ConvertAll(funcionario => (object)funcionario.DataInclusao).ToArray() },
+					{ "EstabelecimentoID", funcionarios.ConvertAll(funcionario => (object)funcionario.EstabelecimentoID).ToArray() },
+					{ "LoginID", funcionarios.ConvertAll(funcionario => (object)funcionario.LoginID).ToArray() },
+					{ "PessoaID", funcionarios.ConvertAll(funcionario => (object)funcionario.PessoaID).ToArray() },
+					{ "Observacoes", funcionarios.ConvertAll(funcionario => (object)funcionario.Observacoes).ToArray() },
+					{ "PermissaoCoordenacao", funcionarios.ConvertAll(funcionario => (object)funcionario.PermissaoCoordenacao).ToArray() },
+					{ "PermissaoGrupoID", funcionarios.ConvertAll(funcionario => (object)funcionario.PermissaoGrupoID).ToArray() },
+					{ "PermissaoModuloAdmin", funcionarios.ConvertAll(funcionario => (object)funcionario.PermissaoModuloAdmin).ToArray() },
+					{ "PermissaoModuloAtendimentos", funcionarios.ConvertAll(funcionario => (object)funcionario.PermissaoModuloAtendimentos).ToArray() },
+					{ "PermissaoModuloPacientes", funcionarios.ConvertAll(funcionario => (object)funcionario.PermissaoModuloPacientes).ToArray() },
+					{ "PermissaoModuloEstoque", funcionarios.ConvertAll(funcionario => (object)funcionario.PermissaoModuloEstoque).ToArray() },
+					{ "PermissaoModuloFinanceiro", funcionarios.ConvertAll(funcionario => (object)funcionario.PermissaoModuloFinanceiro).ToArray() }
+				};
+
+				salvarArquivo = Tools.GerarNomeArquivo($"Funcionarios_{estabelecimentoID}_OdontoCompany_Migração");
+				sqlHelper.GerarSqlInsert("Funcionarios", salvarArquivo, funcionariosDict);
+				excelHelper.GravarExcel(salvarArquivo, funcionariosDict);
+			}
+
+			catch (Exception error)
+			{
+				throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha + 2, colunaLetra, tituloColuna, celulaValor, variaveisValor));
+			}
+		}
+
 		public void ImportarPacientes(string arquivoExcel, string arquivoPacientesAtuais, int estabelecimentoID, int loginID)
         {
 			var indiceLinha = 1;
@@ -609,8 +947,8 @@ namespace Migracao.Sistems
                                         fornecedor = celulaValor == "S" ? true : false;
                                         break;
                                     case "NOME":
-                                        nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).ToNomeCompleto();
-                                        apelido = celulaValor.GetLetras().GetPrimeiroNome().ToNomeCompleto();
+                                        nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+                                        apelido = celulaValor.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
                                         break;
                                     case "CGC_CPF":
 										documento = celulaValor.ToCPF();
@@ -634,10 +972,10 @@ namespace Migracao.Sistems
                                         celular = celulaValor.ToFone();
                                         break;
                                     case "ENDERECO":
-                                        logradouro = celulaValor.ToNomeCompleto();
+                                        logradouro = celulaValor.PrimeiraLetraMaiuscula();
                                         break;
                                     case "BAIRRO":
-                                        bairro = celulaValor.ToNomeCompleto();
+                                        bairro = celulaValor.PrimeiraLetraMaiuscula();
                                         break;
                                     case "NUM_ENDERECO":
                                         logradouroNum = celulaValor;

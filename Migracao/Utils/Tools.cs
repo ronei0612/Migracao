@@ -97,7 +97,7 @@ namespace Migracao.Utils
 			return true;
 		}
 
-		public static string ToNomeCompleto(this string texto)
+		public static string PrimeiraLetraMaiuscula(this string texto)
 		{
 			return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(texto.ToLower());
 		}

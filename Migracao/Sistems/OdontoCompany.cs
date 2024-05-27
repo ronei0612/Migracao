@@ -37,11 +37,14 @@ namespace Migracao.Sistems
 				{
 					indiceLinha++;
 
-					string nomeCompleto = "", cpf = "", hora = "", data = "";
+					if (indiceLinha == 1370)
+						indiceLinha = 1370;
+
+					string nomeCompleto = "", cpf = "", hora = "", minutos = "", dentistaResponsavel = "";
 					bool faltou = false;
 					string? outroSacadoNome = null, observacoes = null, documento = null;
 					int recibo = 0, codigo = 0;
-					int? consumidorID = null, fornecedorID = null, colaboradorID = null, funcionarioID = null, clienteID = null;
+					int? consumidorID = null, fornecedorID = null, colaboradorID = null, funcionarioID = null, clienteID = null, pessoaID = null;
 					decimal pagoValor = 0, valor = 0;
 					byte formaPagamento = (byte)TitulosEspeciesID.DepositoEmConta;
 					DateTime dataConsulta = dataHoje;
@@ -65,10 +68,11 @@ namespace Migracao.Sistems
 										nomeCompleto = celulaValor;
 										break;
 									case "DATA":
-										data = celulaValor;
+										dataConsulta = celulaValor.ToData();
 										break;
 									case "HORA":
-										hora = celulaValor;
+										hora = celula.TimeOnlyCellValue.Value.Hour.ToString();
+										minutos = celula.TimeOnlyCellValue.Value.Minute.ToString();
 										break;
 									case "OBS":
 										observacoes = celulaValor;
@@ -77,56 +81,69 @@ namespace Migracao.Sistems
 										faltou = celulaValor == "S";
 										break;
 									case "RESPONSAVEL":
-										valor = celulaValor.ToMoeda();
+										dentistaResponsavel = celulaValor;
 										break;
 								}
 							}
 						}
 					}
 
-					dataConsulta = (data + " " + hora).ToData();
+					if (!string.IsNullOrEmpty(hora))
+						dataConsulta = dataConsulta.AddHours(double.Parse(hora));
+					if (!string.IsNullOrEmpty(minutos))
+						dataConsulta = dataConsulta.AddMinutes(double.Parse(minutos));
 
 					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: cpf, codigo: codigo.ToString());
-					var fornecedorIDValue = excelHelper.GetFornecedorID(nomeCompleto: nomeCompleto, cpf: cpf);
-					var funcionarioIDValue = excelHelper.GetFuncionarioID(nomeCompleto: nomeCompleto, cpf: cpf);
+					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: dentistaResponsavel);
+					var funcionarioIDValue = excelHelper.GetFuncionarioID(nomeCompleto: dentistaResponsavel);
 
 					if (!string.IsNullOrEmpty(consumidorIDValue))
 						consumidorID = int.Parse(consumidorIDValue);
-					else if (!string.IsNullOrEmpty(fornecedorIDValue))
-						fornecedorID = int.Parse(fornecedorIDValue);
-					else if (!string.IsNullOrEmpty(funcionarioIDValue))
+					if (!string.IsNullOrEmpty(pessoaIDValue))
+						pessoaID = int.Parse(pessoaIDValue);
+					if (!string.IsNullOrEmpty(funcionarioIDValue))
 						funcionarioID = int.Parse(funcionarioIDValue);
 					else
 						outroSacadoNome = cpf;
-
-					agendamentos.Add(new Agendamento()
-					{
-						LoginID = loginID,
-						EstabelecimentoID = estabelecimentoID,
-						AtendeTipoID = 1,
-						DataInicio = dataConsulta,
-						DataTermino = dataConsulta.AddMinutes(30),
-						ConsumidorID = (int)consumidorID,
-						Titulo = observacoes,
-						//DataCancelamento = ,
-						//
-						//AtendimentoValor = ,
-						//SecretariaID = ,
-						//FuncionarioID = ,
-						//SalaID = ,
-						DataInclusao = dataConsulta
-					});
+					if (!string.IsNullOrEmpty(funcionarioIDValue) && !string.IsNullOrEmpty(consumidorIDValue) && !string.IsNullOrEmpty(pessoaIDValue))
+						agendamentos.Add(new Agendamento()
+						{
+							LoginID = loginID,
+							EstabelecimentoID = estabelecimentoID,
+							AtendeTipoID = 1,
+							DataInicio = dataConsulta,
+							DataTermino = dataConsulta.AddMinutes(30),
+							ConsumidorID = (int)consumidorID,
+							Titulo = observacoes,
+							FuncionarioID = (int)funcionarioID,
+							DataInclusao = dataConsulta,
+							PessoaID = (int)pessoaID
+							//DataCancelamento = ,
+							//
+							//AtendimentoValor = ,
+							//SecretariaID = ,
+							//SalaID = ,
+						});
 				}
 
 				indiceLinha = 0;
 
 				var dados = new Dictionary<string, object[]>
 				{
-					{ "ConsumidorID", agendamentos.ConvertAll(agendamento => (object)agendamento.ConsumidorID).ToArray() }
+					{ "LoginID", agendamentos.ConvertAll(agendamento => (object)agendamento.LoginID).ToArray() },
+					{ "EstabelecimentoID", agendamentos.ConvertAll(agendamento => (object)agendamento.EstabelecimentoID).ToArray() },
+					{ "AtendeTipoID", agendamentos.ConvertAll(agendamento => (object)agendamento.AtendeTipoID).ToArray() },
+					{ "DataInicio", agendamentos.ConvertAll(agendamento => (object)agendamento.DataInicio).ToArray() },
+					{ "DataTermino", agendamentos.ConvertAll(agendamento => (object)agendamento.DataTermino).ToArray() },
+					{ "ConsumidorID", agendamentos.ConvertAll(agendamento => (object)agendamento.ConsumidorID).ToArray() },
+					{ "PessoaID", agendamentos.ConvertAll(agendamento => (object)agendamento.PessoaID).ToArray() },
+					{ "Titulo", agendamentos.ConvertAll(agendamento => (object)agendamento.Titulo).ToArray() },
+					{ "FuncionarioID", agendamentos.ConvertAll(agendamento => (object)agendamento.FuncionarioID).ToArray() },
+					{ "DataInclusao", agendamentos.ConvertAll(agendamento => (object)agendamento.DataInclusao).ToArray() }
 				};
 
-				var salvarArquivo = Tools.GerarNomeArquivo($"Recebiveis_{estabelecimentoID}_OdontoCompany_Migração");
-				sqlHelper.GerarSqlInsert("Recebiveis", salvarArquivo, dados);
+				var salvarArquivo = Tools.GerarNomeArquivo($"Agendamentos_{estabelecimentoID}_OdontoCompany_Migração");
+				sqlHelper.GerarSqlInsert("Agendamentos", salvarArquivo, dados);
 				excelHelper.GravarExcel(salvarArquivo, dados);
 
 				MessageBox.Show("Sucesso!");

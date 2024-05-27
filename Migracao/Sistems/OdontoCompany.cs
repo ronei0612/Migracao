@@ -1268,6 +1268,7 @@ namespace Migracao.Sistems
 				sqlHelper.GerarSqlInsert("PessoaFones", salvarArquivo, pessoaFonesDict);
 				excelHelper.GravarExcel(salvarArquivo, pessoaFonesDict);
 
+				//redis-cli.exe -h 127.0.0.1 -n 7 del Equipe:017957-Funcionarios
 				MessageBox.Show("Limpar o Redis" + Environment.NewLine + "redis-cli.exe -h 127.0.0.1 -n 7 del Equipe:" + estabelecimentoID.ToString("D6") + "-Funcionarios", "Sucesso!");
 			}
 

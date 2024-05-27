@@ -78,6 +78,7 @@ namespace Migracao.Utils
 
 					nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
 					cpf = cpf.Replace(".", "").Replace("-", "");
+					logradouro = Tools.RemoverAcentos(logradouro).ToLower();
 
 					string key = cpf;
 
@@ -281,6 +282,7 @@ namespace Migracao.Utils
 
 			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
 			cpf = cpf.Replace(".", "").Replace("-", "");
+			logradouro = Tools.RemoverAcentos(logradouro).ToLower();
 
 			string key = cpf + "|" + logradouro;
 			if (!string.IsNullOrWhiteSpace(cpf))

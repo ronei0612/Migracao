@@ -358,5 +358,15 @@ namespace Migracao.Utils
 
 			return 0;
 		}
+
+		public static LogradouroTipos GetLogradouroTipo(this string texto)
+		{
+			texto = texto.GetPrimeiroNome();
+
+			if (Enum.TryParse<LogradouroTipos>(texto, true, out LogradouroTipos tipo))
+				return tipo;
+
+			return LogradouroTipos.Outros;
+		}
 	}
 }

@@ -1315,6 +1315,7 @@ namespace Migracao.Sistems
 					int cep = 0;
 					byte? estadoCivil = null;
 					bool sexo = true;
+					LogradouroTipos logradouroTipo = LogradouroTipos.Outros;
 					long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
 					string? nomeCompleto = null, documento = null, rg = null, email = null, apelido = null, nascimentoLocal = null, profissaoOutra = null, logradouro = "",
 						 complemento = null, bairro = null, logradouroNum = null, numcadastro = null, cidade = "", estado = null, observacao = null;
@@ -1364,6 +1365,7 @@ namespace Migracao.Sistems
 										break;
 									case "ENDERECO":
 										logradouro = celulaValor.PrimeiraLetraMaiuscula();
+										logradouroTipo = logradouro.GetLogradouroTipo();
 										break;
 									case "BAIRRO":
 										bairro = celulaValor.PrimeiraLetraMaiuscula();
@@ -1434,7 +1436,7 @@ namespace Migracao.Sistems
 									Logradouro = logradouro,
 									LogradouroNum = logradouroNum,
 									Bairro = bairro,
-									LogradouroTipoID = (int)LogradouroTipos.Outros,
+									LogradouroTipoID = (int)logradouroTipo,
 									Complemento = complemento,
 									ParentID = indiceLinha,
 									TableID = 1,
@@ -1608,7 +1610,8 @@ namespace Migracao.Sistems
                     int cep = 0;
 					byte? estadoCivil = null;
 					bool sexo = true;
-                    long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
+					LogradouroTipos logradouroTipo = LogradouroTipos.Outros;
+					long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
 					string? nomeCompleto = null, documento = null, rg = null, email = null, apelido = null, nascimentoLocal = null, profissaoOutra = null, logradouro = "",
 						 complemento = null, bairro = null, logradouroNum = null, numcadastro = null, cidade = "", estado = null, observacao = null;
 
@@ -1657,6 +1660,7 @@ namespace Migracao.Sistems
                                         break;
                                     case "ENDERECO":
                                         logradouro = celulaValor.PrimeiraLetraMaiuscula();
+										logradouroTipo = celulaValor.GetLogradouroTipo();
                                         break;
                                     case "BAIRRO":
                                         bairro = celulaValor.PrimeiraLetraMaiuscula();
@@ -1728,7 +1732,7 @@ namespace Migracao.Sistems
 											Ativo = true,
 											ConsumidorID = int.Parse(consumidorIDValue),
 											EnderecoTipoID = (short)EnderecoTipos.Residencial,
-											LogradouroTipoID = (int)LogradouroTipos.Outros,
+											LogradouroTipoID = (int)logradouroTipo,
 											Logradouro = logradouro,
 											CidadeID = cidadeID,
 											Cep = cep,

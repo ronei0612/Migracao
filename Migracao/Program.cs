@@ -1,3 +1,5 @@
+using Migracao.Models;
+
 namespace Migracao
 {
 	internal static class Program

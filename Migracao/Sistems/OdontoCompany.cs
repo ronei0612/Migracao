@@ -1366,6 +1366,8 @@ namespace Migracao.Sistems
 									case "ENDERECO":
 										logradouro = celulaValor.PrimeiraLetraMaiuscula();
 										logradouroTipo = logradouro.GetLogradouroTipo();
+										if (logradouroTipo != LogradouroTipos.Outros)
+											logradouro = logradouro.RemoverPrimeiroNome();
 										break;
 									case "BAIRRO":
 										bairro = celulaValor.PrimeiraLetraMaiuscula();
@@ -1660,8 +1662,10 @@ namespace Migracao.Sistems
                                         break;
                                     case "ENDERECO":
                                         logradouro = celulaValor.PrimeiraLetraMaiuscula();
-										logradouroTipo = celulaValor.GetLogradouroTipo();
-                                        break;
+										logradouroTipo = logradouro.GetLogradouroTipo();
+										if (logradouroTipo != LogradouroTipos.Outros)
+											logradouro = logradouro.RemoverPrimeiroNome();
+										break;
                                     case "BAIRRO":
                                         bairro = celulaValor.PrimeiraLetraMaiuscula();
                                         break;

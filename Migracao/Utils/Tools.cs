@@ -368,5 +368,14 @@ namespace Migracao.Utils
 
 			return LogradouroTipos.Outros;
 		}
+
+		public static string RemoverPrimeiroNome(this string texto)
+		{
+			texto = texto.Trim();
+
+			string[] nameParts = texto.Split(' ');
+
+			return string.Join(" ", nameParts.Skip(1));
+		}
 	}
 }

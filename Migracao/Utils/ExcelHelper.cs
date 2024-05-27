@@ -227,6 +227,9 @@ namespace Migracao.Utils
 
 		public string GetConsumidorID(string cpf = "", string nomeCompleto = "", string codigo = "")
         {
+			if (string.IsNullOrWhiteSpace(cpf) && string.IsNullOrWhiteSpace(nomeCompleto))
+				return "";
+
 			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
 			cpf = cpf.Replace(".", "").Replace("-", "");
 
@@ -250,6 +253,9 @@ namespace Migracao.Utils
 
 		public bool PessoaFoneExists(string cpf = "", string nomeCompleto = "", string telefone = "")
 		{
+			if (string.IsNullOrWhiteSpace(cpf) && string.IsNullOrWhiteSpace(nomeCompleto))
+				return true;
+
 			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
 			cpf = cpf.Replace(".", "").Replace("-", "");
 
@@ -270,6 +276,9 @@ namespace Migracao.Utils
 
 		public bool ConsumidorEnderecoExists(string cpf = "", string nomeCompleto = "", string logradouro = "")
 		{
+			if (string.IsNullOrWhiteSpace(cpf) && string.IsNullOrWhiteSpace(nomeCompleto))
+				return true;
+
 			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
 			cpf = cpf.Replace(".", "").Replace("-", "");
 
@@ -290,6 +299,9 @@ namespace Migracao.Utils
 
 		public string GetFuncionarioID(string cpf = "", string nomeCompleto = "")
 		{
+			if (string.IsNullOrWhiteSpace(cpf) && string.IsNullOrWhiteSpace(nomeCompleto))
+				return "";
+
 			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
 			cpf = cpf.Replace(".", "").Replace("-", "");
 
@@ -308,6 +320,9 @@ namespace Migracao.Utils
 
 		public string GetFornecedorID(string cpf = "", string nomeCompleto = "", string codigo = "")
 		{
+			if (string.IsNullOrWhiteSpace(cpf) && string.IsNullOrWhiteSpace(nomeCompleto))
+				return "";
+
 			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
 			cpf = cpf.Replace(".", "").Replace("-", "");
 

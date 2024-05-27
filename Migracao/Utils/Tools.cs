@@ -139,9 +139,9 @@ namespace Migracao.Utils
 			Process.Start("explorer.exe", argumento);
 		}
 
-		public static string TratarMensagemErro(string erroMensagem, int indiceLinha, string colunaLetra, string tituloColuna, string celulaValor, string variaveisValor = "")
+		public static string TratarMensagemErro(string arquivo, string erroMensagem, int indiceLinha, string colunaLetra, string tituloColuna, string celulaValor, string variaveisValor = "")
 		{
-			var mensagemErro = $"Falha na linha {indiceLinha}, coluna {colunaLetra}: {tituloColuna}, valor esperado: , valor da célula: \"{celulaValor}\": {erroMensagem}";
+			var mensagemErro = $"\"{arquivo}\" Falha na linha {indiceLinha}, coluna {colunaLetra}: {tituloColuna}, valor esperado: , valor da célula: \"{celulaValor}\": {erroMensagem}";
 
 			if (!string.IsNullOrWhiteSpace(variaveisValor))
 				mensagemErro += Environment.NewLine + "Variáveis" + Environment.NewLine + variaveisValor;

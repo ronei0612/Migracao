@@ -202,7 +202,7 @@ namespace Migracao.Sistems
 
 			catch (Exception error)
 			{
-				throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha, colunaLetra, tituloColuna, celulaValor, variaveisValor));
+				throw new Exception(Tools.TratarMensagemErro(arquivoExcel, error.Message, indiceLinha, colunaLetra, tituloColuna, celulaValor, variaveisValor));
 			}
 		}
 
@@ -356,7 +356,7 @@ namespace Migracao.Sistems
             }
             catch (Exception error)
             {
-                throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha, colunaLetra, tituloColuna, celulaValor, variaveisValor));
+                throw new Exception(Tools.TratarMensagemErro(arquivoExcel, error.Message, indiceLinha, colunaLetra, tituloColuna, celulaValor, variaveisValor));
             }
         }
         public void ImportarPacientes(string arquivoExcel, int estabelecimentoID)
@@ -456,7 +456,7 @@ namespace Migracao.Sistems
 
             catch (Exception error)
             {
-                throw new Exception(Tools.TratarMensagemErro(error.Message, indiceLinha, colunaLetra, tituloColuna, celulaValor, variaveisValor));
+                throw new Exception(Tools.TratarMensagemErro(arquivoExcel, error.Message, indiceLinha, colunaLetra, tituloColuna, celulaValor, variaveisValor));
             }
         }
     }

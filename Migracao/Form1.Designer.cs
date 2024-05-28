@@ -58,13 +58,19 @@
 			lbExcel2 = new Label();
 			txtExcel2 = new TextBox();
 			btnExcel2 = new Button();
+			label2 = new Label();
+			label6 = new Label();
+			txtPessoas = new TextBox();
+			btnPessoas = new Button();
+			txtRecebiveis = new TextBox();
+			btnRecebiveis = new Button();
 			menuStrip1.SuspendLayout();
 			SuspendLayout();
 			// 
 			// label1
 			// 
 			label1.AutoSize = true;
-			label1.Location = new Point(10, 67);
+			label1.Location = new Point(10, 125);
 			label1.Name = "label1";
 			label1.Size = new Size(108, 15);
 			label1.TabIndex = 0;
@@ -73,7 +79,7 @@
 			// 
 			// btnImportar
 			// 
-			btnImportar.Location = new Point(295, 231);
+			btnImportar.Location = new Point(295, 289);
 			btnImportar.Margin = new Padding(3, 2, 3, 2);
 			btnImportar.Name = "btnImportar";
 			btnImportar.Size = new Size(88, 22);
@@ -86,7 +92,7 @@
 			// lbPessoaID
 			// 
 			lbPessoaID.AutoSize = true;
-			lbPessoaID.Location = new Point(449, 67);
+			lbPessoaID.Location = new Point(449, 125);
 			lbPessoaID.Name = "lbPessoaID";
 			lbPessoaID.Size = new Size(104, 15);
 			lbPessoaID.TabIndex = 4;
@@ -99,7 +105,7 @@
 			// 
 			// btnExcel
 			// 
-			btnExcel.Location = new Point(638, 93);
+			btnExcel.Location = new Point(638, 151);
 			btnExcel.Margin = new Padding(3, 2, 3, 2);
 			btnExcel.Name = "btnExcel";
 			btnExcel.Size = new Size(31, 23);
@@ -111,7 +117,7 @@
 			// 
 			// textBoxExcel1
 			// 
-			textBoxExcel1.Location = new Point(131, 94);
+			textBoxExcel1.Location = new Point(131, 152);
 			textBoxExcel1.Margin = new Padding(3, 2, 3, 2);
 			textBoxExcel1.Name = "textBoxExcel1";
 			textBoxExcel1.Size = new Size(501, 23);
@@ -121,7 +127,7 @@
 			// labelExcel1
 			// 
 			labelExcel1.AutoSize = true;
-			labelExcel1.Location = new Point(10, 97);
+			labelExcel1.Location = new Point(10, 155);
 			labelExcel1.Name = "labelExcel1";
 			labelExcel1.Size = new Size(43, 15);
 			labelExcel1.TabIndex = 8;
@@ -133,7 +139,7 @@
 			comboBoxImportacao.DropDownStyle = ComboBoxStyle.DropDownList;
 			comboBoxImportacao.FormattingEnabled = true;
 			comboBoxImportacao.Items.AddRange(new object[] { "JSON", "Agendamentos", "Fornecedores", "Funcionarios", "Pacientes", "Pessoas", "Pagos", "Recebíveis", "Recebidos", "Tabela de Preços" });
-			comboBoxImportacao.Location = new Point(131, 33);
+			comboBoxImportacao.Location = new Point(131, 91);
 			comboBoxImportacao.Margin = new Padding(3, 2, 3, 2);
 			comboBoxImportacao.Name = "comboBoxImportacao";
 			comboBoxImportacao.Size = new Size(214, 23);
@@ -143,7 +149,7 @@
 			// label4
 			// 
 			label4.AutoSize = true;
-			label4.Location = new Point(12, 36);
+			label4.Location = new Point(10, 94);
 			label4.Name = "label4";
 			label4.Size = new Size(87, 15);
 			label4.TabIndex = 10;
@@ -152,7 +158,7 @@
 			// lbReferencia
 			// 
 			lbReferencia.AutoSize = true;
-			lbReferencia.Location = new Point(10, 151);
+			lbReferencia.Location = new Point(10, 209);
 			lbReferencia.Name = "lbReferencia";
 			lbReferencia.Size = new Size(65, 15);
 			lbReferencia.TabIndex = 11;
@@ -161,7 +167,7 @@
 			// 
 			// txtReferencia
 			// 
-			txtReferencia.Location = new Point(131, 148);
+			txtReferencia.Location = new Point(131, 206);
 			txtReferencia.Margin = new Padding(3, 2, 3, 2);
 			txtReferencia.Name = "txtReferencia";
 			txtReferencia.Size = new Size(501, 23);
@@ -170,7 +176,7 @@
 			// 
 			// btnReferencia
 			// 
-			btnReferencia.Location = new Point(638, 148);
+			btnReferencia.Location = new Point(638, 206);
 			btnReferencia.Margin = new Padding(3, 2, 3, 2);
 			btnReferencia.Name = "btnReferencia";
 			btnReferencia.Size = new Size(31, 23);
@@ -183,7 +189,7 @@
 			// label3
 			// 
 			label3.AutoSize = true;
-			label3.Location = new Point(353, 38);
+			label3.Location = new Point(353, 96);
 			label3.Name = "label3";
 			label3.Size = new Size(89, 15);
 			label3.TabIndex = 15;
@@ -195,7 +201,7 @@
 			comboBoxSistema.DropDownStyle = ComboBoxStyle.DropDownList;
 			comboBoxSistema.FormattingEnabled = true;
 			comboBoxSistema.Items.AddRange(new object[] { "DentalOffice", "OdontoCompany" });
-			comboBoxSistema.Location = new Point(463, 34);
+			comboBoxSistema.Location = new Point(463, 92);
 			comboBoxSistema.Margin = new Padding(3, 2, 3, 2);
 			comboBoxSistema.Name = "comboBoxSistema";
 			comboBoxSistema.Size = new Size(206, 23);
@@ -205,7 +211,7 @@
 			// 
 			// txtEstabelecimentoID
 			// 
-			txtEstabelecimentoID.Location = new Point(131, 64);
+			txtEstabelecimentoID.Location = new Point(131, 122);
 			txtEstabelecimentoID.Margin = new Padding(3, 2, 3, 2);
 			txtEstabelecimentoID.Name = "txtEstabelecimentoID";
 			txtEstabelecimentoID.Size = new Size(113, 23);
@@ -216,7 +222,7 @@
 			// 
 			// txtPessoaID
 			// 
-			txtPessoaID.Location = new Point(559, 64);
+			txtPessoaID.Location = new Point(559, 122);
 			txtPessoaID.Margin = new Padding(3, 2, 3, 2);
 			txtPessoaID.Name = "txtPessoaID";
 			txtPessoaID.Size = new Size(110, 23);
@@ -227,7 +233,7 @@
 			// 
 			// txtLoginID
 			// 
-			txtLoginID.Location = new Point(323, 64);
+			txtLoginID.Location = new Point(323, 122);
 			txtLoginID.Margin = new Padding(3, 2, 3, 2);
 			txtLoginID.Name = "txtLoginID";
 			txtLoginID.Size = new Size(110, 23);
@@ -239,7 +245,7 @@
 			// label5
 			// 
 			label5.AutoSize = true;
-			label5.Location = new Point(266, 67);
+			label5.Location = new Point(266, 125);
 			label5.Name = "label5";
 			label5.Size = new Size(51, 15);
 			label5.TabIndex = 16;
@@ -248,7 +254,7 @@
 			// 
 			// listView1
 			// 
-			listView1.Location = new Point(12, 176);
+			listView1.Location = new Point(12, 234);
 			listView1.Name = "listView1";
 			listView1.Size = new Size(620, 48);
 			listView1.TabIndex = 18;
@@ -258,7 +264,7 @@
 			// 
 			// btnAddToList
 			// 
-			btnAddToList.Location = new Point(638, 175);
+			btnAddToList.Location = new Point(638, 233);
 			btnAddToList.Margin = new Padding(3, 2, 3, 2);
 			btnAddToList.Name = "btnAddToList";
 			btnAddToList.Size = new Size(31, 23);
@@ -270,7 +276,7 @@
 			// 
 			// btnDelFromList
 			// 
-			btnDelFromList.Location = new Point(638, 201);
+			btnDelFromList.Location = new Point(638, 259);
 			btnDelFromList.Margin = new Padding(3, 2, 3, 2);
 			btnDelFromList.Name = "btnDelFromList";
 			btnDelFromList.Size = new Size(31, 23);
@@ -313,7 +319,7 @@
 			// lbExcel2
 			// 
 			lbExcel2.AutoSize = true;
-			lbExcel2.Location = new Point(10, 124);
+			lbExcel2.Location = new Point(10, 182);
 			lbExcel2.Name = "lbExcel2";
 			lbExcel2.Size = new Size(43, 15);
 			lbExcel2.TabIndex = 97;
@@ -322,7 +328,7 @@
 			// 
 			// txtExcel2
 			// 
-			txtExcel2.Location = new Point(131, 121);
+			txtExcel2.Location = new Point(131, 179);
 			txtExcel2.Margin = new Padding(3, 2, 3, 2);
 			txtExcel2.Name = "txtExcel2";
 			txtExcel2.Size = new Size(501, 23);
@@ -331,7 +337,7 @@
 			// 
 			// btnExcel2
 			// 
-			btnExcel2.Location = new Point(638, 120);
+			btnExcel2.Location = new Point(638, 178);
 			btnExcel2.Margin = new Padding(3, 2, 3, 2);
 			btnExcel2.Name = "btnExcel2";
 			btnExcel2.Size = new Size(31, 23);
@@ -341,11 +347,75 @@
 			btnExcel2.Visible = false;
 			btnExcel2.Click += btnExcel2_Click_1;
 			// 
+			// label2
+			// 
+			label2.AutoSize = true;
+			label2.Location = new Point(12, 29);
+			label2.Name = "label2";
+			label2.Size = new Size(51, 15);
+			label2.TabIndex = 99;
+			label2.Text = "Pessoas:";
+			// 
+			// label6
+			// 
+			label6.AutoSize = true;
+			label6.Location = new Point(10, 59);
+			label6.Name = "label6";
+			label6.Size = new Size(65, 15);
+			label6.TabIndex = 100;
+			label6.Text = "Recebíveis:";
+			// 
+			// txtPessoas
+			// 
+			txtPessoas.Enabled = false;
+			txtPessoas.Location = new Point(130, 26);
+			txtPessoas.Margin = new Padding(3, 2, 3, 2);
+			txtPessoas.Name = "txtPessoas";
+			txtPessoas.Size = new Size(501, 23);
+			txtPessoas.TabIndex = 101;
+			// 
+			// btnPessoas
+			// 
+			btnPessoas.Location = new Point(636, 26);
+			btnPessoas.Margin = new Padding(3, 2, 3, 2);
+			btnPessoas.Name = "btnPessoas";
+			btnPessoas.Size = new Size(31, 23);
+			btnPessoas.TabIndex = 102;
+			btnPessoas.Text = "📂";
+			btnPessoas.UseVisualStyleBackColor = true;
+			btnPessoas.Click += btnPessoas_Click;
+			// 
+			// txtRecebiveis
+			// 
+			txtRecebiveis.Enabled = false;
+			txtRecebiveis.Location = new Point(130, 56);
+			txtRecebiveis.Margin = new Padding(3, 2, 3, 2);
+			txtRecebiveis.Name = "txtRecebiveis";
+			txtRecebiveis.Size = new Size(501, 23);
+			txtRecebiveis.TabIndex = 103;
+			// 
+			// btnRecebiveis
+			// 
+			btnRecebiveis.Location = new Point(636, 56);
+			btnRecebiveis.Margin = new Padding(3, 2, 3, 2);
+			btnRecebiveis.Name = "btnRecebiveis";
+			btnRecebiveis.Size = new Size(31, 23);
+			btnRecebiveis.TabIndex = 104;
+			btnRecebiveis.Text = "📂";
+			btnRecebiveis.UseVisualStyleBackColor = true;
+			btnRecebiveis.Click += btnRecebiveis_Click;
+			// 
 			// Form1
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
-			ClientSize = new Size(679, 264);
+			ClientSize = new Size(679, 323);
+			Controls.Add(btnRecebiveis);
+			Controls.Add(txtRecebiveis);
+			Controls.Add(btnPessoas);
+			Controls.Add(txtPessoas);
+			Controls.Add(label6);
+			Controls.Add(label2);
 			Controls.Add(lbExcel2);
 			Controls.Add(txtExcel2);
 			Controls.Add(btnExcel2);
@@ -415,5 +485,11 @@
 		private TextBox txtExcel2;
 		private Button btnExcel2;
 		private ToolStripMenuItem abrirPastaToolStripMenuItem;
+		private Label label2;
+		private Label label6;
+		private TextBox txtPessoas;
+		private Button btnPessoas;
+		private TextBox txtRecebiveis;
+		private Button btnRecebiveis;
 	}
 }

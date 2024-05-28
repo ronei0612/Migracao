@@ -174,6 +174,13 @@ namespace Migracao
 			label4.Visible = true;
 			comboBoxImportacao.Visible = true;
 			menuStrip1.Visible = true;
+
+			label2.Visible = true;
+			label6.Visible = true;
+			txtPessoas.Visible = true;
+			txtRecebiveis.Visible = true;
+			btnPessoas.Visible = true;
+			btnRecebiveis.Visible = true;
 		}
 
 		void AlterarNomesCampos()
@@ -181,14 +188,14 @@ namespace Migracao
 			if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
 			{
 				lbExcel2.Text = "Recebíveis (Prod):";
-				lbReferencia.Text = "Form Pgto (CRD013):";
+				lbReferencia.Text = "Recebidos (Prod):";
 			}
 			else if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase) || comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
 				lbReferencia.Text = "Pessoas (Prod):";
-							//|| comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
-							//|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
-							
-							//|| comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
+			//|| comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
+			//|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
+
+			//|| comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
 		}
 
 		void MostrarCampos()
@@ -243,7 +250,7 @@ namespace Migracao
 								txtExcel2.Visible = true;
 								btnExcel2.Visible = true;
 							}
-							
+
 							if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase) || comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
 							{
 								lbPessoaID.Visible = true;
@@ -410,6 +417,62 @@ namespace Migracao
 		private void abrirPastaToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			Tools.AbrirPastaExplorer(Tools.salvarNaPasta);
+		}
+
+		private void btnPessoas_Click(object sender, EventArgs e)
+		{
+			txtPessoas.Text = EscolherArquivoExcel("Arquivo Pessoas.xlsx");
+
+			if (string.IsNullOrEmpty(txtPessoas.Text) == false)
+				try
+				{
+					var excelHelper = new ExcelHelper(txtPessoas.Text);
+					var workbook = excelHelper.LerExcel(txtPessoas.Text);
+					var sheet = workbook.GetSheetAt(0);
+					excelHelper.InitializeDictionaryPessoas(sheet);
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show(ex.Message, "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				}
+		}
+
+		private void btnRecebiveis_Click(object sender, EventArgs e)
+		{
+			//txtRecebiveis.Text = EscolherArquivoExcel("Arquivo Recebiveis.xlsx");
+
+			//try
+			//{
+			//	var excelHelper = new ExcelHelper(txtPessoas.Text);
+			//	var workbook = excelHelper.LerExcel(txtPessoas.Text);
+			//	var sheet = workbook.GetSheetAt(0);
+			//	excelHelper.InitializeDictionaryPessoas(sheet);
+			//}
+			//catch (Exception ex)
+			//{
+			//	MessageBox.Show(ex.Message, "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+			//}
+		}
+
+		string EscolherArquivoExcel(string titulo = "Selecione um arquivo")
+		{
+			string retorno = "";
+
+			var openFileDialog = new OpenFileDialog()
+			{
+				Filter = "Arquivo Excel |*.xlsx",
+				Title = titulo,
+				InitialDirectory = Tools.ultimaPasta
+			};
+
+			if (openFileDialog.ShowDialog() == DialogResult.OK)
+			{
+				retorno = openFileDialog.FileName;
+				Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
+				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta);
+			}
+
+			return retorno;
 		}
 	}
 }

@@ -2,6 +2,7 @@
 using Migracao.Utils;
 using NPOI.SS.UserModel;
 using System.Linq;
+using static NPOI.HSSF.Util.HSSFColor;
 
 namespace Migracao.Sistems
 {
@@ -10,8 +11,21 @@ namespace Migracao.Sistems
         string arquivoExcelCidades = "Files\\EnderecosCidades.xlsx";
 		string arquivoExcelNomesUTF8 = "Files\\NomesUTF8.xlsx";
 
-		public void LerArquivosExcel(ListView listView)
+		public void LerArquivosExcel(string excelPessoas = "", string excelRecebiveis = "", ListView listView = null)
 		{
+			if (!string.IsNullOrEmpty(excelPessoas))
+				try
+				{
+					var excelHelper = new ExcelHelper(excelPessoas);
+					var workbook = excelHelper.LerExcel(excelPessoas);
+					var sheet = workbook.GetSheetAt(0);
+					excelHelper.InitializeDictionaryPessoas(sheet);
+				}
+				catch (Exception ex)
+				{
+					throw new Exception(ex.Message);
+				}
+
 			foreach (var excel in listView.Items)
 			{
 				if (File.Exists(excel.ToString()))
@@ -418,17 +432,28 @@ namespace Migracao.Sistems
 			}
 		}
 
-        public void ImportarRecebidos(string arquivoExcel, int estabelecimentoID, int respFinanceiroPessoaID, int loginID, string arquivoExcelRecebiveis, string arquivoExcelFormaPagamento = "")
+        public void ImportarRecebidos(string arquivoExcel, int estabelecimentoID, int respFinanceiroPessoaID, int loginID, string arquivoExcelRecebiveis, string arquivoExcelRecebidos = "")
         {
-            //CRD013 Forma de Pagamento
-            var dataHoje = DateTime.Now;
+			//CRD013 Forma de Pagamento
+			var dataHoje = DateTime.Now;
             var indiceLinha = 0;
             string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
             var excelHelper = new ExcelHelper(arquivoExcel);
             var sqlHelper = new SqlHelper();
 
-            var excelRecebidosDict = ExcelRecebiveisToDictionary(arquivoExcelRecebiveis);
-			//var excelFormaPagamentoDict = ExcelFormaPagamentoToDictionary(arquivoExcelFormaPagamento);
+			var excelRecebidosDict = ExcelRecebiveisToDictionary(arquivoExcelRecebiveis);
+
+			ISheet sheet;
+			try
+			{
+				IWorkbook workbook = excelHelper.LerExcel(arquivoExcelRecebidos);
+				sheet = workbook.GetSheetAt(0);
+				excelHelper.InitializeDictionaryRecebidos(sheet);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelRecebidos}\": {ex.Message}");
+			}
 
 			var fluxoCaixas = new List<FluxoCaixa>();
 			var recebiveis = new List<Recebivel>();
@@ -440,8 +465,8 @@ namespace Migracao.Sistems
                     indiceLinha++;
 
                     string documento = "";
-                    string? pagamento = null;
-                    int? tipoPagamento = null;
+                    string? pagamento = null, cpf = null, outroSacadoNome = null;
+                    int? tipoPagamento = null, consumidorID = null, recebivelID = null;
 					string? observacao = null;
                     decimal pagoValor = 0;
                     byte formaPagamento = (byte)TitulosEspeciesID.DepositoEmConta;
@@ -474,6 +499,9 @@ namespace Migracao.Sistems
 									//case "TIPO_DOC":
 									//tipoPagamento = int.Parse(celulaValor);
 									//break;
+									case "CGC_CPF":
+										cpf = celulaValor.ToCPF();
+									break;
 									case "NOME_GRUPO":
 										pagamento = celulaValor;
 										break;
@@ -482,41 +510,56 @@ namespace Migracao.Sistems
 						}
 					}
 
-                    //if (tipoPagamento != null && excelFormaPagamentoDict.ContainsKey((int)tipoPagamento))
-                    //    formaPagamento = (byte)excelFormaPagamentoDict[(int)tipoPagamento];
+					//if (tipoPagamento != null && excelFormaPagamentoDict.ContainsKey((int)tipoPagamento))
+					//    formaPagamento = (byte)excelFormaPagamentoDict[(int)tipoPagamento];
 
-                    if (!string.IsNullOrEmpty(documento) && excelRecebidosDict.ContainsKey(documento))
-                    {
-                        fluxoCaixas.Add(new FluxoCaixa()
-                        {
-                            RecebivelID = int.Parse(excelRecebidosDict[documento][0]),
-                            ConsumidorID = int.Parse(excelRecebidosDict[documento][1]),
-                            SituacaoID = 1,
-                            PagoMulta = 0,
-                            PagoJuros = 0,
-							PagoDescontos = 0,
-                            PagoDespesas = 0,
-							TipoID = (byte)TransacaoTiposID.Recebimento,
-                            Data = dataBaixa,
-                            TransacaoID = (byte)TituloTransacoes.Liquidacao,
-                            EspecieID = formaPagamento,
-                            DataBaseCalculo = dataBaixa,
-                            DevidoValor = pagoValor,
-                            PagoValor = pagoValor,
-                            EstabelecimentoID = estabelecimentoID,
-                            LoginID = loginID,
-                            DataInclusao = dataBaixa,
-                            FinanceiroID = respFinanceiroPessoaID,
-                            Observacoes = observacao
-                        });
+					var consumidorIDValue = excelHelper.GetConsumidorID(cpf: cpf);
 
-						recebiveis.Add(new Recebivel()
+					if (string.IsNullOrEmpty(consumidorIDValue) == false)
+					{
+						consumidorID = int.Parse(consumidorIDValue);
+
+						if (excelHelper.RecebidoExists((int)consumidorID, pagoValor, dataBaixa) == false)
 						{
-                            ID = int.Parse(excelRecebidosDict[documento][0]),
-                            DataBaixa = dataBaixa,
-                            ValorDevido = 0
-						});
+							if (!string.IsNullOrEmpty(documento) && excelRecebidosDict.ContainsKey(documento))
+							{
+								recebivelID = int.Parse(excelRecebidosDict[documento][0]);
+								consumidorID = int.Parse(excelRecebidosDict[documento][1]);
 
+								recebiveis.Add(new Recebivel()
+								{
+									ID = int.Parse(excelRecebidosDict[documento][0]),
+									DataBaixa = dataBaixa,
+									ValorDevido = 0
+								});
+							}
+
+							fluxoCaixas.Add(new FluxoCaixa()
+							{
+								RecebivelID = recebivelID,
+								ConsumidorID = consumidorID,
+								SituacaoID = 1,
+								PagoMulta = 0,
+								PagoJuros = 0,
+								PagoDescontos = 0,
+								PagoDespesas = 0,
+								TipoID = (byte)TransacaoTiposID.Recebimento,
+								Data = dataBaixa,
+								TransacaoID = (byte)TituloTransacoes.Liquidacao,
+								EspecieID = formaPagamento,
+								DataBaseCalculo = dataBaixa,
+								DevidoValor = pagoValor,
+								PagoValor = pagoValor,
+								EstabelecimentoID = estabelecimentoID,
+								LoginID = loginID,
+								DataInclusao = dataBaixa,
+								FinanceiroID = respFinanceiroPessoaID,
+								Observacoes = observacao,
+								OutroSacadoNome = outroSacadoNome
+							});
+						}
+						else
+							consumidorID = consumidorID;
 					}
                 }
 
@@ -1950,11 +1993,14 @@ namespace Migracao.Sistems
 							case "ConsumidorID":
 								consumidorID = celulaValor;
 								break;
+							case "CPF":
+								consumidorID = celulaValor;
+								break;
 						}
                     }
 
                     if (!string.IsNullOrEmpty(documento) && !string.IsNullOrEmpty(recebivelID) && !string.IsNullOrEmpty(consumidorID) && !dataDictionary.ContainsKey(documento))
-					    dataDictionary.Add(documento, new string[] { recebivelID, consumidorID });
+					    dataDictionary.Add(documento, [recebivelID, consumidorID]);
 				}
 			}
 			catch (Exception ex)

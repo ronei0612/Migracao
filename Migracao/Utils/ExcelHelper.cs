@@ -1,5 +1,6 @@
 ﻿using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+using System.Runtime.ConstrainedExecution;
 using System.Text.RegularExpressions;
 
 namespace Migracao.Utils
@@ -11,13 +12,13 @@ namespace Migracao.Utils
 		public List<string> cabecalhos;
 		public List<IRow> linhas;
 
-		private Dictionary<string, string> nomeConsumidorDict = new Dictionary<string, string>();
-        private Dictionary<string, string> cpfConsumidorDict = new Dictionary<string, string>();
-        private Dictionary<string, string> nomeCodConsumidorDict = new Dictionary<string, string>();
-		private Dictionary<string, string> nomePessoaDict = new Dictionary<string, string>();
-		private Dictionary<string, string> cpfPessoaDict = new Dictionary<string, string>();
-		private Dictionary<string, string> cpfFuncionarioDict = new Dictionary<string, string>();
-		private Dictionary<string, string> nomeFuncionarioDict = new Dictionary<string, string>();
+		public static Dictionary<string, string> nomeConsumidorDict = new Dictionary<string, string>();
+        public static Dictionary<string, string> cpfConsumidorDict = new Dictionary<string, string>();
+        public static Dictionary<string, string> nomeCodConsumidorDict = new Dictionary<string, string>();
+		public static Dictionary<string, string> nomePessoaDict = new Dictionary<string, string>();
+		public static Dictionary<string, string> cpfPessoaDict = new Dictionary<string, string>();
+		public static Dictionary<string, string> cpfFuncionarioDict = new Dictionary<string, string>();
+		public static Dictionary<string, string> nomeFuncionarioDict = new Dictionary<string, string>();
 
 		private Dictionary<string, string> cidadeDict = new Dictionary<string, string>();
 		private Dictionary<string, string> cidadeEstadoDict = new Dictionary<string, string>();
@@ -25,12 +26,16 @@ namespace Migracao.Utils
 		private Dictionary<string, string> cpfKeyDict = new Dictionary<string, string>();
 		private Dictionary<string, string> nomeKeyDict = new Dictionary<string, string>();
 		private Dictionary<string, string> nomesUTF8Dict = new Dictionary<string, string>();
+
 		private Dictionary<string, string> pessoaIDTelefonesDict = new Dictionary<string, string>();
 		private Dictionary<string, string> pessoaIDEnderecosDict = new Dictionary<string, string>();
 		private Dictionary<string, string> cpfTelefonesDict = new Dictionary<string, string>();
 		private Dictionary<string, string> cpfEnderecosDict = new Dictionary<string, string>();
 		private Dictionary<string, string> nomeTelefonesDict = new Dictionary<string, string>();
 		private Dictionary<string, string> nomeEnderecosDict = new Dictionary<string, string>();
+
+		private Dictionary<string, string> consumidorIDRecebiveisDict = new Dictionary<string, string>();
+		private Dictionary<string, string> consumidorIDRecebidosDict = new Dictionary<string, string>();
 
 		public ExcelHelper(string arquivoExcel)
         {
@@ -45,6 +50,133 @@ namespace Migracao.Utils
 
 			this.cabecalhos = GetCabecalhosExcel(workbook);
 			this.linhas = GetLinhasExcel(workbook);
+		}
+
+		public void InitializeDictionaryRecebiveis(ISheet sheet)
+		{
+			this.sheet = sheet;
+			IRow headerRow = sheet.GetRow(0);
+
+			int consumidorIDColumnIndex = GetColumnIndex(headerRow, "consumidorid");
+			int dataVencimentoColumnIndex = GetColumnIndex(headerRow, "datavencimento");
+			int valorOriginalColumnIndex = GetColumnIndex(headerRow, "valororiginal");
+
+			for (int row = 1; row <= sheet.LastRowNum; row++)
+			{
+				if (sheet.GetRow(row) != null)
+				{
+					string consumidorID = sheet.GetRow(row).GetCell(consumidorIDColumnIndex) != null ? sheet.GetRow(row).GetCell(consumidorIDColumnIndex).ToString() : "";
+					string dataVencimento = sheet.GetRow(row).GetCell(dataVencimentoColumnIndex) != null ? sheet.GetRow(row).GetCell(dataVencimentoColumnIndex).ToString().ToLower() : "";
+					string valorOriginal = sheet.GetRow(row).GetCell(valorOriginalColumnIndex) != null ? sheet.GetRow(row).GetCell(valorOriginalColumnIndex).ToString().ToLower() : "";
+
+					if (!valorOriginal.Contains('.') && !valorOriginal.Contains(','))
+					{
+						valorOriginal = valorOriginal.Insert(valorOriginal.Length - 4, ".");
+						valorOriginal = Tools.ArredondarValor(valorOriginal).ToString("F2");
+					}
+
+					string key = consumidorID + "|" + valorOriginal + "|" + dataVencimento;
+					if (!consumidorIDRecebiveisDict.ContainsKey(key))
+						consumidorIDRecebiveisDict.Add(key, consumidorID);
+				}
+			}
+		}
+
+		public void InitializeDictionaryRecebidos(ISheet sheet)
+		{
+			this.sheet = sheet;
+			IRow headerRow = sheet.GetRow(0);
+
+			int consumidorIDColumnIndex = GetColumnIndex(headerRow, "consumidorid");
+			int dataColumnIndex = GetColumnIndex(headerRow, "data");
+			int pagoValorColumnIndex = GetColumnIndex(headerRow, "pagoValor");
+
+			for (int row = 1; row <= sheet.LastRowNum; row++)
+			{
+				if (sheet.GetRow(row) != null)
+				{
+					string consumidorID = sheet.GetRow(row).GetCell(consumidorIDColumnIndex) != null ? sheet.GetRow(row).GetCell(consumidorIDColumnIndex).ToString() : "";
+					string data = sheet.GetRow(row).GetCell(dataColumnIndex) != null ? sheet.GetRow(row).GetCell(dataColumnIndex).ToString().ToLower() : "";
+					string pagoValor = sheet.GetRow(row).GetCell(pagoValorColumnIndex) != null ? sheet.GetRow(row).GetCell(pagoValorColumnIndex).ToString().ToLower() : "";
+
+					if (!pagoValor.Contains('.') && !pagoValor.Contains(','))
+					{
+						pagoValor = pagoValor.Insert(pagoValor.Length - 4, ".");
+						pagoValor = Tools.ArredondarValor(pagoValor).ToString("F2");
+					}
+
+					string key = consumidorID + "|" + pagoValor + "|" + data;
+					if (!consumidorIDRecebidosDict.ContainsKey(key))
+						consumidorIDRecebidosDict.Add(key, consumidorID);
+				}
+			}
+		}
+
+		public void InitializeDictionaryPessoas(ISheet sheet)
+		{
+			cpfFuncionarioDict.Clear();
+			cpfConsumidorDict.Clear();
+			cpfPessoaDict.Clear();
+			nomeCodConsumidorDict.Clear();
+			nomeConsumidorDict.Clear();
+			nomePessoaDict.Clear();
+			nomeFuncionarioDict.Clear();
+
+			this.sheet = sheet;
+			IRow headerRow = sheet.GetRow(0);
+
+			int cpfColumnIndex = GetColumnIndex(headerRow, "cpf");
+			int nomeCompletoColumnIndex = GetColumnIndex(headerRow, "nomecompleto");
+			int pessoaidColumnIndex = GetColumnIndex(headerRow, "pessoaid");
+			int funcionarioidColumnIndex = GetColumnIndex(headerRow, "funcionarioid");
+			int fornecedoridColumnIndex = GetColumnIndex(headerRow, "fornecedorid");
+			int nomefantasiaColumnIndex = GetColumnIndex(headerRow, "nomefantasia");
+			int consumidoridColumnIndex = GetColumnIndex(headerRow, "consumidorid");
+			int codigoantigoColumnIndex = GetColumnIndex(headerRow, "codigoantigo");
+
+			for (int row = 1; row <= sheet.LastRowNum; row++)
+			{
+				if (sheet.GetRow(row) != null)
+				{
+					string cpf = sheet.GetRow(row).GetCell(cpfColumnIndex) != null ? sheet.GetRow(row).GetCell(cpfColumnIndex).ToString() : "";
+					string nomeCompleto = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex) != null ? sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString().ToLower() : "";
+					string pessoaid = sheet.GetRow(row).GetCell(pessoaidColumnIndex) != null ? sheet.GetRow(row).GetCell(pessoaidColumnIndex).ToString() : "";
+					string funcionarioid = sheet.GetRow(row).GetCell(funcionarioidColumnIndex) != null ? sheet.GetRow(row).GetCell(funcionarioidColumnIndex).ToString() : "";
+					string fornecedorid = sheet.GetRow(row).GetCell(fornecedoridColumnIndex) != null ? sheet.GetRow(row).GetCell(fornecedoridColumnIndex).ToString() : "";
+					string nomefantasia = sheet.GetRow(row).GetCell(nomefantasiaColumnIndex) != null ? sheet.GetRow(row).GetCell(nomefantasiaColumnIndex).ToString() : "";
+					string consumidorid = sheet.GetRow(row).GetCell(consumidoridColumnIndex) != null ? sheet.GetRow(row).GetCell(consumidoridColumnIndex).ToString() : "";
+					string codigoantigo = sheet.GetRow(row).GetCell(codigoantigoColumnIndex) != null ? sheet.GetRow(row).GetCell(codigoantigoColumnIndex).ToString() : "";
+
+					nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
+					cpf = cpf.Replace(".", "").Replace("-", "");
+
+					string key = cpf;
+
+					if (!cpfConsumidorDict.ContainsKey(key))
+						cpfConsumidorDict.Add(key, consumidorid);
+
+					if (!cpfFuncionarioDict.ContainsKey(key))
+						cpfFuncionarioDict.Add(key, funcionarioid);
+
+					if (!cpfPessoaDict.ContainsKey(key))
+						cpfPessoaDict.Add(key, pessoaid);
+
+					key = nomeCompleto + "|" + codigoantigo;
+					if (!nomeCodConsumidorDict.ContainsKey(key))
+						nomeCodConsumidorDict.Add(key, consumidorid);
+
+					key = nomeCompleto;
+
+					if (!nomeConsumidorDict.ContainsKey(key))
+						nomeConsumidorDict.Add(key, consumidorid);
+
+					if (!nomePessoaDict.ContainsKey(key))
+						nomePessoaDict.Add(key, pessoaid);
+
+					if (!nomeFuncionarioDict.ContainsKey(key))
+						nomeFuncionarioDict.Add(key, funcionarioid);
+				}
+			}
 		}
 
 		public void InitializeDictionary(ISheet sheet)
@@ -153,10 +285,6 @@ namespace Migracao.Utils
 					string cidadeCellValue = sheet.GetRow(row).GetCell(cidadeColumnIndex) != null ? sheet.GetRow(row).GetCell(cidadeColumnIndex).ToString() : "";
 					string estadoCellValue = sheet.GetRow(row).GetCell(estadoColumnIndex) != null ? sheet.GetRow(row).GetCell(estadoColumnIndex).ToString() : "";
 
-					//string key = cidadeCellValue.ToLower();
-					//if (!cidadeDict.ContainsKey(key))
-					//	cidadeDict.Add(key, cidadeIdCellValue);
-
 					string key = Tools.RemoverAcentos(cidadeCellValue).ToLower() + "|" + estadoCellValue.ToLower();
 					if (!cidadeEstadoDict.ContainsKey(key))
 						cidadeEstadoDict.Add(key, cidadeIdCellValue);
@@ -263,6 +391,36 @@ namespace Migracao.Utils
 
             return "";
         }
+
+		public bool RecebidoExists(int consumidorID, decimal pagoValor, DateTime data)
+		{
+			if (consumidorID <= 0)
+				return true;
+
+			pagoValor = Tools.ArredondarValor(pagoValor.ToString("F2"));
+
+			string key = consumidorID + "|" + pagoValor + "|" + data.ToString("yyyy-MM-dd HH:mm:ss.fff");
+
+			if (!string.IsNullOrWhiteSpace(key))
+				if (consumidorIDRecebidosDict.ContainsKey(key))
+					return true;
+
+			return false;
+		}
+
+		public bool RecebivelExists(int consumidorID, decimal valorOriginal, DateTime dataVencimento)
+		{
+			if (consumidorID <= 0)
+				return true;
+
+			string key = consumidorID + "|" + valorOriginal + "|" + dataVencimento;
+			if (!string.IsNullOrWhiteSpace(key))
+				if (consumidorIDRecebiveisDict.ContainsKey(key))
+					return true;
+
+			return false;
+		}
+
 		public bool PessoaFoneExists(int pessoaID, string telefone)
 		{
 			if (pessoaID <= 0)

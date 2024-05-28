@@ -1,4 +1,5 @@
 ﻿using Migracao.Models;
+using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -353,6 +354,14 @@ namespace Migracao.Utils
 
 		public static decimal ArredondarValor(this string input)
 		{
+			if (input.Contains('.') && input.Contains(',') == false)
+			{
+				input = input.Replace(".", "");
+				int posicao = input.Length - 4;
+				input = input.Insert(posicao, ",");
+			}
+
+
 			if (decimal.TryParse(input, out decimal valorDecimal))
 				return Math.Round(valorDecimal, 2);
 

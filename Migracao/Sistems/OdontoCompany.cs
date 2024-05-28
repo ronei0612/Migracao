@@ -1,6 +1,7 @@
 ﻿using Migracao.Models;
 using Migracao.Utils;
 using NPOI.SS.UserModel;
+using System.Linq;
 
 namespace Migracao.Sistems
 {
@@ -8,6 +9,36 @@ namespace Migracao.Sistems
 	{
         string arquivoExcelCidades = "Files\\EnderecosCidades.xlsx";
 		string arquivoExcelNomesUTF8 = "Files\\NomesUTF8.xlsx";
+
+		public void LerArquivosExcel(ListView listView)
+		{
+			foreach (var excel in listView.Items)
+			{
+				if (File.Exists(excel.ToString()))
+				{
+					try
+					{
+						var excelHelper = new ExcelHelper(excel.ToString());
+						var cabecalhos = excelHelper.cabecalhos;
+
+						string[] EMD101_cadastroPacientes = { "CODIGO", "NOME", "F_OU_J", "CGC_CPF", "INSC_RG", "CLIENTE", "FORNECEDOR", "PRESTADOR", "DT_CADASTRO", "DT_ULTMOV", "DT_NASCIMENTO", "VR_LIMITE", "OBS1", "BANCO", "AGENCIA", "CONTA", "ENDERECO", "BAIRRO", "CEP", "CIDADE", "ESTADO", "FONE1", "FONE2", "FAX", "CELULAR", "EMAIL", "BANCO2", "AGENCIA2", "CONTA2", "TRANSMISSAO", "ONDE_TRABALHA", "FUNCAO", "ADMISSAO", "RENDA_MES", "CAIXA_POSTAL", "CLASSE", "PAI", "MAE", "CONJUGE", "QTDE_DEPENDENTES", "END_TRAB", "FONE_TRAB", "NOME_REF_1", "FONE_REF_1", "NOME_REF_2", "FONE_REF_2", "NOME_FIA", "PARENTESCO_FIA", "CPF_FIA", "RG_FIA", "FONE_FIA", "ENDERECO_FIA", "BAIRRO_FIA", "CIDADE_FIA", "CEP_FIA", "ESTADO_FIA", "PROFISSAO_FIA", "RENDA_FIA", "MODIFICADO", "USUARIO", "LOJA", "NUM_FICHA", "DEPENDENTE", "TITULAR", "NUM_CONVENIO", "NAO_AUTORIZADO", "DT_NASC_FIA", "NUM_BLOQUEIO", "DATA_BLOQUEIO", "USU_BLOQUEIO", "NUM_ENDERECO", "HIST_BLOQUEIO", "COD_MUNICIPIO", "COD_UF", "COD_VENDEDOR", "CLIENTE_PRAMELHOR", "USU_CADASTRO", "COD_PRAMELHOR", "CNPJ_CPF_VALIDO", "INDICACAO", "PROFISSAO", "SEXO_M_F", "CODIGO_CLIENTE", "DATA_DEP_EXCLUIDO", "TITULAR_DEP_EXCLUIDO", "DT_NASCIMENTO_DEP", "CODIGO_VALIDADE", "NOME_VALIDADE", "DATA_VALIDADE", "USUARIO_VALIDADE", "OBS_VALIDADE", "CODIGO_INDICACAO", "CPF_INDICACAO", "CATEGORIA", "COMPLEMENTO", "INSTITUTO_ODC", "LGPD_USUARIO", "LGPD_DATA_HORA", "LGPD_CPF", "LGPD_TELEFONE", "LGPD_MENSAGEM", "LGPD_IMAGEM", "USUARIO_LGPD", "DATA_LGPD", "PROTETICO", "PROTETICO_ATIVO", "DT_AXON", "AXON_ID", "ID_DRCASH", "DATA_APROVACAO_DRCASH", "VALOR_MAXIMO_DRCASH" };
+						string[] CXD555_Baixa = { "LANCTO", "HISTORICO", "DATA", "TIPO", "CALCULO", "VALOR", "PERIODO", "TRANSMISSAO", "DT_DEPOSITO", "DOCUMENTO", "LOTE", "VALOR_RECEBER", "BANCO", "AGENCIA", "CONTA", "RESPONSAVEL", "HORA", "TERMINAL", "OBS1", "OBS2", "OBS3", "LOJA", "USUARIO", "MODIFICADO", "VLR_BRUTO", "FECHAR_DIRETO", "CNPJ_CPF", "NUM_CONVENIO", "CONTROLE_ROYALTIES", "ROY_ODO", "PRO_ODO", "ROY_MED", "PRO_MED", "FICHA_FINANCEIRO", "DT_AXON", "AXON_ID" };
+						string[] BXD111_Baixa = { "LANCTO", "CGC_CPF", "DOCUMENTO", "VR_PARCELA", "VALOR", "VENCTO", "BAIXA", "CAMPOX", "TRANSMISSAO", "OBS", "TIPO_DOC", "DUPLICATA", "PARCELA", "RESPONSAVEL", "CONTA_CORRENTE", "CONTA_DOCUMENTO", "LOJA", "USUARIO", "MODIFICADO", "TERMINAL", "VR_CALCULADO", "MOTIVO", "GRUPO", "NOME_GRUPO", "NUM_BANCO", "COD_CAIXA", "DATA_REMESSA", "AGUARDANDO_VINCULO", "DT_AXON", "AXON_ID", "ID_BAIXAPLANOS" };
+						string[] CRD111_Recebiveis = { "CGC_CPF", "EMITENTE", "DOCUMENTO", "VALOR", "PRAZO", "VENCTO", "EMISSAO", "CONTA", "BANCO", "AGENCIA", "TIPO_DOC", "PERIODO", "FILIAL", "OBS", "CAMPOX", "BANDA1", "BANDA2", "BANDA3", "TRANSMISSAO", "SITUACAO", "GEROU_TRANSMISSAO", "RECEBEU_TRANSMISSAO", "ALINEA", "DEVOLUCAO", "REAPRESENTOU", "SEQ_ALINEA11", "LOTE", "BAIXA", "CHEQUE_BAIXA", "DESCONTOS", "JUROS", "NOSSONUMERO", "RESPONSAVEL", "TOTAL", "MULTA", "DUPLICATA", "PARCELA", "ENCARGOS", "VALOR_VENDA", "LOJA", "USUARIO", "MODIFICADO", "DATA_ENV_CART", "DATA_RET_CART", "DATA_ENV_SCPC", "DATA_RET_SCPC", "TERMINAL", "VENCTO_ORIG", "VALOR_ORIG", "CHEQUE", "TITULO", "GRUPO", "NOME_GRUPO", "MOTIVO", "REMESSA", "NUM_BANCO", "TIPO_COBRANCA", "ORDEM", "LOCAL", "NOME_LOCAL", "CALC_JUROS", "COBRADORA", "COBRANCA", "DATA_REMESSA", "SITUACAO_REMESSA", "NSU_TRANSACAO", "CONTROLE_CARTAO", "DESCONTO_BOLETO", "ID_PIX", "DT_AXON", "AXON_ID", "CODIGO_TUSS" };
+
+						if (EMD101_cadastroPacientes.All(excelHelper.cabecalhos.Contains))
+						{
+
+						}//ImportarPessoas()
+
+					}
+					catch (Exception ex)
+					{
+						throw new Exception($"Erro ao ler o arquivo Excel \"{excel}\": {ex.Message}");
+					}
+				}
+			}
+		}
 
 		public void ImportarAgenda(string arquivoExcel, int estabelecimentoID, string arquivoExcelFuncionarios, int loginID)
 		{
@@ -36,9 +67,6 @@ namespace Migracao.Sistems
 				foreach (var linha in excelHelper.linhas)
 				{
 					indiceLinha++;
-
-					if (indiceLinha == 1370)
-						indiceLinha = 1370;
 
 					string nomeCompleto = "", cpf = "", hora = "", minutos = "", dentistaResponsavel = "";
 					bool faltou = false;
@@ -1653,7 +1681,7 @@ namespace Migracao.Sistems
                                         fornecedor = celulaValor == "S" ? true : false;
                                         break;
                                     case "NOME":
-                                        nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+										nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
                                         apelido = celulaValor.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
                                         break;
                                     case "CGC_CPF":
@@ -1718,6 +1746,7 @@ namespace Migracao.Sistems
                     }
 
                     pessoaID = indiceLinha;
+
 					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento);
 					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: documento);
 
@@ -1727,10 +1756,10 @@ namespace Migracao.Sistems
                         {
 							if (string.IsNullOrEmpty(pessoaIDValue) == false)
 							{
+								pessoaID = int.Parse(pessoaIDValue);
+
 								if (string.IsNullOrEmpty(consumidorIDValue))
 								{
-									pessoaID = int.Parse(pessoaIDValue);
-
 									consumidores.Add(new Consumidor()
 									{
 										Ativo = true,
@@ -1748,30 +1777,27 @@ namespace Migracao.Sistems
 									var cidadeID = excelHelper.GetCidadeID(cidade, estado);
 
 									if (cidadeID > 0)
-										consumidoresEnderecos.Add(new ConsumidorEndereco()
-										{
-											Ativo = true,
-											ConsumidorID = int.Parse(consumidorIDValue),
-											EnderecoTipoID = (short)EnderecoTipos.Residencial,
-											LogradouroTipoID = (int)logradouroTipo,
-											Logradouro = logradouro,
-											CidadeID = cidadeID,
-											Cep = cep,
-											DataInclusao = dataCadastro,
-											Bairro = bairro,
-											LogradouroNum = logradouroNum,
-											Complemento = complemento,
-											LoginID = loginID
-										});
+										if (excelHelper.ConsumidorEnderecoExists(pessoaID, cep) == false)
+											consumidoresEnderecos.Add(new ConsumidorEndereco()
+											{
+												Ativo = true,
+												ConsumidorID = int.Parse(consumidorIDValue),
+												EnderecoTipoID = (short)EnderecoTipos.Residencial,
+												LogradouroTipoID = (int)logradouroTipo,
+												Logradouro = logradouro,
+												CidadeID = cidadeID,
+												Cep = cep,
+												DataInclusao = dataCadastro,
+												Bairro = bairro,
+												LogradouroNum = logradouroNum,
+												Complemento = complemento,
+												LoginID = loginID
+											});
 								}
 
 
-								if (string.IsNullOrEmpty(arquivoPacientesAtuais) == false)
-									consumidorID++;
-
 								if (celular > 0)
-									if (string.IsNullOrEmpty(arquivoPacientesAtuais) ||
-										(!string.IsNullOrEmpty(arquivoPacientesAtuais) && !string.IsNullOrEmpty(pessoaIDValue) && !excelHelper.PessoaFoneExists(documento, nomeCompleto, celular.ToString())))
+									if (excelHelper.PessoaFoneExists(pessoaID, celular.ToString()) == false)
 										pessoaFones.Add(new PessoaFone()
 										{
 											PessoaID = pessoaID,
@@ -1782,8 +1808,7 @@ namespace Migracao.Sistems
 										});
 
 								if (telefonePrinc > 0)
-									if (string.IsNullOrEmpty(arquivoPacientesAtuais) ||
-										(!string.IsNullOrEmpty(arquivoPacientesAtuais) && !string.IsNullOrEmpty(pessoaIDValue) && !excelHelper.PessoaFoneExists(documento, nomeCompleto, telefonePrinc.ToString())))
+									if (excelHelper.PessoaFoneExists(pessoaID, telefonePrinc.ToString()) == false)
 										pessoaFones.Add(new PessoaFone()
 										{
 											PessoaID = pessoaID,
@@ -1794,8 +1819,7 @@ namespace Migracao.Sistems
 										});
 
 								if (telefoneAltern > 0)
-									if (string.IsNullOrEmpty(arquivoPacientesAtuais) ||
-										(!string.IsNullOrEmpty(arquivoPacientesAtuais) && !string.IsNullOrEmpty(pessoaIDValue) && !excelHelper.PessoaFoneExists(documento, nomeCompleto, telefoneAltern.ToString())))
+									if (excelHelper.PessoaFoneExists(pessoaID, telefoneAltern.ToString()) == false)
 										pessoaFones.Add(new PessoaFone()
 										{
 											PessoaID = pessoaID,
@@ -1806,8 +1830,7 @@ namespace Migracao.Sistems
 										});
 
 								if (telefoneComercial > 0)
-									if (string.IsNullOrEmpty(arquivoPacientesAtuais) ||
-										(!string.IsNullOrEmpty(arquivoPacientesAtuais) && !string.IsNullOrEmpty(pessoaIDValue) && !excelHelper.PessoaFoneExists(documento, nomeCompleto, telefoneComercial.ToString())))
+									if (excelHelper.PessoaFoneExists(pessoaID, telefoneComercial.ToString()) == false)
 										pessoaFones.Add(new PessoaFone()
 										{
 											PessoaID = pessoaID,
@@ -1818,8 +1841,7 @@ namespace Migracao.Sistems
 										});
 
 								if (telefoneOutro > 0)
-									if (string.IsNullOrEmpty(arquivoPacientesAtuais) ||
-										(!string.IsNullOrEmpty(arquivoPacientesAtuais) && !string.IsNullOrEmpty(pessoaIDValue) && !excelHelper.PessoaFoneExists(documento, nomeCompleto, telefoneOutro.ToString())))
+									if (excelHelper.PessoaFoneExists(pessoaID, telefoneOutro.ToString()) == false)
 										pessoaFones.Add(new PessoaFone()
 										{
 											PessoaID = pessoaID,

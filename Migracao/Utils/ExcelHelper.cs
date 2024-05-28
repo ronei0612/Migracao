@@ -25,6 +25,8 @@ namespace Migracao.Utils
 		private Dictionary<string, string> cpfKeyDict = new Dictionary<string, string>();
 		private Dictionary<string, string> nomeKeyDict = new Dictionary<string, string>();
 		private Dictionary<string, string> nomesUTF8Dict = new Dictionary<string, string>();
+		private Dictionary<string, string> pessoaIDTelefonesDict = new Dictionary<string, string>();
+		private Dictionary<string, string> pessoaIDEnderecosDict = new Dictionary<string, string>();
 		private Dictionary<string, string> cpfTelefonesDict = new Dictionary<string, string>();
 		private Dictionary<string, string> cpfEnderecosDict = new Dictionary<string, string>();
 		private Dictionary<string, string> nomeTelefonesDict = new Dictionary<string, string>();
@@ -51,6 +53,7 @@ namespace Migracao.Utils
 			IRow headerRow = sheet.GetRow(0);
 
 			int cpfColumnIndex = GetColumnIndex(headerRow, "cpf");
+			int cepColumnIndex = GetColumnIndex(headerRow, "cep");
 			int nomeCompletoColumnIndex = GetColumnIndex(headerRow, "nomecompleto");
 			int pessoaidColumnIndex = GetColumnIndex(headerRow, "pessoaid");
 			int funcionarioidColumnIndex = GetColumnIndex(headerRow, "funcionarioid");
@@ -66,6 +69,7 @@ namespace Migracao.Utils
 				if (sheet.GetRow(row) != null)
 				{
 					string cpf = sheet.GetRow(row).GetCell(cpfColumnIndex) != null ? sheet.GetRow(row).GetCell(cpfColumnIndex).ToString() : "";
+					string cep = sheet.GetRow(row).GetCell(cepColumnIndex) != null ? sheet.GetRow(row).GetCell(cepColumnIndex).ToString() : "";
 					string nomeCompleto = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex) != null ? sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString().ToLower() : "";
 					string pessoaid = sheet.GetRow(row).GetCell(pessoaidColumnIndex) != null ? sheet.GetRow(row).GetCell(pessoaidColumnIndex).ToString() : "";
 					string funcionarioid = sheet.GetRow(row).GetCell(funcionarioidColumnIndex) != null ? sheet.GetRow(row).GetCell(funcionarioidColumnIndex).ToString() : "";
@@ -95,6 +99,10 @@ namespace Migracao.Utils
 					if (!cpfTelefonesDict.ContainsKey(key))
 						cpfTelefonesDict.Add(key, telefone);
 
+					key = pessoaid + "|" + telefone;
+					if (!pessoaIDTelefonesDict.ContainsKey(key))
+						pessoaIDTelefonesDict.Add(key, telefone);
+
 					key = cpf + "|" + logradouro;
 					if (!cpfEnderecosDict.ContainsKey(key))
 						cpfEnderecosDict.Add(key, logradouro);
@@ -121,6 +129,10 @@ namespace Migracao.Utils
 					key = nomeCompleto + "|" + logradouro;
 					if (!nomeEnderecosDict.ContainsKey(key))
 						nomeEnderecosDict.Add(key, funcionarioid);
+
+					key = pessoaid + "|" + cep;
+					if (!pessoaIDEnderecosDict.ContainsKey(key))
+						pessoaIDEnderecosDict.Add(key, consumidorid);
 				}
 			}
 		}
@@ -251,12 +263,24 @@ namespace Migracao.Utils
 
             return "";
         }
+		public bool PessoaFoneExists(int pessoaID, string telefone)
+		{
+			if (pessoaID <= 0)
+				return true;
+
+			string key = pessoaID + "|" + telefone;
+			if (!string.IsNullOrWhiteSpace(key))
+				if (pessoaIDTelefonesDict.ContainsKey(key))
+					return true;
+
+			return false;
+		}
 
 		public bool PessoaFoneExists(string cpf = "", string nomeCompleto = "", string telefone = "")
 		{
 			if (string.IsNullOrWhiteSpace(cpf) && string.IsNullOrWhiteSpace(nomeCompleto))
 				return true;
-
+			
 			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
 			cpf = cpf.Replace(".", "").Replace("-", "");
 
@@ -271,6 +295,19 @@ namespace Migracao.Utils
 				if (nomeTelefonesDict.ContainsKey(key))
 					return true;
 			}
+
+			return false;
+		}
+
+		public bool ConsumidorEnderecoExists(int pessoaID, int cep)
+		{
+			if (pessoaID <= 0 && cep <= 0)
+				return true;
+
+			string key = pessoaID + "|" + cep;
+			if (!string.IsNullOrWhiteSpace(key))
+				if (pessoaIDEnderecosDict.ContainsKey(key))
+					return true;
 
 			return false;
 		}

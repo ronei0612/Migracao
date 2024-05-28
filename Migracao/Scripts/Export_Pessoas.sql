@@ -10,7 +10,8 @@ SELECT
     c.ID as ConsumidorID, 
     c.CodigoAntigo,
     ce.Logradouro,
-    pf.Telefone 
+    ce.Cep,
+    pf.Telefone
 FROM Pessoas p
 LEFT JOIN Consumidores c
     ON c.PessoaID = p.ID

@@ -361,7 +361,6 @@ namespace Migracao.Utils
 				input = input.Insert(posicao, ",");
 			}
 
-
 			if (decimal.TryParse(input, out decimal valorDecimal))
 				return Math.Round(valorDecimal, 2);
 

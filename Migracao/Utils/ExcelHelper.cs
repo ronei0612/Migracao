@@ -1,5 +1,6 @@
 ﻿using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+using Org.BouncyCastle.Crypto.Operators;
 using System.Runtime.ConstrainedExecution;
 using System.Text.RegularExpressions;
 
@@ -70,10 +71,13 @@ namespace Migracao.Utils
 					string valorOriginal = sheet.GetRow(row).GetCell(valorOriginalColumnIndex) != null ? sheet.GetRow(row).GetCell(valorOriginalColumnIndex).ToString().ToLower() : "";
 
 					if (!valorOriginal.Contains('.') && !valorOriginal.Contains(','))
-					{
 						valorOriginal = valorOriginal.Insert(valorOriginal.Length - 4, ".");
-						valorOriginal = Tools.ArredondarValor(valorOriginal).ToString("F2");
-					}
+
+					valorOriginal = Tools.ArredondarValor(valorOriginal).ToString("F2");
+					//}
+
+					if (consumidorID == "18283648")
+						consumidorID = consumidorID;
 
 					string key = consumidorID + "|" + valorOriginal + "|" + dataVencimento;
 					if (!consumidorIDRecebiveisDict.ContainsKey(key))
@@ -410,10 +414,10 @@ namespace Migracao.Utils
 
 		public bool RecebivelExists(int consumidorID, decimal valorOriginal, DateTime dataVencimento)
 		{
-			if (consumidorID <= 0)
-				return true;
+			if (consumidorID == 18283648)
+				consumidorID = consumidorID;
 
-			string key = consumidorID + "|" + valorOriginal + "|" + dataVencimento;
+			string key = consumidorID + "|" + valorOriginal.ToString("F2") + "|" + dataVencimento.ToString("yyyy-MM-dd HH:mm:ss.fff");
 			if (!string.IsNullOrWhiteSpace(key))
 				if (consumidorIDRecebiveisDict.ContainsKey(key))
 					return true;

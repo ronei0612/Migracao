@@ -138,7 +138,7 @@
 			// 
 			comboBoxImportacao.DropDownStyle = ComboBoxStyle.DropDownList;
 			comboBoxImportacao.FormattingEnabled = true;
-			comboBoxImportacao.Items.AddRange(new object[] { "JSON", "Agendamentos", "Fornecedores", "Funcionarios", "Pacientes", "Pessoas", "Pagos", "Recebíveis", "Recebidos", "Tabela de Preços" });
+			comboBoxImportacao.Items.AddRange(new object[] { "JSON", "Todos", "Agendamentos", "Fornecedores", "Funcionarios", "Pacientes", "Pessoas", "Pagos", "Recebíveis", "Recebidos", "Tabela de Preços" });
 			comboBoxImportacao.Location = new Point(131, 91);
 			comboBoxImportacao.Margin = new Padding(3, 2, 3, 2);
 			comboBoxImportacao.Name = "comboBoxImportacao";

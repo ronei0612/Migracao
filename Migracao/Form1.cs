@@ -40,6 +40,9 @@ namespace Migracao
 				{
 					if (listView1.Visible == true)
 					{
+						var odontoCompany = new OdontoCompany();
+						odontoCompany.LerArquivos(listView1);
+
 						ConverterHelper converterHelper = new ConverterHelper();
 						var nomeArquivo = "";
 
@@ -212,6 +215,14 @@ namespace Migracao
 					btnImportar.Visible = true;
 				}
 
+				else if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "Todos")
+				{
+					listView1.Visible = true;
+					btnAddToList.Visible = true;
+					btnDelFromList.Visible = true;
+					btnImportar.Visible = true;
+				}
+
 				else
 				{
 					comboBoxSistema.Visible = true;
@@ -335,7 +346,11 @@ namespace Migracao
 		private void btnAddToList_Click(object sender, EventArgs e)
 		{
 			var openFileDialog = new OpenFileDialog();
-			openFileDialog.Filter = "Arquivo Json |*.json";
+			if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "Todos")
+				openFileDialog.Filter = "Arquivo Excel |*.csv;*.xlsx";
+			else if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "JSON")
+				openFileDialog.Filter = "Arquivo Json |*.json";
+
 			openFileDialog.Title = "Selecione um arquivo";
 
 			if (openFileDialog.ShowDialog() == DialogResult.OK)

@@ -688,5 +688,47 @@ namespace Migracao.Utils
 				workbook.Write(fileStream);
 			}
 		}
+
+		public static List<string[]> LerCSV(string filePath, char separador)
+		{
+			List<string[]> linhas = new List<string[]>();
+			using (var reader = new StreamReader(filePath))
+			{
+				string linha;
+				while ((linha = reader.ReadLine()) != null)
+				{
+					string[] valores = linha.Split(separador); // Assumindo que o separador é ';'
+					linhas.Add(valores);
+				}
+			}
+			return linhas;
+		}
+
+		// Método para obter os cabeçalhos do CSV
+		public static List<string> GetCabecalhosCSV(string filePath, char separador)
+		{
+			List<string[]> linhas = LerCSV(filePath, separador);
+			if (linhas.Count > 0)
+			{
+				return linhas[0].ToList(); // Primeira linha é o cabeçalho
+			}
+			return new List<string>();
+		}
+
+		public static char DetectarSeparadorCSV(string filePath)
+		{
+			char[] separadores = { ',', ';', '\t', '|' }; // Separadores comuns
+
+			using (var reader = new StreamReader(filePath))
+			{
+				string primeiraLinha = reader.ReadLine();
+
+				// Verifica qual separador tem o maior número de ocorrências
+				char separadorMaisFrequente = separadores.OrderByDescending(s => primeiraLinha.Count(c => c == s)).First();
+
+				return separadorMaisFrequente;
+			}
+		}
+
 	}
 }

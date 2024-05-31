@@ -357,10 +357,13 @@ namespace Migracao
 			else if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "JSON")
 				openFileDialog.Filter = "Arquivo Json |*.json";
 
-			openFileDialog.Title = "Selecione um arquivo";
+			openFileDialog.Title = "Selecione os arquivos";
+			openFileDialog.Multiselect = true;
 
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
-				listView1.Items.Add(openFileDialog.FileName);
+				foreach (var file in openFileDialog.FileNames)
+					listView1.Items.Add(file);
+			//listView1.Items.Add(openFileDialog.FileName);
 		}
 
 		private void Form1_Load(object sender, EventArgs e)

@@ -48,6 +48,7 @@
 			txtLoginID = new TextBox();
 			label5 = new Label();
 			listView1 = new ListView();
+			columnHeader1 = new ColumnHeader();
 			btnAddToList = new Button();
 			btnDelFromList = new Button();
 			menuStrip1 = new MenuStrip();
@@ -79,7 +80,8 @@
 			// 
 			// btnImportar
 			// 
-			btnImportar.Location = new Point(295, 289);
+			btnImportar.Anchor = AnchorStyles.Bottom;
+			btnImportar.Location = new Point(295, 386);
 			btnImportar.Margin = new Padding(3, 2, 3, 2);
 			btnImportar.Name = "btnImportar";
 			btnImportar.Size = new Size(88, 22);
@@ -105,6 +107,7 @@
 			// 
 			// btnExcel
 			// 
+			btnExcel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 			btnExcel.Location = new Point(638, 151);
 			btnExcel.Margin = new Padding(3, 2, 3, 2);
 			btnExcel.Name = "btnExcel";
@@ -117,6 +120,7 @@
 			// 
 			// textBoxExcel1
 			// 
+			textBoxExcel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 			textBoxExcel1.Location = new Point(131, 152);
 			textBoxExcel1.Margin = new Padding(3, 2, 3, 2);
 			textBoxExcel1.Name = "textBoxExcel1";
@@ -167,6 +171,7 @@
 			// 
 			// txtReferencia
 			// 
+			txtReferencia.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 			txtReferencia.Location = new Point(131, 206);
 			txtReferencia.Margin = new Padding(3, 2, 3, 2);
 			txtReferencia.Name = "txtReferencia";
@@ -176,6 +181,7 @@
 			// 
 			// btnReferencia
 			// 
+			btnReferencia.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 			btnReferencia.Location = new Point(638, 206);
 			btnReferencia.Margin = new Padding(3, 2, 3, 2);
 			btnReferencia.Name = "btnReferencia";
@@ -254,16 +260,24 @@
 			// 
 			// listView1
 			// 
+			listView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+			listView1.Columns.AddRange(new ColumnHeader[] { columnHeader1 });
 			listView1.Location = new Point(12, 234);
 			listView1.Name = "listView1";
-			listView1.Size = new Size(620, 48);
+			listView1.Size = new Size(620, 147);
 			listView1.TabIndex = 18;
 			listView1.UseCompatibleStateImageBehavior = false;
-			listView1.View = View.List;
+			listView1.View = View.Details;
 			listView1.Visible = false;
+			// 
+			// columnHeader1
+			// 
+			columnHeader1.Text = "";
+			columnHeader1.Width = 2000;
 			// 
 			// btnAddToList
 			// 
+			btnAddToList.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 			btnAddToList.Location = new Point(638, 233);
 			btnAddToList.Margin = new Padding(3, 2, 3, 2);
 			btnAddToList.Name = "btnAddToList";
@@ -276,6 +290,7 @@
 			// 
 			// btnDelFromList
 			// 
+			btnDelFromList.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 			btnDelFromList.Location = new Point(638, 259);
 			btnDelFromList.Margin = new Padding(3, 2, 3, 2);
 			btnDelFromList.Name = "btnDelFromList";
@@ -328,6 +343,7 @@
 			// 
 			// txtExcel2
 			// 
+			txtExcel2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 			txtExcel2.Location = new Point(131, 179);
 			txtExcel2.Margin = new Padding(3, 2, 3, 2);
 			txtExcel2.Name = "txtExcel2";
@@ -337,6 +353,7 @@
 			// 
 			// btnExcel2
 			// 
+			btnExcel2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 			btnExcel2.Location = new Point(638, 178);
 			btnExcel2.Margin = new Padding(3, 2, 3, 2);
 			btnExcel2.Name = "btnExcel2";
@@ -367,6 +384,7 @@
 			// 
 			// txtPessoas
 			// 
+			txtPessoas.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 			txtPessoas.Enabled = false;
 			txtPessoas.Location = new Point(130, 26);
 			txtPessoas.Margin = new Padding(3, 2, 3, 2);
@@ -376,6 +394,7 @@
 			// 
 			// btnPessoas
 			// 
+			btnPessoas.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 			btnPessoas.Location = new Point(636, 26);
 			btnPessoas.Margin = new Padding(3, 2, 3, 2);
 			btnPessoas.Name = "btnPessoas";
@@ -387,6 +406,7 @@
 			// 
 			// txtRecebiveis
 			// 
+			txtRecebiveis.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 			txtRecebiveis.Enabled = false;
 			txtRecebiveis.Location = new Point(130, 56);
 			txtRecebiveis.Margin = new Padding(3, 2, 3, 2);
@@ -396,6 +416,7 @@
 			// 
 			// btnRecebiveis
 			// 
+			btnRecebiveis.Anchor = AnchorStyles.Top | AnchorStyles.Right;
 			btnRecebiveis.Location = new Point(636, 56);
 			btnRecebiveis.Margin = new Padding(3, 2, 3, 2);
 			btnRecebiveis.Name = "btnRecebiveis";
@@ -409,7 +430,7 @@
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
-			ClientSize = new Size(679, 323);
+			ClientSize = new Size(679, 418);
 			Controls.Add(btnRecebiveis);
 			Controls.Add(txtRecebiveis);
 			Controls.Add(btnPessoas);
@@ -443,7 +464,6 @@
 			Icon = (Icon)resources.GetObject("$this.Icon");
 			MainMenuStrip = menuStrip1;
 			Margin = new Padding(3, 2, 3, 2);
-			MaximizeBox = false;
 			Name = "Form1";
 			StartPosition = FormStartPosition.CenterScreen;
 			Text = "Migração";
@@ -491,5 +511,6 @@
 		private Button btnPessoas;
 		private TextBox txtRecebiveis;
 		private Button btnRecebiveis;
+		private ColumnHeader columnHeader1;
 	}
 }

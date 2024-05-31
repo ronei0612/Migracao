@@ -40,22 +40,28 @@ namespace Migracao
 				{
 					if (listView1.Visible == true)
 					{
-						var odontoCompany = new OdontoCompany();
-						odontoCompany.LerArquivos(listView1);
-
-						ConverterHelper converterHelper = new ConverterHelper();
-						var nomeArquivo = "";
-
-						foreach (ListViewItem item in listView1.Items)
+						if (comboBoxImportacao.Text.Equals("todos", StringComparison.CurrentCultureIgnoreCase))
 						{
-							nomeArquivo = Tools.TratarCaracteres(Path.GetFileNameWithoutExtension(item.Text));
-							var pastaArquivo = Path.GetDirectoryName(item.Text);
-							nomeArquivo = Path.Combine(pastaArquivo, nomeArquivo) + ".xlsx";
-
-							converterHelper.JsonExcel(item.Text, nomeArquivo);
+							var odontoCompany = new OdontoCompany();
+							odontoCompany.LerArquivos(listView1);
 						}
 
-						Tools.AbrirPastaSelecionandoArquivo(nomeArquivo);
+						else if (comboBoxImportacao.Text.Equals("json", StringComparison.CurrentCultureIgnoreCase))
+						{
+							ConverterHelper converterHelper = new ConverterHelper();
+							var nomeArquivo = "";
+
+							foreach (ListViewItem item in listView1.Items)
+							{
+								nomeArquivo = Tools.TratarCaracteres(Path.GetFileNameWithoutExtension(item.Text));
+								var pastaArquivo = Path.GetDirectoryName(item.Text);
+								nomeArquivo = Path.Combine(pastaArquivo, nomeArquivo) + ".xlsx";
+
+								converterHelper.JsonExcel(item.Text, nomeArquivo);
+							}
+
+							Tools.AbrirPastaSelecionandoArquivo(nomeArquivo);
+						}
 					}
 
 					else if (comboBoxSistema.Text.Equals("dentaloffice", StringComparison.CurrentCultureIgnoreCase))

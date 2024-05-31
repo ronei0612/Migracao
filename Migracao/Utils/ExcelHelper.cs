@@ -1,8 +1,8 @@
 ﻿using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-using Org.BouncyCastle.Crypto.Operators;
-using System.Runtime.ConstrainedExecution;
+using System.Text;
 using System.Text.RegularExpressions;
+using static OfficeOpenXml.ExcelErrorValue;
 
 namespace Migracao.Utils
 {
@@ -38,19 +38,22 @@ namespace Migracao.Utils
 		private Dictionary<string, string> consumidorIDRecebiveisDict = new Dictionary<string, string>();
 		private Dictionary<string, string> consumidorIDRecebidosDict = new Dictionary<string, string>();
 
-		public ExcelHelper(string arquivoExcel)
+		public ExcelHelper(string? arquivoExcel = null)
         {
-			try
+			if (!string.IsNullOrEmpty(arquivoExcel))
 			{
-				this.workbook = LerExcel(arquivoExcel);
-			}
-			catch (Exception ex)
-			{
-				throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcel}\": {ex.Message}");
-			}
+				try
+				{
+					this.workbook = LerExcel(arquivoExcel);
+				}
+				catch (Exception ex)
+				{
+					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcel}\": {ex.Message}");
+				}
 
-			this.cabecalhos = GetCabecalhosExcel(workbook);
-			this.linhas = GetLinhasExcel(workbook);
+				this.cabecalhos = GetCabecalhosExcel(workbook);
+				this.linhas = GetLinhasExcel(workbook);
+			}
 		}
 
 		public void InitializeDictionaryRecebiveis(ISheet sheet)
@@ -691,7 +694,7 @@ namespace Migracao.Utils
 
 		public static List<string[]> LerCSV(string filePath, char separador)
 		{
-			List<string[]> linhas = new List<string[]>();
+			var linhas = new List<string[]>();
 			using (var reader = new StreamReader(filePath))
 			{
 				string linha;
@@ -704,13 +707,38 @@ namespace Migracao.Utils
 			return linhas;
 		}
 
+		public static List<string[]> GetLinhasCSV(string filePath, char separador)
+		{
+			var linhas = new List<string[]>();
+			using (var reader = new StreamReader(filePath))
+			{
+				// Ignora a primeira linha (cabeçalho)
+				reader.ReadLine();
+
+				string linha;
+				string[]? valores = null;
+
+				while ((linha = reader.ReadLine()) != null)
+				{
+					valores = linha.Split(separador);
+					// Remover aspas duplas de cada valor na linha
+					for (int i = 0; i < valores.Length; i++)
+						valores[i] = valores[i].Replace("\"", "");
+
+					if (valores != null && linha[0] == separador)					
+						linhas.Add(valores);
+				}
+			}
+			return linhas;
+		}
+
 		// Método para obter os cabeçalhos do CSV
 		public static List<string> GetCabecalhosCSV(string filePath, char separador)
 		{
 			List<string[]> linhas = LerCSV(filePath, separador);
 			if (linhas.Count > 0)
 			{
-				return linhas[0].ToList(); // Primeira linha é o cabeçalho
+				return linhas[0].Select(cabecalho => cabecalho.Replace("\"", "")).ToList(); // Remove aspas duplas e pega a Primeira linha que é o cabeçalho
 			}
 			return new List<string>();
 		}

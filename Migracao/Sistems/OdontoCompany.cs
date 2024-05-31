@@ -1,6 +1,9 @@
-﻿using Migracao.Models;
+﻿using MathNet.Numerics.Distributions;
+using Migracao.Models;
 using Migracao.Utils;
 using NPOI.SS.UserModel;
+using System.Runtime.ConstrainedExecution;
+using System.Text;
 
 namespace Migracao.Sistems
 {
@@ -9,10 +12,14 @@ namespace Migracao.Sistems
         string arquivoExcelCidades = "Files\\EnderecosCidades.xlsx";
 		string arquivoExcelNomesUTF8 = "Files\\NomesUTF8.xlsx";
 
-		string[] EMD101_cadastroPacientes = { "CODIGO", "NOME", "F_OU_J", "CGC_CPF", "INSC_RG", "CLIENTE", "FORNECEDOR", "PRESTADOR", "DT_CADASTRO", "DT_ULTMOV", "DT_NASCIMENTO", "VR_LIMITE", "OBS1", "BANCO", "AGENCIA", "CONTA", "ENDERECO", "BAIRRO", "CEP", "CIDADE", "ESTADO", "FONE1", "FONE2", "FAX", "CELULAR", "EMAIL", "BANCO2", "AGENCIA2", "CONTA2", "TRANSMISSAO", "ONDE_TRABALHA", "FUNCAO", "ADMISSAO", "RENDA_MES", "CAIXA_POSTAL", "CLASSE", "PAI", "MAE", "CONJUGE", "QTDE_DEPENDENTES", "END_TRAB", "FONE_TRAB", "NOME_REF_1", "FONE_REF_1", "NOME_REF_2", "FONE_REF_2", "NOME_FIA", "PARENTESCO_FIA", "CPF_FIA", "RG_FIA", "FONE_FIA", "ENDERECO_FIA", "BAIRRO_FIA", "CIDADE_FIA", "CEP_FIA", "ESTADO_FIA", "PROFISSAO_FIA", "RENDA_FIA", "MODIFICADO", "USUARIO", "LOJA", "NUM_FICHA", "DEPENDENTE", "TITULAR", "NUM_CONVENIO", "NAO_AUTORIZADO", "DT_NASC_FIA", "NUM_BLOQUEIO", "DATA_BLOQUEIO", "USU_BLOQUEIO", "NUM_ENDERECO", "HIST_BLOQUEIO", "COD_MUNICIPIO", "COD_UF", "COD_VENDEDOR", "CLIENTE_PRAMELHOR", "USU_CADASTRO", "COD_PRAMELHOR", "CNPJ_CPF_VALIDO", "INDICACAO", "PROFISSAO", "SEXO_M_F", "CODIGO_CLIENTE", "DATA_DEP_EXCLUIDO", "TITULAR_DEP_EXCLUIDO", "DT_NASCIMENTO_DEP", "CODIGO_VALIDADE", "NOME_VALIDADE", "DATA_VALIDADE", "USUARIO_VALIDADE", "OBS_VALIDADE", "CODIGO_INDICACAO", "CPF_INDICACAO", "CATEGORIA", "COMPLEMENTO", "INSTITUTO_ODC", "LGPD_USUARIO", "LGPD_DATA_HORA", "LGPD_CPF", "LGPD_TELEFONE", "LGPD_MENSAGEM", "LGPD_IMAGEM", "USUARIO_LGPD", "DATA_LGPD", "PROTETICO", "PROTETICO_ATIVO", "DT_AXON", "AXON_ID", "ID_DRCASH", "DATA_APROVACAO_DRCASH", "VALOR_MAXIMO_DRCASH" };
-		string[] CRD111_Recebiveis = { "CGC_CPF", "EMITENTE", "DOCUMENTO", "VALOR", "PRAZO", "VENCTO", "EMISSAO", "CONTA", "BANCO", "AGENCIA", "TIPO_DOC", "PERIODO", "FILIAL", "OBS", "CAMPOX", "BANDA1", "BANDA2", "BANDA3", "TRANSMISSAO", "SITUACAO", "GEROU_TRANSMISSAO", "RECEBEU_TRANSMISSAO", "ALINEA", "DEVOLUCAO", "REAPRESENTOU", "SEQ_ALINEA11", "LOTE", "BAIXA", "CHEQUE_BAIXA", "DESCONTOS", "JUROS", "NOSSONUMERO", "RESPONSAVEL", "TOTAL", "MULTA", "DUPLICATA", "PARCELA", "ENCARGOS", "VALOR_VENDA", "LOJA", "USUARIO", "MODIFICADO", "DATA_ENV_CART", "DATA_RET_CART", "DATA_ENV_SCPC", "DATA_RET_SCPC", "TERMINAL", "VENCTO_ORIG", "VALOR_ORIG", "CHEQUE", "TITULO", "GRUPO", "NOME_GRUPO", "MOTIVO", "REMESSA", "NUM_BANCO", "TIPO_COBRANCA", "ORDEM", "LOCAL", "NOME_LOCAL", "CALC_JUROS", "COBRADORA", "COBRANCA", "DATA_REMESSA", "SITUACAO_REMESSA", "NSU_TRANSACAO", "CONTROLE_CARTAO", "DESCONTO_BOLETO", "ID_PIX", "DT_AXON", "AXON_ID", "CODIGO_TUSS" };
-		string[] CXD555_Baixa = { "LANCTO", "HISTORICO", "DATA", "TIPO", "CALCULO", "VALOR", "PERIODO", "TRANSMISSAO", "DT_DEPOSITO", "DOCUMENTO", "LOTE", "VALOR_RECEBER", "BANCO", "AGENCIA", "CONTA", "RESPONSAVEL", "HORA", "TERMINAL", "OBS1", "OBS2", "OBS3", "LOJA", "USUARIO", "MODIFICADO", "VLR_BRUTO", "FECHAR_DIRETO", "CNPJ_CPF", "NUM_CONVENIO", "CONTROLE_ROYALTIES", "ROY_ODO", "PRO_ODO", "ROY_MED", "PRO_MED", "FICHA_FINANCEIRO", "DT_AXON", "AXON_ID" };
-		string[] BXD111_Baixa = { "LANCTO", "CGC_CPF", "DOCUMENTO", "VR_PARCELA", "VALOR", "VENCTO", "BAIXA", "CAMPOX", "TRANSMISSAO", "OBS", "TIPO_DOC", "DUPLICATA", "PARCELA", "RESPONSAVEL", "CONTA_CORRENTE", "CONTA_DOCUMENTO", "LOJA", "USUARIO", "MODIFICADO", "TERMINAL", "VR_CALCULADO", "MOTIVO", "GRUPO", "NOME_GRUPO", "NUM_BANCO", "COD_CAIXA", "DATA_REMESSA", "AGUARDANDO_VINCULO", "DT_AXON", "AXON_ID", "ID_BAIXAPLANOS" };
+		string[] EMD101_Pacientes		= { "BAIRRO", "CEP", "CGC_CPF", "CIDADE", "CLIENTE", "CELULAR", "DT_CADASTRO", "DT_NASCIMENTO", "EMAIL", "ENDERECO", "ESTADO", "FONE1", "FONE2", "FORNECEDOR", "INSC_RG", "NOME", "NUM_CONVENIO", "NUM_ENDERECO", "NUM_FICHA", "OBS1", "SEXO_M_F" };
+		string[] CRD111_Recebiveis		= { "AGENCIA", "AGUARDANDO_VINCULO", "ALINEA", "AXON_ID", "BANCO", "BANDA1", "BANDA2", "BANDA3", "BAIXA", "CAMPOX", "COD_CAIXA", "CODIGO_TUSS", "CONTA", "CONTA_CORRENTE", "CONTA_DOCUMENTO", "COBRADORA", "COBRANCA", "DATA_ENV_CART", "DATA_ENV_SCPC", "DATA_REMESSA", "DATA_RET_CART", "DATA_RET_SCPC", "DESCONTO_BOLETO", "DEVOLUCAO", "DOCUMENTO", "DT_AXON", "DUPLICATA", "EMISSAO", "EMITENTE", "ENCARGOS", "FILIAL", "GEROU_TRANSMISSAO", "GRUPO", "ID_BAIXAPLANOS", "ID_PIX", "JUROS", "LANCTO", "LOCAL", "LOJA", "MODIFICADO", "MOTIVO", "MULTA", "NOME_GRUPO", "NOME_LOCAL", "NOSSONUMERO", "NUM_BANCO", "OBS", "ORDEM", "PARCELA", "PERIODO", "PRAZO", "REAPRESENTOU", "RECEBEU_TRANSMISSAO", "REMESA", "RESPONSAVEL", "SEQ_ALINEA11", "SITUACAO", "SITUACAO_REMESSA", "TERMINAL", "TIPO_COBRANCA", "TIPO_DOC", "TOTAL", "TRANSMISSAO", "USUARIO", "VALOR", "VALOR_ORIG", "VALOR_RECEBER", "VALOR_VENDA", "VENCTO", "VENCTO_ORIG", "VR_CALCULADO", "VR_PARCELA" };
+		string[] CXD555_Baixa			= { "AGENCIA", "BANCO", "BAIXA", "CALCULO", "CNPJ_CPF", "CONTA", "DATA", "DOCUMENTO", "DT_AXON", "DT_DEPOSITO", "FECHAR_DIRETO", "FICHA_FINANCEIRO", "HISTORICO", "HORA", "LANCTO", "LOJA", "LOTE", "MODIFICADO", "NUM_CONVENIO", "OBS1", "OBS2", "OBS3", "PERIODO", "PRO_MED", "PRO_ODO", "RESPONSAVEL", "ROY_MED", "ROY_ODO", "TERMINAL", "TIPO", "TRANSMISSAO", "USUARIO", "VALOR", "VALOR_RECEBER", "VLR_BRUTO" };
+		string[] BXD111_Baixa			= { "AGUARDANDO_VINCULO", "AXON_ID", "BAIXA", "BANCO", "CAMPOX", "CGC_CPF", "COD_CAIXA", "CONTA_CORRENTE", "CONTA_DOCUMENTO", "DATA_REMESSA", "DOCUMENTO", "DT_AXON", "DUPLICATA", "GRUPO", "ID_BAIXAPLANOS", "LANCTO", "LOJA", "MODIFICADO", "MOTIVO", "NOME_GRUPO", "NUM_BANCO", "OBS", "PARCELA", "RESPONSAVEL", "TERMINAL", "TIPO_DOC", "TRANSMISSAO", "USUARIO", "VALOR", "VENCTO", "VR_CALCULADO", "VR_PARCELA" };
+		string[] CED006_Dentistas		= { "ADMISSAO", "AGENCIA", "AGENCIA2", "AXON_ID", "BAIRRO", "BANCO", "BANCO2", "CAIXA_POSTAL", "CEP", "CGC_CPF", "CIDADE", "CLIENTE", "CODIGO", "CODIGO_CLIENTE", "CODIGO_INDICACAO", "CODIGO_VALIDADE", "COD_MUNICIPIO", "COD_PRAMELHOR", "COD_UF", "COD_VENDEDOR", "CONJUGE", "CONTA", "CONTA2", "CPF_FIA", "CPF_INDICACAO", "DATA_APROVACAO_DRCASH", "DATA_BLOQUEIO", "DATA_DEP_EXCLUIDO", "DATA_LGPD", "DATA_VALIDADE", "DEPENDENTE", "DT_AXON", "DT_CADASTRO", "DT_NASC_FIA", "DT_NASCIMENTO", "DT_NASCIMENTO_DEP", "DT_ULTMOV", "EMAIL", "ENDERECO", "ENDERECO_FIA", "ESTADO", "ESTADO_FIA", "FAX", "FONE1", "FONE2", "FONE_FIA", "FONE_REF_1", "FONE_REF_2", "F_OU_J", "FORNECEDOR", "FUNCAO", "ID_DRCASH", "INSC_RG", "INSTITUTO_ODC", "LGPD_CPF", "LGPD_DATA_HORA", "LGPD_IMAGEM", "LGPD_MENSAGEM", "LGPD_TELEFONE", "LGPD_USUARIO", "LOJA", "MAE", "MODIFICADO", "NOME", "NOME_FIA", "NOME_GRUPO", "NOME_LOCAL", "NOME_REF_1", "NOME_REF_2", "NOME_VALIDADE", "NUM_BLOQUEIO", "NUM_CONVENIO", "NUM_ENDERECO", "NUM_FICHA", "OBS1", "OBS_VALIDADE", "ONDE_TRABALHA", "PAI", "PARENTESCO_FIA", "PRESTADOR", "PROFISSAO", "PROFISSAO_FIA", "PROTETICO", "PROTETICO_ATIVO", "QTDE_DEPENDENTES", "RENDA_FIA", "RENDA_MES", "RG_FIA", "SEXO_M_F", "TITULAR", "TITULAR_DEP_EXCLUIDO", "TRANSMISSAO", "USU_BLOQUEIO", "USU_CADASTRO", "USUARIO", "USUARIO_LGPD", "USUARIO_VALIDADE", "VALOR_MAXIMO_DRCASH", "VR_LIMITE" };
+
+		//List<string> cabecalhos_Pacientes = new List<string>() { "NomeCompleto", "Apelido", "CPF", "DataInclusao", "Email", "RG", "Sexo", "NascimentoData", "NascimentoLocal", "ProfissaoOutra", "EstadoCivilID", "EstabelecimentoID", "LoginID", "Guid", "FoneticaApelido", "FoneticaNomeCompleto" };
+		List<string> cabecalhos_Pacientes = new List<string>() { "NomeCompleto", "Apelido", "CPF", "DataInclusao", "Email", "RG", "Sexo", "NascimentoData", "NascimentoLocal", "Profissao", "EstadoCivil" };
 
 		public void LerArquivosExcel(string excelPessoas = "", string excelRecebiveis = "", ListView listView = null)
 		{
@@ -38,7 +45,7 @@ namespace Migracao.Sistems
 						var excelHelper = new ExcelHelper(excel.ToString());
 						var cabecalhos = excelHelper.cabecalhos;
 
-						if (EMD101_cadastroPacientes.All(excelHelper.cabecalhos.Contains))
+						if (EMD101_Pacientes.All(excelHelper.cabecalhos.Contains))
 						{
 
 						}//ImportarPessoas()
@@ -69,18 +76,92 @@ namespace Migracao.Sistems
 		public void LerArquivosExcelCsv(string arquivo)
 		{
 			var separador = ExcelHelper.DetectarSeparadorCSV(arquivo);
+			//separador = '|';
 
-			List<string[]> linhasCSV = ExcelHelper.LerCSV(arquivo, separador);
+			List<string[]> linhasCSV = ExcelHelper.GetLinhasCSV(arquivo, separador);
 			List<string> cabecalhosCSV = ExcelHelper.GetCabecalhosCSV(arquivo, separador);
 
-			if (EMD101_cadastroPacientes.All(cabecalhosCSV.Contains))
+			if (EMD101_Pacientes.All(cabecalhosCSV.Contains))
 			{
-				foreach (string[] linha in linhasCSV)
+				ConvertExcelPessoas(cabecalhosCSV, linhasCSV);
+			}
+		}
+
+		public List<List<string>> ConvertExcelPessoas(List<string> cabecalhos, List<string[]> linhas)
+		{
+			var listaDados = new List<List<string>>();
+
+			try
+			{
+				foreach (string[] linha in linhas)
 				{
-					// Acessar valores da linha, por exemplo:
-					string nome = linha[0];
-					string cpf = linha[1];
+					var valoresLinha = new Dictionary<string, string>();
+
+					for (int i = 0; i < cabecalhos.Count; i++)
+						if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
+							valoresLinha.Add(cabecalhos[i], linha[i]);
+
+					var clienteStr = valoresLinha.GetValueOrDefault("CLIENTE");
+					var fornecedorStr = valoresLinha.GetValueOrDefault("FORNECEDOR");
+					var nomeStr = valoresLinha.GetValueOrDefault("NOME");
+					var cgcCpfStr = valoresLinha.GetValueOrDefault("CGC_CPF");
+					var inscRgStr = valoresLinha.GetValueOrDefault("INSC_RG");
+					var sexoMfStr = valoresLinha.GetValueOrDefault("SEXO_M_F");
+					var emailStr = valoresLinha.GetValueOrDefault("EMAIL");
+					var fone1Str = valoresLinha.GetValueOrDefault("FONE1");
+					var fone2Str = valoresLinha.GetValueOrDefault("FONE2");
+					var celularStr = valoresLinha.GetValueOrDefault("CELULAR");
+					var enderecoStr = valoresLinha.GetValueOrDefault("ENDERECO");
+					var bairroStr = valoresLinha.GetValueOrDefault("BAIRRO");
+					var numEnderecoStr = valoresLinha.GetValueOrDefault("NUM_ENDERECO");
+					var cidadeStr = valoresLinha.GetValueOrDefault("CIDADE");
+					var estadoStr = valoresLinha.GetValueOrDefault("ESTADO");
+					var cepStr = valoresLinha.GetValueOrDefault("CEP");
+					var obsStr = valoresLinha.GetValueOrDefault("OBS1");
+					var numConvenioStr = valoresLinha.GetValueOrDefault("NUM_CONVENIO");
+					var dataCadastroStr = valoresLinha.GetValueOrDefault("DT_CADASTRO");
+					var dataNascimentoStr = valoresLinha.GetValueOrDefault("DT_NASCIMENTO");
+					var numFichaStr = valoresLinha.GetValueOrDefault("NUM_FICHA");
+
+					var cliente = clienteStr == "S" ? true : false;
+					var fornecedor = fornecedorStr == "S" ? true : false;
+					string? nomeCompleto = nomeStr.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+					string? apelido = nomeStr.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
+					string? documento = cgcCpfStr.ToCPF();
+					string? rg = inscRgStr.GetPrimeirosCaracteres(20);
+					var sexo = sexoMfStr.ToSexo("m", "f");
+					var sexoTexto = sexo == true ? "M" : "F";
+					string? email = emailStr.ToEmail();
+					long telefonePrinc = fone1Str.ToFone();
+					long telefoneAltern = fone2Str.ToFone();
+					long celular = celularStr.ToFone();
+					var logradouro = enderecoStr.PrimeiraLetraMaiuscula();
+					var logradouroTipo = logradouro.GetLogradouroTipo();
+					if (logradouroTipo != LogradouroTipos.Outros)
+						logradouro = logradouro.RemoverPrimeiroNome();
+					var bairro = bairroStr.PrimeiraLetraMaiuscula();
+					var logradouroNum = numEnderecoStr;
+					var cidade = cidadeStr;
+					var estado = estadoStr;
+					var cep = cepStr.ToNum();
+					var observacao = obsStr;
+					var dataCadastro = dataCadastroStr.ToData();
+					var dataNascimento = dataNascimentoStr.ToData();
+					var numcadastro = numFichaStr;
+
+					listaDados.Add(new List<string> { nomeCompleto, apelido, documento, dataCadastro.ToString(), email, rg, sexoTexto, dataNascimento.ToString(), null, null, null });
+
+					//listaDados.Add(new List<string> { cliente.ToString(), fornecedor.ToString(), nomeCompleto, apelido });
 				}
+
+				var excelHelper = new ExcelHelper();
+				excelHelper.CreateExcelFile("PessoasConvertidas.xlsx", cabecalhos_Pacientes, listaDados);
+
+				return listaDados;
+			}
+			catch (Exception error)
+			{
+				throw new Exception(error.Message);
 			}
 		}
 

@@ -14,8 +14,11 @@ namespace Migracao.Utils
 		public static string salvarNaPasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Documents");
 		public static string ultimaPasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Documents");
 
-		public static string ToCPF(this string possivelCpf)
+		public static string? ToCPF(this string possivelCpf)
 		{
+			if (string.IsNullOrEmpty(possivelCpf))
+				return null;
+
 			if (possivelCpf.Contains('.') && possivelCpf.Contains('-') && possivelCpf.Length <= 14)
 				return possivelCpf;
 
@@ -33,21 +36,30 @@ namespace Migracao.Utils
 
 		public static string GetPrimeiroNome(this string texto)
 		{
+			if (string.IsNullOrEmpty(texto))
+				return "";
+
 			return texto.Contains(' ') ? texto.Split(' ')[0] : texto;
 		}
 
-		public static string ToEmail(this string email)
+		public static string? ToEmail(this string email)
 		{
+			if (string.IsNullOrEmpty(email))
+				return null;
+
 			//return texto.Contains('@') && texto.Contains('.') ? texto : "";
 			var emailRegex = new Regex(@"^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$");
 			if (emailRegex.IsMatch(email))
 				return email.ToLower();
 
-			return "";
+			return null;
 		}
 
 		public static long ToFone(this string telefone)
 		{
+			if (string.IsNullOrEmpty(telefone))
+				return 0;
+
 			var possivelTel = Regex.Replace(telefone, "[^0-9]", "");
 
 			if (string.IsNullOrEmpty(possivelTel))
@@ -65,28 +77,45 @@ namespace Migracao.Utils
 
 		public static DateTime ToData(this string texto)
 		{
-			DateTime dataMinima = new(1900, 01, 01), dataMaxima = new(2079, 06, 06), dataHoje = DateTime.Now, data;
+			if (string.IsNullOrEmpty(texto))
+				return DateTime.Now;
 
-			if (DateTime.TryParse(texto, out data))
+			try
 			{
-			}
-			else if (double.TryParse(texto, out double codigoData))
-				data = DateTime.FromOADate(codigoData);
-			else
-				throw new Exception("Erro na conversão de data");
-			if ((data >= dataMinima && data <= dataMaxima) == false)
-				data = dataHoje;
+				DateTime dataMinima = new(1900, 01, 01), dataMaxima = new(2079, 06, 06), dataHoje = DateTime.Now, data;
 
-			return data;
+				if (DateTime.TryParse(texto, out data))
+				{
+				}
+				else if (double.TryParse(texto, out double codigoData))
+					data = DateTime.FromOADate(codigoData);
+				else
+					throw new Exception("Erro na conversão de data");
+				if ((data >= dataMinima && data <= dataMaxima) == false)
+					data = dataHoje;
+
+				return data;
+			} catch (Exception e)
+			{
+
+			}
+
+			return DateTime.Now;
 		}
 
 		public static int ToNum(this string texto)
 		{
+			if (string.IsNullOrEmpty(texto))
+				return 0;
+
 			return int.Parse(Regex.Replace(texto, "[^0-9]", ""));
 		}
 
 		public static bool ToSexo(this string texto, string masculino, string feminino)
 		{
+			if (string.IsNullOrEmpty(texto))
+				return true;
+
 			var sexoLetra = texto.ToLower();
 
 			if (sexoLetra == masculino)
@@ -98,8 +127,11 @@ namespace Migracao.Utils
 			return true;
 		}
 
-		public static string PrimeiraLetraMaiuscula(this string texto)
+		public static string? PrimeiraLetraMaiuscula(this string texto)
 		{
+			if (string.IsNullOrEmpty(texto))
+				return null;
+
 			return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(texto.ToLower());
 		}
 

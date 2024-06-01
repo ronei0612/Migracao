@@ -62,15 +62,12 @@ namespace Migracao.Utils
 			return null;
 		}
 
-		public static long ToFone(this string telefone)
+		public static long? ToFone(this string telefone)
 		{
-			if (string.IsNullOrEmpty(telefone))
-				return 0;
-
 			var possivelTel = Regex.Replace(telefone, "[^0-9]", "");
 
 			if (string.IsNullOrEmpty(possivelTel))
-				return 0;
+				return null;
 			else if (possivelTel.Length >= 8 && possivelTel.Length <= 16)
 				return long.Parse(possivelTel);
 			else

@@ -723,7 +723,7 @@ namespace Migracao.Utils
 		public static List<string[]> LerCSV(string filePath, char separador)
 		{
 			var linhas = new List<string[]>();
-			using (var reader = new StreamReader(filePath))
+			using (var reader = new StreamReader(filePath, System.Text.Encoding.UTF7))
 			{
 				string linha;
 				while ((linha = reader.ReadLine()) != null)
@@ -738,7 +738,7 @@ namespace Migracao.Utils
 		public static List<string[]> GetLinhasCSV(string filePath, char separador)
 		{
 			var linhas = new List<string[]>();
-			using (var reader = new StreamReader(filePath))
+			using (var reader = new StreamReader(filePath, System.Text.Encoding.UTF7))
 			{
 				// Ignora a primeira linha (cabeçalho)
 				reader.ReadLine();

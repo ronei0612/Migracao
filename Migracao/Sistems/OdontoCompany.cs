@@ -17,6 +17,7 @@ namespace Migracao.Sistems
 		string[] CED006_Dentistas		= { "ADMISSAO", "AGENCIA", "AGENCIA2", "AXON_ID", "BAIRRO", "BANCO", "BANCO2", "CAIXA_POSTAL", "CEP", "CGC_CPF", "CIDADE", "CLIENTE", "CODIGO", "CODIGO_CLIENTE", "CODIGO_INDICACAO", "CODIGO_VALIDADE", "COD_MUNICIPIO", "COD_PRAMELHOR", "COD_UF", "COD_VENDEDOR", "CONJUGE", "CONTA", "CONTA2", "CPF_FIA", "CPF_INDICACAO", "DATA_APROVACAO_DRCASH", "DATA_BLOQUEIO", "DATA_DEP_EXCLUIDO", "DATA_LGPD", "DATA_VALIDADE", "DEPENDENTE", "DT_AXON", "DT_CADASTRO", "DT_NASC_FIA", "DT_NASCIMENTO", "DT_NASCIMENTO_DEP", "DT_ULTMOV", "EMAIL", "ENDERECO", "ENDERECO_FIA", "ESTADO", "ESTADO_FIA", "FAX", "FONE1", "FONE2", "FONE_FIA", "FONE_REF_1", "FONE_REF_2", "F_OU_J", "FORNECEDOR", "FUNCAO", "ID_DRCASH", "INSC_RG", "INSTITUTO_ODC", "LGPD_CPF", "LGPD_DATA_HORA", "LGPD_IMAGEM", "LGPD_MENSAGEM", "LGPD_TELEFONE", "LGPD_USUARIO", "LOJA", "MAE", "MODIFICADO", "NOME", "NOME_FIA", "NOME_GRUPO", "NOME_LOCAL", "NOME_REF_1", "NOME_REF_2", "NOME_VALIDADE", "NUM_BLOQUEIO", "NUM_CONVENIO", "NUM_ENDERECO", "NUM_FICHA", "OBS1", "OBS_VALIDADE", "ONDE_TRABALHA", "PAI", "PARENTESCO_FIA", "PRESTADOR", "PROFISSAO", "PROFISSAO_FIA", "PROTETICO", "PROTETICO_ATIVO", "QTDE_DEPENDENTES", "RENDA_FIA", "RENDA_MES", "RG_FIA", "SEXO_M_F", "TITULAR", "TITULAR_DEP_EXCLUIDO", "TRANSMISSAO", "USU_BLOQUEIO", "USU_CADASTRO", "USUARIO", "USUARIO_LGPD", "USUARIO_VALIDADE", "VALOR_MAXIMO_DRCASH", "VR_LIMITE" };
 
 		List<string> cabecalhos_Pacientes = new List<string>() { "NumFicha", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)" };
+		HashSet<string> cadastroPaciente;
 
 		public void LerArquivosExcel(string excelPessoas = "", string excelRecebiveis = "", ListView listView = null)
 		{
@@ -66,12 +67,11 @@ namespace Migracao.Sistems
 			return new Tuple<List<string[]>, List<string>>(linhasCSV, cabecalhosCSV);
 		}
 
-		public void LerArquivos(ListView listView = null)
+		public void LerArquivos(string estabelecimentoID, ListView listView = null)
 		{
-			ExcelHelper excelHelper = new ExcelHelper();
-			DataTable dataTablePessoas = new DataTable();
-			DataRow dataRowPessoas = dataTablePessoas.NewRow();
-			HashSet<int> fichasCadastradas = new HashSet<int>(); // Adicionado para verificar números de ficha repetidos
+			ExcelHelper excelHelper = new();
+			DataTable dataTablePessoas = new();
+			//cadastroPaciente = new HashSet<int>();
 
 			foreach (string coluna in cabecalhos_Pacientes)
 				dataTablePessoas.Columns.Add(coluna, typeof(string));
@@ -88,25 +88,26 @@ namespace Migracao.Sistems
 						resultado = LerArquivosExcelCsv(item.Text);
 
 					var linhasCSV = resultado.Item1;
-					var cabecalhosCSV = resultado.Item2;					
+					var cabecalhosCSV = resultado.Item2;
 
 					if (EMD101_Pacientes.All(cabecalhosCSV.Contains))
-						dataRowPessoas = ConvertExcelPessoasPacientes(fichasCadastradas, dataRowPessoas, cabecalhosCSV, linhasCSV);
+						dataTablePessoas = ConvertExcelPessoasPacientes(dataTablePessoas, cabecalhosCSV, linhasCSV);
 					else if (CED006_Dentistas.All(cabecalhosCSV.Contains))
-						dataRowPessoas = ConvertExcelPessoasDentistas(fichasCadastradas, dataRowPessoas, cabecalhosCSV, linhasCSV);
+						dataTablePessoas = ConvertExcelPessoasDentistas(dataTablePessoas, cabecalhosCSV, linhasCSV);
 				}
 			}
 
-			dataTablePessoas.Rows.Add(dataRowPessoas);
-			excelHelper.CriarExcelArquivo("teste.xlsx", dataTablePessoas);
+			var salvarArquivo = Tools.GerarNomeArquivo($"CadastroPessoas_{estabelecimentoID}_OdontoCompany");
+			excelHelper.CriarExcelArquivo(salvarArquivo + ".xlsx", dataTablePessoas);
 		}
 
-		public DataRow ConvertExcelPessoasDentistas(HashSet<int> fichasCadastradas, DataRow dataRow, List<string> cabecalhos, List<string[]> linhas)
+		public DataTable ConvertExcelPessoasDentistas(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas)
 		{
 			try
 			{
 				foreach (string[] linha in linhas)
 				{
+					DataRow dataRow = dataTable.NewRow();
 					var valoresLinha = new Dictionary<string, string>();
 
 					for (int i = 0; i < cabecalhos.Count; i++)
@@ -115,43 +116,43 @@ namespace Migracao.Sistems
 
 					var codigo = valoresLinha.GetValueOrDefault("CODIGO");
 
-					if (fichasCadastradas.Contains(codigo.ToNum()))
-					{
-						var nome = valoresLinha.GetValueOrDefault("NOME");
-						var departamento = valoresLinha.GetValueOrDefault("DEPARTAMENTO");
-						var obs = valoresLinha.GetValueOrDefault("OBS");
-						var ativo = valoresLinha.GetValueOrDefault("ATIVO");
-						var nomeCompleto = valoresLinha.GetValueOrDefault("NOME_COMPLETO");
-						var email = valoresLinha.GetValueOrDefault("EMAIL");
-						var telefone = valoresLinha.GetValueOrDefault("TELEFONE");
-						var cro = valoresLinha.GetValueOrDefault("CRO");
-						var modificado = valoresLinha.GetValueOrDefault("MODIFICADO");
+					//if (fichasCadastradas.Contains(codigo.ToNum()))
+					var nome = valoresLinha.GetValueOrDefault("NOME");
+					var departamento = valoresLinha.GetValueOrDefault("DEPARTAMENTO");
+					var obs = valoresLinha.GetValueOrDefault("OBS");
+					var ativo = valoresLinha.GetValueOrDefault("ATIVO");
+					var nomeCompleto = valoresLinha.GetValueOrDefault("NOME_COMPLETO");
+					var email = valoresLinha.GetValueOrDefault("EMAIL");
+					var telefone = valoresLinha.GetValueOrDefault("TELEFONE");
+					var cro = valoresLinha.GetValueOrDefault("CRO");
+					var modificado = valoresLinha.GetValueOrDefault("MODIFICADO");
 
-						dataRow["NumFicha"] = codigo.ToNum();
-						dataRow["Ativo(S/N)"] = "S";
-						dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
-						dataRow["NomeSocial"] = "";
-						dataRow["Apelido"] = nome.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
-						//dataRow["Documento(CPF,CNPJ,CGC)"] = cgcCpf.ToCPF();
-						dataRow["DataCadastro(01/12/2024)"] = modificado.ToData();
-						dataRow["Observações"] = obs;
-						dataRow["Email"] = email.ToEmail();
-						//dataRow["RG"] = rg.GetPrimeirosCaracteres(20);
-						//dataRow["Sexo(M/F)"] = sexo.ToSexo("m", "f").ToSN();
-						//dataRow["NascimentoData"] = dataNascimento.ToData();
-						dataRow["NascimentoLocal"] = "";
-						dataRow["EstadoCivil(S/C/V)"] = "";
-						dataRow["Profissao"] = "";
-						dataRow["CargoNaClinica"] = "";
-						dataRow["Dentista(S/N)"] = "N";
-						dataRow["ConselhoCodigo"] = "";
-						dataRow["Paciente(S/N)"] = "N";
-						dataRow["Funcionario(S/N)"] = "S";
-						dataRow["Fornecedor(S/N)"] = "N";
-					}
+					dataRow["NumFicha"] = codigo.ToNum();
+					dataRow["Ativo(S/N)"] = "S";
+					dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+					dataRow["NomeSocial"] = "";
+					dataRow["Apelido"] = nome.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
+					//dataRow["Documento(CPF,CNPJ,CGC)"] = cgcCpf.ToCPF();
+					dataRow["DataCadastro(01/12/2024)"] = modificado.ToData();
+					dataRow["Observações"] = obs;
+					dataRow["Email"] = email.ToEmail();
+					//dataRow["RG"] = rg.GetPrimeirosCaracteres(20);
+					//dataRow["Sexo(M/F)"] = sexo.ToSexo("m", "f").ToSN();
+					//dataRow["NascimentoData"] = dataNascimento.ToData();
+					dataRow["NascimentoLocal"] = "";
+					dataRow["EstadoCivil(S/C/V)"] = "";
+					dataRow["Profissao"] = "";
+					dataRow["CargoNaClinica"] = "";
+					dataRow["Dentista(S/N)"] = "N";
+					dataRow["ConselhoCodigo"] = "";
+					dataRow["Paciente(S/N)"] = "N";
+					dataRow["Funcionario(S/N)"] = "S";
+					dataRow["Fornecedor(S/N)"] = "N";
+
+					dataTable.Rows.Add(dataRow);
 				}
 
-				return dataRow;
+				return dataTable;
 			}
 			catch (Exception error)
 			{
@@ -159,81 +160,80 @@ namespace Migracao.Sistems
 			}
 		}
 
-		public DataRow ConvertExcelPessoasPacientes(HashSet<int> fichasCadastradas, DataRow dataRow, List<string> cabecalhos, List<string[]> linhas)
+		public DataTable ConvertExcelPessoasPacientes(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas)
 		{
 			try
 			{
 				foreach (string[] linha in linhas)
 				{
+					DataRow dataRow = dataTable.NewRow();
 					var valoresLinha = new Dictionary<string, string>();
 
 					for (int i = 0; i < cabecalhos.Count; i++)
 						if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
 							valoresLinha.Add(cabecalhos[i], linha[i]);
 
-					var numFicha = valoresLinha.GetValueOrDefault("NUM_FICHA");
+					//var numFicha = valoresLinha.GetValueOrDefault("NUM_FICHA");
+					var cliente = valoresLinha.GetValueOrDefault("CLIENTE");
+					var fornecedor = valoresLinha.GetValueOrDefault("FORNECEDOR");
+					var nome = valoresLinha.GetValueOrDefault("NOME");
+					var cgcCpf = valoresLinha.GetValueOrDefault("CGC_CPF");
+					var rg = valoresLinha.GetValueOrDefault("INSC_RG");
+					var sexo = valoresLinha.GetValueOrDefault("SEXO_M_F");
+					var email = valoresLinha.GetValueOrDefault("EMAIL");
+					var fone1 = valoresLinha.GetValueOrDefault("FONE1");
+					var fone2 = valoresLinha.GetValueOrDefault("FONE2");
+					var celular = valoresLinha.GetValueOrDefault("CELULAR");
+					var endereco = valoresLinha.GetValueOrDefault("ENDERECO");
+					var bairro = valoresLinha.GetValueOrDefault("BAIRRO");
+					var numEndereco = valoresLinha.GetValueOrDefault("NUM_ENDERECO");
+					var cidade = valoresLinha.GetValueOrDefault("CIDADE");
+					var estado = valoresLinha.GetValueOrDefault("ESTADO");
+					var cep = valoresLinha.GetValueOrDefault("CEP");
+					var obs = valoresLinha.GetValueOrDefault("OBS1");
+					var numConvenio = valoresLinha.GetValueOrDefault("NUM_CONVENIO");
+					var dataCadastro = valoresLinha.GetValueOrDefault("DT_CADASTRO");
+					var dataNascimento = valoresLinha.GetValueOrDefault("DT_NASCIMENTO");
 
-					if (fichasCadastradas.Contains(numFicha.ToNum()))
-					{
-						var cliente = valoresLinha.GetValueOrDefault("CLIENTE");
-						var fornecedor = valoresLinha.GetValueOrDefault("FORNECEDOR");
-						var nome = valoresLinha.GetValueOrDefault("NOME");
-						var cgcCpf = valoresLinha.GetValueOrDefault("CGC_CPF");
-						var rg = valoresLinha.GetValueOrDefault("INSC_RG");
-						var sexo = valoresLinha.GetValueOrDefault("SEXO_M_F");
-						var email = valoresLinha.GetValueOrDefault("EMAIL");
-						var fone1 = valoresLinha.GetValueOrDefault("FONE1");
-						var fone2 = valoresLinha.GetValueOrDefault("FONE2");
-						var celular = valoresLinha.GetValueOrDefault("CELULAR");
-						var endereco = valoresLinha.GetValueOrDefault("ENDERECO");
-						var bairro = valoresLinha.GetValueOrDefault("BAIRRO");
-						var numEndereco = valoresLinha.GetValueOrDefault("NUM_ENDERECO");
-						var cidade = valoresLinha.GetValueOrDefault("CIDADE");
-						var estado = valoresLinha.GetValueOrDefault("ESTADO");
-						var cep = valoresLinha.GetValueOrDefault("CEP");
-						var obs = valoresLinha.GetValueOrDefault("OBS1");
-						var numConvenio = valoresLinha.GetValueOrDefault("NUM_CONVENIO");
-						var dataCadastro = valoresLinha.GetValueOrDefault("DT_CADASTRO");
-						var dataNascimento = valoresLinha.GetValueOrDefault("DT_NASCIMENTO");
+					if (cliente != "S" && fornecedor != "S")
+						cliente = "S";
 
-						if (cliente != "S" && fornecedor != "S")
-							cliente = "S";
+					//dataRow["NumFicha"] = numFicha.ToNum();
+					dataRow["Ativo(S/N)"] = "S";
+					dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+					dataRow["NomeSocial"] = "";
+					dataRow["Apelido"] = nome.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
+					dataRow["Documento(CPF,CNPJ,CGC)"] = cgcCpf.ToCPF();
+					dataRow["DataCadastro(01/12/2024)"] = dataCadastro.ToData();
+					dataRow["Observações"] = obs;
+					dataRow["Email"] = email.ToEmail();
+					dataRow["RG"] = rg.GetPrimeirosCaracteres(20);
+					dataRow["Sexo(M/F)"] = sexo.ToSexo("m", "f").ToSN();
+					dataRow["NascimentoData"] = dataNascimento.ToData();
+					dataRow["NascimentoLocal"] = "";
+					dataRow["EstadoCivil(S/C/V)"] = "";
+					dataRow["Profissao"] = "";
+					dataRow["CargoNaClinica"] = "";
+					dataRow["Dentista(S/N)"] = "N";
+					dataRow["ConselhoCodigo"] = "";
+					dataRow["Paciente(S/N)"] = cliente;
+					dataRow["Funcionario(S/N)"] = "N";
+					dataRow["Fornecedor(S/N)"] = fornecedor;
+					dataRow["TelefonePrincipal"] = fone1.ToFone();
+					dataRow["Celular"] = celular.ToFone();
+					dataRow["TelefoneAlternativo"] = fone2.ToFone();
+					dataRow["Logradouro"] = endereco.PrimeiraLetraMaiuscula();
+					dataRow["LogradouroNum"] = numEndereco;
+					dataRow["Complemento"] = "";
+					dataRow["Bairro"] = bairro.PrimeiraLetraMaiuscula();
+					dataRow["Cidade"] = cidade;
+					dataRow["Estado(SP)"] = estado.ToUpper();
+					dataRow["CEP(00000-000)"] = cep.ToNum();
 
-						dataRow["NumFicha"] = numFicha.ToNum();
-						dataRow["Ativo(S/N)"] = "S";
-						dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
-						dataRow["NomeSocial"] = "";
-						dataRow["Apelido"] = nome.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
-						dataRow["Documento(CPF,CNPJ,CGC)"] = cgcCpf.ToCPF();
-						dataRow["DataCadastro(01/12/2024)"] = dataCadastro.ToData();
-						dataRow["Observações"] = obs;
-						dataRow["Email"] = email.ToEmail();
-						dataRow["RG"] = rg.GetPrimeirosCaracteres(20);
-						dataRow["Sexo(M/F)"] = sexo.ToSexo("m", "f").ToSN();
-						dataRow["NascimentoData"] = dataNascimento.ToData();
-						dataRow["NascimentoLocal"] = "";
-						dataRow["EstadoCivil(S/C/V)"] = "";
-						dataRow["Profissao"] = "";
-						dataRow["CargoNaClinica"] = "";
-						dataRow["Dentista(S/N)"] = "N";
-						dataRow["ConselhoCodigo"] = "";
-						dataRow["Paciente(S/N)"] = cliente;
-						dataRow["Funcionario(S/N)"] = "N";
-						dataRow["Fornecedor(S/N)"] = fornecedor;
-						dataRow["TelefonePrincipal"] = fone1.ToFone();
-						dataRow["Celular"] = celular.ToFone();
-						dataRow["TelefoneAlternativo"] = fone2.ToFone();
-						dataRow["Logradouro"] = endereco.PrimeiraLetraMaiuscula();
-						dataRow["LogradouroNum"] = numEndereco;
-						dataRow["Complemento"] = "";
-						dataRow["Bairro"] = bairro.PrimeiraLetraMaiuscula();
-						dataRow["Cidade"] = cidade;
-						dataRow["Estado(SP)"] = estado.ToUpper();
-						dataRow["CEP(00000-000)"] = cep.ToNum();
-					}
+					dataTable.Rows.Add(dataRow);
 				}
 
-				return dataRow;
+				return dataTable;
 			}
 			catch (Exception error)
 			{
@@ -850,7 +850,7 @@ namespace Migracao.Sistems
 					int cep = 0;
 					byte? estadoCivil = null;
 					bool sexo = true;
-					long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
+					long? telefonePrinc = null, telefoneAltern = null, telefoneComercial = null, telefoneOutro = null, celular = null;
 					string? nomeCompleto = null, documento = null, rg = null, email = null, apelido = null, nascimentoLocal = null, profissaoOutra = null, logradouro = "",
 						 complemento = null, bairro = null, logradouroNum = null, numcadastro = null, cidade = "", estado = null, observacao = null;
 
@@ -1046,7 +1046,7 @@ namespace Migracao.Sistems
 					int cep = 0;
 					byte? estadoCivil = null;
 					bool sexo = true;
-					long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
+					long? telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
 					string? nomeCompleto = null, documento = null, rg = null, email = null, apelido = null, nascimentoLocal = null, profissaoOutra = null, logradouro = "",
 						 complemento = null, bairro = null, logradouroNum = null, numcadastro = null, cidade = "", estado = null, observacao = null;
 
@@ -1243,7 +1243,7 @@ namespace Migracao.Sistems
 					DateTime dataNascimento = dataHoje, dataCadastro = dataHoje;
 					int cep = 0;
 					int? codigo = null;
-					long telefonePrinc = 0;
+					long? telefonePrinc = null;
 					string? nomeCompleto = null, departamento = null, cro = null, observacao = null, email = null;
 					string apelido = "", documento = "";
 
@@ -1411,7 +1411,7 @@ namespace Migracao.Sistems
 					DateTime dataNascimento = dataHoje, dataCadastro = dataHoje;
 					int cep = 0;
 					int? codigo = null;
-					long telefonePrinc = 0;
+					long? telefonePrinc = null;
 					string? nomeCompleto = null, departamento = null, cro = null, observacao = null, email = null;
 					string apelido = "";
 
@@ -1497,7 +1497,7 @@ namespace Migracao.Sistems
 								PermissaoModuloFinanceiro = false
 							});
 
-							if (telefonePrinc > 0)
+							if (telefonePrinc != null)
 								if (string.IsNullOrEmpty(arquivoFuncionariosAtuais)
 									|| (!string.IsNullOrEmpty(arquivoFuncionariosAtuais) && !excelHelper.PessoaFoneExists(nomeCompleto, telefonePrinc.ToString())))
 								{
@@ -1505,7 +1505,7 @@ namespace Migracao.Sistems
 									{
 										PessoaID = pessoaID,
 										FoneTipoID = (short)FoneTipos.Principal,
-										Telefone = telefonePrinc,
+										Telefone = (long)telefonePrinc,
 										DataInclusao = dataCadastro,
 										LoginID = loginID
 									});
@@ -1603,7 +1603,7 @@ namespace Migracao.Sistems
 					byte? estadoCivil = null;
 					bool sexo = true;
 					LogradouroTipos logradouroTipo = LogradouroTipos.Outros;
-					long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
+					long? telefonePrinc = null, telefoneAltern = null, telefoneComercial = null, telefoneOutro = null, celular = null;
 					string? nomeCompleto = null, documento = null, rg = null, email = null, apelido = null, nascimentoLocal = null, profissaoOutra = null, logradouro = "",
 						 complemento = null, bairro = null, logradouroNum = null, numcadastro = null, cidade = "", estado = null, observacao = null;
 
@@ -1732,52 +1732,52 @@ namespace Migracao.Sistems
 								});
 							}
 
-							if (celular > 0 && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, celular.ToString()))
+							if (celular != null && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, celular.ToString()))
 								fornecedorFones.Add(new FornecedorFone()
 								{
 									FornecedorID = indiceLinha,
 									FoneTipoID = (short)FoneTipos.Celular,
-									Telefone = celular,
+									Telefone = (long)celular,
 									DataInclusao = dataCadastro,
 									LoginID = loginID
 								});
 
-							if (telefonePrinc > 0 && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefonePrinc.ToString()))
+							if (telefonePrinc != null && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefonePrinc.ToString()))
 								fornecedorFones.Add(new FornecedorFone()
 								{
 									FornecedorID = indiceLinha,
 									FoneTipoID = (short)FoneTipos.Principal,
-									Telefone = telefonePrinc,
+									Telefone = (long)telefonePrinc,
 									DataInclusao = dataCadastro,
 									LoginID = loginID
 								});
 
-							if (telefoneAltern > 0 && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefoneAltern.ToString()))
+							if (telefoneAltern != null && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefoneAltern.ToString()))
 								fornecedorFones.Add(new FornecedorFone()
 								{
 									FornecedorID = indiceLinha,
 									FoneTipoID = (short)FoneTipos.Alternativo,
-									Telefone = telefoneAltern,
+									Telefone = (long)telefoneAltern,
 									DataInclusao = dataCadastro,
 									LoginID = loginID
 								});
 
-							if (telefoneComercial > 0 && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefoneComercial.ToString()))
+							if (telefoneComercial != null && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefoneComercial.ToString()))
 								fornecedorFones.Add(new FornecedorFone()
 								{
 									FornecedorID = indiceLinha,
 									FoneTipoID = (short)FoneTipos.Comercial,
-									Telefone = telefoneComercial,
+									Telefone = (long)telefoneComercial,
 									DataInclusao = dataCadastro,
 									LoginID = loginID
 								});
 
-							if (telefoneOutro > 0 && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefoneOutro.ToString()))
+							if (telefoneOutro != null && !excelHelper.ConsumidorEnderecoExists(documento, nomeCompleto, telefoneOutro.ToString()))
 								fornecedorFones.Add(new FornecedorFone()
 								{
 									FornecedorID = indiceLinha,
 									FoneTipoID = (short)FoneTipos.Outros,
-									Telefone = telefoneOutro,
+									Telefone = (long)telefoneOutro,
 									DataInclusao = dataCadastro,
 									LoginID = loginID
 								});
@@ -1900,7 +1900,7 @@ namespace Migracao.Sistems
 					byte? estadoCivil = null;
 					bool sexo = true;
 					LogradouroTipos logradouroTipo = LogradouroTipos.Outros;
-					long telefonePrinc = 0, telefoneAltern = 0, telefoneComercial = 0, telefoneOutro = 0, celular = 0;
+					long? telefonePrinc = null, telefoneAltern = null, telefoneComercial = null, telefoneOutro = null, celular = null;
 					string? nomeCompleto = null, documento = null, rg = null, email = null, apelido = null, nascimentoLocal = null, profissaoOutra = null, logradouro = "",
 						 complemento = null, bairro = null, logradouroNum = null, numcadastro = null, cidade = "", estado = null, observacao = null;
 
@@ -2038,57 +2038,57 @@ namespace Migracao.Sistems
 								}
 
 
-								if (celular > 0)
+								if (celular != null)
 									if (excelHelper.PessoaFoneExists(pessoaID, celular.ToString()) == false)
 										pessoaFones.Add(new PessoaFone()
 										{
 											PessoaID = pessoaID,
 											FoneTipoID = (short)FoneTipos.Celular,
-											Telefone = celular,
+											Telefone = (long)celular,
 											DataInclusao = dataCadastro,
 											LoginID = loginID
 										});
 
-								if (telefonePrinc > 0)
+								if (telefonePrinc != null)
 									if (excelHelper.PessoaFoneExists(pessoaID, telefonePrinc.ToString()) == false)
 										pessoaFones.Add(new PessoaFone()
 										{
 											PessoaID = pessoaID,
 											FoneTipoID = (short)FoneTipos.Principal,
-											Telefone = telefonePrinc,
+											Telefone = (long)telefonePrinc,
 											DataInclusao = dataCadastro,
 											LoginID = loginID
 										});
 
-								if (telefoneAltern > 0)
+								if (telefoneAltern != null)
 									if (excelHelper.PessoaFoneExists(pessoaID, telefoneAltern.ToString()) == false)
 										pessoaFones.Add(new PessoaFone()
 										{
 											PessoaID = pessoaID,
 											FoneTipoID = (short)FoneTipos.Alternativo,
-											Telefone = telefoneAltern,
+											Telefone = (long)telefoneAltern,
 											DataInclusao = dataCadastro,
 											LoginID = loginID
 										});
 
-								if (telefoneComercial > 0)
+								if (telefoneComercial != null)
 									if (excelHelper.PessoaFoneExists(pessoaID, telefoneComercial.ToString()) == false)
 										pessoaFones.Add(new PessoaFone()
 										{
 											PessoaID = pessoaID,
 											FoneTipoID = (short)FoneTipos.Comercial,
-											Telefone = telefoneComercial,
+											Telefone = (long)telefoneComercial,
 											DataInclusao = dataCadastro,
 											LoginID = loginID
 										});
 
-								if (telefoneOutro > 0)
+								if (telefoneOutro != null)
 									if (excelHelper.PessoaFoneExists(pessoaID, telefoneOutro.ToString()) == false)
 										pessoaFones.Add(new PessoaFone()
 										{
 											PessoaID = pessoaID,
 											FoneTipoID = (short)FoneTipos.Outros,
-											Telefone = telefoneOutro,
+											Telefone = (long)telefoneOutro,
 											DataInclusao = dataCadastro,
 											LoginID = loginID
 										});

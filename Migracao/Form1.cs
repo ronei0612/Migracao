@@ -43,7 +43,9 @@ namespace Migracao
 						if (comboBoxImportacao.Text.Equals("todos", StringComparison.CurrentCultureIgnoreCase))
 						{
 							var odontoCompany = new OdontoCompany();
-							odontoCompany.LerArquivos(listView1);
+							odontoCompany.LerArquivos(txtEstabelecimentoID.Text, listView1);
+
+							MessageBox.Show("Sucesso");
 						}
 
 						else if (comboBoxImportacao.Text.Equals("json", StringComparison.CurrentCultureIgnoreCase))
@@ -353,7 +355,8 @@ namespace Migracao
 		{
 			var openFileDialog = new OpenFileDialog();
 			if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "Todos")
-				openFileDialog.Filter = "Arquivo Excel |*.csv;*.xlsx";
+				openFileDialog.Filter = "Arquivo Excel |*.csv";
+			//openFileDialog.Filter = "Arquivo Excel |*.csv;*.xlsx";
 			else if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "JSON")
 				openFileDialog.Filter = "Arquivo Json |*.json";
 

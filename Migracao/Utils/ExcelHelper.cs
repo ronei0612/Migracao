@@ -744,9 +744,19 @@ namespace Migracao.Utils
 				reader.ReadLine();
 
 				string linha;
+				string proximaLinha = reader.ReadLine();
 
-				while ((linha = reader.ReadLine()) != null)
+				while (proximaLinha != null)
 				{
+					linha = proximaLinha;
+					proximaLinha = reader.ReadLine();
+
+					if (proximaLinha != null && !proximaLinha.StartsWith(separador.ToString()))
+					{
+						linha += proximaLinha;
+						proximaLinha = reader.ReadLine();
+					}
+
 					var valores = linha.Split(separador);
 					// Remover aspas duplas de cada valor na linha
 					for (int i = 0; i < valores.Length; i++)
@@ -757,6 +767,7 @@ namespace Migracao.Utils
 			}
 			return linhas;
 		}
+
 
 		// Método para obter os cabeçalhos do CSV
 		public static List<string> GetCabecalhosCSV(string filePath, char separador)

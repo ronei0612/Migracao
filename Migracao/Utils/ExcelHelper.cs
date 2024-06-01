@@ -744,17 +744,15 @@ namespace Migracao.Utils
 				reader.ReadLine();
 
 				string linha;
-				string[]? valores = null;
 
 				while ((linha = reader.ReadLine()) != null)
 				{
-					valores = linha.Split(separador);
+					var valores = linha.Split(separador);
 					// Remover aspas duplas de cada valor na linha
 					for (int i = 0; i < valores.Length; i++)
 						valores[i] = valores[i].Replace("\"", "");
 
-					if (valores != null && linha[0] == separador)					
-						linhas.Add(valores);
+					linhas.Add(valores);
 				}
 			}
 			return linhas;

@@ -164,80 +164,93 @@ namespace Migracao.Sistems
 		{
 			try
 			{
+				int linhaIndex = 0;
 				foreach (string[] linha in linhas)
 				{
-					DataRow dataRow = dataTable.NewRow();
-					var valoresLinha = new Dictionary<string, string>();
+					try
+					{
+						DataRow dataRow = dataTable.NewRow();
+						var valoresLinha = new Dictionary<string, string>();
 
-					for (int i = 0; i < cabecalhos.Count; i++)
-						if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
-							valoresLinha.Add(cabecalhos[i], linha[i]);
+						for (int i = 0; i < cabecalhos.Count; i++)
+						{
+							if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
+								valoresLinha.Add(cabecalhos[i], linha[i]);
+						}
 
-					//var numFicha = valoresLinha.GetValueOrDefault("NUM_FICHA");
-					var cliente = valoresLinha.GetValueOrDefault("CLIENTE");
-					var fornecedor = valoresLinha.GetValueOrDefault("FORNECEDOR");
-					var nome = valoresLinha.GetValueOrDefault("NOME");
-					var cgcCpf = valoresLinha.GetValueOrDefault("CGC_CPF");
-					var rg = valoresLinha.GetValueOrDefault("INSC_RG");
-					var sexo = valoresLinha.GetValueOrDefault("SEXO_M_F");
-					var email = valoresLinha.GetValueOrDefault("EMAIL");
-					var fone1 = valoresLinha.GetValueOrDefault("FONE1");
-					var fone2 = valoresLinha.GetValueOrDefault("FONE2");
-					var celular = valoresLinha.GetValueOrDefault("CELULAR");
-					var endereco = valoresLinha.GetValueOrDefault("ENDERECO");
-					var bairro = valoresLinha.GetValueOrDefault("BAIRRO");
-					var numEndereco = valoresLinha.GetValueOrDefault("NUM_ENDERECO");
-					var cidade = valoresLinha.GetValueOrDefault("CIDADE");
-					var estado = valoresLinha.GetValueOrDefault("ESTADO");
-					var cep = valoresLinha.GetValueOrDefault("CEP");
-					var obs = valoresLinha.GetValueOrDefault("OBS1");
-					var numConvenio = valoresLinha.GetValueOrDefault("NUM_CONVENIO");
-					var dataCadastro = valoresLinha.GetValueOrDefault("DT_CADASTRO");
-					var dataNascimento = valoresLinha.GetValueOrDefault("DT_NASCIMENTO");
+						//var numFicha = valoresLinha.GetValueOrDefault("NUM_FICHA");
+						var cliente = valoresLinha.GetValueOrDefault("CLIENTE");
+						var fornecedor = valoresLinha.GetValueOrDefault("FORNECEDOR");
+						var nome = valoresLinha.GetValueOrDefault("NOME");
+						var cgcCpf = valoresLinha.GetValueOrDefault("CGC_CPF");
+						var rg = valoresLinha.GetValueOrDefault("INSC_RG");
+						var sexo = valoresLinha.GetValueOrDefault("SEXO_M_F");
+						var email = valoresLinha.GetValueOrDefault("EMAIL");
+						var fone1 = valoresLinha.GetValueOrDefault("FONE1");
+						var fone2 = valoresLinha.GetValueOrDefault("FONE2");
+						var celular = valoresLinha.GetValueOrDefault("CELULAR");
+						var endereco = valoresLinha.GetValueOrDefault("ENDERECO");
+						var bairro = valoresLinha.GetValueOrDefault("BAIRRO");
+						var numEndereco = valoresLinha.GetValueOrDefault("NUM_ENDERECO");
+						var cidade = valoresLinha.GetValueOrDefault("CIDADE");
+						var estado = valoresLinha.GetValueOrDefault("ESTADO");
+						var cep = valoresLinha.GetValueOrDefault("CEP");
+						var obs = valoresLinha.GetValueOrDefault("OBS1");
+						var numConvenio = valoresLinha.GetValueOrDefault("NUM_CONVENIO");
+						var dataCadastro = valoresLinha.GetValueOrDefault("DT_CADASTRO");
+						var dataNascimento = valoresLinha.GetValueOrDefault("DT_NASCIMENTO");
 
-					if (cliente != "S" && fornecedor != "S")
-						cliente = "S";
+						if (cliente != "S" && fornecedor != "S")
+							cliente = "S";
 
-					//dataRow["NumFicha"] = numFicha.ToNum();
-					dataRow["Ativo(S/N)"] = "S";
-					dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
-					dataRow["NomeSocial"] = "";
-					dataRow["Apelido"] = nome.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
-					dataRow["Documento(CPF,CNPJ,CGC)"] = cgcCpf.ToCPF();
-					dataRow["DataCadastro(01/12/2024)"] = dataCadastro.ToData();
-					dataRow["Observações"] = obs;
-					dataRow["Email"] = email.ToEmail();
-					dataRow["RG"] = rg.GetPrimeirosCaracteres(20);
-					dataRow["Sexo(M/F)"] = sexo.ToSexo("m", "f").ToSN();
-					dataRow["NascimentoData"] = dataNascimento.ToData();
-					dataRow["NascimentoLocal"] = "";
-					dataRow["EstadoCivil(S/C/V)"] = "";
-					dataRow["Profissao"] = "";
-					dataRow["CargoNaClinica"] = "";
-					dataRow["Dentista(S/N)"] = "N";
-					dataRow["ConselhoCodigo"] = "";
-					dataRow["Paciente(S/N)"] = cliente;
-					dataRow["Funcionario(S/N)"] = "N";
-					dataRow["Fornecedor(S/N)"] = fornecedor;
-					dataRow["TelefonePrincipal"] = fone1.ToFone();
-					dataRow["Celular"] = celular.ToFone();
-					dataRow["TelefoneAlternativo"] = fone2.ToFone();
-					dataRow["Logradouro"] = endereco.PrimeiraLetraMaiuscula();
-					dataRow["LogradouroNum"] = numEndereco;
-					dataRow["Complemento"] = "";
-					dataRow["Bairro"] = bairro.PrimeiraLetraMaiuscula();
-					dataRow["Cidade"] = cidade;
-					dataRow["Estado(SP)"] = estado.ToUpper();
-					dataRow["CEP(00000-000)"] = cep.ToNum();
+						//dataRow["NumFicha"] = numFicha.ToNum();
+						dataRow["Ativo(S/N)"] = "S";
+						dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+						dataRow["NomeSocial"] = "";
+						dataRow["Apelido"] = nome.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
+						dataRow["Documento(CPF,CNPJ,CGC)"] = cgcCpf.ToCPF();
+						dataRow["DataCadastro(01/12/2024)"] = dataCadastro.ToData();
+						dataRow["Observações"] = obs;
+						dataRow["Email"] = email.ToEmail();
+						dataRow["RG"] = rg.GetPrimeirosCaracteres(20);
+						dataRow["Sexo(M/F)"] = sexo.ToSexo("m", "f").ToSN();
+						dataRow["NascimentoData"] = dataNascimento.ToData();
+						dataRow["NascimentoLocal"] = "";
+						dataRow["EstadoCivil(S/C/V)"] = "";
+						dataRow["Profissao"] = "";
+						dataRow["CargoNaClinica"] = "";
+						dataRow["Dentista(S/N)"] = "N";
+						dataRow["ConselhoCodigo"] = "";
+						dataRow["Paciente(S/N)"] = cliente;
+						dataRow["Funcionario(S/N)"] = "N";
+						dataRow["Fornecedor(S/N)"] = fornecedor;
+						dataRow["TelefonePrincipal"] = fone1.ToFone();
+						dataRow["Celular"] = celular.ToFone();
+						dataRow["TelefoneAlternativo"] = fone2.ToFone();
+						dataRow["Logradouro"] = endereco.PrimeiraLetraMaiuscula();
+						dataRow["LogradouroNum"] = numEndereco;
+						dataRow["Complemento"] = "";
+						dataRow["Bairro"] = bairro.PrimeiraLetraMaiuscula();
+						dataRow["Cidade"] = cidade;
+						dataRow["Estado(SP)"] = estado.ToUpper();
+						dataRow["CEP(00000-000)"] = cep.ToNum();
 
-					dataTable.Rows.Add(dataRow);
+						dataTable.Rows.Add(dataRow);
+					}
+
+					catch (Exception error)
+					{
+						throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
+					}
+
+					linhaIndex++;
 				}
 
 				return dataTable;
 			}
 			catch (Exception error)
 			{
-				throw new Exception(error.Message);
+				throw new Exception($"Erro ao converter Excel para Pessoas Pacientes: {error.Message}");
 			}
 		}
 

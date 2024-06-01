@@ -1,6 +1,7 @@
 ﻿using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Data;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Migracao.Utils
@@ -761,25 +762,23 @@ namespace Migracao.Utils
 				reader.ReadLine();
 
 				string linha;
-				string proximaLinha = reader.ReadLine();
+				List<string> valoresTemp = new List<string>();
 
-				while (proximaLinha != null)
+				while ((linha = reader.ReadLine()) != null)
 				{
-					linha = proximaLinha;
-					proximaLinha = reader.ReadLine();
-
-					if (proximaLinha != null && !proximaLinha.StartsWith(separador.ToString()))
-					{
-						linha += proximaLinha;
-						proximaLinha = reader.ReadLine();
-					}
-
 					var valores = linha.Split(separador);
 					// Remover aspas duplas de cada valor na linha
 					for (int i = 0; i < valores.Length; i++)
 						valores[i] = valores[i].Replace("\"", "");
 
-					linhas.Add(valores);
+					valoresTemp.AddRange(valores);
+
+					// Se a quantidade de valores for igual à quantidade de cabeçalhos, adicione à lista de linhas
+					if (valoresTemp.Count == cabecalhos)
+					{
+						linhas.Add(valoresTemp.ToArray());
+						valoresTemp.Clear();
+					}
 				}
 			}
 			return linhas;

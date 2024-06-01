@@ -141,18 +141,17 @@ namespace Migracao.Sistems
 						if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
 							valoresLinha.Add(cabecalhos[i], linha[i]);
 
-					var codigo = valoresLinha.GetValueOrDefault("CODIGO");
-
 					//if (fichasCadastradas.Contains(codigo.ToNum()))
-					var nome = valoresLinha.GetValueOrDefault("NOME");
-					var departamento = valoresLinha.GetValueOrDefault("DEPARTAMENTO");
-					var obs = valoresLinha.GetValueOrDefault("OBS");
-					var ativo = valoresLinha.GetValueOrDefault("ATIVO");
-					var nomeCompleto = valoresLinha.GetValueOrDefault("NOME_COMPLETO");
-					var email = valoresLinha.GetValueOrDefault("EMAIL");
-					var telefone = valoresLinha.GetValueOrDefault("TELEFONE");
-					var cro = valoresLinha.GetValueOrDefault("CRO");
-					var modificado = valoresLinha.GetValueOrDefault("MODIFICADO");
+					var codigo = valoresLinha.GetValueOrDefault("CODIGO").Trim();
+					var nome = valoresLinha.GetValueOrDefault("NOME").Trim();
+					var departamento = valoresLinha.GetValueOrDefault("DEPARTAMENTO").Trim();
+					var obs = valoresLinha.GetValueOrDefault("OBS").Trim();
+					var ativo = valoresLinha.GetValueOrDefault("ATIVO").Trim();
+					var nomeCompleto = valoresLinha.GetValueOrDefault("NOME_COMPLETO").Trim();
+					var email = valoresLinha.GetValueOrDefault("EMAIL").Trim();
+					var telefone = valoresLinha.GetValueOrDefault("TELEFONE").Trim();
+					var cro = valoresLinha.GetValueOrDefault("CRO").Trim();
+					var modificado = valoresLinha.GetValueOrDefault("MODIFICADO").Trim();
 
 					dataRow["NumFicha"] = codigo.ToNum();
 					dataRow["Ativo(S/N)"] = "S";
@@ -204,27 +203,27 @@ namespace Migracao.Sistems
 							if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
 								valoresLinha.Add(cabecalhos[i], linha[i]);
 
-						var numFicha = valoresLinha.GetValueOrDefault("NUM_FICHA");
-						var cliente = valoresLinha.GetValueOrDefault("CLIENTE");
-						var fornecedor = valoresLinha.GetValueOrDefault("FORNECEDOR");
-						var nome = valoresLinha.GetValueOrDefault("NOME");
-						var cgcCpf = valoresLinha.GetValueOrDefault("CGC_CPF");
-						var rg = valoresLinha.GetValueOrDefault("INSC_RG");
-						var sexo = valoresLinha.GetValueOrDefault("SEXO_M_F");
-						var email = valoresLinha.GetValueOrDefault("EMAIL");
-						var fone1 = valoresLinha.GetValueOrDefault("FONE1");
-						var fone2 = valoresLinha.GetValueOrDefault("FONE2");
-						var celular = valoresLinha.GetValueOrDefault("CELULAR");
-						var endereco = valoresLinha.GetValueOrDefault("ENDERECO");
-						var bairro = valoresLinha.GetValueOrDefault("BAIRRO");
-						var numEndereco = valoresLinha.GetValueOrDefault("NUM_ENDERECO");
-						var cidade = valoresLinha.GetValueOrDefault("CIDADE");
-						var estado = valoresLinha.GetValueOrDefault("ESTADO");
-						var cep = valoresLinha.GetValueOrDefault("CEP");
-						var obs = valoresLinha.GetValueOrDefault("OBS1");
-						var numConvenio = valoresLinha.GetValueOrDefault("NUM_CONVENIO");
-						var dataCadastro = valoresLinha.GetValueOrDefault("DT_CADASTRO");
-						var dataNascimento = valoresLinha.GetValueOrDefault("DT_NASCIMENTO");
+						var numFicha = valoresLinha.GetValueOrDefault("NUM_FICHA").Trim();
+						var cliente = valoresLinha.GetValueOrDefault("CLIENTE").Trim();
+						var fornecedor = valoresLinha.GetValueOrDefault("FORNECEDOR").Trim();
+						var nome = valoresLinha.GetValueOrDefault("NOME").Trim();
+						var cgcCpf = valoresLinha.GetValueOrDefault("CGC_CPF").Trim();
+						var rg = valoresLinha.GetValueOrDefault("INSC_RG").Trim();
+						var sexo = valoresLinha.GetValueOrDefault("SEXO_M_F").Trim();
+						var email = valoresLinha.GetValueOrDefault("EMAIL").Trim();
+						var fone1 = valoresLinha.GetValueOrDefault("FONE1").Trim();
+						var fone2 = valoresLinha.GetValueOrDefault("FONE2").Trim();
+						var celular = valoresLinha.GetValueOrDefault("CELULAR").Trim();
+						var endereco = valoresLinha.GetValueOrDefault("ENDERECO").Trim();
+						var bairro = valoresLinha.GetValueOrDefault("BAIRRO").Trim();
+						var numEndereco = valoresLinha.GetValueOrDefault("NUM_ENDERECO").Trim();
+						var cidade = valoresLinha.GetValueOrDefault("CIDADE").Trim();
+						var estado = valoresLinha.GetValueOrDefault("ESTADO").Trim();
+						var cep = valoresLinha.GetValueOrDefault("CEP").Trim();
+						var obs = valoresLinha.GetValueOrDefault("OBS1").Trim();
+						var numConvenio = valoresLinha.GetValueOrDefault("NUM_CONVENIO").Trim();
+						var dataCadastro = valoresLinha.GetValueOrDefault("DT_CADASTRO").Trim();
+						var dataNascimento = valoresLinha.GetValueOrDefault("DT_NASCIMENTO").Trim();
 
 						if (cliente != "S" && fornecedor != "S")
 							cliente = "S";

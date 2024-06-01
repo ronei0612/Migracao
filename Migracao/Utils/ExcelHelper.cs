@@ -331,6 +331,23 @@ namespace Migracao.Utils
             throw new Exception($"Coluna {columnName} não encontrada");
         }
 
+		public bool CidadeExists(string cidade, string estado)
+		{
+			if (string.IsNullOrEmpty(cidade))
+				return true;
+
+			cidade = Tools.RemoverAcentos(cidade).ToLower();
+
+			if (!string.IsNullOrWhiteSpace(cidade))
+			{
+				string key = cidade + "|" + estado.ToLower();
+				if (cidadeEstadoDict.ContainsKey(key))
+					return true;
+			}
+
+			return false;
+		}
+
 		public int GetCidadeID(string cidade, string estado)
 		{
 			cidade = Tools.RemoverAcentos(cidade).ToLower();

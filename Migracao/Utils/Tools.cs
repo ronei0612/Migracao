@@ -1,5 +1,4 @@
 ﻿using Migracao.Models;
-using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -40,6 +39,14 @@ namespace Migracao.Utils
 				return "";
 
 			return texto.Contains(' ') ? texto.Split(' ')[0] : texto;
+		}
+
+		public static string ToSN(this bool texto)
+		{
+			if (texto)
+				return "S";
+
+			return "N";
 		}
 
 		public static string? ToEmail(this string email)

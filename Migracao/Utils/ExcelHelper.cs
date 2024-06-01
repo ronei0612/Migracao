@@ -1,14 +1,13 @@
 ﻿using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-using System.Text;
+using System.Data;
 using System.Text.RegularExpressions;
-using static OfficeOpenXml.ExcelErrorValue;
 
 namespace Migracao.Utils
 {
     internal class ExcelHelper
     {
-        private ISheet sheet;
+		private ISheet sheet;
 		private IWorkbook workbook;
 		public List<string> cabecalhos;
 		public List<IRow> linhas;
@@ -656,6 +655,35 @@ namespace Migracao.Utils
 			}
 
 			return nome;
+		}
+
+		public void CriarExcelArquivo(string nomeArquivo, DataTable dataTable)
+		{
+			IWorkbook workbook = new XSSFWorkbook();
+			ISheet sheet = workbook.CreateSheet("Planilha1");
+
+			// Adiciona os nomes das colunas ao arquivo Excel
+			IRow headerRow = sheet.CreateRow(0);
+			for (int j = 0; j < dataTable.Columns.Count; j++)
+			{
+				ICell cell = headerRow.CreateCell(j);
+				cell.SetCellValue(dataTable.Columns[j].ColumnName);
+			}
+
+			// Adiciona o DataTable ao arquivo Excel
+			for (int i = 0; i < dataTable.Rows.Count; i++)
+			{
+				IRow row = sheet.CreateRow(i + 1); // Começa na segunda linha, pois a primeira linha é para os nomes das colunas
+				for (int j = 0; j < dataTable.Columns.Count; j++)
+				{
+					ICell cell = row.CreateCell(j);
+					cell.SetCellValue(dataTable.Rows[i][j].ToString());
+				}
+			}
+
+			FileStream sw = File.Create(nomeArquivo);
+			workbook.Write(sw);
+			sw.Close();
 		}
 
 		public void CreateExcelFile(string salvarArquivo, List<string> cabecalhos, List<List<string>> dados)

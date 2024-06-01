@@ -363,7 +363,6 @@ namespace Migracao
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
 				foreach (var file in openFileDialog.FileNames)
 					listView1.Items.Add(file);
-			//listView1.Items.Add(openFileDialog.FileName);
 		}
 
 		private void Form1_Load(object sender, EventArgs e)

@@ -80,20 +80,29 @@ namespace Migracao.Sistems
 			{
 				if (File.Exists(item.Text))
 				{
-					Tuple<List<string[]>, List<string>> resultado = null;
-
-					if (Path.GetExtension(item.Text).Equals(".csv", StringComparison.CurrentCultureIgnoreCase))
-						resultado = LerArquivosExcelCsv(item.Text);
-					else if (Path.GetExtension(item.Text).Equals(".xlsx", StringComparison.CurrentCultureIgnoreCase))
-						resultado = LerArquivosExcelCsv(item.Text);
-
+					var resultado = LerArquivosExcelCsv(item.Text);
 					var linhasCSV = resultado.Item1;
 					var cabecalhosCSV = resultado.Item2;
 
-					if (EMD101_Pacientes.All(cabecalhosCSV.Contains))
+					if (Path.GetFileNameWithoutExtension(item.Text).Contains("EMD101"))
 						dataTablePessoas = ConvertExcelPessoasPacientes(dataTablePessoas, cabecalhosCSV, linhasCSV);
-					else if (CED006_Dentistas.All(cabecalhosCSV.Contains))
+					else if (Path.GetFileNameWithoutExtension(item.Text).Contains("CED006"))
 						dataTablePessoas = ConvertExcelPessoasDentistas(dataTablePessoas, cabecalhosCSV, linhasCSV);
+
+					//Tuple<List<string[]>, List<string>> resultado = null;
+
+					//if (Path.GetExtension(item.Text).Equals(".csv", StringComparison.CurrentCultureIgnoreCase))
+					//	resultado = LerArquivosExcelCsv(item.Text);
+					//else if (Path.GetExtension(item.Text).Equals(".xlsx", StringComparison.CurrentCultureIgnoreCase))
+					//	resultado = LerArquivosExcelCsv(item.Text);
+
+					//var linhasCSV = resultado.Item1;
+					//var cabecalhosCSV = resultado.Item2;
+
+					//if (EMD101_Pacientes.All(cabecalhosCSV.Contains))
+					//	dataTablePessoas = ConvertExcelPessoasPacientes(dataTablePessoas, cabecalhosCSV, linhasCSV);
+					//else if (CED006_Dentistas.All(cabecalhosCSV.Contains))
+					//	dataTablePessoas = ConvertExcelPessoasDentistas(dataTablePessoas, cabecalhosCSV, linhasCSV);
 				}
 			}
 
@@ -131,7 +140,7 @@ namespace Migracao.Sistems
 					dataRow["Ativo(S/N)"] = "S";
 					dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
 					dataRow["NomeSocial"] = "";
-					dataRow["Apelido"] = nome.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
+					dataRow["Apelido"] = nome.GetLetras().GetPrimeirosCaracteres(20).PrimeiraLetraMaiuscula();
 					//dataRow["Documento(CPF,CNPJ,CGC)"] = cgcCpf.ToCPF();
 					dataRow["DataCadastro(01/12/2024)"] = modificado.ToData();
 					dataRow["Observações"] = obs;
@@ -205,7 +214,7 @@ namespace Migracao.Sistems
 						dataRow["Ativo(S/N)"] = "S";
 						dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
 						dataRow["NomeSocial"] = "";
-						dataRow["Apelido"] = nome.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
+						dataRow["Apelido"] = nome.GetLetras().GetPrimeirosCaracteres(20).PrimeiraLetraMaiuscula();
 						dataRow["Documento(CPF,CNPJ,CGC)"] = cgcCpf.ToCPF();
 						dataRow["DataCadastro(01/12/2024)"] = dataCadastro.ToData();
 						dataRow["Observações"] = obs;

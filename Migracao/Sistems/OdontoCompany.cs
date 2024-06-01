@@ -57,12 +57,12 @@ namespace Migracao.Sistems
 			}
 		}
 
-		public Tuple<List<string[]>, List<string>> LerArquivosExcelCsv(string arquivo)
+		public Tuple<List<string[]>, List<string>> LerArquivosExcelCsv(string arquivo, System.Text.Encoding encoding)
 		{
 			var separador = ExcelHelper.DetectarSeparadorCSV(arquivo);
 
-			List<string[]> linhasCSV = ExcelHelper.GetLinhasCSV(arquivo, separador);
-			List<string> cabecalhosCSV = ExcelHelper.GetCabecalhosCSV(arquivo, separador);
+			List<string> cabecalhosCSV = ExcelHelper.GetCabecalhosCSV(arquivo, separador, encoding);
+			List<string[]> linhasCSV = ExcelHelper.GetLinhasCSV(arquivo, separador, cabecalhosCSV.Count(), encoding);
 
 			return new Tuple<List<string[]>, List<string>>(linhasCSV, cabecalhosCSV);
 		}
@@ -73,6 +73,18 @@ namespace Migracao.Sistems
 			DataTable dataTablePessoas = new();
 			//cadastroPaciente = new HashSet<int>();
 
+			if (File.Exists(arquivoExcelCidades))
+				try
+				{
+					var workbookCidades = excelHelper.LerExcel(arquivoExcelCidades);
+					var sheetCidades = workbookCidades.GetSheetAt(0);
+					excelHelper.InitializeDictionaryCidade(sheetCidades);
+				}
+				catch (Exception ex)
+				{
+					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
+				}
+
 			foreach (string coluna in cabecalhos_Pacientes)
 				dataTablePessoas.Columns.Add(coluna, typeof(string));
 
@@ -80,14 +92,20 @@ namespace Migracao.Sistems
 			{
 				if (File.Exists(item.Text))
 				{
-					var resultado = LerArquivosExcelCsv(item.Text);
-					var linhasCSV = resultado.Item1;
-					var cabecalhosCSV = resultado.Item2;
-
 					if (Path.GetFileNameWithoutExtension(item.Text).Contains("EMD101"))
+					{
+						var resultado = LerArquivosExcelCsv(item.Text, System.Text.Encoding.UTF8);
+						var linhasCSV = resultado.Item1;
+						var cabecalhosCSV = resultado.Item2;
 						dataTablePessoas = ConvertExcelPessoasPacientes(dataTablePessoas, cabecalhosCSV, linhasCSV);
+					}
 					else if (Path.GetFileNameWithoutExtension(item.Text).Contains("CED006"))
+					{
+						var resultado = LerArquivosExcelCsv(item.Text, System.Text.Encoding.UTF8);
+						var linhasCSV = resultado.Item1;
+						var cabecalhosCSV = resultado.Item2;
 						dataTablePessoas = ConvertExcelPessoasDentistas(dataTablePessoas, cabecalhosCSV, linhasCSV);
+					}
 
 					//Tuple<List<string[]>, List<string>> resultado = null;
 
@@ -171,6 +189,7 @@ namespace Migracao.Sistems
 
 		public DataTable ConvertExcelPessoasPacientes(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas)
 		{
+			ExcelHelper excelHelper = new();
 			try
 			{
 				int linhaIndex = 0;
@@ -185,7 +204,7 @@ namespace Migracao.Sistems
 							if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
 								valoresLinha.Add(cabecalhos[i], linha[i]);
 
-						//var numFicha = valoresLinha.GetValueOrDefault("NUM_FICHA");
+						var numFicha = valoresLinha.GetValueOrDefault("NUM_FICHA");
 						var cliente = valoresLinha.GetValueOrDefault("CLIENTE");
 						var fornecedor = valoresLinha.GetValueOrDefault("FORNECEDOR");
 						var nome = valoresLinha.GetValueOrDefault("NOME");
@@ -209,6 +228,9 @@ namespace Migracao.Sistems
 
 						if (cliente != "S" && fornecedor != "S")
 							cliente = "S";
+
+						if (!excelHelper.CidadeExists(cidade.PrimeiraLetraMaiuscula(), estado))
+							cidade = cidade.EncontrarCidadeSemelhante();
 
 						//dataRow["NumFicha"] = numFicha.ToNum();
 						dataRow["Ativo(S/N)"] = "S";
@@ -238,7 +260,7 @@ namespace Migracao.Sistems
 						dataRow["LogradouroNum"] = numEndereco;
 						dataRow["Complemento"] = "";
 						dataRow["Bairro"] = bairro.PrimeiraLetraMaiuscula();
-						dataRow["Cidade"] = cidade;
+						dataRow["Cidade"] = cidade.EncontrarCidadeSemelhante();
 						dataRow["Estado(SP)"] = estado.ToUpper();
 						dataRow["CEP(00000-000)"] = cep.ToNum();
 

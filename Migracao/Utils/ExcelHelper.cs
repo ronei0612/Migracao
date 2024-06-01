@@ -737,10 +737,10 @@ namespace Migracao.Utils
 			}
 		}
 
-		public static List<string[]> LerCSV(string filePath, char separador)
+		public static List<string[]> LerCSV(string filePath, char separador, Encoding encoding)
 		{
 			var linhas = new List<string[]>();
-			using (var reader = new StreamReader(filePath, System.Text.Encoding.UTF7))
+			using (var reader = new StreamReader(filePath, encoding))
 			{
 				string linha;
 				while ((linha = reader.ReadLine()) != null)
@@ -752,10 +752,10 @@ namespace Migracao.Utils
 			return linhas;
 		}
 
-		public static List<string[]> GetLinhasCSV(string filePath, char separador)
+		public static List<string[]> GetLinhasCSV(string filePath, char separador, int cabecalhos, Encoding encoding)
 		{
 			var linhas = new List<string[]>();
-			using (var reader = new StreamReader(filePath, System.Text.Encoding.UTF7))
+			using (var reader = new StreamReader(filePath, encoding))
 			{
 				// Ignora a primeira linha (cabeçalho)
 				reader.ReadLine();
@@ -787,9 +787,9 @@ namespace Migracao.Utils
 
 
 		// Método para obter os cabeçalhos do CSV
-		public static List<string> GetCabecalhosCSV(string filePath, char separador)
+		public static List<string> GetCabecalhosCSV(string filePath, char separador, Encoding encoding)
 		{
-			List<string[]> linhas = LerCSV(filePath, separador);
+			List<string[]> linhas = LerCSV(filePath, separador, encoding);
 			if (linhas.Count > 0)
 			{
 				return linhas[0].Select(cabecalho => cabecalho.Replace("\"", "")).ToList(); // Remove aspas duplas e pega a Primeira linha que é o cabeçalho

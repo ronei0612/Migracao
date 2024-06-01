@@ -173,10 +173,8 @@ namespace Migracao.Sistems
 						var valoresLinha = new Dictionary<string, string>();
 
 						for (int i = 0; i < cabecalhos.Count; i++)
-						{
 							if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
 								valoresLinha.Add(cabecalhos[i], linha[i]);
-						}
 
 						//var numFicha = valoresLinha.GetValueOrDefault("NUM_FICHA");
 						var cliente = valoresLinha.GetValueOrDefault("CLIENTE");

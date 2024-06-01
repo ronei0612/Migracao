@@ -84,27 +84,19 @@ namespace Migracao.Utils
 			if (string.IsNullOrEmpty(texto))
 				return DateTime.Now;
 
-			try
+			DateTime dataMinima = new(1900, 01, 01), dataMaxima = new(2079, 06, 06), dataHoje = DateTime.Now, data;
+
+			if (DateTime.TryParse(texto, out data))
 			{
-				DateTime dataMinima = new(1900, 01, 01), dataMaxima = new(2079, 06, 06), dataHoje = DateTime.Now, data;
-
-				if (DateTime.TryParse(texto, out data))
-				{
-				}
-				else if (double.TryParse(texto, out double codigoData))
-					data = DateTime.FromOADate(codigoData);
-				else
-					throw new Exception("Erro na conversão de data");
-				if ((data >= dataMinima && data <= dataMaxima) == false)
-					data = dataHoje;
-
-				return data;
-			} catch (Exception e)
-			{
-
 			}
+			else if (double.TryParse(texto, out double codigoData))
+				data = DateTime.FromOADate(codigoData);
+			else
+				throw new Exception("Erro na conversão de data");
+			if ((data >= dataMinima && data <= dataMaxima) == false)
+				data = dataHoje;
 
-			return DateTime.Now;
+			return data;
 		}
 
 		public static int ToNum(this string texto)

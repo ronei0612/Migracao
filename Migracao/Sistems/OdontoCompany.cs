@@ -86,57 +86,67 @@ namespace Migracao.Sistems
 		{
 			try
 			{
+				int linhaIndex = 0;
 				foreach (string[] linha in linhas)
 				{
-					DataRow dataRow = dataTable.NewRow();
-					var valoresLinha = new Dictionary<string, string>();
+					try
+					{
+						DataRow dataRow = dataTable.NewRow();
+						var valoresLinha = new Dictionary<string, string>();
 
-					for (int i = 0; i < cabecalhos.Count; i++)
-						if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
-							valoresLinha.Add(cabecalhos[i], linha[i]);
+						for (int i = 0; i < cabecalhos.Count; i++)
+							if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
+								valoresLinha.Add(cabecalhos[i], linha[i]);
 
-					//if (fichasCadastradas.Contains(codigo.ToNum()))
-					var codigo = valoresLinha.GetValueOrDefault("CODIGO").Trim();
-					var nome = valoresLinha.GetValueOrDefault("NOME").Trim();
-					var departamento = valoresLinha.GetValueOrDefault("DEPARTAMENTO").Trim();
-					var obs = valoresLinha.GetValueOrDefault("OBS").Trim();
-					var ativo = valoresLinha.GetValueOrDefault("ATIVO").Trim();
-					var nomeCompleto = valoresLinha.GetValueOrDefault("NOME_COMPLETO").Trim();
-					var email = valoresLinha.GetValueOrDefault("EMAIL").Trim();
-					var telefone = valoresLinha.GetValueOrDefault("TELEFONE").Trim();
-					var cro = valoresLinha.GetValueOrDefault("CRO").Trim();
-					var modificado = valoresLinha.GetValueOrDefault("MODIFICADO").Trim();
+						//if (fichasCadastradas.Contains(codigo.ToNum()))
+						var codigo = valoresLinha.GetValueOrDefault("CODIGO").Trim();
+						var nome = valoresLinha.GetValueOrDefault("NOME").Trim();
+						var departamento = valoresLinha.GetValueOrDefault("DEPARTAMENTO").Trim();
+						var obs = valoresLinha.GetValueOrDefault("OBS").Trim();
+						var ativo = valoresLinha.GetValueOrDefault("ATIVO").Trim();
+						var nomeCompleto = valoresLinha.GetValueOrDefault("NOME_COMPLETO").Trim();
+						var email = valoresLinha.GetValueOrDefault("EMAIL").Trim();
+						var telefone = valoresLinha.GetValueOrDefault("TELEFONE").Trim();
+						var cro = valoresLinha.GetValueOrDefault("CRO").Trim();
+						var modificado = valoresLinha.GetValueOrDefault("MODIFICADO").Trim();
 
-					dataRow["Codigo"] = codigo.ToNum();
-					dataRow["Ativo(S/N)"] = "S";
-					dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
-					dataRow["NomeSocial"] = "";
-					dataRow["Apelido"] = nome.GetLetras().GetPrimeirosCaracteres(20).PrimeiraLetraMaiuscula();
-					//dataRow["Documento(CPF,CNPJ,CGC)"] = cgcCpf.ToCPF();
-					dataRow["DataCadastro(01/12/2024)"] = modificado.ToData();
-					dataRow["Observações"] = obs;
-					dataRow["Email"] = email.ToEmail();
-					//dataRow["RG"] = rg.GetPrimeirosCaracteres(20);
-					//dataRow["Sexo(M/F)"] = sexo.ToSexo("m", "f").ToSN();
-					//dataRow["NascimentoData"] = dataNascimento.ToData();
-					dataRow["NascimentoLocal"] = "";
-					dataRow["EstadoCivil(S/C/V)"] = "";
-					dataRow["Profissao"] = "";
-					dataRow["CargoNaClinica"] = "";
-					dataRow["Dentista(S/N)"] = "N";
-					dataRow["ConselhoCodigo"] = "";
-					dataRow["Paciente(S/N)"] = "N";
-					dataRow["Funcionario(S/N)"] = "S";
-					dataRow["Fornecedor(S/N)"] = "N";
+						dataRow["Codigo"] = codigo.ToNum();
+						dataRow["Ativo(S/N)"] = "S";
+						dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+						dataRow["NomeSocial"] = "";
+						dataRow["Apelido"] = nome.GetLetras().GetPrimeirosCaracteres(20).PrimeiraLetraMaiuscula();
+						//dataRow["Documento(CPF,CNPJ,CGC)"] = cgcCpf.ToCPF();
+						dataRow["DataCadastro(01/12/2024)"] = modificado.ToData();
+						dataRow["Observações"] = obs;
+						dataRow["Email"] = email.ToEmail();
+						//dataRow["RG"] = rg.GetPrimeirosCaracteres(20);
+						//dataRow["Sexo(M/F)"] = sexo.ToSexo("m", "f").ToSN();
+						//dataRow["NascimentoData"] = dataNascimento.ToData();
+						dataRow["NascimentoLocal"] = "";
+						dataRow["EstadoCivil(S/C/V)"] = "";
+						dataRow["Profissao"] = "";
+						dataRow["CargoNaClinica"] = "";
+						dataRow["Dentista(S/N)"] = "N";
+						dataRow["ConselhoCodigo"] = "";
+						dataRow["Paciente(S/N)"] = "N";
+						dataRow["Funcionario(S/N)"] = "S";
+						dataRow["Fornecedor(S/N)"] = "N";
 
-					dataTable.Rows.Add(dataRow);
+						dataTable.Rows.Add(dataRow);
+					}
+					catch (Exception error)
+					{
+						throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
+					}
+
+					linhaIndex++;
 				}
 
 				return dataTable;
 			}
 			catch (Exception error)
 			{
-				throw new Exception(error.Message);
+				throw new Exception($"Erro ao converter Excel para Pessoas Dentistas: {error.Message}");
 			}
 		}
 

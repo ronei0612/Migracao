@@ -11,14 +11,14 @@ namespace Migracao.Sistems
         string arquivoExcelCidades = "Files\\EnderecosCidades.xlsx";
 		string arquivoExcelNomesUTF8 = "Files\\NomesUTF8.xlsx";
 
-		string[] EMD101_Pacientes		= [ "BAIRRO", "CEP", "CGC_CPF", "CIDADE", "CLIENTE", "CELULAR", "DT_CADASTRO", "DT_NASCIMENTO", "EMAIL", "ENDERECO", "ESTADO", "FONE1", "FONE2", "FORNECEDOR", "INSC_RG", "NOME", "NUM_CONVENIO", "NUM_ENDERECO", "NUM_FICHA", "OBS1", "SEXO_M_F"];
-		string[] CRD111_Recebiveis		= [ "AGENCIA", "AGUARDANDO_VINCULO", "ALINEA", "AXON_ID", "BANCO", "BANDA1", "BANDA2", "BANDA3", "BAIXA", "CAMPOX", "COD_CAIXA", "CODIGO_TUSS", "CONTA", "CONTA_CORRENTE", "CONTA_DOCUMENTO", "COBRADORA", "COBRANCA", "DATA_ENV_CART", "DATA_ENV_SCPC", "DATA_REMESSA", "DATA_RET_CART", "DATA_RET_SCPC", "DESCONTO_BOLETO", "DEVOLUCAO", "DOCUMENTO", "DT_AXON", "DUPLICATA", "EMISSAO", "EMITENTE", "ENCARGOS", "FILIAL", "GEROU_TRANSMISSAO", "GRUPO", "ID_BAIXAPLANOS", "ID_PIX", "JUROS", "LANCTO", "LOCAL", "LOJA", "MODIFICADO", "MOTIVO", "MULTA", "NOME_GRUPO", "NOME_LOCAL", "NOSSONUMERO", "NUM_BANCO", "OBS", "ORDEM", "PARCELA", "PERIODO", "PRAZO", "REAPRESENTOU", "RECEBEU_TRANSMISSAO", "REMESA", "RESPONSAVEL", "SEQ_ALINEA11", "SITUACAO", "SITUACAO_REMESSA", "TERMINAL", "TIPO_COBRANCA", "TIPO_DOC", "TOTAL", "TRANSMISSAO", "USUARIO", "VALOR", "VALOR_ORIG", "VALOR_RECEBER", "VALOR_VENDA", "VENCTO", "VENCTO_ORIG", "VR_CALCULADO", "VR_PARCELA" ];
-		string[] CXD555_Baixa			= [ "AGENCIA", "BANCO", "BAIXA", "CALCULO", "CNPJ_CPF", "CONTA", "DATA", "DOCUMENTO", "DT_AXON", "DT_DEPOSITO", "FECHAR_DIRETO", "FICHA_FINANCEIRO", "HISTORICO", "HORA", "LANCTO", "LOJA", "LOTE", "MODIFICADO", "NUM_CONVENIO", "OBS1", "OBS2", "OBS3", "PERIODO", "PRO_MED", "PRO_ODO", "RESPONSAVEL", "ROY_MED", "ROY_ODO", "TERMINAL", "TIPO", "TRANSMISSAO", "USUARIO", "VALOR", "VALOR_RECEBER", "VLR_BRUTO" ];
-		string[] BXD111_Baixa			= [ "AGUARDANDO_VINCULO", "AXON_ID", "BAIXA", "BANCO", "CAMPOX", "CGC_CPF", "COD_CAIXA", "CONTA_CORRENTE", "CONTA_DOCUMENTO", "DATA_REMESSA", "DOCUMENTO", "DT_AXON", "DUPLICATA", "GRUPO", "ID_BAIXAPLANOS", "LANCTO", "LOJA", "MODIFICADO", "MOTIVO", "NOME_GRUPO", "NUM_BANCO", "OBS", "PARCELA", "RESPONSAVEL", "TERMINAL", "TIPO_DOC", "TRANSMISSAO", "USUARIO", "VALOR", "VENCTO", "VR_CALCULADO", "VR_PARCELA" ];
-		string[] CED006_Dentistas		= [ "ADMISSAO", "AGENCIA", "AGENCIA2", "AXON_ID", "BAIRRO", "BANCO", "BANCO2", "CAIXA_POSTAL", "CEP", "CGC_CPF", "CIDADE", "CLIENTE", "CODIGO", "CODIGO_CLIENTE", "CODIGO_INDICACAO", "CODIGO_VALIDADE", "COD_MUNICIPIO", "COD_PRAMELHOR", "COD_UF", "COD_VENDEDOR", "CONJUGE", "CONTA", "CONTA2", "CPF_FIA", "CPF_INDICACAO", "DATA_APROVACAO_DRCASH", "DATA_BLOQUEIO", "DATA_DEP_EXCLUIDO", "DATA_LGPD", "DATA_VALIDADE", "DEPENDENTE", "DT_AXON", "DT_CADASTRO", "DT_NASC_FIA", "DT_NASCIMENTO", "DT_NASCIMENTO_DEP", "DT_ULTMOV", "EMAIL", "ENDERECO", "ENDERECO_FIA", "ESTADO", "ESTADO_FIA", "FAX", "FONE1", "FONE2", "FONE_FIA", "FONE_REF_1", "FONE_REF_2", "F_OU_J", "FORNECEDOR", "FUNCAO", "ID_DRCASH", "INSC_RG", "INSTITUTO_ODC", "LGPD_CPF", "LGPD_DATA_HORA", "LGPD_IMAGEM", "LGPD_MENSAGEM", "LGPD_TELEFONE", "LGPD_USUARIO", "LOJA", "MAE", "MODIFICADO", "NOME", "NOME_FIA", "NOME_GRUPO", "NOME_LOCAL", "NOME_REF_1", "NOME_REF_2", "NOME_VALIDADE", "NUM_BLOQUEIO", "NUM_CONVENIO", "NUM_ENDERECO", "NUM_FICHA", "OBS1", "OBS_VALIDADE", "ONDE_TRABALHA", "PAI", "PARENTESCO_FIA", "PRESTADOR", "PROFISSAO", "PROFISSAO_FIA", "PROTETICO", "PROTETICO_ATIVO", "QTDE_DEPENDENTES", "RENDA_FIA", "RENDA_MES", "RG_FIA", "SEXO_M_F", "TITULAR", "TITULAR_DEP_EXCLUIDO", "TRANSMISSAO", "USU_BLOQUEIO", "USU_CADASTRO", "USUARIO", "USUARIO_LGPD", "USUARIO_VALIDADE", "VALOR_MAXIMO_DRCASH", "VR_LIMITE" ];
+		string[] EMD101_Pacientes		= ["BAIRRO", "CEP", "CGC_CPF", "CIDADE", "CLIENTE", "CELULAR", "DT_CADASTRO", "DT_NASCIMENTO", "EMAIL", "ENDERECO", "ESTADO", "FONE1", "FONE2", "FORNECEDOR", "INSC_RG", "NOME", "NUM_CONVENIO", "NUM_ENDERECO", "NUM_FICHA", "OBS1", "SEXO_M_F"];
+		string[] CRD111_Recebiveis		= ["AGENCIA", "AGUARDANDO_VINCULO", "ALINEA", "AXON_ID", "BANCO", "BANDA1", "BANDA2", "BANDA3", "BAIXA", "CAMPOX", "COD_CAIXA", "CODIGO_TUSS", "CONTA", "CONTA_CORRENTE", "CONTA_DOCUMENTO", "COBRADORA", "COBRANCA", "DATA_ENV_CART", "DATA_ENV_SCPC", "DATA_REMESSA", "DATA_RET_CART", "DATA_RET_SCPC", "DESCONTO_BOLETO", "DEVOLUCAO", "DOCUMENTO", "DT_AXON", "DUPLICATA", "EMISSAO", "EMITENTE", "ENCARGOS", "FILIAL", "GEROU_TRANSMISSAO", "GRUPO", "ID_BAIXAPLANOS", "ID_PIX", "JUROS", "LANCTO", "LOCAL", "LOJA", "MODIFICADO", "MOTIVO", "MULTA", "NOME_GRUPO", "NOME_LOCAL", "NOSSONUMERO", "NUM_BANCO", "OBS", "ORDEM", "PARCELA", "PERIODO", "PRAZO", "REAPRESENTOU", "RECEBEU_TRANSMISSAO", "REMESA", "RESPONSAVEL", "SEQ_ALINEA11", "SITUACAO", "SITUACAO_REMESSA", "TERMINAL", "TIPO_COBRANCA", "TIPO_DOC", "TOTAL", "TRANSMISSAO", "USUARIO", "VALOR", "VALOR_ORIG", "VALOR_RECEBER", "VALOR_VENDA", "VENCTO", "VENCTO_ORIG", "VR_CALCULADO", "VR_PARCELA"];
+		string[] CXD555_Baixa			= ["AGENCIA", "BANCO", "BAIXA", "CALCULO", "CNPJ_CPF", "CONTA", "DATA", "DOCUMENTO", "DT_AXON", "DT_DEPOSITO", "FECHAR_DIRETO", "FICHA_FINANCEIRO", "HISTORICO", "HORA", "LANCTO", "LOJA", "LOTE", "MODIFICADO", "NUM_CONVENIO", "OBS1", "OBS2", "OBS3", "PERIODO", "PRO_MED", "PRO_ODO", "RESPONSAVEL", "ROY_MED", "ROY_ODO", "TERMINAL", "TIPO", "TRANSMISSAO", "USUARIO", "VALOR", "VALOR_RECEBER", "VLR_BRUTO"];
+		string[] BXD111_Baixa			= ["AGUARDANDO_VINCULO", "AXON_ID", "BAIXA", "BANCO", "CAMPOX", "CGC_CPF", "COD_CAIXA", "CONTA_CORRENTE", "CONTA_DOCUMENTO", "DATA_REMESSA", "DOCUMENTO", "DT_AXON", "DUPLICATA", "GRUPO", "ID_BAIXAPLANOS", "LANCTO", "LOJA", "MODIFICADO", "MOTIVO", "NOME_GRUPO", "NUM_BANCO", "OBS", "PARCELA", "RESPONSAVEL", "TERMINAL", "TIPO_DOC", "TRANSMISSAO", "USUARIO", "VALOR", "VENCTO", "VR_CALCULADO", "VR_PARCELA"];
+		string[] CED006_Dentistas		= ["ADMISSAO", "AGENCIA", "AGENCIA2", "AXON_ID", "BAIRRO", "BANCO", "BANCO2", "CAIXA_POSTAL", "CEP", "CGC_CPF", "CIDADE", "CLIENTE", "CODIGO", "CODIGO_CLIENTE", "CODIGO_INDICACAO", "CODIGO_VALIDADE", "COD_MUNICIPIO", "COD_PRAMELHOR", "COD_UF", "COD_VENDEDOR", "CONJUGE", "CONTA", "CONTA2", "CPF_FIA", "CPF_INDICACAO", "DATA_APROVACAO_DRCASH", "DATA_BLOQUEIO", "DATA_DEP_EXCLUIDO", "DATA_LGPD", "DATA_VALIDADE", "DEPENDENTE", "DT_AXON", "DT_CADASTRO", "DT_NASC_FIA", "DT_NASCIMENTO", "DT_NASCIMENTO_DEP", "DT_ULTMOV", "EMAIL", "ENDERECO", "ENDERECO_FIA", "ESTADO", "ESTADO_FIA", "FAX", "FONE1", "FONE2", "FONE_FIA", "FONE_REF_1", "FONE_REF_2", "F_OU_J", "FORNECEDOR", "FUNCAO", "ID_DRCASH", "INSC_RG", "INSTITUTO_ODC", "LGPD_CPF", "LGPD_DATA_HORA", "LGPD_IMAGEM", "LGPD_MENSAGEM", "LGPD_TELEFONE", "LGPD_USUARIO", "LOJA", "MAE", "MODIFICADO", "NOME", "NOME_FIA", "NOME_GRUPO", "NOME_LOCAL", "NOME_REF_1", "NOME_REF_2", "NOME_VALIDADE", "NUM_BLOQUEIO", "NUM_CONVENIO", "NUM_ENDERECO", "NUM_FICHA", "OBS1", "OBS_VALIDADE", "ONDE_TRABALHA", "PAI", "PARENTESCO_FIA", "PRESTADOR", "PROFISSAO", "PROFISSAO_FIA", "PROTETICO", "PROTETICO_ATIVO", "QTDE_DEPENDENTES", "RENDA_FIA", "RENDA_MES", "RG_FIA", "SEXO_M_F", "TITULAR", "TITULAR_DEP_EXCLUIDO", "TRANSMISSAO", "USU_BLOQUEIO", "USU_CADASTRO", "USUARIO", "USUARIO_LGPD", "USUARIO_VALIDADE", "VALOR_MAXIMO_DRCASH", "VR_LIMITE"];
 
-		List<string> cabecalhos_Pacientes = [ "Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
-		List<string> cabecalhos_Recebiveis = [ "Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
+		List<string> cabecalhos_Pacientes = ["Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
+		List<string> cabecalhos_Recebiveis = ["CPF", "Emitente", "DocumentoRef", "Valor", "Prazo", "Vencimento(01/12/2010)", "Emissão(01/12/2010)", "Recebível(S/N)", "Exigível(S/N)"];
 		HashSet<string> cadastroPaciente, cadastroRecebivel;
 
 		public Tuple<List<string[]>, List<string>> LerArquivosExcelCsv(string arquivo, Encoding encoding)
@@ -79,7 +79,99 @@ namespace Migracao.Sistems
 			var salvarArquivo = Tools.GerarNomeArquivo($"CadastroPessoas_{estabelecimentoID}_OdontoCompany");
 			excelHelper.CriarExcelArquivo(salvarArquivo + ".xlsx", dataTablePessoas);
 
-			
+
+
+			var excel_CRD111 = listView.Items.Cast<ListViewItem>()
+				.FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("CRD111")));
+			if (excel_CRD111 != null)
+			{
+				var resultado = LerArquivosExcelCsv(excel_CRD111.Text, Encoding.UTF8);
+				var linhasCSV = resultado.Item1;
+				var cabecalhosCSV = resultado.Item2;
+				dataTableRecebiveis = ConvertExcelRecebiveis(dataTableRecebiveis, cabecalhosCSV, linhasCSV);
+			}
+
+			var excel_BXD111 = listView.Items.Cast<ListViewItem>()
+				.FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("BXD111")));
+			if (excel_BXD111 != null)
+			{
+				var resultado = LerArquivosExcelCsv(excel_BXD111.Text, Encoding.UTF8);
+				var linhasCSV = resultado.Item1;
+				var cabecalhosCSV = resultado.Item2;
+				dataTableRecebiveis = ConvertExcelRecebiveis(dataTableRecebiveis, cabecalhosCSV, linhasCSV);
+			}
+
+			var excel_CXD555 = listView.Items.Cast<ListViewItem>()
+				.FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("CXD555")));
+			if (excel_CXD555 != null)
+			{
+				var resultado = LerArquivosExcelCsv(excel_CXD555.Text, Encoding.UTF8);
+				var linhasCSV = resultado.Item1;
+				var cabecalhosCSV = resultado.Item2;
+				dataTableRecebiveis = ConvertExcelRecebiveis(dataTableRecebiveis, cabecalhosCSV, linhasCSV);
+			}
+
+			salvarArquivo = Tools.GerarNomeArquivo($"CadastroRecebiveis_{estabelecimentoID}_OdontoCompany");
+			excelHelper.CriarExcelArquivo(salvarArquivo + ".xlsx", dataTableRecebiveis);
+		}
+
+		//else if (comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
+		//	nomeArquivoExcel = "CED001";
+		//else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
+		//	nomeArquivoExcel = "AGENDA";
+
+		public DataTable ConvertExcelRecebiveis(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas)
+		{
+			try
+			{
+				int linhaIndex = 0;
+				foreach (string[] linha in linhas)
+				{
+					try
+					{
+						DataRow dataRow = dataTable.NewRow();
+						var valoresLinha = new Dictionary<string, string>();
+
+						for (int i = 0; i < cabecalhos.Count; i++)
+							if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
+								valoresLinha.Add(cabecalhos[i], linha[i]);
+
+						//"CGC_CPF"|"EMITENTE"|"DOCUMENTO"|"VALOR"|"PRAZO"|"VENCTO"|"EMISSAO"|"CONTA"|"BANCO"|"AGENCIA"|"TIPO_DOC"|"PERIODO"|"FILIAL"|"OBS"|"CAMPOX"|"BANDA1"|"BANDA2"|"BANDA3"|"TRANSMISSAO"|"SITUACAO"|"GEROU_TRANSMISSAO"|"RECEBEU_TRANSMISSAO"|"ALINEA"|"DEVOLUCAO"|"REAPRESENTOU"|"SEQ_ALINEA11"|"LOTE"|"BAIXA"|"CHEQUE_BAIXA"|"DESCONTOS"|"JUROS"|"NOSSONUMERO"|"RESPONSAVEL"|"TOTAL"|"MULTA"|"DUPLICATA"|"PARCELA"|"ENCARGOS"|"VALOR_VENDA"|"LOJA"|"USUARIO"|"MODIFICADO"|"DATA_ENV_CART"|"DATA_RET_CART"|"DATA_ENV_SCPC"|"DATA_RET_SCPC"|"TERMINAL"|"VENCTO_ORIG"|"VALOR_ORIG"|"CHEQUE"|"TITULO"|"GRUPO"|"NOME_GRUPO"|"MOTIVO"|"REMESSA"|"NUM_BANCO"|"TIPO_COBRANCA"|"ORDEM"|"LOCAL"|"NOME_LOCAL"|"CALC_JUROS"|"COBRADORA"|"COBRANCA"|"DATA_REMESSA"|"SITUACAO_REMESSA"|"NSU_TRANSACAO"|"CONTROLE_CARTAO"|"DESCONTO_BOLETO"|"ID_PIX"|"DT_AXON"|"AXON_ID"|"CODIGO_TUSS"
+						//if (fichasCadastradas.Contains(codigo.ToNum()))
+						var cpf = valoresLinha.GetValueOrDefault("CGC_CPF").Trim();
+						var emitente = valoresLinha.GetValueOrDefault("EMITENTE").Trim();
+						var documento = valoresLinha.GetValueOrDefault("DOCUMENTO").Trim();
+						var valor = valoresLinha.GetValueOrDefault("VALOR").Trim();
+						var prazo = valoresLinha.GetValueOrDefault("PRAZO").Trim();
+						var vencimentoData = valoresLinha.GetValueOrDefault("VENCTO").Trim();
+						var emissaoData = valoresLinha.GetValueOrDefault("EMISSAO").Trim();
+
+						dataRow["CPF"] = cpf.ToCPF();
+						dataRow["Emitente"] = emitente;
+						dataRow["DocumentoRef"] = documento;
+						dataRow["Valor"] = valor.ArredondarValorV2();
+						dataRow["Prazo"] = prazo;
+						dataRow["Vencimento(01/12/2010)"] = vencimentoData.ToData();
+						dataRow["Emissão(01/12/2010)"] = emissaoData.ToData();
+						dataRow["Recebível(S/N)"] = "S";
+						dataRow["Exigível(S/N)"] = "";
+
+						dataTable.Rows.Add(dataRow);
+					}
+					catch (Exception error)
+					{
+						throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
+					}
+
+					linhaIndex++;
+				}
+
+				return dataTable;
+			}
+			catch (Exception error)
+			{
+				throw new Exception($"Erro ao converter Excel para Pessoas Dentistas: {error.Message}");
+			}
 		}
 
 		public DataTable ConvertExcelPessoasDentistas(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas)

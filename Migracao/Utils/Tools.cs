@@ -380,6 +380,17 @@ namespace Migracao.Utils
 			return d[s.Length, t.Length];
 		}
 
+		public static decimal ArredondarValorV2(this string input)
+		{
+			if (input.Contains('.'))
+				input = input.Replace(".", ",");
+
+			if (decimal.TryParse(input, out decimal valorDecimal))
+				return Math.Round(valorDecimal, 2);
+
+			return 0;
+		}
+
 		public static decimal ArredondarValor(this string input)
 		{
 			if (input.Contains('.') && input.Contains(',') == false)

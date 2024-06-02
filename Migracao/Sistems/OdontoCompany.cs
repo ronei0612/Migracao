@@ -10,7 +10,7 @@ namespace Migracao.Sistems
         string arquivoExcelCidades = "Files\\EnderecosCidades.xlsx";
 		string arquivoExcelNomesUTF8 = "Files\\NomesUTF8.xlsx";
 
-		string[] EMD101_Pacientes		= { "BAIRRO", "CEP", "CGC_CPF", "CIDADE", "CLIENTE", "CELULAR", "DT_CADASTRO", "DT_NASCIMENTO", "EMAIL", "ENDERECO", "ESTADO", "FONE1", "FONE2", "FORNECEDOR", "INSC_RG", "NOME", "NUM_CONVENIO", "NUM_ENDERECO", "NUM_FICHA", "OBS1", "SEXO_M_F" };
+		string[] EMD101_Pacientes		= { "BAIRRO", "CEP", "CGC_CPF", "CIDADE", "CLIENTE", "CELULAR", "CODIGO", "DT_CADASTRO", "DT_NASCIMENTO", "EMAIL", "ENDERECO", "ESTADO", "FONE1", "FONE2", "FORNECEDOR", "INSC_RG", "NOME", "NUM_CONVENIO", "NUM_ENDERECO", "OBS1", "SEXO_M_F" };
 		string[] CRD111_Recebiveis		= { "AGENCIA", "AGUARDANDO_VINCULO", "ALINEA", "AXON_ID", "BANCO", "BANDA1", "BANDA2", "BANDA3", "BAIXA", "CAMPOX", "COD_CAIXA", "CODIGO_TUSS", "CONTA", "CONTA_CORRENTE", "CONTA_DOCUMENTO", "COBRADORA", "COBRANCA", "DATA_ENV_CART", "DATA_ENV_SCPC", "DATA_REMESSA", "DATA_RET_CART", "DATA_RET_SCPC", "DESCONTO_BOLETO", "DEVOLUCAO", "DOCUMENTO", "DT_AXON", "DUPLICATA", "EMISSAO", "EMITENTE", "ENCARGOS", "FILIAL", "GEROU_TRANSMISSAO", "GRUPO", "ID_BAIXAPLANOS", "ID_PIX", "JUROS", "LANCTO", "LOCAL", "LOJA", "MODIFICADO", "MOTIVO", "MULTA", "NOME_GRUPO", "NOME_LOCAL", "NOSSONUMERO", "NUM_BANCO", "OBS", "ORDEM", "PARCELA", "PERIODO", "PRAZO", "REAPRESENTOU", "RECEBEU_TRANSMISSAO", "REMESA", "RESPONSAVEL", "SEQ_ALINEA11", "SITUACAO", "SITUACAO_REMESSA", "TERMINAL", "TIPO_COBRANCA", "TIPO_DOC", "TOTAL", "TRANSMISSAO", "USUARIO", "VALOR", "VALOR_ORIG", "VALOR_RECEBER", "VALOR_VENDA", "VENCTO", "VENCTO_ORIG", "VR_CALCULADO", "VR_PARCELA" };
 		string[] CXD555_Baixa			= { "AGENCIA", "BANCO", "BAIXA", "CALCULO", "CNPJ_CPF", "CONTA", "DATA", "DOCUMENTO", "DT_AXON", "DT_DEPOSITO", "FECHAR_DIRETO", "FICHA_FINANCEIRO", "HISTORICO", "HORA", "LANCTO", "LOJA", "LOTE", "MODIFICADO", "NUM_CONVENIO", "OBS1", "OBS2", "OBS3", "PERIODO", "PRO_MED", "PRO_ODO", "RESPONSAVEL", "ROY_MED", "ROY_ODO", "TERMINAL", "TIPO", "TRANSMISSAO", "USUARIO", "VALOR", "VALOR_RECEBER", "VLR_BRUTO" };
 		string[] BXD111_Baixa			= { "AGUARDANDO_VINCULO", "AXON_ID", "BAIXA", "BANCO", "CAMPOX", "CGC_CPF", "COD_CAIXA", "CONTA_CORRENTE", "CONTA_DOCUMENTO", "DATA_REMESSA", "DOCUMENTO", "DT_AXON", "DUPLICATA", "GRUPO", "ID_BAIXAPLANOS", "LANCTO", "LOJA", "MODIFICADO", "MOTIVO", "NOME_GRUPO", "NUM_BANCO", "OBS", "PARCELA", "RESPONSAVEL", "TERMINAL", "TIPO_DOC", "TRANSMISSAO", "USUARIO", "VALOR", "VENCTO", "VR_CALCULADO", "VR_PARCELA" };
@@ -18,44 +18,6 @@ namespace Migracao.Sistems
 
 		List<string> cabecalhos_Pacientes = new List<string>() { "NumFicha", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)" };
 		HashSet<string> cadastroPaciente;
-
-		public void LerArquivosExcel(string excelPessoas = "", string excelRecebiveis = "", ListView listView = null)
-		{
-			if (!string.IsNullOrEmpty(excelPessoas))
-				try
-				{
-					var excelHelper = new ExcelHelper(excelPessoas);
-					var workbook = excelHelper.LerExcel(excelPessoas);
-					var sheet = workbook.GetSheetAt(0);
-					excelHelper.InitializeDictionaryPessoas(sheet);
-				}
-				catch (Exception ex)
-				{
-					throw new Exception(ex.Message);
-				}
-
-			foreach (var excel in listView.Items)
-			{
-				if (File.Exists(excel.ToString()))
-				{
-					try
-					{
-						var excelHelper = new ExcelHelper(excel.ToString());
-						var cabecalhos = excelHelper.cabecalhos;
-
-						if (EMD101_Pacientes.All(excelHelper.cabecalhos.Contains))
-						{
-
-						}//ImportarPessoas()
-
-					}
-					catch (Exception ex)
-					{
-						throw new Exception($"Erro ao ler o arquivo Excel \"{excel}\": {ex.Message}");
-					}
-				}
-			}
-		}
 
 		public Tuple<List<string[]>, List<string>> LerArquivosExcelCsv(string arquivo, System.Text.Encoding encoding)
 		{
@@ -153,7 +115,7 @@ namespace Migracao.Sistems
 					var cro = valoresLinha.GetValueOrDefault("CRO").Trim();
 					var modificado = valoresLinha.GetValueOrDefault("MODIFICADO").Trim();
 
-					dataRow["NumFicha"] = codigo.ToNum();
+					dataRow["Codigo"] = codigo.ToNum();
 					dataRow["Ativo(S/N)"] = "S";
 					dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
 					dataRow["NomeSocial"] = "";
@@ -231,7 +193,7 @@ namespace Migracao.Sistems
 						if (!excelHelper.CidadeExists(cidade.PrimeiraLetraMaiuscula(), estado))
 							cidade = cidade.EncontrarCidadeSemelhante();
 
-						//dataRow["NumFicha"] = numFicha.ToNum();
+						//dataRow["Codigo"] = numFicha.ToNum();
 						dataRow["Ativo(S/N)"] = "S";
 						dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
 						dataRow["NomeSocial"] = "";

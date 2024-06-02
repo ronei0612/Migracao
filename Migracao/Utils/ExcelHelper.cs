@@ -756,6 +756,7 @@ namespace Migracao.Utils
 		public static List<string[]> GetLinhasCSV(string filePath, char separador, int cabecalhos, Encoding encoding)
 		{
 			var linhas = new List<string[]>();
+
 			using (var reader = new StreamReader(filePath, encoding))
 			{
 				// Ignora a primeira linha (cabeçalho)
@@ -767,6 +768,11 @@ namespace Migracao.Utils
 				while ((linha = reader.ReadLine()) != null)
 				{
 					var valores = linha.Split(separador);
+
+					//Remover o primeiro elemento quando for quebra de linha
+					if (valoresTemp.Count() > 0)
+						valores = valores.Skip(1).ToArray();
+
 					// Remover aspas duplas de cada valor na linha
 					for (int i = 0; i < valores.Length; i++)
 						valores[i] = valores[i].Replace("\"", "");
@@ -774,7 +780,7 @@ namespace Migracao.Utils
 					valoresTemp.AddRange(valores);
 
 					// Se a quantidade de valores for igual à quantidade de cabeçalhos, adicione à lista de linhas
-					if (valoresTemp.Count == cabecalhos)
+					if (valoresTemp.Count >= cabecalhos)
 					{
 						linhas.Add(valoresTemp.ToArray());
 						valoresTemp.Clear();

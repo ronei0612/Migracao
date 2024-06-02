@@ -2,7 +2,9 @@
 using Migracao.Utils;
 using NPOI.SS.UserModel;
 using System.Data;
+using System.Diagnostics;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Migracao.Sistems
 {
@@ -18,8 +20,8 @@ namespace Migracao.Sistems
 		string[] CED006_Dentistas		= ["ADMISSAO", "AGENCIA", "AGENCIA2", "AXON_ID", "BAIRRO", "BANCO", "BANCO2", "CAIXA_POSTAL", "CEP", "CGC_CPF", "CIDADE", "CLIENTE", "CODIGO", "CODIGO_CLIENTE", "CODIGO_INDICACAO", "CODIGO_VALIDADE", "COD_MUNICIPIO", "COD_PRAMELHOR", "COD_UF", "COD_VENDEDOR", "CONJUGE", "CONTA", "CONTA2", "CPF_FIA", "CPF_INDICACAO", "DATA_APROVACAO_DRCASH", "DATA_BLOQUEIO", "DATA_DEP_EXCLUIDO", "DATA_LGPD", "DATA_VALIDADE", "DEPENDENTE", "DT_AXON", "DT_CADASTRO", "DT_NASC_FIA", "DT_NASCIMENTO", "DT_NASCIMENTO_DEP", "DT_ULTMOV", "EMAIL", "ENDERECO", "ENDERECO_FIA", "ESTADO", "ESTADO_FIA", "FAX", "FONE1", "FONE2", "FONE_FIA", "FONE_REF_1", "FONE_REF_2", "F_OU_J", "FORNECEDOR", "FUNCAO", "ID_DRCASH", "INSC_RG", "INSTITUTO_ODC", "LGPD_CPF", "LGPD_DATA_HORA", "LGPD_IMAGEM", "LGPD_MENSAGEM", "LGPD_TELEFONE", "LGPD_USUARIO", "LOJA", "MAE", "MODIFICADO", "NOME", "NOME_FIA", "NOME_GRUPO", "NOME_LOCAL", "NOME_REF_1", "NOME_REF_2", "NOME_VALIDADE", "NUM_BLOQUEIO", "NUM_CONVENIO", "NUM_ENDERECO", "NUM_FICHA", "OBS1", "OBS_VALIDADE", "ONDE_TRABALHA", "PAI", "PARENTESCO_FIA", "PRESTADOR", "PROFISSAO", "PROFISSAO_FIA", "PROTETICO", "PROTETICO_ATIVO", "QTDE_DEPENDENTES", "RENDA_FIA", "RENDA_MES", "RG_FIA", "SEXO_M_F", "TITULAR", "TITULAR_DEP_EXCLUIDO", "TRANSMISSAO", "USU_BLOQUEIO", "USU_CADASTRO", "USUARIO", "USUARIO_LGPD", "USUARIO_VALIDADE", "VALOR_MAXIMO_DRCASH", "VR_LIMITE"];
 
 		List<string> cabecalhos_Pacientes = ["Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
-		List<string> cabecalhos_Recebiveis = ["CPF", "Emitente", "DocumentoRef", "Valor", "Prazo", "Vencimento(01/12/2010)", "Emissão(01/12/2010)", "Recebível(S/N)", "Exigível(S/N)"];
-		HashSet<string> cadastroPaciente, cadastroRecebivel;
+		List<string> cabecalhos_Recebiveis = ["CPF", "Emitente", "DocumentoRef", "RecebívelExigível(R/E)", "ValorOriginal", "ValorPago", "Prazo", "Vencimento(01/12/2010)", "DataBaixa", "Emissão(01/12/2010)", "ObservaçãoRecebível", "ObservaçãoRecebido"];
+		HashSet<string> cadastroPaciente, registroRecebivel;
 
 		public Tuple<List<string[]>, List<string>> LerArquivosExcelCsv(string arquivo, Encoding encoding)
 		{
@@ -36,7 +38,7 @@ namespace Migracao.Sistems
 			ExcelHelper excelHelper = new();
 			DataTable dataTablePessoas = new();
 			DataTable dataTableRecebiveis = new();
-			//cadastroPaciente = new HashSet<int>();
+			registroRecebivel = new HashSet<string>();
 
 			foreach (string coluna in cabecalhos_Pacientes)
 				dataTablePessoas.Columns.Add(coluna, typeof(string));
@@ -76,9 +78,11 @@ namespace Migracao.Sistems
 				dataTablePessoas = ConvertExcelPessoasPacientes(dataTablePessoas, cabecalhosCSV, linhasCSV);
 			}
 
-			var salvarArquivo = Tools.GerarNomeArquivo($"CadastroPessoas_{estabelecimentoID}_OdontoCompany");
-			excelHelper.CriarExcelArquivo(salvarArquivo + ".xlsx", dataTablePessoas);
-
+			if (excel_CED006 != null || excel_EMD101 != null)
+			{
+				var salvarArquivoPessoas = Tools.GerarNomeArquivo($"CadastroPessoas_{estabelecimentoID}_OdontoCompany");
+				excelHelper.CriarExcelArquivo(salvarArquivoPessoas + ".xlsx", dataTablePessoas);
+			}
 
 
 			var excel_CRD111 = listView.Items.Cast<ListViewItem>()
@@ -98,7 +102,7 @@ namespace Migracao.Sistems
 				var resultado = LerArquivosExcelCsv(excel_BXD111.Text, Encoding.UTF8);
 				var linhasCSV = resultado.Item1;
 				var cabecalhosCSV = resultado.Item2;
-				dataTableRecebiveis = ConvertExcelRecebiveis(dataTableRecebiveis, cabecalhosCSV, linhasCSV);
+				dataTableRecebiveis = ConvertExcelRecebidos(dataTableRecebiveis, cabecalhosCSV, linhasCSV);
 			}
 
 			var excel_CXD555 = listView.Items.Cast<ListViewItem>()
@@ -108,11 +112,14 @@ namespace Migracao.Sistems
 				var resultado = LerArquivosExcelCsv(excel_CXD555.Text, Encoding.UTF8);
 				var linhasCSV = resultado.Item1;
 				var cabecalhosCSV = resultado.Item2;
-				dataTableRecebiveis = ConvertExcelRecebiveis(dataTableRecebiveis, cabecalhosCSV, linhasCSV);
+				dataTableRecebiveis = ConvertExcelRecebidos(dataTableRecebiveis, cabecalhosCSV, linhasCSV);
 			}
 
-			salvarArquivo = Tools.GerarNomeArquivo($"CadastroRecebiveis_{estabelecimentoID}_OdontoCompany");
-			excelHelper.CriarExcelArquivo(salvarArquivo + ".xlsx", dataTableRecebiveis);
+			if (excel_BXD111 != null || excel_CXD555 != null || excel_CRD111 != null)
+			{
+				var salvarArquivoRecebiveis = Tools.GerarNomeArquivo($"CadastroRecebiveis_{estabelecimentoID}_OdontoCompany");
+				excelHelper.CriarExcelArquivo(salvarArquivoRecebiveis + ".xlsx", dataTableRecebiveis);
+			}
 		}
 
 		//else if (comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
@@ -136,27 +143,27 @@ namespace Migracao.Sistems
 							if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
 								valoresLinha.Add(cabecalhos[i], linha[i]);
 
-						//"CGC_CPF"|"EMITENTE"|"DOCUMENTO"|"VALOR"|"PRAZO"|"VENCTO"|"EMISSAO"|"CONTA"|"BANCO"|"AGENCIA"|"TIPO_DOC"|"PERIODO"|"FILIAL"|"OBS"|"CAMPOX"|"BANDA1"|"BANDA2"|"BANDA3"|"TRANSMISSAO"|"SITUACAO"|"GEROU_TRANSMISSAO"|"RECEBEU_TRANSMISSAO"|"ALINEA"|"DEVOLUCAO"|"REAPRESENTOU"|"SEQ_ALINEA11"|"LOTE"|"BAIXA"|"CHEQUE_BAIXA"|"DESCONTOS"|"JUROS"|"NOSSONUMERO"|"RESPONSAVEL"|"TOTAL"|"MULTA"|"DUPLICATA"|"PARCELA"|"ENCARGOS"|"VALOR_VENDA"|"LOJA"|"USUARIO"|"MODIFICADO"|"DATA_ENV_CART"|"DATA_RET_CART"|"DATA_ENV_SCPC"|"DATA_RET_SCPC"|"TERMINAL"|"VENCTO_ORIG"|"VALOR_ORIG"|"CHEQUE"|"TITULO"|"GRUPO"|"NOME_GRUPO"|"MOTIVO"|"REMESSA"|"NUM_BANCO"|"TIPO_COBRANCA"|"ORDEM"|"LOCAL"|"NOME_LOCAL"|"CALC_JUROS"|"COBRADORA"|"COBRANCA"|"DATA_REMESSA"|"SITUACAO_REMESSA"|"NSU_TRANSACAO"|"CONTROLE_CARTAO"|"DESCONTO_BOLETO"|"ID_PIX"|"DT_AXON"|"AXON_ID"|"CODIGO_TUSS"
-						//if (fichasCadastradas.Contains(codigo.ToNum()))
 						var cpf = valoresLinha.GetValueOrDefault("CGC_CPF").Trim();
-						var emitente = valoresLinha.GetValueOrDefault("EMITENTE").Trim();
+						//var emitente = valoresLinha.GetValueOrDefault("EMITENTE").Trim();
+						var observacao = valoresLinha.GetValueOrDefault("OBS").Trim();
 						var documento = valoresLinha.GetValueOrDefault("DOCUMENTO").Trim();
 						var valor = valoresLinha.GetValueOrDefault("VALOR").Trim();
-						var prazo = valoresLinha.GetValueOrDefault("PRAZO").Trim();
+						//var prazo = valoresLinha.GetValueOrDefault("PRAZO").Trim();
 						var vencimentoData = valoresLinha.GetValueOrDefault("VENCTO").Trim();
 						var emissaoData = valoresLinha.GetValueOrDefault("EMISSAO").Trim();
 
 						dataRow["CPF"] = cpf.ToCPF();
-						dataRow["Emitente"] = emitente;
+						//dataRow["Emitente"] = emitente;
+						dataRow["ObservaçãoRecebível"] = observacao;
 						dataRow["DocumentoRef"] = documento;
-						dataRow["Valor"] = valor.ArredondarValorV2();
-						dataRow["Prazo"] = prazo;
+						dataRow["ValorOriginal"] = valor.ArredondarValorV2();
+						//dataRow["Prazo"] = prazo;
 						dataRow["Vencimento(01/12/2010)"] = vencimentoData.ToData();
 						dataRow["Emissão(01/12/2010)"] = emissaoData.ToData();
-						dataRow["Recebível(S/N)"] = "S";
-						dataRow["Exigível(S/N)"] = "";
+						dataRow["RecebívelExigível(R/E)"] = "R";
 
 						dataTable.Rows.Add(dataRow);
+						//registroRecebivel.Add(documento);
 					}
 					catch (Exception error)
 					{
@@ -170,7 +177,75 @@ namespace Migracao.Sistems
 			}
 			catch (Exception error)
 			{
-				throw new Exception($"Erro ao converter Excel para Pessoas Dentistas: {error.Message}");
+				throw new Exception($"Erro ao converter Excel Recebíveis: {error.Message}");
+			}
+		}
+
+		public DataTable ConvertExcelRecebidos(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas)
+		{
+			try
+			{
+				int linhaIndex = 0;
+				foreach (string[] linha in linhas)
+				{
+					try
+					{
+						DataRow dataRow = dataTable.NewRow();
+						var valoresLinha = new Dictionary<string, string>();
+
+						for (int i = 0; i < cabecalhos.Count; i++)
+							if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
+								valoresLinha.Add(cabecalhos[i], linha[i]);
+
+						//if (registroRecebivel.Contains(codigo.ToNum()))
+						//LANCTO	CGC_CPF	DOCUMENTO	VR_PARCELA	VALOR	VENCTO	BAIXA	CAMPOX	TRANSMISSAO	OBS	TIPO_DOC	DUPLICATA	PARCELA	RESPONSAVEL	CONTA_CORRENTE	CONTA_DOCUMENTO	LOJA	USUARIO	MODIFICADO	TERMINAL	VR_CALCULADO	MOTIVO	GRUPO	NOME_GRUPO	NUM_BANCO	COD_CAIXA	DATA_REMESSA	AGUARDANDO_VINCULO	DT_AXON	AXON_ID	ID_BAIXAPLANOS
+						var cpf = valoresLinha.GetValueOrDefault("CGC_CPF").Trim();
+						var documento = valoresLinha.GetValueOrDefault("DOCUMENTO").Trim();
+						var valor = valoresLinha.GetValueOrDefault("VALOR").Trim();
+						var observacao = valoresLinha.GetValueOrDefault("OBS").Trim();
+						var baixaData = valoresLinha.GetValueOrDefault("BAIXA").Trim();
+						var vencimentoData = valoresLinha.GetValueOrDefault("VENCTO").Trim();
+						//var emissaoData = valoresLinha.GetValueOrDefault("EMISSAO").Trim();
+
+						DataRow[] dataRowEncontrados = dataTable.Select($"DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}'");
+
+						if (dataRowEncontrados.Length > 1)
+							throw new Exception($"Mais de uma linha encontrada em Recebíveis: DocumentoRef = '{documento}'");
+
+						if (dataRowEncontrados.Length == 1)
+						{
+							dataRowEncontrados[0]["ValorPago"] = valor.ArredondarValorV2();
+							dataRowEncontrados[0]["DataBaixa"] = baixaData.ToData();
+							dataRowEncontrados[0]["ObservaçãoRecebido"] = observacao;
+						}
+
+						else
+						{
+							dataRow["CPF"] = cpf.ToCPF();
+							dataRow["DocumentoRef"] = documento;
+							dataRow["ValorPago"] = valor.ArredondarValorV2();
+							dataRow["DataBaixa"] = baixaData;
+							dataRow["Vencimento(01/12/2010)"] = vencimentoData.ToData();
+							//dataRow["Emissão(01/12/2010)"] = emissaoData.ToData();
+							dataRow["ObservaçãoRecebido"] = observacao;
+							dataRow["RecebívelExigível(R/E)"] = "R";
+
+							dataTable.Rows.Add(dataRow);
+						}
+					}
+					catch (Exception error)
+					{
+						throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
+					}
+
+					linhaIndex++;
+				}
+
+				return dataTable;
+			}
+			catch (Exception error)
+			{
+				throw new Exception($"Erro ao converter Excel Recebidos: {error.Message}");
 			}
 		}
 

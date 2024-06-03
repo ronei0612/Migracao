@@ -511,7 +511,7 @@ namespace Migracao.Sistems
 				{
 					IWorkbook workbook = excelHelper.LerExcel(arquivoExcelAgenda);
 					sheet = workbook.GetSheetAt(0);
-					excelHelper.InitializeDictionary(sheet);
+					excelHelper.InitializeDictionaryAgendamentos(sheet);
 				}
 				catch (Exception ex)
 				{
@@ -529,11 +529,11 @@ namespace Migracao.Sistems
 
 					string nomeCompleto = "", cpf = "", dentistaResponsavel = "";
 					bool faltou = false;
-					string? outroSacadoNome = null, observacoes = null, documento = null;
+					string? titulo = null, observacoes = null, documento = null;
 					int recibo = 0, codigo = 0;
 					int? consumidorID = null, fornecedorID = null, colaboradorID = null, funcionarioID = null, clienteID = null, pessoaID = null;
 					decimal pagoValor = 0, valor = 0;
-					long? telefone;
+					long? telefone = null;
 					byte formaPagamento = (byte)TitulosEspeciesID.DepositoEmConta;
 					DateTime dataConsulta = dataHoje, dataInclusao = dataHoje;
 
@@ -589,26 +589,37 @@ namespace Migracao.Sistems
 					if (!string.IsNullOrEmpty(funcionarioIDValue))
 						funcionarioID = int.Parse(funcionarioIDValue);
 					else
-						outroSacadoNome = cpf;
-					if (!string.IsNullOrEmpty(funcionarioIDValue) && !string.IsNullOrEmpty(consumidorIDValue) && !string.IsNullOrEmpty(pessoaIDValue))
-						agendamentos.Add(new Agendamento()
-						{
-							LoginID = loginID,
-							EstabelecimentoID = estabelecimentoID,
-							AtendeTipoID = 1,
-							DataInicio = dataConsulta,
-							DataTermino = dataConsulta.AddMinutes(30),
-							ConsumidorID = (int)consumidorID,
-							Titulo = observacoes,
-							FuncionarioID = (int)funcionarioID,
-							DataInclusao = dataConsulta,
-							PessoaID = (int)pessoaID
-							//DataCancelamento = ,
-							//
-							//AtendimentoValor = ,
-							//SecretariaID = ,
-							//SalaID = ,
-						});
+						titulo = nomeCompleto;
+
+					if (!excelHelper.AgendamentoExists(nomeCompleto, dataConsulta, consumidorID))
+					{
+						if (telefone == null)
+							telefone = 0;
+
+						if (!string.IsNullOrEmpty(funcionarioIDValue) && !string.IsNullOrEmpty(consumidorIDValue) && !string.IsNullOrEmpty(pessoaIDValue))
+							agendamentos.Add(new Agendamento()
+							{
+								LoginID = loginID,
+								EstabelecimentoID = estabelecimentoID,
+								AtendeTipoID = 1,
+								DataInicio = dataConsulta,
+								DataTermino = dataConsulta.AddMinutes(30),
+								ConsumidorID = (int)consumidorID,
+								ConsumidorPessoaNome = nomeCompleto,
+								Titulo = titulo,
+								FuncionarioID = (int)funcionarioID,
+								DataInclusao = dataInclusao,
+								ConsumidorPessoaFone1 = (long)telefone,
+								Descricao = observacoes
+								//ConsumidorPessoaID = (int)pessoaID,
+								//PessoaID = (int)pessoaID,
+								//DataCancelamento = ,
+								//
+								//AtendimentoValor = ,
+								//SecretariaID = ,
+								//SalaID = ,
+							});
+					}
 				}
 
 				indiceLinha = 0;
@@ -621,10 +632,12 @@ namespace Migracao.Sistems
 					{ "DataInicio", agendamentos.ConvertAll(agendamento => (object)agendamento.DataInicio).ToArray() },
 					{ "DataTermino", agendamentos.ConvertAll(agendamento => (object)agendamento.DataTermino).ToArray() },
 					{ "ConsumidorID", agendamentos.ConvertAll(agendamento => (object)agendamento.ConsumidorID).ToArray() },
-					{ "PessoaID", agendamentos.ConvertAll(agendamento => (object)agendamento.PessoaID).ToArray() },
+					{ "ConsumidorPessoaNome", agendamentos.ConvertAll(agendamento => (object)agendamento.ConsumidorPessoaNome).ToArray() },
 					{ "Titulo", agendamentos.ConvertAll(agendamento => (object)agendamento.Titulo).ToArray() },
 					{ "FuncionarioID", agendamentos.ConvertAll(agendamento => (object)agendamento.FuncionarioID).ToArray() },
-					{ "DataInclusao", agendamentos.ConvertAll(agendamento => (object)agendamento.DataInclusao).ToArray() }
+					{ "DataInclusao", agendamentos.ConvertAll(agendamento => (object)agendamento.DataInclusao).ToArray() },
+					{ "ConsumidorPessoaFone1", agendamentos.ConvertAll(agendamento => (object)agendamento.ConsumidorPessoaFone1).ToArray() },
+					{ "Descricao", agendamentos.ConvertAll(agendamento => (object)agendamento.Descricao).ToArray() },
 				};
 
 				var salvarArquivo = Tools.GerarNomeArquivo($"Agendamentos_{estabelecimentoID}_OdontoCompany_Migração");
@@ -1038,8 +1051,9 @@ namespace Migracao.Sistems
                     { "LoginID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.LoginID).ToArray() },
                     { "DataInclusao", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DataInclusao).ToArray() },
                     { "FinanceiroID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.FinanceiroID).ToArray() },
-                    { "Observacoes", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.Observacoes).ToArray() }
-                };
+                    { "Observacoes", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.Observacoes).ToArray() },
+					{ "OutroSacadoNome", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.OutroSacadoNome).ToArray() }
+				};
 
                 var salvarArquivo = Tools.GerarNomeArquivo($"Recebidos_{estabelecimentoID}_OdontoCompany_Migração");
                 sqlHelper.GerarSqlInsert("FluxoCaixa", salvarArquivo, dados);

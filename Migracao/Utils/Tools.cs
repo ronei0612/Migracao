@@ -386,9 +386,9 @@ namespace Migracao.Utils
 				input = input.Replace(".", ",");
 
 			if (decimal.TryParse(input, out decimal valorDecimal))
-				return Math.Round(valorDecimal, 2);
+				return decimal.Parse(Math.Round(valorDecimal, 2).ToString("F2"));
 
-			return 0;
+			return 0.00m;
 		}
 
 		public static decimal ArredondarValor(this string input)

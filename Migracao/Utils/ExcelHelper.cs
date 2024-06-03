@@ -38,6 +38,10 @@ namespace Migracao.Utils
 		private Dictionary<string, string> consumidorIDRecebiveisDict = new Dictionary<string, string>();
 		private Dictionary<string, string> consumidorIDRecebidosDict = new Dictionary<string, string>();
 
+		private Dictionary<string, string> pessoaIDDataAgendaDict = new Dictionary<string, string>();
+		private Dictionary<string, string> tituloDataAgendaDict = new Dictionary<string, string>();
+		private Dictionary<string, string> nomeDataAgendaDict = new Dictionary<string, string>();
+
 		public ExcelHelper(string? arquivoExcel = null)
         {
 			if (!string.IsNullOrEmpty(arquivoExcel))
@@ -77,14 +81,41 @@ namespace Migracao.Utils
 						valorOriginal = valorOriginal.Insert(valorOriginal.Length - 4, ".");
 
 					valorOriginal = Tools.ArredondarValor(valorOriginal).ToString("F2");
-					//}
-
-					if (consumidorID == "18283648")
-						consumidorID = consumidorID;
 
 					string key = consumidorID + "|" + valorOriginal + "|" + dataVencimento;
 					if (!consumidorIDRecebiveisDict.ContainsKey(key))
 						consumidorIDRecebiveisDict.Add(key, consumidorID);
+				}
+			}
+		}
+
+		public void InitializeDictionaryAgendamentos(ISheet sheet)
+		{
+			this.sheet = sheet;
+			IRow headerRow = sheet.GetRow(0);
+
+			int dataInicioColumnIndex = GetColumnIndex(headerRow, "datainicio");
+			int tituloColumnIndex = GetColumnIndex(headerRow, "titulo");
+			int consumidoridColumnIndex = GetColumnIndex(headerRow, "consumidorid");
+
+			for (int row = 1; row <= sheet.LastRowNum; row++)
+			{
+				if (sheet.GetRow(row) != null)
+				{
+					string dataInicio = sheet.GetRow(row).GetCell(dataInicioColumnIndex) != null ? sheet.GetRow(row).GetCell(dataInicioColumnIndex).ToString() : "";
+					string titulo = sheet.GetRow(row).GetCell(tituloColumnIndex) != null ? sheet.GetRow(row).GetCell(tituloColumnIndex).ToString().ToLower() : "";
+					string consumidorid = sheet.GetRow(row).GetCell(consumidoridColumnIndex) != null ? sheet.GetRow(row).GetCell(consumidoridColumnIndex).ToString() : "";
+
+					string key = titulo + "|" + dataInicio;
+					if (!tituloDataAgendaDict.ContainsKey(key))
+						tituloDataAgendaDict.Add(key, consumidorid);
+
+					if (!string.IsNullOrEmpty(consumidorid))
+					{
+						key = consumidorid + "|" + dataInicio;
+						if (!pessoaIDDataAgendaDict.ContainsKey(key))
+							pessoaIDDataAgendaDict.Add(key, consumidorid);
+					}
 				}
 			}
 		}
@@ -343,6 +374,28 @@ namespace Migracao.Utils
 			{
 				string key = cidade + "|" + estado.ToLower();
 				if (cidadeEstadoDict.ContainsKey(key))
+					return true;
+			}
+
+			return false;
+		}
+
+		public bool AgendamentoExists(string titulo, DateTime dataConsulta, int? consumidorID = null)
+		{
+			if (consumidorID == null && string.IsNullOrWhiteSpace(titulo))
+				return false;
+
+			if (consumidorID > 0)
+			{
+				string key = consumidorID + "|" + dataConsulta.ToString("yyyy-MM-dd HH:mm:ss.fff");
+				if (pessoaIDDataAgendaDict.ContainsKey(key))
+					return true;
+			}
+
+			if (!string.IsNullOrWhiteSpace(titulo))
+			{
+				string key = titulo.ToLower() + "|" + dataConsulta.ToString("yyyy-MM-dd HH:mm:ss.fff");
+				if (tituloDataAgendaDict.ContainsKey(key))
 					return true;
 			}
 

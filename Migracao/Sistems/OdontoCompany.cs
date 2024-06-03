@@ -275,7 +275,7 @@ namespace Migracao.Sistems
 						var cro = valoresLinha.GetValueOrDefault("CRO").Trim();
 						var modificado = valoresLinha.GetValueOrDefault("MODIFICADO").Trim();
 
-						dataRow["Codigo"] = codigo.ToNum();
+						dataRow["Código"] = codigo.ToNum();
 						dataRow["Ativo(S/N)"] = "S";
 						dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
 						dataRow["NomeSocial"] = "";

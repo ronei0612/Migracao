@@ -1036,69 +1036,152 @@ namespace Migracao.Sistems
 							{
 								switch (tituloColuna)
 								{
-									case "CLIENTE":
-										cliente = celulaValor == "S" ? true : false;
+									case "Código":
 										break;
-									case "FORNECEDOR":
-										fornecedor = celulaValor == "S" ? true : false;
+									case "Ativo(S/N)":
 										break;
-									case "NOME":
+									case "NomeCompleto":
 										nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+										break;
+									case "NomeSocial":
+										break;
+									case "Apelido":
 										apelido = nomeCompleto.GetPrimeirosCaracteres(20);
 										break;
-									case "CGC_CPF":
+									case "Documento(CPF,CNPJ,CGC)":
 										documento = celulaValor.ToCPF();
 										break;
-									case "INSC_RG":
-										rg = celulaValor.GetPrimeirosCaracteres(20);
-										break;
-									case "SEXO_M_F":
-										sexo = celulaValor.ToSexo("m", "f");
-										break;
-									case "EMAIL":
-										email = celulaValor.ToEmail();
-										break;
-									case "FONE1":
-										telefonePrinc = celulaValor.ToFone();
-										break;
-									case "FONE2":
-										telefoneAltern = celulaValor.ToFone();
-										break;
-									case "CELULAR":
-										celular = celulaValor.ToFone();
-										break;
-									case "ENDERECO":
-										logradouro = celulaValor.PrimeiraLetraMaiuscula();
-										break;
-									case "BAIRRO":
-										bairro = celulaValor.PrimeiraLetraMaiuscula();
-										break;
-									case "NUM_ENDERECO":
-										logradouroNum = celulaValor;
-										break;
-									case "CIDADE":
-										cidade = celulaValor;
-										break;
-									case "ESTADO":
-										estado = celulaValor;
-										break;
-									case "CEP":
-										cep = celulaValor.ToNum();
-										break;
-									case "OBS1":
-										observacao = celulaValor;
-										break;
-									case "NUM_CONVENIO":
-										break;
-									case "DT_CADASTRO":
+									case "DataCadastro(01/12/2024)":
 										dataCadastro = celulaValor.ToData();
 										break;
-									case "DT_NASCIMENTO":
+									case "Observações":
+										observacao = celulaValor;
+										break;
+									case "Email":
+										email = celulaValor.ToEmail();
+										break;
+									case "RG":
+										rg = celulaValor.GetPrimeirosCaracteres(20);
+										break;
+									case "Sexo(M/F)":
+										sexo = celulaValor.ToSexo("m", "f");
+										break;
+									case "NascimentoData":
 										dataNascimento = celulaValor.ToData();
 										break;
-									case "NUM_FICHA":
-										numcadastro = celulaValor;
+									case "NascimentoLocal":
 										break;
+									case "EstadoCivil(S/C/V)":
+										break;
+									case "Profissao":
+										break;
+									case "CargoNaClinica":
+										break;
+									case "Dentista(S/N)":
+										break;
+									case "ConselhoCodigo":
+										break;
+									case "Paciente(S/N)":
+										cliente = celulaValor == "S" ? true : false;
+										break;
+									case "Funcionario(S/N)":
+										break;
+									case "Fornecedor(S/N)":
+										fornecedor = celulaValor == "S" ? true : false;
+										break;
+									case "TelefonePrincipal":
+										telefonePrinc = celulaValor.ToFone();
+										break;
+									case "Celular":
+										celular = celulaValor.ToFone();
+										break;
+									case "TelefoneAlternativo":
+										telefoneAltern = celulaValor.ToFone();
+										break;
+									case "Logradouro":
+										logradouro = celulaValor.PrimeiraLetraMaiuscula();
+										break;
+									case "LogradouroNum":
+										logradouroNum = celulaValor;
+										break;
+									case "Complemento":
+										break;
+									case "Bairro":
+										bairro = celulaValor.PrimeiraLetraMaiuscula();
+										break;
+									case "Cidade":
+										cidade = celulaValor;
+										break;
+									case "Estado(SP)":
+										estado = celulaValor;
+										break;
+									case "CEP(00000-000)":
+										cep = celulaValor.ToNum();
+										break;
+
+										//case "CLIENTE":
+										//	cliente = celulaValor == "S" ? true : false;
+										//	break;
+										//case "FORNECEDOR":
+										//	fornecedor = celulaValor == "S" ? true : false;
+										//	break;
+										//case "NOME":
+										//	nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+										//	apelido = nomeCompleto.GetPrimeirosCaracteres(20);
+										//	break;
+										//case "CGC_CPF":
+										//	documento = celulaValor.ToCPF();
+										//	break;
+										//case "INSC_RG":
+										//	rg = celulaValor.GetPrimeirosCaracteres(20);
+										//	break;
+										//case "SEXO_M_F":
+										//	sexo = celulaValor.ToSexo("m", "f");
+										//	break;
+										//case "EMAIL":
+										//	email = celulaValor.ToEmail();
+										//	break;
+										//case "FONE1":
+										//	telefonePrinc = celulaValor.ToFone();
+										//	break;
+										//case "FONE2":
+										//	telefoneAltern = celulaValor.ToFone();
+										//	break;
+										//case "CELULAR":
+										//	celular = celulaValor.ToFone();
+										//	break;
+										//case "ENDERECO":
+										//	logradouro = celulaValor.PrimeiraLetraMaiuscula();
+										//	break;
+										//case "BAIRRO":
+										//	bairro = celulaValor.PrimeiraLetraMaiuscula();
+										//	break;
+										//case "NUM_ENDERECO":
+										//	logradouroNum = celulaValor;
+										//	break;
+										//case "CIDADE":
+										//	cidade = celulaValor;
+										//	break;
+										//case "ESTADO":
+										//	estado = celulaValor;
+										//	break;
+										//case "CEP":
+										//	cep = celulaValor.ToNum();
+										//	break;
+										//case "OBS1":
+										//	observacao = celulaValor;
+										//	break;
+										//case "NUM_CONVENIO":
+										//	break;
+										//case "DT_CADASTRO":
+										//	dataCadastro = celulaValor.ToData();
+										//	break;
+										//case "DT_NASCIMENTO":
+										//	dataNascimento = celulaValor.ToData();
+										//	break;
+										//case "NUM_FICHA":
+										//	numcadastro = celulaValor;
+										//	break;
 								}
 							}
 						}

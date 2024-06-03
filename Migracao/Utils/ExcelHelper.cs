@@ -377,11 +377,13 @@ namespace Migracao.Utils
 				return "";
 
 			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
-			cpf = cpf.Replace(".", "").Replace("-", "");
 
 			if (!string.IsNullOrWhiteSpace(cpf))
+			{
+				cpf = cpf.Replace(".", "").Replace("-", "");
 				if (cpfPessoaDict.ContainsKey(cpf))
 					return cpfPessoaDict[cpf];
+			}
 
 			if (!string.IsNullOrWhiteSpace(nomeCompleto))
 				if (nomePessoaDict.ContainsKey(nomeCompleto))

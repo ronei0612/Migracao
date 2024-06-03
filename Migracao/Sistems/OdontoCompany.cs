@@ -1121,70 +1121,6 @@ namespace Migracao.Sistems
 									case "CEP(00000-000)":
 										cep = celulaValor.ToNum();
 										break;
-
-										//case "CLIENTE":
-										//	cliente = celulaValor == "S" ? true : false;
-										//	break;
-										//case "FORNECEDOR":
-										//	fornecedor = celulaValor == "S" ? true : false;
-										//	break;
-										//case "NOME":
-										//	nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
-										//	apelido = nomeCompleto.GetPrimeirosCaracteres(20);
-										//	break;
-										//case "CGC_CPF":
-										//	documento = celulaValor.ToCPF();
-										//	break;
-										//case "INSC_RG":
-										//	rg = celulaValor.GetPrimeirosCaracteres(20);
-										//	break;
-										//case "SEXO_M_F":
-										//	sexo = celulaValor.ToSexo("m", "f");
-										//	break;
-										//case "EMAIL":
-										//	email = celulaValor.ToEmail();
-										//	break;
-										//case "FONE1":
-										//	telefonePrinc = celulaValor.ToFone();
-										//	break;
-										//case "FONE2":
-										//	telefoneAltern = celulaValor.ToFone();
-										//	break;
-										//case "CELULAR":
-										//	celular = celulaValor.ToFone();
-										//	break;
-										//case "ENDERECO":
-										//	logradouro = celulaValor.PrimeiraLetraMaiuscula();
-										//	break;
-										//case "BAIRRO":
-										//	bairro = celulaValor.PrimeiraLetraMaiuscula();
-										//	break;
-										//case "NUM_ENDERECO":
-										//	logradouroNum = celulaValor;
-										//	break;
-										//case "CIDADE":
-										//	cidade = celulaValor;
-										//	break;
-										//case "ESTADO":
-										//	estado = celulaValor;
-										//	break;
-										//case "CEP":
-										//	cep = celulaValor.ToNum();
-										//	break;
-										//case "OBS1":
-										//	observacao = celulaValor;
-										//	break;
-										//case "NUM_CONVENIO":
-										//	break;
-										//case "DT_CADASTRO":
-										//	dataCadastro = celulaValor.ToData();
-										//	break;
-										//case "DT_NASCIMENTO":
-										//	dataNascimento = celulaValor.ToData();
-										//	break;
-										//case "NUM_FICHA":
-										//	numcadastro = celulaValor;
-										//	break;
 								}
 							}
 						}
@@ -1192,12 +1128,6 @@ namespace Migracao.Sistems
 
 					pessoaID = indiceLinha;
 					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento);
-					//if (!string.IsNullOrEmpty(pessoaIDValue))
-					//	pessoaID = int.Parse(pessoaIDValue);
-
-					//var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: documento);
-					//if (!string.IsNullOrEmpty(consumidorIDValue))
-					//	consumidorID = int.Parse(consumidorIDValue);
 
 					if (!fornecedor)
 					{
@@ -1235,7 +1165,6 @@ namespace Migracao.Sistems
 
 				var pessoasDict = new Dictionary<string, object[]>
 				{
-					//{ "ID", pessoas.ConvertAll(pessoa => (object)pessoa.ID).ToArray() },
 					{ "NomeCompleto", pessoas.ConvertAll(pessoa => (object)pessoa.NomeCompleto).ToArray() },
 					{ "Apelido", pessoas.ConvertAll(pessoa => (object)pessoa.Apelido).ToArray() },
 					{ "CPF", pessoas.ConvertAll(pessoa => (object)pessoa.CPF).ToArray() },

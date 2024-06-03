@@ -331,15 +331,6 @@ namespace Migracao
 			e.Handled = !(char.IsNumber(e.KeyChar) || e.KeyChar == (char)Keys.Back);
 		}
 
-		private void txtEstabelecimentoID_TextChanged(object sender, EventArgs e)
-		{
-		}
-
-		private void txtPessoaID_TextChanged(object sender, EventArgs e)
-		{
-			//MostrarCampos();
-		}
-
 		private void txtLoginID_KeyPress(object sender, KeyPressEventArgs e)
 		{
 			e.Handled = !(char.IsNumber(e.KeyChar) || e.KeyChar == (char)Keys.Back);

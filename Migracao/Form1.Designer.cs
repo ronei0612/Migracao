@@ -223,7 +223,6 @@
 			txtEstabelecimentoID.Size = new Size(113, 23);
 			txtEstabelecimentoID.TabIndex = 2;
 			txtEstabelecimentoID.Visible = false;
-			txtEstabelecimentoID.TextChanged += txtEstabelecimentoID_TextChanged;
 			txtEstabelecimentoID.KeyPress += txtEstabelecimentoID_KeyPress;
 			// 
 			// txtPessoaID
@@ -234,7 +233,6 @@
 			txtPessoaID.Size = new Size(110, 23);
 			txtPessoaID.TabIndex = 4;
 			txtPessoaID.Visible = false;
-			txtPessoaID.TextChanged += txtPessoaID_TextChanged;
 			txtPessoaID.KeyPress += txtPessoaID_KeyPress;
 			// 
 			// txtLoginID

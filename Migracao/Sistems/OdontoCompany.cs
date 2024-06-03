@@ -205,10 +205,10 @@ namespace Migracao.Sistems
 						var vencimentoData = valoresLinha.GetValueOrDefault("VENCTO").Trim();
 						//var emissaoData = valoresLinha.GetValueOrDefault("EMISSAO").Trim();
 
-						DataRow[] dataRowEncontrados = dataTable.Select($"DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}'");
+						DataRow[] dataRowEncontrados = dataTable.Select($"DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND VALOR = {valor.ArredondarValorV2()}");
 
 						if (dataRowEncontrados.Length > 1)
-							throw new Exception($"Mais de uma linha encontrada em Recebíveis: DocumentoRef = '{documento}'");
+							throw new Exception($"Mais de uma linha encontrada em Recebíveis: DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND VALOR = {valor.ArredondarValorV2()}");
 
 						if (dataRowEncontrados.Length == 1)
 						{
@@ -279,7 +279,7 @@ namespace Migracao.Sistems
 						dataRow["Ativo(S/N)"] = "S";
 						dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
 						dataRow["NomeSocial"] = "";
-						dataRow["Apelido"] = nome.GetLetras().GetPrimeirosCaracteres(20).PrimeiraLetraMaiuscula();
+						dataRow["Apelido"] = nome.GetLetras().GetPrimeirosCaracteres(19).PrimeiraLetraMaiuscula();
 						//dataRow["Documento(CPF,CNPJ,CGC)"] = cgcCpf.ToCPF();
 						dataRow["DataCadastro(01/12/2024)"] = modificado.ToData();
 						dataRow["Observações"] = obs;
@@ -364,7 +364,7 @@ namespace Migracao.Sistems
 						dataRow["Ativo(S/N)"] = "S";
 						dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
 						dataRow["NomeSocial"] = "";
-						dataRow["Apelido"] = nome.GetLetras().GetPrimeirosCaracteres(20).PrimeiraLetraMaiuscula();
+						dataRow["Apelido"] = nome.GetLetras().GetPrimeirosCaracteres(19).PrimeiraLetraMaiuscula();
 						dataRow["Documento(CPF,CNPJ,CGC)"] = cgcCpf.ToCPF();
 						dataRow["DataCadastro(01/12/2024)"] = dataCadastro.ToData();
 						dataRow["Observações"] = obs;
@@ -1024,6 +1024,9 @@ namespace Migracao.Sistems
 					string? nomeCompleto = null, documento = null, rg = null, email = null, apelido = null, nascimentoLocal = null, profissaoOutra = null, logradouro = "",
 						 complemento = null, bairro = null, logradouroNum = null, numcadastro = null, cidade = "", estado = null, observacao = null;
 
+					if (indiceLinha == 2894)
+						indiceLinha = 0;
+
 					foreach (var celula in linha.Cells)
 					{
 						if (celula != null)
@@ -1046,7 +1049,7 @@ namespace Migracao.Sistems
 									case "NomeSocial":
 										break;
 									case "Apelido":
-										apelido = nomeCompleto.GetPrimeirosCaracteres(20);
+										apelido = nomeCompleto.GetPrimeirosCaracteres(19);
 										break;
 									case "Documento(CPF,CNPJ,CGC)":
 										documento = celulaValor.ToCPF();

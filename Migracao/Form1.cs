@@ -247,12 +247,12 @@ namespace Migracao
 						textBoxExcel1.Visible = true;
 						btnExcel.Visible = true;
 
-						if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase)
+						if (comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
 							//|| comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase)
-							|| comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
+							//|| comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase)
 							//|| comboBoxImportacao.Text.Equals("pessoas", StringComparison.CurrentCultureIgnoreCase)
-							|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
-							|| comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase)
+							//|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
+							//|| comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("funcionarios", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))

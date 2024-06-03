@@ -2,9 +2,7 @@
 using Migracao.Utils;
 using NPOI.SS.UserModel;
 using System.Data;
-using System.Diagnostics;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Migracao.Sistems
 {
@@ -75,7 +73,7 @@ namespace Migracao.Sistems
 				var resultado = LerArquivosExcelCsv(excel_CED006.Text, Encoding.UTF8);
 				var linhasCSV = resultado.Item1;
 				var cabecalhosCSV = resultado.Item2;
-				dataTablePessoas = ConvertExcelPessoasPacientes(dataTablePessoas, cabecalhosCSV, linhasCSV);
+				dataTablePessoas = ConvertExcelPessoasDentistas(dataTablePessoas, cabecalhosCSV, linhasCSV);
 			}
 
 			if (excel_CED006 != null || excel_EMD101 != null)

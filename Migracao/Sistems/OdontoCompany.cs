@@ -436,9 +436,9 @@ namespace Migracao.Sistems
 		public DataTable ConvertExcelAgenda(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null)
 		{
 			//ExcelHelper excelHelper = new();
-			string cpf = "", nome = "", cod_responsavel = "", responsavel = "", telefone = "", dataInclusao = "", observacao = "", id = "";
-			DateTime dataInicio = DateTime.Now;
-			DateTime dataTermino = DateTime.Now;
+			//string cpf = "", nome = "", cod_responsavel = "", responsavel = "", telefone = "", dataInclusao = "", observacao = "", id = "";
+			//DateTime dataInicio = DateTime.Now;
+			//DateTime dataTermino = DateTime.Now;
 
 			try
 			{
@@ -454,58 +454,50 @@ namespace Migracao.Sistems
 							if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
 								valoresLinha.Add(cabecalhos[i], linha[i]);
 
-
-						//DataRow[] dataRowIDsEncontrados = dataTablePessoas.Select($"ID = '{id}'");
-						//if (dataRowIDsEncontrados.Length > 0)
-						//	dataRowIDsEncontrados[0]["Data Término (01/12/2024 00:00)"] = dataTermino.AddMinutes(15);
-
-						if (linhaIndex > 0)
-						{
-							if (valoresLinha.GetValueOrDefault("LANCTO").Trim() == id)
-								dataTermino = dataTermino.AddMinutes(15);
-							else
-							{
-								dataTermino = dataTermino.AddMinutes(15);
-
-								DataRow[] dataRowEncontrados = dataTablePessoas.Select($"Código = '{cod_responsavel}'");
-								if (dataRowEncontrados.Length > 0)
-									responsavel = dataRowEncontrados[0]["NomeCompleto"].ToString();
-
-								dataRow["ID"] = id;
-								dataRow["CPF"] = cpf.ToCPF();
-								dataRow["Nome Completo"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
-								dataRow["Data Início (01/12/2024 00:00)"] = dataInicio;
-								dataRow["Data Término (01/12/2024 00:00)"] = dataInicio;
-								dataRow["Data Inclusão (01/12/2024)"] = dataInclusao.ToData();
-								dataRow["NomeCompletoDentista"] = responsavel;
-								dataRow["Telefone"] = telefone.ToFone();
-								dataRow["Observacao"] = observacao;
-
-								dataTable.Rows.Add(dataRow);
-							}
-						}
-
-						cpf = valoresLinha.GetValueOrDefault("CNPJ_CPF").Trim();
-						nome = valoresLinha.GetValueOrDefault("NOME").Trim();
+						var cpf = valoresLinha.GetValueOrDefault("CNPJ_CPF").Trim();
+						var nome = valoresLinha.GetValueOrDefault("NOME").Trim();
 						var data = valoresLinha.GetValueOrDefault("DATA").Trim();
 						var hora = valoresLinha.GetValueOrDefault("HORA").Trim();
-						cod_responsavel = valoresLinha.GetValueOrDefault("CODIGO_RESP").Trim();
-						responsavel = valoresLinha.GetValueOrDefault("RESPONSAVEL").Trim();
-						telefone = valoresLinha.GetValueOrDefault("FONE_1").Trim();
-						dataInclusao = valoresLinha.GetValueOrDefault("MODIFICADO").Trim();
-						observacao = valoresLinha.GetValueOrDefault("OBS").Trim();
-						id = valoresLinha.GetValueOrDefault("LANCTO").Trim();
+						var cod_responsavel = valoresLinha.GetValueOrDefault("CODIGO_RESP").Trim();
+						var responsavel = valoresLinha.GetValueOrDefault("RESPONSAVEL").Trim();
+						var telefone = valoresLinha.GetValueOrDefault("FONE_1").Trim();
+						var dataInclusao = valoresLinha.GetValueOrDefault("MODIFICADO").Trim();
+						var observacao = valoresLinha.GetValueOrDefault("OBS").Trim();
+						var id = valoresLinha.GetValueOrDefault("LANCTO").Trim();
 
 						var minutos = hora.Split(':')[1];
 						var horas = hora.Split(':')[0];
-						dataInicio = data.ToData();
+						var dataInicio = data.ToData();
 
 						if (!string.IsNullOrEmpty(horas))
 							dataInicio = dataInicio.AddHours(double.Parse(horas));
 						if (!string.IsNullOrEmpty(minutos))
 							dataInicio = dataInicio.AddMinutes(double.Parse(minutos));
 
-						dataTermino = dataInicio;
+						var dataTermino = dataInicio.AddMinutes(15);
+
+						DataRow[] dataRowEncontrados = dataTablePessoas.Select($"Código = '{cod_responsavel}'");
+						if (dataRowEncontrados.Length > 0)
+							responsavel = dataRowEncontrados[0]["NomeCompleto"].ToString();
+
+						dataRow["ID"] = id;
+						dataRow["CPF"] = cpf.ToCPF();
+						dataRow["Nome Completo"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+						dataRow["Data Início (01/12/2024 00:00)"] = dataInicio;
+						dataRow["Data Término (01/12/2024 00:00)"] = dataTermino;
+						dataRow["Data Inclusão (01/12/2024)"] = dataInclusao.ToData();
+						dataRow["NomeCompletoDentista"] = responsavel;
+						dataRow["Telefone"] = telefone.ToFone();
+						dataRow["Observacao"] = observacao;
+
+						dataRowEncontrados = dataTable.Select($"ID = '{id}'");
+						if (dataRowEncontrados.Length > 0)
+						{
+							dataTermino = dataRowEncontrados[0]["Data Término (01/12/2024 00:00)"].ToString().ToData();
+							dataRowEncontrados[0]["Data Término (01/12/2024 00:00)"] = dataTermino.AddMinutes(15);
+						}
+						else
+							dataTable.Rows.Add(dataRow);
 					}
 
 					catch (Exception error)

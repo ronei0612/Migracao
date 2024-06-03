@@ -20,7 +20,7 @@ namespace Migracao.Sistems
 
 		List<string> cabecalhos_Pacientes = ["Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
 		List<string> cabecalhos_Recebiveis = ["CPF", "Emitente", "DocumentoRef", "RecebívelExigível(R/E)", "ValorOriginal", "ValorPago", "Prazo", "Vencimento(01/12/2010)", "DataBaixa", "Emissão(01/12/2010)", "ObservaçãoRecebível", "ObservaçãoRecebido"];
-		List<string> cabecalhos_Agenda = ["CPF", "NomeCompleto", "Telefone", "DataHoraConsulta(01/12/2024 00:00)", "NomeCompletoDentista", "Observacao", "DataInclusao(01/12/2024)"];
+		List<string> cabecalhos_Agenda = ["ID", "CPF", "Nome Completo", "Telefone", "Data Início (01/12/2024 00:00)", "Data Término (01/12/2024 00:00)", "Data Inclusão (01/12/2024)", "NomeCompletoDentista", "Observacao"];
 
 		HashSet<string> cadastroPaciente, registroRecebivel;
 
@@ -134,7 +134,7 @@ namespace Migracao.Sistems
 				var resultado = LerArquivosExcelCsv(excel_AGENDA.Text, Encoding.UTF8);
 				var linhasCSV = resultado.Item1;
 				var cabecalhosCSV = resultado.Item2;
-				dataTableAgenda = ConvertExcelAgenda(dataTableAgenda, cabecalhosCSV, linhasCSV);
+				dataTableAgenda = ConvertExcelAgenda(dataTableAgenda, cabecalhosCSV, linhasCSV, dataTablePessoas);
 			}
 
 			if (excel_AGENDA != null)
@@ -433,9 +433,13 @@ namespace Migracao.Sistems
 			}
 		}
 
-		public DataTable ConvertExcelAgenda(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas)
+		public DataTable ConvertExcelAgenda(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null)
 		{
-			ExcelHelper excelHelper = new();
+			//ExcelHelper excelHelper = new();
+			string cpf = "", nome = "", cod_responsavel = "", responsavel = "", telefone = "", dataInclusao = "", observacao = "", id = "";
+			DateTime dataInicio = DateTime.Now;
+			DateTime dataTermino = DateTime.Now;
+
 			try
 			{
 				int linhaIndex = 0;
@@ -450,34 +454,58 @@ namespace Migracao.Sistems
 							if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
 								valoresLinha.Add(cabecalhos[i], linha[i]);
 
-						var cpf = valoresLinha.GetValueOrDefault("CNPJ_CPF").Trim();
-						var nome = valoresLinha.GetValueOrDefault("NOME").Trim();
+
+						//DataRow[] dataRowIDsEncontrados = dataTablePessoas.Select($"ID = '{id}'");
+						//if (dataRowIDsEncontrados.Length > 0)
+						//	dataRowIDsEncontrados[0]["Data Término (01/12/2024 00:00)"] = dataTermino.AddMinutes(15);
+
+						if (linhaIndex > 0)
+						{
+							if (valoresLinha.GetValueOrDefault("LANCTO").Trim() == id)
+								dataTermino = dataTermino.AddMinutes(15);
+							else
+							{
+								dataTermino = dataTermino.AddMinutes(15);
+
+								DataRow[] dataRowEncontrados = dataTablePessoas.Select($"Código = '{cod_responsavel}'");
+								if (dataRowEncontrados.Length > 0)
+									responsavel = dataRowEncontrados[0]["NomeCompleto"].ToString();
+
+								dataRow["ID"] = id;
+								dataRow["CPF"] = cpf.ToCPF();
+								dataRow["Nome Completo"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+								dataRow["Data Início (01/12/2024 00:00)"] = dataInicio;
+								dataRow["Data Término (01/12/2024 00:00)"] = dataInicio;
+								dataRow["Data Inclusão (01/12/2024)"] = dataInclusao.ToData();
+								dataRow["NomeCompletoDentista"] = responsavel;
+								dataRow["Telefone"] = telefone.ToFone();
+								dataRow["Observacao"] = observacao;
+
+								dataTable.Rows.Add(dataRow);
+							}
+						}
+
+						cpf = valoresLinha.GetValueOrDefault("CNPJ_CPF").Trim();
+						nome = valoresLinha.GetValueOrDefault("NOME").Trim();
 						var data = valoresLinha.GetValueOrDefault("DATA").Trim();
 						var hora = valoresLinha.GetValueOrDefault("HORA").Trim();
-						var cod_responsavel = valoresLinha.GetValueOrDefault("CODIGO_RESP").Trim();
-						var responsavel = valoresLinha.GetValueOrDefault("RESPONSAVEL").Trim();
-						var telefone = valoresLinha.GetValueOrDefault("FONE_1").Trim();
-						var dataInclusao = valoresLinha.GetValueOrDefault("MODIFICADO").Trim();
-						var observacao = valoresLinha.GetValueOrDefault("OBS").Trim();
+						cod_responsavel = valoresLinha.GetValueOrDefault("CODIGO_RESP").Trim();
+						responsavel = valoresLinha.GetValueOrDefault("RESPONSAVEL").Trim();
+						telefone = valoresLinha.GetValueOrDefault("FONE_1").Trim();
+						dataInclusao = valoresLinha.GetValueOrDefault("MODIFICADO").Trim();
+						observacao = valoresLinha.GetValueOrDefault("OBS").Trim();
+						id = valoresLinha.GetValueOrDefault("LANCTO").Trim();
 
 						var minutos = hora.Split(':')[1];
 						var horas = hora.Split(':')[0];
-						var dataConsulta = data.ToData();
+						dataInicio = data.ToData();
 
 						if (!string.IsNullOrEmpty(horas))
-							dataConsulta = dataConsulta.AddHours(double.Parse(horas));
+							dataInicio = dataInicio.AddHours(double.Parse(horas));
 						if (!string.IsNullOrEmpty(minutos))
-							dataConsulta = dataConsulta.AddMinutes(double.Parse(minutos));
+							dataInicio = dataInicio.AddMinutes(double.Parse(minutos));
 
-						dataRow["CPF"] = cpf.ToCPF();
-						dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
-						dataRow["DataHoraConsulta(01/12/2024 00:00)"] = dataConsulta;
-						dataRow["DataInclusao(01/12/2024)"] = dataInclusao.ToData();
-						dataRow["NomeCompletoDentista"] = responsavel;
-						dataRow["Telefone"] = telefone.ToFone();
-						dataRow["Observacao"] = observacao;
-
-						dataTable.Rows.Add(dataRow);
+						dataTermino = dataInicio;
 					}
 
 					catch (Exception error)
@@ -603,16 +631,16 @@ namespace Migracao.Sistems
 								EstabelecimentoID = estabelecimentoID,
 								AtendeTipoID = 1,
 								DataInicio = dataConsulta,
-								DataTermino = dataConsulta.AddMinutes(30),
+								DataTermino = dataConsulta.AddMinutes(15),
 								ConsumidorID = (int)consumidorID,
 								ConsumidorPessoaNome = nomeCompleto,
 								Titulo = titulo,
 								FuncionarioID = (int)funcionarioID,
 								DataInclusao = dataInclusao,
 								ConsumidorPessoaFone1 = (long)telefone,
-								Descricao = observacoes
+								Descricao = observacoes,
+								PessoaID = (int)pessoaID
 								//ConsumidorPessoaID = (int)pessoaID,
-								//PessoaID = (int)pessoaID,
 								//DataCancelamento = ,
 								//
 								//AtendimentoValor = ,
@@ -620,6 +648,9 @@ namespace Migracao.Sistems
 								//SalaID = ,
 							});
 					}
+
+					else
+						telefone = 0;
 				}
 
 				indiceLinha = 0;
@@ -638,6 +669,7 @@ namespace Migracao.Sistems
 					{ "DataInclusao", agendamentos.ConvertAll(agendamento => (object)agendamento.DataInclusao).ToArray() },
 					{ "ConsumidorPessoaFone1", agendamentos.ConvertAll(agendamento => (object)agendamento.ConsumidorPessoaFone1).ToArray() },
 					{ "Descricao", agendamentos.ConvertAll(agendamento => (object)agendamento.Descricao).ToArray() },
+					{ "PessoaID", agendamentos.ConvertAll(agendamento => (object)agendamento.PessoaID).ToArray() }
 				};
 
 				var salvarArquivo = Tools.GerarNomeArquivo($"Agendamentos_{estabelecimentoID}_OdontoCompany_Migração");

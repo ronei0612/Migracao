@@ -1,6 +1,7 @@
 ﻿using Migracao.Models;
 using Migracao.Utils;
 using NPOI.SS.UserModel;
+using Org.BouncyCastle.Cms;
 using System.Data;
 using System.Text;
 
@@ -19,6 +20,8 @@ namespace Migracao.Sistems
 
 		List<string> cabecalhos_Pacientes = ["Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
 		List<string> cabecalhos_Recebiveis = ["CPF", "Emitente", "DocumentoRef", "RecebívelExigível(R/E)", "ValorOriginal", "ValorPago", "Prazo", "Vencimento(01/12/2010)", "DataBaixa", "Emissão(01/12/2010)", "ObservaçãoRecebível", "ObservaçãoRecebido"];
+		List<string> cabecalhos_Agenda = ["CPF", "NomeCompleto", "Telefone", "DataHoraConsulta(01/12/2024 00:00)", "NomeCompletoDentista", "Observacao", "DataInclusao(01/12/2024)"];
+
 		HashSet<string> cadastroPaciente, registroRecebivel;
 
 		public Tuple<List<string[]>, List<string>> LerArquivosExcelCsv(string arquivo, Encoding encoding)
@@ -36,13 +39,17 @@ namespace Migracao.Sistems
 			ExcelHelper excelHelper = new();
 			DataTable dataTablePessoas = new();
 			DataTable dataTableRecebiveis = new();
-			registroRecebivel = new HashSet<string>();
+			DataTable dataTableAgenda = new();
+			//registroRecebivel = new HashSet<string>();
 
 			foreach (string coluna in cabecalhos_Pacientes)
 				dataTablePessoas.Columns.Add(coluna, typeof(string));
 
 			foreach (string coluna in cabecalhos_Recebiveis)
 				dataTableRecebiveis.Columns.Add(coluna, typeof(string));
+
+			foreach (string coluna in cabecalhos_Agenda)
+				dataTableAgenda.Columns.Add(coluna, typeof(string));
 
 			if (File.Exists(arquivoExcelCidades))
 				try
@@ -118,12 +125,27 @@ namespace Migracao.Sistems
 				var salvarArquivoRecebiveis = Tools.GerarNomeArquivo($"CadastroRecebiveis_{estabelecimentoID}_OdontoCompany");
 				excelHelper.CriarExcelArquivo(salvarArquivoRecebiveis + ".xlsx", dataTableRecebiveis);
 			}
+
+
+			var excel_AGENDA = listView.Items.Cast<ListViewItem>()
+				.FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("AGENDA")));
+			if (excel_AGENDA != null)
+			{
+				var resultado = LerArquivosExcelCsv(excel_AGENDA.Text, Encoding.UTF8);
+				var linhasCSV = resultado.Item1;
+				var cabecalhosCSV = resultado.Item2;
+				dataTableAgenda = ConvertExcelAgenda(dataTableAgenda, cabecalhosCSV, linhasCSV);
+			}
+
+			if (excel_AGENDA != null)
+			{
+				var salvarArquivoAgenda = Tools.GerarNomeArquivo($"CadastroAgenda_{estabelecimentoID}_OdontoCompany");
+				excelHelper.CriarExcelArquivo(salvarArquivoAgenda + ".xlsx", dataTableAgenda);
+			}
 		}
 
 		//else if (comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
 		//	nomeArquivoExcel = "CED001";
-		//else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
-		//	nomeArquivoExcel = "AGENDA";
 
 		public DataTable ConvertExcelRecebiveis(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas)
 		{
@@ -411,7 +433,70 @@ namespace Migracao.Sistems
 			}
 		}
 
-		public void ImportarAgenda(string arquivoExcel, int estabelecimentoID, string arquivoExcelFuncionarios, int loginID)
+		public DataTable ConvertExcelAgenda(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas)
+		{
+			ExcelHelper excelHelper = new();
+			try
+			{
+				int linhaIndex = 0;
+				foreach (string[] linha in linhas)
+				{
+					try
+					{
+						DataRow dataRow = dataTable.NewRow();
+						var valoresLinha = new Dictionary<string, string>();
+
+						for (int i = 0; i < cabecalhos.Count; i++)
+							if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
+								valoresLinha.Add(cabecalhos[i], linha[i]);
+
+						var cpf = valoresLinha.GetValueOrDefault("CNPJ_CPF").Trim();
+						var nome = valoresLinha.GetValueOrDefault("NOME").Trim();
+						var data = valoresLinha.GetValueOrDefault("DATA").Trim();
+						var hora = valoresLinha.GetValueOrDefault("HORA").Trim();
+						var cod_responsavel = valoresLinha.GetValueOrDefault("CODIGO_RESP").Trim();
+						var responsavel = valoresLinha.GetValueOrDefault("RESPONSAVEL").Trim();
+						var telefone = valoresLinha.GetValueOrDefault("FONE_1").Trim();
+						var dataInclusao = valoresLinha.GetValueOrDefault("MODIFICADO").Trim();
+						var observacao = valoresLinha.GetValueOrDefault("OBS").Trim();
+
+						var minutos = hora.Split(':')[1];
+						var horas = hora.Split(':')[0];
+						var dataConsulta = data.ToData();
+
+						if (!string.IsNullOrEmpty(horas))
+							dataConsulta = dataConsulta.AddHours(double.Parse(horas));
+						if (!string.IsNullOrEmpty(minutos))
+							dataConsulta = dataConsulta.AddMinutes(double.Parse(minutos));
+
+						dataRow["CPF"] = cpf.ToCPF();
+						dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+						dataRow["DataHoraConsulta(01/12/2024 00:00)"] = dataConsulta;
+						dataRow["DataInclusao(01/12/2024)"] = dataInclusao.ToData();
+						dataRow["NomeCompletoDentista"] = responsavel;
+						dataRow["Telefone"] = telefone.ToFone();
+						dataRow["Observacao"] = observacao;
+
+						dataTable.Rows.Add(dataRow);
+					}
+
+					catch (Exception error)
+					{
+						throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
+					}
+
+					linhaIndex++;
+				}
+
+				return dataTable;
+			}
+			catch (Exception error)
+			{
+				throw new Exception($"Erro ao converter Excel para Pessoas Pacientes: {error.Message}");
+			}
+		}
+
+		public void ImportarAgenda(string arquivoExcel, int estabelecimentoID, string arquivoExcelAgenda, int loginID)
 		{
 			var dataHoje = DateTime.Now;
 			var indiceLinha = 0;
@@ -419,16 +504,19 @@ namespace Migracao.Sistems
 			var excelHelper = new ExcelHelper(arquivoExcel);
 			var sqlHelper = new SqlHelper();
 
-			ISheet sheet;
-			try
+			if (!string.IsNullOrEmpty(arquivoExcelAgenda))
 			{
-				IWorkbook workbook = excelHelper.LerExcel(arquivoExcelFuncionarios);
-				sheet = workbook.GetSheetAt(0);
-				excelHelper.InitializeDictionary(sheet);
-			}
-			catch (Exception ex)
-			{
-				throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelFuncionarios}\": {ex.Message}");
+				ISheet sheet;
+				try
+				{
+					IWorkbook workbook = excelHelper.LerExcel(arquivoExcelAgenda);
+					sheet = workbook.GetSheetAt(0);
+					excelHelper.InitializeDictionary(sheet);
+				}
+				catch (Exception ex)
+				{
+					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelAgenda}\": {ex.Message}");
+				}
 			}
 
 			var agendamentos = new List<Agendamento>();
@@ -439,14 +527,15 @@ namespace Migracao.Sistems
 				{
 					indiceLinha++;
 
-					string nomeCompleto = "", cpf = "", hora = "", minutos = "", dentistaResponsavel = "";
+					string nomeCompleto = "", cpf = "", dentistaResponsavel = "";
 					bool faltou = false;
 					string? outroSacadoNome = null, observacoes = null, documento = null;
 					int recibo = 0, codigo = 0;
 					int? consumidorID = null, fornecedorID = null, colaboradorID = null, funcionarioID = null, clienteID = null, pessoaID = null;
 					decimal pagoValor = 0, valor = 0;
+					long? telefone;
 					byte formaPagamento = (byte)TitulosEspeciesID.DepositoEmConta;
-					DateTime dataConsulta = dataHoje;
+					DateTime dataConsulta = dataHoje, dataInclusao = dataHoje;
 
 					foreach (var celula in linha.Cells)
 					{
@@ -460,37 +549,34 @@ namespace Migracao.Sistems
 							{
 								switch (tituloColuna)
 								{
-									case "CNPJ_CPF":
+									case "CPF":
 										cpf = celulaValor.ToCPF();
 										break;
-									case "NOME":
+									case "NomeCompleto":
 										nomeCompleto = celulaValor;
 										break;
-									case "DATA":
+									case "Telefone":
+										telefone = celulaValor.ToFone();
+										break;
+									case "DataHoraConsulta(01/12/2024 00:00)":
 										dataConsulta = celulaValor.ToData();
 										break;
-									case "HORA":
-										hora = celula.TimeOnlyCellValue.Value.Hour.ToString();
-										minutos = celula.TimeOnlyCellValue.Value.Minute.ToString();
+									case "NomeCompletoDentista":
+										dentistaResponsavel = celulaValor;
 										break;
-									case "OBS":
+									case "Observacao":
 										observacoes = celulaValor;
 										break;
-									case "FALTOU":
-										faltou = celulaValor == "S";
-										break;
-									case "RESPONSAVEL":
-										dentistaResponsavel = celulaValor;
+									case "DataInclusao(01/12/2024)":
+										dataInclusao = celulaValor.ToData();
 										break;
 								}
 							}
 						}
 					}
 
-					if (!string.IsNullOrEmpty(hora))
-						dataConsulta = dataConsulta.AddHours(double.Parse(hora));
-					if (!string.IsNullOrEmpty(minutos))
-						dataConsulta = dataConsulta.AddMinutes(double.Parse(minutos));
+					if (dataConsulta == dataHoje)
+						dataConsulta = dataInclusao;
 
 					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: cpf, codigo: codigo.ToString());
 					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: dentistaResponsavel);

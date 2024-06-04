@@ -99,6 +99,14 @@ namespace Migracao.Utils
 			return data;
 		}
 
+		public static long ToNumV2(this string texto)
+		{
+			if (string.IsNullOrEmpty(texto))
+				return 0;
+
+			return long.Parse(Regex.Replace(texto, "[^0-9]", ""));
+		}
+
 		public static int ToNum(this string texto)
 		{
 			if (string.IsNullOrEmpty(texto))

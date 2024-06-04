@@ -22,7 +22,7 @@ namespace Migracao.Sistems
 		List<string> cabecalhos_Pacientes		= ["Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
 		List<string> cabecalhos_Recebiveis		= ["CPF", "Emitente", "DocumentoRef", "RecebívelExigível(R/E)", "ValorOriginal", "ValorPago", "Prazo", "Vencimento(01/12/2010)", "DataBaixa", "Emissão(01/12/2010)", "ObservaçãoRecebível", "ObservaçãoRecebido"];
 		List<string> cabecalhos_Agendamentos	= ["ID", "CPF", "Nome Completo", "Telefone", "Data Início (01/12/2024 00:00)", "Data Término (01/12/2024 00:00)", "Data Inclusão (01/12/2024)", "NomeCompletoDentista", "Observacao"];
-		List<string> cabecalhos_Procedimentos	= ["Nome Tabela", "Ativo(S/N)", "Procedimento(Nome)", "Abreviação", "Preço", "TUSS", "Diagnóstico(S/N)", "Prevenção(S/N)", "Odontopediatria(S/N)", "Dentística(S/N)", "Endodontia(S/N)", "Periodontia(S/N)", "Prótese(S/N)", "Cirurgia(S/N)", "Ortodontia(S/N)", "Radiologia(S/N)", "Estética(S/N)", "Implantodontia(S/N)", "Odontogeriatria(S/N)", "DTM(S/N)", "Orofacial(S/N)", ];
+		List<string> cabecalhos_Procedimentos	= ["Nome Tabela", "Ativo(S/N)", "Procedimento(Nome)", "Abreviação", "Especialidade", "Preço", "TUSS", "Diagnóstico(S/N)", "Prevenção(S/N)", "Odontopediatria(S/N)", "Dentística(S/N)", "Endodontia(S/N)", "Periodontia(S/N)", "Prótese(S/N)", "Cirurgia(S/N)", "Ortodontia(S/N)", "Radiologia(S/N)", "Estética(S/N)", "Implantodontia(S/N)", "Odontogeriatria(S/N)", "DTM(S/N)", "Orofacial(S/N)", ];
 		List<string> cabecalhos_CodProcedimentos = ["ID", "Nome", "Usuário"];
 
 		HashSet<string> cadastroPaciente, registroRecebivel;
@@ -190,9 +190,6 @@ namespace Migracao.Sistems
 				excelHelper.CriarExcelArquivo(salvarArquivoAgenda + ".xlsx", dataTableProcedimentos);
 			}
 		}
-
-		//else if (comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
-		//	nomeArquivoExcel = "CED001";
 
 		public DataTable ConvertExcelRecebiveis(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas)
 		{
@@ -501,7 +498,7 @@ namespace Migracao.Sistems
 						var usuario = valoresLinha.GetValueOrDefault("USUARIO").Trim();
 
 						dataRow["ID"] = cod;
-						dataRow["Nome"] = nome.GetPrimeirosCaracteres(100).PrimeiraLetraMaiuscula(); ;
+						dataRow["Nome"] = nome.GetPrimeirosCaracteres(100).PrimeiraLetraMaiuscula();
 						dataRow["Usuário"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
 
 						dataTable.Rows.Add(dataRow);
@@ -538,7 +535,7 @@ namespace Migracao.Sistems
 						for (int i = 0; i < cabecalhos.Count; i++)
 							if (i < linha.Length)
 								valoresLinha.Add(cabecalhos[i], linha[i]);
-						
+
 						var cod = valoresLinha.GetValueOrDefault("GRUPO").Trim();
 						var nome = valoresLinha.GetValueOrDefault("NOME").Trim();
 						var abreviacao = valoresLinha.GetValueOrDefault("SIMBOLO").Trim();
@@ -548,22 +545,26 @@ namespace Migracao.Sistems
 						var observacao = valoresLinha.GetValueOrDefault("OBS").Trim();
 						var particular = valoresLinha.GetValueOrDefault("PARTICULAR").Trim();
 						var nomeTabela = "";
+						var especialidade = "";
 
-						if (string.IsNullOrEmpty(observacao) && particular != "N")
+						DataRow[] dataRowEncontrados = codProcedimentos.Select($"ID = '{cod}'");
+						if (dataRowEncontrados.Length > 0)
+							especialidade = dataRowEncontrados[0]["Nome"].ToString();
+
+						if (nome.StartsWith("ODC "))
+							nomeTabela = "ODC";
+						else if (string.IsNullOrEmpty(observacao) && particular != "N")
 							nomeTabela = "Particular";
 						else
-						{
-							DataRow[] dataRowEncontrados = codProcedimentos.Select($"Código = '{cod}'");
-							if (dataRowEncontrados.Length > 0)
-								nomeTabela = dataRowEncontrados[0]["Nome"].ToString();
-						}
+							nomeTabela = especialidade;
 
 						dataRow["Nome Tabela"] = nome.GetPrimeirosCaracteres(100).PrimeiraLetraMaiuscula();
+						dataRow["Especialidade"] = especialidade;
 						dataRow["Ativo(S/N)"] = ativo == "N" ? "N" : "S";
 						dataRow["Procedimento(Nome)"] = nomeTabela.GetPrimeirosCaracteres(40).PrimeiraLetraMaiuscula();
 						dataRow["Abreviação"] = abreviacao;
 						dataRow["Preço"] = valor.ArredondarValorV2();
-						dataRow["TUSS"] = tuss.ToNum();
+						dataRow["TUSS"] = tuss.ToNumV2();
 
 						dataTable.Rows.Add(dataRow);
 					}

@@ -551,17 +551,20 @@ namespace Migracao.Sistems
 						if (dataRowEncontrados.Length > 0)
 							especialidade = dataRowEncontrados[0]["Nome"].ToString();
 
-						if (nome.StartsWith("ODC "))
+						if (nome.StartsWith("odc ", StringComparison.CurrentCultureIgnoreCase))
 							nomeTabela = "ODC";
 						else if (string.IsNullOrEmpty(observacao) && particular != "N")
 							nomeTabela = "Particular";
 						else
+						{
 							nomeTabela = especialidade;
+							especialidade = "Outros";
+						}
 
-						dataRow["Nome Tabela"] = nome.GetPrimeirosCaracteres(100).PrimeiraLetraMaiuscula();
+						dataRow["Nome Tabela"] = nomeTabela.GetPrimeirosCaracteres(40).PrimeiraLetraMaiuscula();
 						dataRow["Especialidade"] = especialidade;
 						dataRow["Ativo(S/N)"] = ativo == "N" ? "N" : "S";
-						dataRow["Procedimento(Nome)"] = nomeTabela.GetPrimeirosCaracteres(40).PrimeiraLetraMaiuscula();
+						dataRow["Procedimento(Nome)"] = nome.GetPrimeirosCaracteres(100).PrimeiraLetraMaiuscula();
 						dataRow["Abreviação"] = abreviacao;
 						dataRow["Preço"] = valor.ArredondarValorV2();
 						dataRow["TUSS"] = tuss.ToNumV2();

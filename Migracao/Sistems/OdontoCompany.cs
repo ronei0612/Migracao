@@ -16,10 +16,14 @@ namespace Migracao.Sistems
 		string[] CXD555_Baixa			= ["AGENCIA", "BANCO", "BAIXA", "CALCULO", "CNPJ_CPF", "CONTA", "DATA", "DOCUMENTO", "DT_AXON", "DT_DEPOSITO", "FECHAR_DIRETO", "FICHA_FINANCEIRO", "HISTORICO", "HORA", "LANCTO", "LOJA", "LOTE", "MODIFICADO", "NUM_CONVENIO", "OBS1", "OBS2", "OBS3", "PERIODO", "PRO_MED", "PRO_ODO", "RESPONSAVEL", "ROY_MED", "ROY_ODO", "TERMINAL", "TIPO", "TRANSMISSAO", "USUARIO", "VALOR", "VALOR_RECEBER", "VLR_BRUTO"];
 		string[] BXD111_Baixa			= ["AGUARDANDO_VINCULO", "AXON_ID", "BAIXA", "BANCO", "CAMPOX", "CGC_CPF", "COD_CAIXA", "CONTA_CORRENTE", "CONTA_DOCUMENTO", "DATA_REMESSA", "DOCUMENTO", "DT_AXON", "DUPLICATA", "GRUPO", "ID_BAIXAPLANOS", "LANCTO", "LOJA", "MODIFICADO", "MOTIVO", "NOME_GRUPO", "NUM_BANCO", "OBS", "PARCELA", "RESPONSAVEL", "TERMINAL", "TIPO_DOC", "TRANSMISSAO", "USUARIO", "VALOR", "VENCTO", "VR_CALCULADO", "VR_PARCELA"];
 		string[] CED006_Dentistas		= ["ADMISSAO", "AGENCIA", "AGENCIA2", "AXON_ID", "BAIRRO", "BANCO", "BANCO2", "CAIXA_POSTAL", "CEP", "CGC_CPF", "CIDADE", "CLIENTE", "CODIGO", "CODIGO_CLIENTE", "CODIGO_INDICACAO", "CODIGO_VALIDADE", "COD_MUNICIPIO", "COD_PRAMELHOR", "COD_UF", "COD_VENDEDOR", "CONJUGE", "CONTA", "CONTA2", "CPF_FIA", "CPF_INDICACAO", "DATA_APROVACAO_DRCASH", "DATA_BLOQUEIO", "DATA_DEP_EXCLUIDO", "DATA_LGPD", "DATA_VALIDADE", "DEPENDENTE", "DT_AXON", "DT_CADASTRO", "DT_NASC_FIA", "DT_NASCIMENTO", "DT_NASCIMENTO_DEP", "DT_ULTMOV", "EMAIL", "ENDERECO", "ENDERECO_FIA", "ESTADO", "ESTADO_FIA", "FAX", "FONE1", "FONE2", "FONE_FIA", "FONE_REF_1", "FONE_REF_2", "F_OU_J", "FORNECEDOR", "FUNCAO", "ID_DRCASH", "INSC_RG", "INSTITUTO_ODC", "LGPD_CPF", "LGPD_DATA_HORA", "LGPD_IMAGEM", "LGPD_MENSAGEM", "LGPD_TELEFONE", "LGPD_USUARIO", "LOJA", "MAE", "MODIFICADO", "NOME", "NOME_FIA", "NOME_GRUPO", "NOME_LOCAL", "NOME_REF_1", "NOME_REF_2", "NOME_VALIDADE", "NUM_BLOQUEIO", "NUM_CONVENIO", "NUM_ENDERECO", "NUM_FICHA", "OBS1", "OBS_VALIDADE", "ONDE_TRABALHA", "PAI", "PARENTESCO_FIA", "PRESTADOR", "PROFISSAO", "PROFISSAO_FIA", "PROTETICO", "PROTETICO_ATIVO", "QTDE_DEPENDENTES", "RENDA_FIA", "RENDA_MES", "RG_FIA", "SEXO_M_F", "TITULAR", "TITULAR_DEP_EXCLUIDO", "TRANSMISSAO", "USU_BLOQUEIO", "USU_CADASTRO", "USUARIO", "USUARIO_LGPD", "USUARIO_VALIDADE", "VALOR_MAXIMO_DRCASH", "VR_LIMITE"];
+		string[] CED001_Procedimentos	= ["CODIGO", "NOME", "SIMBOLO", "GRUPO", "CODIGO_TUSS", "VRVENDA", "ATIVO", "OBS", "PARTICULAR"];
+		string[] CED002_CodProcedimentos = ["CODIGO", "NOME", "USUARIO"];
 
-		List<string> cabecalhos_Pacientes = ["Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
-		List<string> cabecalhos_Recebiveis = ["CPF", "Emitente", "DocumentoRef", "RecebívelExigível(R/E)", "ValorOriginal", "ValorPago", "Prazo", "Vencimento(01/12/2010)", "DataBaixa", "Emissão(01/12/2010)", "ObservaçãoRecebível", "ObservaçãoRecebido"];
-		List<string> cabecalhos_Agendamentos = ["ID", "CPF", "Nome Completo", "Telefone", "Data Início (01/12/2024 00:00)", "Data Término (01/12/2024 00:00)", "Data Inclusão (01/12/2024)", "NomeCompletoDentista", "Observacao"];
+		List<string> cabecalhos_Pacientes		= ["Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
+		List<string> cabecalhos_Recebiveis		= ["CPF", "Emitente", "DocumentoRef", "RecebívelExigível(R/E)", "ValorOriginal", "ValorPago", "Prazo", "Vencimento(01/12/2010)", "DataBaixa", "Emissão(01/12/2010)", "ObservaçãoRecebível", "ObservaçãoRecebido"];
+		List<string> cabecalhos_Agendamentos	= ["ID", "CPF", "Nome Completo", "Telefone", "Data Início (01/12/2024 00:00)", "Data Término (01/12/2024 00:00)", "Data Inclusão (01/12/2024)", "NomeCompletoDentista", "Observacao"];
+		List<string> cabecalhos_Procedimentos	= ["Nome Tabela", "Ativo(S/N)", "Procedimento(Nome)", "Abreviação", "Preço", "TUSS", "Diagnóstico(S/N)", "Prevenção(S/N)", "Odontopediatria(S/N)", "Dentística(S/N)", "Endodontia(S/N)", "Periodontia(S/N)", "Prótese(S/N)", "Cirurgia(S/N)", "Ortodontia(S/N)", "Radiologia(S/N)", "Estética(S/N)", "Implantodontia(S/N)", "Odontogeriatria(S/N)", "DTM(S/N)", "Orofacial(S/N)", ];
+		List<string> cabecalhos_CodProcedimentos = ["ID", "Nome", "Usuário"];
 
 		HashSet<string> cadastroPaciente, registroRecebivel;
 
@@ -39,6 +43,8 @@ namespace Migracao.Sistems
 			DataTable dataTablePessoas = new();
 			DataTable dataTableRecebiveis = new();
 			DataTable dataTableAgendamentos = new();
+			DataTable dataTableProcedimentos = new();
+			DataTable dataTableCodProcedimentos = new();
 			//registroRecebivel = new HashSet<string>();
 
 			foreach (string coluna in cabecalhos_Pacientes)
@@ -49,6 +55,12 @@ namespace Migracao.Sistems
 
 			foreach (string coluna in cabecalhos_Agendamentos)
 				dataTableAgendamentos.Columns.Add(coluna, typeof(string));
+
+			foreach (string coluna in cabecalhos_Procedimentos)
+				dataTableProcedimentos.Columns.Add(coluna, typeof(string));
+
+			foreach (string coluna in cabecalhos_CodProcedimentos)
+				dataTableCodProcedimentos.Columns.Add(coluna, typeof(string));
 
 			if (File.Exists(arquivoExcelCidades))
 				try
@@ -145,6 +157,37 @@ namespace Migracao.Sistems
 			{
 				var salvarArquivoAgenda = Tools.GerarNomeArquivo($"CadastroAgenda_{estabelecimentoID}_OdontoCompany");
 				excelHelper.CriarExcelArquivo(salvarArquivoAgenda + ".xlsx", dataTableAgendamentos);
+			}
+
+
+			var excel_CED002 = listView.Items.Cast<ListViewItem>()
+				.FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("CED002")));
+			if (excel_CED002 != null)
+			{
+				var resultado = LerArquivosExcelCsv(excel_CED002.Text, Encoding.UTF8);
+				var linhasCSV = resultado.Item1;
+				var cabecalhosCSV = resultado.Item2;
+
+				if (CED002_CodProcedimentos.All(cabecalhosCSV.Contains))
+					dataTableCodProcedimentos = ConvertExcelGrupoProcedimentos(dataTableCodProcedimentos, cabecalhosCSV, linhasCSV);
+			}
+
+			var excel_CED001 = listView.Items.Cast<ListViewItem>()
+				.FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("CED001")));
+			if (excel_CED001 != null)
+			{
+				var resultado = LerArquivosExcelCsv(excel_CED001.Text, Encoding.UTF8);
+				var linhasCSV = resultado.Item1;
+				var cabecalhosCSV = resultado.Item2;
+
+				if (CED001_Procedimentos.All(cabecalhosCSV.Contains))
+					dataTableProcedimentos = ConvertExcelProcedimentos(dataTableProcedimentos, cabecalhosCSV, linhasCSV, dataTableCodProcedimentos);
+			}
+
+			if (dataTableProcedimentos != null)
+			{
+				var salvarArquivoAgenda = Tools.GerarNomeArquivo($"CadastroProcedimentos_{estabelecimentoID}_OdontoCompany");
+				excelHelper.CriarExcelArquivo(salvarArquivoAgenda + ".xlsx", dataTableProcedimentos);
 			}
 		}
 
@@ -434,6 +477,110 @@ namespace Migracao.Sistems
 			catch (Exception error)
 			{
 				throw new Exception($"Erro ao converter Excel para Pessoas Pacientes: {error.Message}");
+			}
+		}
+
+		public DataTable ConvertExcelGrupoProcedimentos(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas)
+		{
+			try
+			{
+				int linhaIndex = 0;
+				foreach (string[] linha in linhas)
+				{
+					try
+					{
+						DataRow dataRow = dataTable.NewRow();
+						var valoresLinha = new Dictionary<string, string>();
+
+						for (int i = 0; i < cabecalhos.Count; i++)
+							if (i < linha.Length)
+								valoresLinha.Add(cabecalhos[i], linha[i]);
+
+						var cod = valoresLinha.GetValueOrDefault("CODIGO").Trim();
+						var nome = valoresLinha.GetValueOrDefault("NOME").Trim();
+						var usuario = valoresLinha.GetValueOrDefault("USUARIO").Trim();
+
+						dataRow["ID"] = cod;
+						dataRow["Nome"] = nome.GetPrimeirosCaracteres(100).PrimeiraLetraMaiuscula(); ;
+						dataRow["Usuário"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+
+						dataTable.Rows.Add(dataRow);
+					}
+
+					catch (Exception error)
+					{
+						throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
+					}
+
+					linhaIndex++;
+				}
+
+				return dataTable;
+			}
+			catch (Exception error)
+			{
+				throw new Exception($"Erro ao converter Excel Grupo Procedimentos: {error.Message}");
+			}
+		}
+
+		public DataTable ConvertExcelProcedimentos(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable codProcedimentos)
+		{
+			try
+			{
+				int linhaIndex = 0;
+				foreach (string[] linha in linhas)
+				{
+					try
+					{
+						DataRow dataRow = dataTable.NewRow();
+						var valoresLinha = new Dictionary<string, string>();
+
+						for (int i = 0; i < cabecalhos.Count; i++)
+							if (i < linha.Length)
+								valoresLinha.Add(cabecalhos[i], linha[i]);
+						
+						var cod = valoresLinha.GetValueOrDefault("GRUPO").Trim();
+						var nome = valoresLinha.GetValueOrDefault("NOME").Trim();
+						var abreviacao = valoresLinha.GetValueOrDefault("SIMBOLO").Trim();
+						var tuss = valoresLinha.GetValueOrDefault("CODIGO_TUSS").Trim();
+						var valor = valoresLinha.GetValueOrDefault("VRVENDA").Trim();
+						var ativo = valoresLinha.GetValueOrDefault("ATIVO").Trim();
+						var observacao = valoresLinha.GetValueOrDefault("OBS").Trim();
+						var particular = valoresLinha.GetValueOrDefault("PARTICULAR").Trim();
+						var nomeTabela = "";
+
+						if (string.IsNullOrEmpty(observacao) && particular != "N")
+							nomeTabela = "Particular";
+						else
+						{
+							DataRow[] dataRowEncontrados = codProcedimentos.Select($"Código = '{cod}'");
+							if (dataRowEncontrados.Length > 0)
+								nomeTabela = dataRowEncontrados[0]["Nome"].ToString();
+						}
+
+						dataRow["Nome Tabela"] = nome.GetPrimeirosCaracteres(100).PrimeiraLetraMaiuscula();
+						dataRow["Ativo(S/N)"] = ativo == "N" ? "N" : "S";
+						dataRow["Procedimento(Nome)"] = nomeTabela.GetPrimeirosCaracteres(40).PrimeiraLetraMaiuscula();
+						dataRow["Abreviação"] = abreviacao;
+						dataRow["Preço"] = valor.ArredondarValorV2();
+						dataRow["TUSS"] = tuss.ToNum();
+
+						dataTable.Rows.Add(dataRow);
+					}
+
+					catch (Exception error)
+					{
+						throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
+					}
+
+					linhaIndex++;
+				}
+
+				return dataTable;
+			}
+			catch (Exception error)
+			{
+				throw new Exception($"Erro ao converter Excel Procedimentos: {error.Message}");
 			}
 		}
 

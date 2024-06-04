@@ -138,7 +138,7 @@ namespace Migracao.Sistems
 				var resultado = LerArquivosExcelCsv(excel_AGENDA.Text, Encoding.UTF8);
 				var linhasCSV = resultado.Item1;
 				var cabecalhosCSV = resultado.Item2;
-				dataTableAgendamentos = ConvertExcelAgenda(dataTableAgendamentos, cabecalhosCSV, linhasCSV, dataTablePessoas);
+				dataTableAgendamentos = ConvertExcelAgendamento(dataTableAgendamentos, cabecalhosCSV, linhasCSV, dataTablePessoas);
 			}
 
 			if (excel_AGENDA != null)
@@ -437,7 +437,7 @@ namespace Migracao.Sistems
 			}
 		}
 
-		public DataTable ConvertExcelAgenda(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null)
+		public DataTable ConvertExcelAgendamento(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null)
 		{
 			List<string> ids = new();
 
@@ -498,8 +498,8 @@ namespace Migracao.Sistems
 							dataRow["Data Inclusão (01/12/2024)"] = dataInclusao.ToData();
 							dataRow["NomeCompletoDentista"] = responsavel;
 							dataRow["Telefone"] = telefone.ToFone();
-							dataRow["Observacao"] = observacao;							
-							
+							dataRow["Observacao"] = observacao;
+
 							dataTable.Rows.Add(dataRow);
 						}
 					}

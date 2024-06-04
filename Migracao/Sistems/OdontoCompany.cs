@@ -524,7 +524,22 @@ namespace Migracao.Sistems
 		{
 			try
 			{
+				var grupoCategoriaDict = new Dictionary<string, string>()
+				{
+					{ "CIRURGIA", "Cirurgia" },
+					{ "ENDODONTIA", "Endodontia" },
+					{ "PERIODONTIA", "Periodontia" },
+					{ "PROTESE", "Protese" },
+					{ "CLINICO", "Outros" },
+					{ "MANUTENCAO", "Ortodontia" },
+					{ "ORTODONTIA", "Ortodontia" },
+					{ "ORTO", "Ortodontia" },
+					{ "PREVENCAO", "Prevencao" },
+					{ "OROFACIAL", "Orofacial" },
+					{ "HARMONIZACAO OROFACIAL", "Orofacial" }
+				};
 				int linhaIndex = 0;
+
 				foreach (string[] linha in linhas)
 				{
 					try
@@ -560,6 +575,11 @@ namespace Migracao.Sistems
 							nomeTabela = especialidade;
 							especialidade = "Outros";
 						}
+
+						especialidade = Tools.RemoverAcentos(especialidade).ToUpper();
+
+						if (grupoCategoriaDict.ContainsKey(especialidade))
+							especialidade = grupoCategoriaDict[especialidade];
 
 						dataRow["Nome Tabela"] = nomeTabela.GetPrimeirosCaracteres(40).PrimeiraLetraMaiuscula();
 						dataRow["Especialidade"] = especialidade;
@@ -831,26 +851,114 @@ namespace Migracao.Sistems
 			}
 		}
 
-		public void ImportarPrecos(string arquivoExcel, int estabelecimentoID, string arquivoExcelGruposProcedimentos)
-        {
-			//CED001
-			//CED002 Categoria
-			var dataHoje = DateTime.Now;
+		public void ImportarPrecosTabelas(string arquivoExcel, int estabelecimentoID, int loginID)
+		{
 			var indiceLinha = 0;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
 			var excelHelper = new ExcelHelper(arquivoExcel);
+			var sqlHelper = new SqlHelper();
 
-			var cabecalhos = new List<string> { "Especialidade", "PROCEDIMENTOS", "PREÇO", "TUSS" };			
+			var adicionados = new List<string>();
+			var precosTabelas = new List<PrecosTabela>();
 
-			//var categorias = new List<string>();
-			//var titulos = new List<string>();
-			//var valores = new List<string>();
-			//var tuss = new List<string>();
+			try
+			{
+				foreach (var linha in excelHelper.linhas)
+				{
+					indiceLinha++;
 
-            //var celulas = new List<string>();
-            List<List<string>> listaDados = new List<List<string>>();
+					string? nome = null, abreviacao = null;
+					decimal valor = 0;
+					string especialidade = "Outros";
+					long tuss = 0;
+					bool ativo = true;
+					byte categoria = (byte)ProcedimentosCategoriasID.Outros;
 
-			var gruposProcedimentosToDictionary = GruposProcedimentosToDictionary(arquivoExcelGruposProcedimentos);
+					foreach (var celula in linha.Cells)
+					{
+						if (celula != null)
+						{
+							celulaValor = celula.ToString().Trim().Replace("'", "’");
+							tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
+							colunaLetra = excelHelper.GetColumnLetter(celula);
+
+							if (!string.IsNullOrWhiteSpace(celulaValor))
+							{
+								switch (tituloColuna)
+								{
+									case "Nome Tabela":
+										nome = celulaValor.PrimeiraLetraMaiuscula();
+										break;
+								}
+							}
+						}
+					}
+
+					if (!adicionados.Contains(nome))
+					{
+						adicionados.Add(nome);
+
+						precosTabelas.Add(new PrecosTabela
+						{
+							Ativo = ativo,
+							DataInclusao = DateTime.Now,
+							LoginID = loginID,
+							SeguimentoID = 1,
+							SolucaoID = 1,
+							EstabelecimentoID = estabelecimentoID,
+							Nome = nome
+						});
+					}
+				}
+
+				indiceLinha = 0;
+
+				var dados = new Dictionary<string, object[]>
+				{
+					{ "Ativo", precosTabelas.ConvertAll(precotabela => (object)precotabela.Ativo).ToArray() },
+					{ "DataInclusao", precosTabelas.ConvertAll(precotabela => (object)precotabela.DataInclusao).ToArray() },
+					{ "LoginID", precosTabelas.ConvertAll(precotabela => (object)precotabela.LoginID).ToArray() },
+					{ "SeguimentoID", precosTabelas.ConvertAll(precotabela => (object)precotabela.SeguimentoID).ToArray() },
+					{ "SolucaoID", precosTabelas.ConvertAll(precotabela => (object)precotabela.SolucaoID).ToArray() },
+					{ "EstabelecimentoID", precosTabelas.ConvertAll(precotabela => (object)precotabela.EstabelecimentoID).ToArray() },
+					{ "Nome", precosTabelas.ConvertAll(precotabela => (object)precotabela.Nome).ToArray() }
+				};
+
+				var salvarArquivo = Tools.GerarNomeArquivo($"PrecosTabelas_{estabelecimentoID}_OdontoCompany_Migração");
+				sqlHelper.GerarSqlInsert("PrecosTabelas", salvarArquivo, dados);
+				excelHelper.GravarExcel(salvarArquivo, dados);
+
+				MessageBox.Show("Sucesso!");
+			}
+			catch (Exception error)
+			{
+				throw new Exception(Tools.TratarMensagemErro(arquivoExcel, error.Message, indiceLinha++, colunaLetra, tituloColuna, celulaValor, variaveisValor));
+			}
+		}
+
+		public void ImportarPrecos(string arquivoExcel, int estabelecimentoID, int loginID)
+        {
+			var indiceLinha = 0;
+			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
+			var excelHelper = new ExcelHelper(arquivoExcel);
+			var sqlHelper = new SqlHelper();
+
+			var grupoCategoriaDict = new Dictionary<string, ProcedimentosCategoriasID>()
+			{
+				{ "CIRURGIA", ProcedimentosCategoriasID.Cirurgia },
+				{ "ENDODONTIA", ProcedimentosCategoriasID.Endodontia },
+				{ "PERIODONTIA", ProcedimentosCategoriasID.Periodontia },
+				{ "PROTESE", ProcedimentosCategoriasID.Prótese },
+				{ "CLINICO", ProcedimentosCategoriasID.Outros },
+				{ "MANUTENCAO", ProcedimentosCategoriasID.Ortodontia },
+				{ "ORTODONTIA", ProcedimentosCategoriasID.Ortodontia },
+				{ "PREVENCAO", ProcedimentosCategoriasID.Prevenção },
+				{ "OROFACIAL", ProcedimentosCategoriasID.Orofacial },
+				{ "OUTROS", ProcedimentosCategoriasID.Outros }
+			};
+
+			var precosTabelas = new List<PrecosTabela>();
+			var precos = new List<Preco>();
 
 			try
             {
@@ -858,9 +966,11 @@ namespace Migracao.Sistems
                 {
                     indiceLinha++;
 
-                    string? titulo = null, tuss = "0";
-                    decimal? valor = null;
-                    int? grupo = null;
+					string? titulo = null, abreviacao = null;
+                    decimal valor = 0;
+                    string especialidade = "Outros", nomeTabela = "";
+					long tuss = 0;
+					bool ativo = true;
                     byte categoria = (byte)ProcedimentosCategoriasID.Outros;
 
                     foreach (var celula in linha.Cells)
@@ -875,40 +985,69 @@ namespace Migracao.Sistems
                             {
                                 switch (tituloColuna)
                                 {
-                                    case "NOME":
-                                        titulo = celulaValor.PrimeiraLetraMaiuscula();
+                                    case "Nome Tabela":
+                                        nomeTabela = celulaValor.PrimeiraLetraMaiuscula();
                                         break;
-                                    case "VRVENDA":
-										valor = celulaValor.ArredondarValor();
+                                    case "Ativo(S/N)":
+										ativo = celulaValor == "S" ? true : false;
                                         break;
-                                    case "GRUPO":
-										grupo = int.Parse(celulaValor);
+                                    case "Procedimento(Nome)":
+										titulo = celulaValor;
                                         break;
-                                }
+									case "Abreviação":
+										abreviacao = celulaValor;
+										break;
+									case "Especialidade":
+										especialidade = celulaValor;
+										break;
+									case "Preço":
+										valor = celulaValor.ToMoeda();
+										break;
+									case "TUSS":
+										tuss = celulaValor.ToNumV2();
+										break;
+								}
                             }
                         }
                     }
 
-                    if (grupo != null && !string.IsNullOrEmpty(titulo))
-                    {
-                        if (gruposProcedimentosToDictionary.ContainsKey((int)grupo))
-                            categoria = (byte)gruposProcedimentosToDictionary[(int)grupo];
+                    if (grupoCategoriaDict.ContainsKey(especialidade))
+                        categoria = (byte)grupoCategoriaDict[especialidade];
 
-						listaDados.Add(new List<string> { categoria.ToString(), titulo, valor.ToString(), tuss });
-					}
+					precos.Add(new Preco
+					{
+						Ativo = ativo,
+						CategoriaID = categoria,
+						DataInclusao = DateTime.Now,
+						LoginID = loginID,
+						TabelaID = 1,
+						Titulo = titulo,
+						Valor = valor,
+						CodigoTISS = tuss,
+						Atalho = abreviacao
+					});
 				}
 
-				//var listaDados = new List<List<string>>()
-				//{
-				//	titulos,
-				//	categorias,
-				//	valores,
-    //                tuss
-				//};
+				indiceLinha = 0;
+
+				var dados = new Dictionary<string, object[]>
+				{
+					{ "LoginID", precos.ConvertAll(preco => (object)preco.LoginID).ToArray() },
+					{ "Ativo", precos.ConvertAll(preco => (object)preco.Ativo).ToArray() },
+					{ "CategoriaID", precos.ConvertAll(preco => (object)preco.CategoriaID).ToArray() },
+					{ "DataInclusao", precos.ConvertAll(preco => (object)preco.DataInclusao).ToArray() },
+					{ "TabelaID", precos.ConvertAll(preco => (object)preco.TabelaID).ToArray() },
+					{ "Titulo", precos.ConvertAll(preco => (object)preco.Titulo).ToArray() },
+					{ "Valor", precos.ConvertAll(preco => (object)preco.Valor).ToArray() },
+					{ "CodigoTISS", precos.ConvertAll(preco => (object)preco.CodigoTISS).ToArray() },
+					{ "Atalho", precos.ConvertAll(preco => (object)preco.Atalho).ToArray() }
+				};
 
 				var salvarArquivo = Tools.GerarNomeArquivo($"Precos_{estabelecimentoID}_OdontoCompany_Migração");
-				excelHelper.CreateExcelFile(salvarArquivo + ".xlsx", cabecalhos, listaDados);
-				//Tools.AbrirPastaSelecionandoArquivo(salvarArquivo + ".xlsx");
+				sqlHelper.GerarSqlInsert("Precos", salvarArquivo, dados);
+				excelHelper.GravarExcel(salvarArquivo, dados);
+
+				MessageBox.Show("Sucesso!");
 			}
 			catch (Exception error)
 			{
@@ -2744,25 +2883,11 @@ namespace Migracao.Sistems
                 { "ENDODONTIA", ProcedimentosCategoriasID.Endodontia },
                 { "PERIODONTIA", ProcedimentosCategoriasID.Periodontia },
                 { "PROTESE", ProcedimentosCategoriasID.Prótese },
-                { "CLINICO", ProcedimentosCategoriasID.Outros }, // Assumindo que "CLINICO" seja uma categoria genérica
-                { "MANUTENCAO", ProcedimentosCategoriasID.Prevenção }, // Assumindo que "MANUTENCAO" seja sinônimo de "PREVENÇÃO"
+                { "CLINICO", ProcedimentosCategoriasID.Outros },
+                { "MANUTENCAO", ProcedimentosCategoriasID.Ortodontia },
                 { "ORTODONTIA", ProcedimentosCategoriasID.Ortodontia },
-                { "AMIL", ProcedimentosCategoriasID.Outros }, // Assumindo que "AMIL" seja um tipo de convênio
-                { "PREVENÇÃO ODC", ProcedimentosCategoriasID.Prevenção },
-                { "INSTITUTO ODONTOCOMPANY", ProcedimentosCategoriasID.Outros }, // Assumindo que "INSTITUTO ODONTOCOMPANY" seja um tipo de convênio
-                { "UNIMED", ProcedimentosCategoriasID.Outros }, // Assumindo que "UNIMED" seja um tipo de convênio
-                { "PRIMAVIDA", ProcedimentosCategoriasID.Outros }, // Assumindo que "PRIMAVIDA" seja um tipo de convênio
-                { "HARMONIZAÇÃO OROFACIAL", ProcedimentosCategoriasID.Orofacial },
-                { "ODONTOMAXI", ProcedimentosCategoriasID.Outros }, // Assumindo que "ODONTOMAXI" seja um tipo de convênio
-                { "RODRIGUES LEIRA", ProcedimentosCategoriasID.Outros }, // Assumindo que "RODRIGUES LEIRA" seja um tipo de convênio
-                { "PORTO SEGURO", ProcedimentosCategoriasID.Outros }, // Assumindo que "PORTO SEGURO" seja um tipo de convênio
-                { "INPAO", ProcedimentosCategoriasID.Outros }, // Assumindo que "INPAO" seja um tipo de convênio
-                { "DENTAL byteEGRAL", ProcedimentosCategoriasID.Outros }, // Assumindo que "DENTAL byteEGRAL" seja um tipo de convênio
-                { "AESP", ProcedimentosCategoriasID.Outros }, // Assumindo que "AESP" seja um tipo de convênio
-                { "PROASA", ProcedimentosCategoriasID.Outros }, // Assumindo que "PROASA" seja um tipo de convênio
-                { "IDEAL ODONTO", ProcedimentosCategoriasID.Outros }, // Assumindo que "IDEAL ODONTO" seja um tipo de convênio
-                { "ODONTOART", ProcedimentosCategoriasID.Outros }, // Assumindo que "ODONTOART" seja um tipo de convênio
-                { "BRAZIL DENTAL", ProcedimentosCategoriasID.Outros }, // Assumindo que "BRAZIL DENTAL" seja um tipo de convênio
+                { "PREVENCAO", ProcedimentosCategoriasID.Prevenção },
+                { "OROFACIAL", ProcedimentosCategoriasID.Orofacial }
 			};
 
 			try

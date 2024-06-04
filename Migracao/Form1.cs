@@ -205,7 +205,7 @@ namespace Migracao
 				lbReferencia.Text = "Pessoas (Prod):";
 
 			else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase) || comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
-				lbReferencia.Text = "Agenda (Prod):";
+				lbReferencia.Text = "Agendamentos (Prod):";
 			//|| comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
 			//|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
 

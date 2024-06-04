@@ -19,7 +19,7 @@ namespace Migracao.Sistems
 
 		List<string> cabecalhos_Pacientes = ["Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
 		List<string> cabecalhos_Recebiveis = ["CPF", "Emitente", "DocumentoRef", "RecebívelExigível(R/E)", "ValorOriginal", "ValorPago", "Prazo", "Vencimento(01/12/2010)", "DataBaixa", "Emissão(01/12/2010)", "ObservaçãoRecebível", "ObservaçãoRecebido"];
-		List<string> cabecalhos_Agenda = ["ID", "CPF", "Nome Completo", "Telefone", "Data Início (01/12/2024 00:00)", "Data Término (01/12/2024 00:00)", "Data Inclusão (01/12/2024)", "NomeCompletoDentista", "Observacao"];
+		List<string> cabecalhos_Agendamentos = ["ID", "CPF", "Nome Completo", "Telefone", "Data Início (01/12/2024 00:00)", "Data Término (01/12/2024 00:00)", "Data Inclusão (01/12/2024)", "NomeCompletoDentista", "Observacao"];
 
 		HashSet<string> cadastroPaciente, registroRecebivel;
 
@@ -38,7 +38,7 @@ namespace Migracao.Sistems
 			ExcelHelper excelHelper = new();
 			DataTable dataTablePessoas = new();
 			DataTable dataTableRecebiveis = new();
-			DataTable dataTableAgenda = new();
+			DataTable dataTableAgendamentos = new();
 			//registroRecebivel = new HashSet<string>();
 
 			foreach (string coluna in cabecalhos_Pacientes)
@@ -47,8 +47,8 @@ namespace Migracao.Sistems
 			foreach (string coluna in cabecalhos_Recebiveis)
 				dataTableRecebiveis.Columns.Add(coluna, typeof(string));
 
-			foreach (string coluna in cabecalhos_Agenda)
-				dataTableAgenda.Columns.Add(coluna, typeof(string));
+			foreach (string coluna in cabecalhos_Agendamentos)
+				dataTableAgendamentos.Columns.Add(coluna, typeof(string));
 
 			if (File.Exists(arquivoExcelCidades))
 				try
@@ -138,13 +138,13 @@ namespace Migracao.Sistems
 				var resultado = LerArquivosExcelCsv(excel_AGENDA.Text, Encoding.UTF8);
 				var linhasCSV = resultado.Item1;
 				var cabecalhosCSV = resultado.Item2;
-				dataTableAgenda = ConvertExcelAgenda(dataTableAgenda, cabecalhosCSV, linhasCSV, dataTablePessoas);
+				dataTableAgendamentos = ConvertExcelAgenda(dataTableAgendamentos, cabecalhosCSV, linhasCSV, dataTablePessoas);
 			}
 
 			if (excel_AGENDA != null)
 			{
 				var salvarArquivoAgenda = Tools.GerarNomeArquivo($"CadastroAgenda_{estabelecimentoID}_OdontoCompany");
-				excelHelper.CriarExcelArquivo(salvarArquivoAgenda + ".xlsx", dataTableAgenda);
+				excelHelper.CriarExcelArquivo(salvarArquivoAgenda + ".xlsx", dataTableAgendamentos);
 			}
 		}
 

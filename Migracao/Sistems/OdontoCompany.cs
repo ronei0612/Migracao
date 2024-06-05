@@ -1180,6 +1180,7 @@ namespace Migracao.Sistems
 					int recibo = 0, codigo = 0;
 					int? consumidorID = null, fornecedorID = null, colaboradorID = null, funcionarioID = null, clienteID = null;
 					decimal pagoValor = 0, valor = 0;
+					bool recebivel = false;
 					byte formaPagamento = (byte)TitulosEspeciesID.DepositoEmConta;
 					DateTime dataPagamento = dataHoje, nascimentoData = dataHoje, dataVencimento = dataHoje, dataInclusao = dataHoje;
 
@@ -1195,79 +1196,85 @@ namespace Migracao.Sistems
 							{
 								switch (tituloColuna)
 								{
-									case "CGC_CPF":
+									case "CPF":
 										cpf = celulaValor.ToCPF();
-										if (cpf == "281.394.453-04")
-											cpf = cpf;
 										break;
-									case "DOCUMENTO":
+									case "Emitente":
+										outroSacadoNome = celulaValor;
+										break;
+									case "DocumentoRef":
 										documento = celulaValor;
 										break;
-									case "VENCTO":
+									case "Vencimento(01/12/2010)":
 										dataVencimento = celulaValor.ToData();
 										break;
-									case "EMISSAO":
+									case "Emissão(01/12/2010)":
 										dataInclusao = celulaValor.ToData();
 										break;
-									case "OBS":
+									case "ObservaçãoRecebível":
                                         observacoes = celulaValor;//.ToTipoPagamento()
 										break;
-									case "VALOR_VENDA":
-										//valor = celulaValor.ToMoeda();
+									case "ValorOriginal":
 										valor = celulaValor.ArredondarValor();
+										break;
+									case "RecebívelExigível(R/E)":
+										recebivel = celulaValor == "R" ? true : false;
 										break;
 								}
 							}
 						}
 					}
 
-					if (dataVencimento == dataHoje)
-						dataVencimento = new DateTime(dataInclusao.Year, dataVencimento.Month, dataVencimento.Day);
-
-					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: cpf, codigo: codigo.ToString());
-					var fornecedorIDValue = excelHelper.GetFornecedorID(nomeCompleto: nomeCompleto, cpf: cpf);
-					var funcionarioIDValue = excelHelper.GetFuncionarioID(nomeCompleto: nomeCompleto, cpf: cpf);
-
-					if (!string.IsNullOrEmpty(consumidorIDValue))
-						consumidorID = int.Parse(consumidorIDValue);
-					else if (!string.IsNullOrEmpty(fornecedorIDValue))
-						fornecedorID = int.Parse(fornecedorIDValue);
-					else if (!string.IsNullOrEmpty(funcionarioIDValue))
-						funcionarioID = int.Parse(funcionarioIDValue);
-					else
-						outroSacadoNome = cpf;
-
-					if (consumidorID == 18283648)
-						consumidorID = consumidorID;
-
-					if (!string.IsNullOrEmpty(consumidorIDValue))
+					if (recebivel)
 					{
-						if (!excelHelper.RecebivelExists((int)consumidorID, valor, dataVencimento))
-							recebiveis.Add(new Recebivel()
-							{
-								ConsumidorID = consumidorID,
-								FornecedorID = fornecedorID,
-								ClienteID = clienteID,
-								ColaboradorID = colaboradorID,
-								SacadoNome = outroSacadoNome,
-								EspecieID = (byte)formaPagamento,
-								DataEmissao = dataInclusao,
-								ValorOriginal = valor,
-								ValorDevido = valor,
-								DataBaseCalculo = dataInclusao,
-								DataInclusao = dataInclusao,
-								DataVencimento = dataVencimento,
-								FinanceiroID = respFinanceiroPessoaID,
-								LoginID = loginID,
-								EstabelecimentoID = estabelecimentoID,
-								SituacaoID = (byte)TituloSituacoesID.Normal,
-								Observacoes = observacoes,
-								ExclusaoMotivo = documento
-								//OrcamentoID
-								//PlanoContasID
-								//Documento = contratoControle
-								//ContratoID = contratoID
-							});
+						if (dataVencimento == dataHoje)
+							dataVencimento = new DateTime(dataInclusao.Year, dataVencimento.Month, dataVencimento.Day);
+
+						var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: cpf, codigo: codigo.ToString());
+						var fornecedorIDValue = excelHelper.GetFornecedorID(nomeCompleto: nomeCompleto, cpf: cpf);
+						var funcionarioIDValue = excelHelper.GetFuncionarioID(nomeCompleto: nomeCompleto, cpf: cpf);
+
+						if (!string.IsNullOrEmpty(consumidorIDValue))
+							consumidorID = int.Parse(consumidorIDValue);
+						else if (!string.IsNullOrEmpty(fornecedorIDValue))
+							fornecedorID = int.Parse(fornecedorIDValue);
+						else if (!string.IsNullOrEmpty(funcionarioIDValue))
+							funcionarioID = int.Parse(funcionarioIDValue);
+						else
+							outroSacadoNome = cpf;
+
+						if (consumidorID == 18283648)
+							consumidorID = consumidorID;
+
+						if (!string.IsNullOrEmpty(consumidorIDValue))
+						{
+							if (!excelHelper.RecebivelExists((int)consumidorID, valor, dataVencimento))
+								recebiveis.Add(new Recebivel()
+								{
+									ConsumidorID = consumidorID,
+									FornecedorID = fornecedorID,
+									ClienteID = clienteID,
+									ColaboradorID = colaboradorID,
+									SacadoNome = outroSacadoNome,
+									EspecieID = (byte)formaPagamento,
+									DataEmissao = dataInclusao,
+									ValorOriginal = valor,
+									ValorDevido = valor,
+									DataBaseCalculo = dataInclusao,
+									DataInclusao = dataInclusao,
+									DataVencimento = dataVencimento,
+									FinanceiroID = respFinanceiroPessoaID,
+									LoginID = loginID,
+									EstabelecimentoID = estabelecimentoID,
+									SituacaoID = (byte)TituloSituacoesID.Normal,
+									Observacoes = observacoes,
+									ExclusaoMotivo = documento
+									//OrcamentoID
+									//PlanoContasID
+									//Documento = contratoControle
+									//ContratoID = contratoID
+								});
+						}
 					}
 				}
 

@@ -57,12 +57,6 @@ namespace Migracao.Sistems
 			foreach (string coluna in cabecalhos_Agendamentos)
 				dataTableAgendamentos.Columns.Add(coluna, typeof(string));
 
-			foreach (string coluna in cabecalhos_Procedimentos)
-				dataTableProcedimentos.Columns.Add(coluna, typeof(string));
-
-			foreach (string coluna in cabecalhos_CodProcedimentos)
-				dataTableCodProcedimentos.Columns.Add(coluna, typeof(string));
-
 			if (File.Exists(arquivoExcelCidades))
 				try
 				{
@@ -165,6 +159,9 @@ namespace Migracao.Sistems
 				.FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("CED002")));
 			if (excel_CED002 != null)
 			{
+				foreach (string coluna in cabecalhos_CodProcedimentos)
+					dataTableCodProcedimentos.Columns.Add(coluna, typeof(string));
+
 				var resultado = LerArquivosExcelCsv(excel_CED002.Text, Encoding.UTF8);
 				var linhasCSV = resultado.Item1;
 				var cabecalhosCSV = resultado.Item2;
@@ -177,6 +174,9 @@ namespace Migracao.Sistems
 				.FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("CED001")));
 			if (excel_CED001 != null)
 			{
+				foreach (string coluna in cabecalhos_Procedimentos)
+					dataTableProcedimentos.Columns.Add(coluna, typeof(string));
+
 				var resultado = LerArquivosExcelCsv(excel_CED001.Text, Encoding.UTF8);
 				var linhasCSV = resultado.Item1;
 				var cabecalhosCSV = resultado.Item2;
@@ -601,7 +601,7 @@ namespace Migracao.Sistems
 						var nomeTabela = "";
 						var especialidade = "";
 
-						DataRow[] dataRowEncontrados = dataTable.AsEnumerable()
+						DataRow[] dataRowEncontrados = codProcedimentos.AsEnumerable()
 						.Where(row =>
 							row.Field<string>("ID") == cod)
 						.ToArray();

@@ -127,15 +127,15 @@ namespace Migracao.Sistems
 				dataTableRecebiveis = ConvertExcelRecebidos(dataTableRecebiveis, cabecalhosCSV, linhasCSV);
 			}
 
-			var excel_CXD555 = listView.Items.Cast<ListViewItem>()
-				.FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("CXD555")));
-			if (excel_CXD555 != null)
-			{
-				var resultado = LerArquivosExcelCsv(excel_CXD555.Text, Encoding.UTF8);
-				var linhasCSV = resultado.Item1;
-				var cabecalhosCSV = resultado.Item2;
-				dataTableRecebiveis = ConvertExcelRecebidos(dataTableRecebiveis, cabecalhosCSV, linhasCSV);
-			}
+			//var excel_CXD555 = listView.Items.Cast<ListViewItem>()
+			//	.FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("CXD555")));
+			//if (excel_CXD555 != null)
+			//{
+			//	var resultado = LerArquivosExcelCsv(excel_CXD555.Text, Encoding.UTF8);
+			//	var linhasCSV = resultado.Item1;
+			//	var cabecalhosCSV = resultado.Item2;
+			//	dataTableRecebiveis = ConvertExcelRecebidos(dataTableRecebiveis, cabecalhosCSV, linhasCSV);
+			//}
 
 			if (excel_BXD111 != null || excel_CRD111 != null)
 			{
@@ -283,8 +283,7 @@ namespace Migracao.Sistems
 						var baixaData = valoresLinha.GetValueOrDefault(cabecalhoDataBaixa).Trim();
 						var vencimentoData = valoresLinha.GetValueOrDefault(cabecalhoDataVencimento).Trim();
 
-						if (documento == "10564/01-1")
-							documento = documento;
+
 						//DataRow[] dataRowEncontrados = dataTable.Select($"DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND ValorOriginal = '{valor.ArredondarValorV2()}'");
 
 						//var dataView = new DataView(dataTable);
@@ -310,14 +309,17 @@ namespace Migracao.Sistems
 						//dataView.RowFilter = filter;
 						//DataRow[] dataRowEncontrados = dataView.ToTable().Rows.Cast<DataRow>().ToArray();
 
-						if (dataRowEncontrados.Length > 1)
-							throw new Exception($"Mais de uma linha encontrada em Recebíveis: DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND VALOR = {valor.ArredondarValorV2()}");
+						//if (dataRowEncontrados.Length > 1)
+						//	throw new Exception($"Mais de uma linha encontrada em Recebíveis: DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND VALOR = {valorOriginal.ArredondarValorV2()}");
 
-						if (dataRowEncontrados.Length == 1)
+						if (dataRowEncontrados.Length > 0)
 						{
-							dataRowEncontrados[0]["ValorPago"] = valor.ArredondarValorV2();
-							dataRowEncontrados[0]["DataBaixa"] = baixaData.ToData();
-							dataRowEncontrados[0]["ObservaçãoRecebido"] = observacao;
+							foreach (var dataRowEncontrado in dataRowEncontrados)
+							{
+								dataRowEncontrado["ValorPago"] = valor.ArredondarValorV2();
+								dataRowEncontrado["DataBaixa"] = baixaData.ToData();
+								dataRowEncontrado["ObservaçãoRecebido"] = observacao;
+							}
 						}
 
 						else
@@ -599,7 +601,12 @@ namespace Migracao.Sistems
 						var nomeTabela = "";
 						var especialidade = "";
 
-						DataRow[] dataRowEncontrados = codProcedimentos.Select($"ID = '{cod}'");
+						DataRow[] dataRowEncontrados = dataTable.AsEnumerable()
+						.Where(row =>
+							row.Field<string>("ID") == cod)
+						.ToArray();
+
+						//DataRow[] dataRowEncontrados = codProcedimentos.Select($"ID = '{cod}'");
 						if (dataRowEncontrados.Length > 0)
 							especialidade = dataRowEncontrados[0]["Nome"].ToString();
 
@@ -682,9 +689,16 @@ namespace Migracao.Sistems
 						{
 							ids.Add(id);
 
-							DataRow[] dataRowEncontrados = dataTablePessoas.Select($"Código = '{cod_responsavel}'");
+							DataRow[] dataRowEncontrados = dataTablePessoas.AsEnumerable()
+								.Where(row =>
+								row.Field<string>("Código") == cod_responsavel)
+								.ToArray();
+
+							//DataRow[] dataRowEncontrados = dataTablePessoas.Select($"Código = '{cod_responsavel}'");
+							
 							if (dataRowEncontrados.Length > 0)
-								responsavel = dataRowEncontrados[0]["NomeCompleto"].ToString();
+								foreach (var dataRowEncontrado in dataRowEncontrados)
+									responsavel = dataRowEncontrado["NomeCompleto"].ToString();
 
 							var minutos = hora.Split(':')[1];
 							var horas = hora.Split(':')[0];

@@ -1180,7 +1180,7 @@ namespace Migracao.Sistems
 					int recibo = 0, codigo = 0;
 					int? consumidorID = null, fornecedorID = null, colaboradorID = null, funcionarioID = null, clienteID = null;
 					decimal pagoValor = 0, valor = 0;
-					bool recebivel = false;
+					bool recebivel = false, baixa = false;
 					byte formaPagamento = (byte)TitulosEspeciesID.DepositoEmConta;
 					DateTime dataPagamento = dataHoje, nascimentoData = dataHoje, dataVencimento = dataHoje, dataInclusao = dataHoje;
 
@@ -1196,6 +1196,7 @@ namespace Migracao.Sistems
 							{
 								switch (tituloColuna)
 								{
+									//					ValorPago	Prazo					ObservaçãoRecebido
 									case "CPF":
 										cpf = celulaValor.ToCPF();
 										break;
@@ -1220,12 +1221,15 @@ namespace Migracao.Sistems
 									case "RecebívelExigível(R/E)":
 										recebivel = celulaValor == "R" ? true : false;
 										break;
+									case "DataBaixa":
+										baixa = !string.IsNullOrEmpty(celulaValor) ? true : false;
+										break;
 								}
 							}
 						}
 					}
 
-					if (recebivel)
+					if (recebivel && !baixa)
 					{
 						if (dataVencimento == dataHoje)
 							dataVencimento = new DateTime(dataInclusao.Year, dataVencimento.Month, dataVencimento.Day);

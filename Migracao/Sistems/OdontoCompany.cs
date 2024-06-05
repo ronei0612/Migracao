@@ -1,6 +1,7 @@
 ﻿using Migracao.Models;
 using Migracao.Utils;
 using NPOI.SS.UserModel;
+using OfficeOpenXml;
 using System.Data;
 using System.Text;
 
@@ -136,7 +137,7 @@ namespace Migracao.Sistems
 				dataTableRecebiveis = ConvertExcelRecebidos(dataTableRecebiveis, cabecalhosCSV, linhasCSV);
 			}
 
-			if (excel_BXD111 != null || excel_CXD555 != null || excel_CRD111 != null)
+			if (excel_BXD111 != null || excel_CRD111 != null)
 			{
 				var salvarArquivoRecebiveis = Tools.GerarNomeArquivo($"CadastroRecebiveis_{estabelecimentoID}_OdontoCompany");
 				excelHelper.CriarExcelArquivo(salvarArquivoRecebiveis + ".xlsx", dataTableRecebiveis);
@@ -184,7 +185,7 @@ namespace Migracao.Sistems
 					dataTableProcedimentos = ConvertExcelProcedimentos(dataTableProcedimentos, cabecalhosCSV, linhasCSV, dataTableCodProcedimentos);
 			}
 
-			if (dataTableProcedimentos != null)
+			if (dataTableProcedimentos.Rows.Count > 0)
 			{
 				var salvarArquivoAgenda = Tools.GerarNomeArquivo($"CadastroProcedimentos_{estabelecimentoID}_OdontoCompany");
 				excelHelper.CriarExcelArquivo(salvarArquivoAgenda + ".xlsx", dataTableProcedimentos);
@@ -277,11 +278,37 @@ namespace Migracao.Sistems
 						var cpf = valoresLinha.GetValueOrDefault(cabecalhoCpf).Trim();
 						var documento = valoresLinha.GetValueOrDefault("DOCUMENTO").Trim();
 						var valor = valoresLinha.GetValueOrDefault("VALOR").Trim();
+						var valorOriginal = valoresLinha.GetValueOrDefault("VR_PARCELA").Trim();
 						var observacao = valoresLinha.GetValueOrDefault(cabecalhoObs).Trim();
 						var baixaData = valoresLinha.GetValueOrDefault(cabecalhoDataBaixa).Trim();
 						var vencimentoData = valoresLinha.GetValueOrDefault(cabecalhoDataVencimento).Trim();
 
-						DataRow[] dataRowEncontrados = dataTable.Select($"DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND ValorOriginal = '{valor.ArredondarValorV2()}'");
+						if (documento == "10564/01-1")
+							documento = documento;
+						//DataRow[] dataRowEncontrados = dataTable.Select($"DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND ValorOriginal = '{valor.ArredondarValorV2()}'");
+
+						//var dataView = new DataView(dataTable);
+						//var filter = $"DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND ValorOriginal = '{valor.ArredondarValorV2()}'";
+						//dataView.RowFilter = filter;
+						//DataRow[] dataRowEncontrados = dataView.ToTable().Rows.Cast<DataRow>().ToArray();
+
+						DataRow[] dataRowEncontrados = dataTable.AsEnumerable()
+						.Where(row =>
+							row.Field<string>("DocumentoRef") == documento &&
+							row.Field<string>("CPF") == cpf.ToCPF()
+							&& row.Field<string>("ValorOriginal") == valorOriginal.ArredondarValorV2().ToString())
+						.ToArray();
+
+						//dataTable.Columns["DocumentoRef"].SetOrdinal(0); // Define "DocumentoRef" como a primeira coluna
+						//dataTable.Columns["CPF"].SetOrdinal(1); // Define "CPF" como a segunda coluna
+						//dataTable.Columns["ValorOriginal"].SetOrdinal(2); // Define "ValorOriginal" como a terceira coluna
+						//dataTable.PrimaryKey = new[] { dataTable.Columns["DocumentoRef"], dataTable.Columns["CPF"], dataTable.Columns["ValorOriginal"] };
+						//// Busca otimizada para encontrar linhas duplicadas
+						//// Usando DataView para filtrar dados com performance aprimorada
+						//var dataView = new DataView(dataTable);
+						//var filter = $"DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND ValorOriginal = '{valor.ArredondarValorV2()}'";
+						//dataView.RowFilter = filter;
+						//DataRow[] dataRowEncontrados = dataView.ToTable().Rows.Cast<DataRow>().ToArray();
 
 						if (dataRowEncontrados.Length > 1)
 							throw new Exception($"Mais de uma linha encontrada em Recebíveis: DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND VALOR = {valor.ArredondarValorV2()}");

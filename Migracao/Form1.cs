@@ -105,7 +105,7 @@ namespace Migracao
 							odontoCompany.ImportarRecebidos(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text), txtExcel2.Text, txtReferencia.Text);
 
 						else if (comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
-							odontoCompany.ImportarPrecos(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), txtReferencia.Text);
+							odontoCompany.ImportarPrecosTabelas(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text), txtReferencia.Text);
 
 						else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
 							odontoCompany.ImportarAgenda(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), txtReferencia.Text, int.Parse(txtLoginID.Text));
@@ -255,7 +255,7 @@ namespace Migracao
 							//|| comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase)
 							//|| comboBoxImportacao.Text.Equals("pessoas", StringComparison.CurrentCultureIgnoreCase)
 							//|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
-							//|| comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase)
+							|| comboBoxImportacao.Text.Equals("preços procedimentos", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("funcionarios", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))

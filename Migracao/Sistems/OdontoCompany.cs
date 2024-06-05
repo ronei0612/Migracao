@@ -568,7 +568,8 @@ namespace Migracao.Sistems
 
 						if (nome.StartsWith("odc ", StringComparison.CurrentCultureIgnoreCase))
 							nomeTabela = "ODC";
-						else if (string.IsNullOrEmpty(observacao) && particular != "N")
+						//else if (string.IsNullOrEmpty(observacao) && particular != "N")
+						else if (string.IsNullOrEmpty(observacao) || grupoCategoriaDict.ContainsKey(Tools.RemoverAcentos(especialidade).ToUpper()))
 							nomeTabela = "Particular";
 						else
 						{
@@ -576,10 +577,13 @@ namespace Migracao.Sistems
 							especialidade = "Outros";
 						}
 
-						especialidade = Tools.RemoverAcentos(especialidade).ToUpper();
+						var buscarEspecialidade = Tools.RemoverAcentos(especialidade).ToUpper();
 
-						if (grupoCategoriaDict.ContainsKey(especialidade))
-							especialidade = grupoCategoriaDict[especialidade];
+						if (grupoCategoriaDict.ContainsKey(buscarEspecialidade))
+							especialidade = grupoCategoriaDict[buscarEspecialidade];
+
+						if (nomeTabela.GetPrimeirosCaracteres(40).PrimeiraLetraMaiuscula() == "")
+							nomeTabela = nomeTabela;
 
 						dataRow["Nome Tabela"] = nomeTabela.GetPrimeirosCaracteres(40).PrimeiraLetraMaiuscula();
 						dataRow["Especialidade"] = especialidade;
@@ -851,15 +855,27 @@ namespace Migracao.Sistems
 			}
 		}
 
-		public void ImportarPrecosTabelas(string arquivoExcel, int estabelecimentoID, int loginID)
+		public void ImportarPrecosTabelas(string arquivoExcel, int estabelecimentoID, int loginID, string arquivoTabelaPrecosAtuais)
 		{
 			var indiceLinha = 0;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
 			var excelHelper = new ExcelHelper(arquivoExcel);
 			var sqlHelper = new SqlHelper();
-
 			var adicionados = new List<string>();
 			var precosTabelas = new List<PrecosTabela>();
+			ISheet sheet = null;
+
+			if (!string.IsNullOrEmpty(arquivoTabelaPrecosAtuais))
+				try
+				{
+					var workbook = excelHelper.LerExcel(arquivoTabelaPrecosAtuais);
+					sheet = workbook.GetSheetAt(0);
+				}
+				catch (Exception ex)
+				{
+					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoTabelaPrecosAtuais}\": {ex.Message}");
+				}
+
 
 			try
 			{
@@ -894,7 +910,7 @@ namespace Migracao.Sistems
 						}
 					}
 
-					if (!adicionados.Contains(nome))
+					if (!adicionados.Contains(nome) && (!excelHelper.ExisteTexto(sheet, "Nome", nome) && !excelHelper.ExisteTexto(sheet, "Nome", "Migração - " + nome)))
 					{
 						adicionados.Add(nome);
 
@@ -928,7 +944,7 @@ namespace Migracao.Sistems
 				sqlHelper.GerarSqlInsert("PrecosTabelas", salvarArquivo, dados);
 				excelHelper.GravarExcel(salvarArquivo, dados);
 
-				MessageBox.Show("Sucesso!");
+				MessageBox.Show("Limpar o Redis" + Environment.NewLine + "redis-cli.exe -h 127.0.0.1 -n 0 del Tabelas:Tabelas-" + estabelecimentoID.ToString("D6"), "Sucesso!");
 			}
 			catch (Exception error)
 			{
@@ -936,7 +952,7 @@ namespace Migracao.Sistems
 			}
 		}
 
-		public void ImportarPrecos(string arquivoExcel, int estabelecimentoID, int loginID)
+		public void ImportarPrecos(string arquivoExcel, int estabelecimentoID, int loginID, string arquivoTabelaPrecosAtuais)
         {
 			var indiceLinha = 0;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
@@ -959,6 +975,18 @@ namespace Migracao.Sistems
 
 			var precosTabelas = new List<PrecosTabela>();
 			var precos = new List<Preco>();
+			ISheet sheet = null;
+
+			if (!string.IsNullOrEmpty(arquivoTabelaPrecosAtuais))
+				try
+				{
+					var workbook = excelHelper.LerExcel(arquivoTabelaPrecosAtuais);
+					sheet = workbook.GetSheetAt(0);
+				}
+				catch (Exception ex)
+				{
+					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoTabelaPrecosAtuais}\": {ex.Message}");
+				}
 
 			try
             {
@@ -1011,21 +1039,24 @@ namespace Migracao.Sistems
                         }
                     }
 
-                    if (grupoCategoriaDict.ContainsKey(especialidade))
-                        categoria = (byte)grupoCategoriaDict[especialidade];
-
-					precos.Add(new Preco
+					if (!excelHelper.ExisteTexto(sheet, "Titulo", titulo))
 					{
-						Ativo = ativo,
-						CategoriaID = categoria,
-						DataInclusao = DateTime.Now,
-						LoginID = loginID,
-						TabelaID = 1,
-						Titulo = titulo,
-						Valor = valor,
-						CodigoTISS = tuss,
-						Atalho = abreviacao
-					});
+						if (grupoCategoriaDict.ContainsKey(especialidade))
+							categoria = (byte)grupoCategoriaDict[especialidade];
+
+						precos.Add(new Preco
+						{
+							Ativo = ativo,
+							CategoriaID = categoria,
+							DataInclusao = DateTime.Now,
+							LoginID = loginID,
+							TabelaID = 1,
+							Titulo = titulo,
+							Valor = valor,
+							CodigoTISS = tuss,
+							Atalho = abreviacao
+						});
+					}
 				}
 
 				indiceLinha = 0;
@@ -2158,7 +2189,6 @@ namespace Migracao.Sistems
 				sqlHelper.GerarSqlInsert("PessoaFones", salvarArquivo, pessoaFonesDict);
 				excelHelper.GravarExcel(salvarArquivo, pessoaFonesDict);
 
-				//redis-cli.exe -h 127.0.0.1 -n 7 del Equipe:017957-Funcionarios
 				MessageBox.Show("Limpar o Redis" + Environment.NewLine + "redis-cli.exe -h 127.0.0.1 -n 7 del Equipe:" + estabelecimentoID.ToString("D6") + "-Funcionarios", "Sucesso!");
 			}
 

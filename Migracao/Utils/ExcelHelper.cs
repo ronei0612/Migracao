@@ -217,6 +217,28 @@ namespace Migracao.Utils
 			}
 		}
 
+		public bool ExisteTexto(ISheet sheet, string coluna, string texto)
+		{
+			int columnIndex = sheet.GetRow(0)
+				.Cells
+				.FirstOrDefault(c => c.StringCellValue.Equals(coluna, StringComparison.OrdinalIgnoreCase))
+				?.ColumnIndex ?? -1;
+
+			if (columnIndex == -1)
+				throw new Exception($"Coluna {coluna} não encontrada");
+
+			for (int rowIdx = 1; rowIdx <= sheet.LastRowNum; rowIdx++)
+			{
+				IRow row = sheet.GetRow(rowIdx);
+				ICell cell = row.GetCell(columnIndex);
+
+				if (cell != null && cell.CellType != CellType.Blank && cell.StringCellValue.Equals(texto, StringComparison.OrdinalIgnoreCase))
+					return true;
+			}
+
+			return false;
+		}
+
 		public void InitializeDictionary(ISheet sheet)
 		{
 			this.sheet = sheet;

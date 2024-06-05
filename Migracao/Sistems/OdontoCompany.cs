@@ -697,8 +697,7 @@ namespace Migracao.Sistems
 							//DataRow[] dataRowEncontrados = dataTablePessoas.Select($"Código = '{cod_responsavel}'");
 							
 							if (dataRowEncontrados.Length > 0)
-								foreach (var dataRowEncontrado in dataRowEncontrados)
-									responsavel = dataRowEncontrado["NomeCompleto"].ToString();
+								responsavel = dataRowEncontrados[0]["NomeCompleto"].ToString();
 
 							var minutos = hora.Split(':')[1];
 							var horas = hora.Split(':')[0];

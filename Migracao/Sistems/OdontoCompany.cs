@@ -21,7 +21,7 @@ namespace Migracao.Sistems
 		string[] CED002_CodProcedimentos = ["CODIGO", "NOME", "USUARIO"];
 
 		List<string> cabecalhos_Pacientes		= ["Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
-		List<string> cabecalhos_Recebiveis		= ["CPF", "Emitente", "DocumentoRef", "RecebívelExigível(R/E)", "ValorOriginal", "ValorPago", "Prazo", "Vencimento(01/12/2010)", "DataBaixa", "Emissão(01/12/2010)", "ObservaçãoRecebível", "ObservaçãoRecebido"];
+		List<string> cabecalhos_Recebiveis		= ["CPF", "Nome", "DocumentoRef", "RecebívelExigível(R/E)", "ValorOriginal", "ValorPago", "Prazo", "Vencimento(01/12/2010)", "DataBaixa", "Emissão(01/12/2010)", "ObservaçãoRecebível", "ObservaçãoRecebido"];
 		List<string> cabecalhos_Agendamentos	= ["ID", "CPF", "Nome Completo", "Telefone", "Data Início (01/12/2024 00:00)", "Data Término (01/12/2024 00:00)", "Data Inclusão (01/12/2024)", "NomeCompletoDentista", "Observacao"];
 		List<string> cabecalhos_Procedimentos	= ["Nome Tabela", "Ativo(S/N)", "Procedimento(Nome)", "Abreviação", "Especialidade", "Preço", "TUSS", "Diagnóstico(S/N)", "Prevenção(S/N)", "Odontopediatria(S/N)", "Dentística(S/N)", "Endodontia(S/N)", "Periodontia(S/N)", "Prótese(S/N)", "Cirurgia(S/N)", "Ortodontia(S/N)", "Radiologia(S/N)", "Estética(S/N)", "Implantodontia(S/N)", "Odontogeriatria(S/N)", "DTM(S/N)", "Orofacial(S/N)", ];
 		List<string> cabecalhos_CodProcedimentos = ["ID", "Nome", "Usuário"];
@@ -108,7 +108,7 @@ namespace Migracao.Sistems
 				var resultado = LerArquivosExcelCsv(excel_CRD111.Text, Encoding.UTF8);
 				var linhasCSV = resultado.Item1;
 				var cabecalhosCSV = resultado.Item2;
-				dataTableRecebiveis = ConvertExcelRecebiveis(dataTableRecebiveis, cabecalhosCSV, linhasCSV);
+				dataTableRecebiveis = ConvertExcelRecebiveis(dataTableRecebiveis, cabecalhosCSV, linhasCSV, dataTablePessoas);
 			}
 
 			var excel_BXD111 = listView.Items.Cast<ListViewItem>()
@@ -118,7 +118,7 @@ namespace Migracao.Sistems
 				var resultado = LerArquivosExcelCsv(excel_BXD111.Text, Encoding.UTF8);
 				var linhasCSV = resultado.Item1;
 				var cabecalhosCSV = resultado.Item2;
-				dataTableRecebiveis = ConvertExcelRecebidos(dataTableRecebiveis, cabecalhosCSV, linhasCSV);
+				dataTableRecebiveis = ConvertExcelRecebidos(dataTableRecebiveis, cabecalhosCSV, linhasCSV, dataTablePessoas);
 			}
 
 			//var excel_CXD555 = listView.Items.Cast<ListViewItem>()
@@ -192,7 +192,7 @@ namespace Migracao.Sistems
 			}
 		}
 
-		public DataTable ConvertExcelRecebiveis(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas)
+		public DataTable ConvertExcelRecebiveis(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePacientes)
 		{
 			try
 			{
@@ -205,28 +205,36 @@ namespace Migracao.Sistems
 						var valoresLinha = new Dictionary<string, string>();
 
 						for (int i = 0; i < cabecalhos.Count; i++)
-							if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
+							if (i < linha.Length)
 								valoresLinha.Add(cabecalhos[i], linha[i]);
 
 						var cpf = valoresLinha.GetValueOrDefault("CGC_CPF").Trim();
-						//var emitente = valoresLinha.GetValueOrDefault("EMITENTE").Trim();
 						var observacao = valoresLinha.GetValueOrDefault("OBS").Trim();
 						var documento = valoresLinha.GetValueOrDefault("DOCUMENTO").Trim();
 						var valor = valoresLinha.GetValueOrDefault("VALOR").Trim();
-						//var prazo = valoresLinha.GetValueOrDefault("PRAZO").Trim();
 						var vencimentoData = valoresLinha.GetValueOrDefault("VENCTO").Trim();
 						var emissaoData = valoresLinha.GetValueOrDefault("EMISSAO").Trim();
 
+						cpf = cpf.ToCPF();
+						string nome = "";
+
+						if (dataTablePacientes.Rows.Count > 0)
+						{
+							DataRow[] dataRowEncontrados = dataTablePacientes.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
+							if (dataRowEncontrados.Length > 0)
+								nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
+						}
+
 						if (valor.ArredondarValorV2() > 1)
 						{
-							dataRow["CPF"] = cpf.ToCPF();
-							//dataRow["Emitente"] = emitente;
+							dataRow["CPF"] = cpf;
+							dataRow["Nome"] = nome;
 							dataRow["ObservaçãoRecebível"] = observacao;
 							dataRow["DocumentoRef"] = documento;
 							dataRow["ValorOriginal"] = valor.ArredondarValorV2();
 							//dataRow["Prazo"] = prazo;
-							dataRow["Vencimento(01/12/2010)"] = vencimentoData.ToData();
-							dataRow["Emissão(01/12/2010)"] = emissaoData.ToData();
+							dataRow["Vencimento(01/12/2010)"] = vencimentoData.ToData().ToString("dd/MM/yyyy");
+							dataRow["Emissão(01/12/2010)"] = emissaoData.ToData().ToString("dd/MM/yyyy");
 							dataRow["RecebívelExigível(R/E)"] = "R";
 
 							dataTable.Rows.Add(dataRow);
@@ -248,7 +256,7 @@ namespace Migracao.Sistems
 			}
 		}
 
-		public DataTable ConvertExcelRecebidos(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas)
+		public DataTable ConvertExcelRecebidos(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePacientes)
 		{
 			try
 			{
@@ -261,7 +269,7 @@ namespace Migracao.Sistems
 						var valoresLinha = new Dictionary<string, string>();
 
 						for (int i = 0; i < cabecalhos.Count; i++)
-							if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
+							if (i < linha.Length)
 								valoresLinha.Add(cabecalhos[i], linha[i]);
 
 						var cabecalhoCpf = "CGC_CPF";
@@ -286,52 +294,42 @@ namespace Migracao.Sistems
 						var vencimentoData = valoresLinha.GetValueOrDefault(cabecalhoDataVencimento).Trim();
 
 
-						//DataRow[] dataRowEncontrados = dataTable.Select($"DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND ValorOriginal = '{valor.ArredondarValorV2()}'");
+						cpf = cpf.ToCPF();
+						string nome = "";
 
-						//var dataView = new DataView(dataTable);
-						//var filter = $"DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND ValorOriginal = '{valor.ArredondarValorV2()}'";
-						//dataView.RowFilter = filter;
-						//DataRow[] dataRowEncontrados = dataView.ToTable().Rows.Cast<DataRow>().ToArray();
+						if (dataTablePacientes.Rows.Count > 0)
+						{
+							DataRow[] dataRowPessoasEncontrados = dataTablePacientes.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
+							if (dataRowPessoasEncontrados.Length > 0)
+								nome = dataRowPessoasEncontrados[0]["NomeCompleto"].ToString();
+						}
+
 
 						DataRow[] dataRowEncontrados = dataTable.AsEnumerable()
 						.Where(row =>
 							row.Field<string>("DocumentoRef") == documento &&
-							row.Field<string>("CPF") == cpf.ToCPF()
-							&& row.Field<string>("ValorOriginal") == valorOriginal.ArredondarValorV2().ToString())
+							row.Field<string>("CPF") == cpf &&
+							row.Field<string>("ValorOriginal") == valorOriginal.ArredondarValorV2().ToString())
 						.ToArray();
-
-						//dataTable.Columns["DocumentoRef"].SetOrdinal(0); // Define "DocumentoRef" como a primeira coluna
-						//dataTable.Columns["CPF"].SetOrdinal(1); // Define "CPF" como a segunda coluna
-						//dataTable.Columns["ValorOriginal"].SetOrdinal(2); // Define "ValorOriginal" como a terceira coluna
-						//dataTable.PrimaryKey = new[] { dataTable.Columns["DocumentoRef"], dataTable.Columns["CPF"], dataTable.Columns["ValorOriginal"] };
-						//// Busca otimizada para encontrar linhas duplicadas
-						//// Usando DataView para filtrar dados com performance aprimorada
-						//var dataView = new DataView(dataTable);
-						//var filter = $"DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND ValorOriginal = '{valor.ArredondarValorV2()}'";
-						//dataView.RowFilter = filter;
-						//DataRow[] dataRowEncontrados = dataView.ToTable().Rows.Cast<DataRow>().ToArray();
-
-						//if (dataRowEncontrados.Length > 1)
-						//	throw new Exception($"Mais de uma linha encontrada em Recebíveis: DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND VALOR = {valorOriginal.ArredondarValorV2()}");
 
 						if (dataRowEncontrados.Length > 0)
 						{
 							foreach (var dataRowEncontrado in dataRowEncontrados)
 							{
 								dataRowEncontrado["ValorPago"] = valor.ArredondarValorV2();
-								dataRowEncontrado["DataBaixa"] = baixaData.ToData();
+								dataRowEncontrado["DataBaixa"] = baixaData.ToData().ToString("dd/MM/yyyy");
 								dataRowEncontrado["ObservaçãoRecebido"] = observacao;
 							}
 						}
 
 						else
 						{
-							dataRow["CPF"] = cpf.ToCPF();
+							dataRow["CPF"] = cpf;
+							dataRow["Nome"] = nome;
 							dataRow["DocumentoRef"] = documento;
 							dataRow["ValorPago"] = valor.ArredondarValorV2();
 							dataRow["DataBaixa"] = baixaData;
 							dataRow["Vencimento(01/12/2010)"] = vencimentoData.ToData();
-							//dataRow["Emissão(01/12/2010)"] = emissaoData.ToData();
 							dataRow["ObservaçãoRecebido"] = observacao;
 							dataRow["RecebívelExigível(R/E)"] = "R";
 

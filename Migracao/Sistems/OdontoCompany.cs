@@ -217,18 +217,20 @@ namespace Migracao.Sistems
 						var vencimentoData = valoresLinha.GetValueOrDefault("VENCTO").Trim();
 						var emissaoData = valoresLinha.GetValueOrDefault("EMISSAO").Trim();
 
-						dataRow["CPF"] = cpf.ToCPF();
-						//dataRow["Emitente"] = emitente;
-						dataRow["ObservaçãoRecebível"] = observacao;
-						dataRow["DocumentoRef"] = documento;
-						dataRow["ValorOriginal"] = valor.ArredondarValorV2();
-						//dataRow["Prazo"] = prazo;
-						dataRow["Vencimento(01/12/2010)"] = vencimentoData.ToData();
-						dataRow["Emissão(01/12/2010)"] = emissaoData.ToData();
-						dataRow["RecebívelExigível(R/E)"] = "R";
+						if (valor.ArredondarValorV2() > 1)
+						{
+							dataRow["CPF"] = cpf.ToCPF();
+							//dataRow["Emitente"] = emitente;
+							dataRow["ObservaçãoRecebível"] = observacao;
+							dataRow["DocumentoRef"] = documento;
+							dataRow["ValorOriginal"] = valor.ArredondarValorV2();
+							//dataRow["Prazo"] = prazo;
+							dataRow["Vencimento(01/12/2010)"] = vencimentoData.ToData();
+							dataRow["Emissão(01/12/2010)"] = emissaoData.ToData();
+							dataRow["RecebívelExigível(R/E)"] = "R";
 
-						dataTable.Rows.Add(dataRow);
-						//registroRecebivel.Add(documento);
+							dataTable.Rows.Add(dataRow);
+						}
 					}
 					catch (Exception error)
 					{

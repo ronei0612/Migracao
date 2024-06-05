@@ -1353,7 +1353,7 @@ namespace Migracao.Sistems
                     string? pagamento = null, cpf = null, outroSacadoNome = null;
                     int? tipoPagamento = null, consumidorID = null, recebivelID = null;
 					string? observacao = null;
-                    decimal pagoValor = 0;
+                    decimal pagoValor = 0, valor = 0;
                     byte formaPagamento = (byte)TitulosEspeciesID.DepositoEmConta;
                     DateTime dataBaixa = DateTime.Now;
 
@@ -1374,6 +1374,9 @@ namespace Migracao.Sistems
 										break;
 									case "ValorPago":
 										pagoValor = celulaValor.ArredondarValor();
+										break;
+									case "ValorOriginal":
+										valor = celulaValor.ArredondarValor();
 										break;
 									case "DataBaixa":
 										dataBaixa = celulaValor.ToData();
@@ -1414,9 +1417,13 @@ namespace Migracao.Sistems
 								{
 									ID = int.Parse(excelRecebidosDict[documento][0]),
 									DataBaixa = dataBaixa,
-									ValorDevido = 0
+									ValorDevido = valor
 								});
 							}
+
+							var tituloTransacao = TituloTransacoes.Liquidacao;
+							if (pagoValor < valor)
+								tituloTransacao = TituloTransacoes.PagamentoParcial;
 
 							fluxoCaixas.Add(new FluxoCaixa()
 							{
@@ -1429,7 +1436,7 @@ namespace Migracao.Sistems
 								PagoDespesas = 0,
 								TipoID = (byte)TransacaoTiposID.Recebimento,
 								Data = dataBaixa,
-								TransacaoID = (byte)TituloTransacoes.Liquidacao,
+								TransacaoID = (byte)tituloTransacao,
 								EspecieID = formaPagamento,
 								DataBaseCalculo = dataBaixa,
 								DevidoValor = pagoValor,

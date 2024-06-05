@@ -1039,23 +1039,31 @@ namespace Migracao.Sistems
                         }
                     }
 
-					if (!excelHelper.ExisteTexto(sheet, "Titulo", titulo))
-					{
-						if (grupoCategoriaDict.ContainsKey(especialidade))
-							categoria = (byte)grupoCategoriaDict[especialidade];
 
-						precos.Add(new Preco
+					if (!excelHelper.ExisteTexto(sheet, "Titulo", titulo)) {
+
+						var tabelaIdEcontrada = excelHelper.ProcurarCelula(sheet, "Nome", nomeTabela, "TabelaID");
+						if (string.IsNullOrEmpty(tabelaIdEcontrada))
+							tabelaIdEcontrada = excelHelper.ProcurarCelula(sheet, "Nome", "Migração - " + nomeTabela, "TabelaID");
+
+						if (string.IsNullOrEmpty(tabelaIdEcontrada))
 						{
-							Ativo = ativo,
-							CategoriaID = categoria,
-							DataInclusao = DateTime.Now,
-							LoginID = loginID,
-							TabelaID = 1,
-							Titulo = titulo,
-							Valor = valor,
-							CodigoTISS = tuss,
-							Atalho = abreviacao
-						});
+							if (grupoCategoriaDict.ContainsKey(especialidade))
+								categoria = (byte)grupoCategoriaDict[especialidade];
+
+							precos.Add(new Preco
+							{
+								Ativo = ativo,
+								CategoriaID = categoria,
+								DataInclusao = DateTime.Now,
+								LoginID = loginID,
+								TabelaID = int.Parse(tabelaIdEcontrada),
+								Titulo = titulo,
+								Valor = valor,
+								CodigoTISS = tuss,
+								Atalho = abreviacao
+							});
+						}
 					}
 				}
 

@@ -217,6 +217,37 @@ namespace Migracao.Utils
 			}
 		}
 
+		public string ProcurarCelula(ISheet sheet, string coluna, string texto, string colunaRetorno)
+		{
+			int columnIndex = sheet.GetRow(0)
+				.Cells
+				.FirstOrDefault(c => c.StringCellValue.Equals(coluna, StringComparison.OrdinalIgnoreCase))
+				?.ColumnIndex ?? -1;
+
+			int columnRetorno = sheet.GetRow(0)
+				.Cells
+				.FirstOrDefault(c => c.StringCellValue.Equals(colunaRetorno, StringComparison.OrdinalIgnoreCase))
+				?.ColumnIndex ?? -1;
+
+			if (columnIndex == -1)
+				throw new Exception($"Coluna {coluna} não encontrada");
+
+			if (columnRetorno == -1)
+				throw new Exception($"Coluna {colunaRetorno} não encontrada");
+
+			for (int rowIdx = 1; rowIdx <= sheet.LastRowNum; rowIdx++)
+			{
+				IRow row = sheet.GetRow(rowIdx);
+				ICell cell = row.GetCell(columnIndex);
+				ICell cellRetorno = row.GetCell(columnRetorno);
+
+				if (cell != null && cell.CellType != CellType.Blank && cell.StringCellValue.Equals(texto, StringComparison.OrdinalIgnoreCase))
+					return cellRetorno.ToString();
+			}
+
+			return "";
+		}
+
 		public bool ExisteTexto(ISheet sheet, string coluna, string texto)
 		{
 			int columnIndex = sheet.GetRow(0)

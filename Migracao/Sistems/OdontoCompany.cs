@@ -1196,7 +1196,6 @@ namespace Migracao.Sistems
 							{
 								switch (tituloColuna)
 								{
-									//					ValorPago	Prazo					ObservaçãoRecebido
 									case "CPF":
 										cpf = celulaValor.ToCPF();
 										break;
@@ -1370,26 +1369,25 @@ namespace Migracao.Sistems
 							{
 								switch (tituloColuna)
 								{
-									case "DOCUMENTO":
+									case "DocumentoRef":
 										documento = celulaValor;
 										break;
-									case "VALOR":
+									case "ValorPago":
 										pagoValor = celulaValor.ArredondarValor();
 										break;
-									case "BAIXA":
+									case "DataBaixa":
 										dataBaixa = celulaValor.ToData();
 										break;
-									case "MOTIVO":
+									case "ObservaçãoRecebido":
 										observacao = celulaValor;
 										break;
 									//case "TIPO_DOC":
 									//tipoPagamento = int.Parse(celulaValor);
 									//break;
-									case "CGC_CPF":
+									case "CPF":
 										cpf = celulaValor.ToCPF();
 									break;
 									case "NOME_GRUPO":
-										pagamento = celulaValor;
 										break;
 								}
 							}

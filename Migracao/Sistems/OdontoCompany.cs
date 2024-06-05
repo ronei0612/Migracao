@@ -261,15 +261,25 @@ namespace Migracao.Sistems
 							if (i < linha.Length) // Verificar se o índice está dentro do tamanho da linha
 								valoresLinha.Add(cabecalhos[i], linha[i]);
 
-						//if (registroRecebivel.Contains(codigo.ToNum()))
-						//LANCTO	CGC_CPF	DOCUMENTO	VR_PARCELA	VALOR	VENCTO	BAIXA	CAMPOX	TRANSMISSAO	OBS	TIPO_DOC	DUPLICATA	PARCELA	RESPONSAVEL	CONTA_CORRENTE	CONTA_DOCUMENTO	LOJA	USUARIO	MODIFICADO	TERMINAL	VR_CALCULADO	MOTIVO	GRUPO	NOME_GRUPO	NUM_BANCO	COD_CAIXA	DATA_REMESSA	AGUARDANDO_VINCULO	DT_AXON	AXON_ID	ID_BAIXAPLANOS
-						var cpf = valoresLinha.GetValueOrDefault("CGC_CPF").Trim();
+						var cabecalhoCpf = "CGC_CPF";
+						var cabecalhoObs = "OBS";
+						var cabecalhoDataBaixa = "BAIXA";
+						var cabecalhoDataVencimento = "VENCTO";
+
+						if (cabecalhos.Contains("CNPJ_CPF"))
+						{
+							cabecalhoCpf = "CNPJ_CPF";
+							cabecalhoObs = "OBS1";
+							cabecalhoDataBaixa = "DATA";
+							cabecalhoDataVencimento = "DATA";
+						}
+
+						var cpf = valoresLinha.GetValueOrDefault(cabecalhoCpf).Trim();
 						var documento = valoresLinha.GetValueOrDefault("DOCUMENTO").Trim();
 						var valor = valoresLinha.GetValueOrDefault("VALOR").Trim();
-						var observacao = valoresLinha.GetValueOrDefault("OBS").Trim();
-						var baixaData = valoresLinha.GetValueOrDefault("BAIXA").Trim();
-						var vencimentoData = valoresLinha.GetValueOrDefault("VENCTO").Trim();
-						//var emissaoData = valoresLinha.GetValueOrDefault("EMISSAO").Trim();
+						var observacao = valoresLinha.GetValueOrDefault(cabecalhoObs).Trim();
+						var baixaData = valoresLinha.GetValueOrDefault(cabecalhoDataBaixa).Trim();
+						var vencimentoData = valoresLinha.GetValueOrDefault(cabecalhoDataVencimento).Trim();
 
 						DataRow[] dataRowEncontrados = dataTable.Select($"DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND ValorOriginal = '{valor.ArredondarValorV2()}'");
 

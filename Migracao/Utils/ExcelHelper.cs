@@ -461,6 +461,14 @@ namespace Migracao.Utils
 
 			if (!string.IsNullOrWhiteSpace(cidade))
             {
+				if (string.IsNullOrEmpty(estado))
+				{
+					if (cidadeDict.ContainsKey(cidade))
+						return int.Parse(cidadeDict[cidade]);
+					else
+						return 0;
+				}
+
 				string key = cidade + "|" + estado.ToLower();
                 if (cidadeEstadoDict.ContainsKey(key))
                     return int.Parse(cidadeEstadoDict[key]);
@@ -504,11 +512,13 @@ namespace Migracao.Utils
 				return "";
 
 			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
-			cpf = cpf.Replace(".", "").Replace("-", "");
 
 			if (!string.IsNullOrWhiteSpace(cpf))
+			{
+				cpf = cpf.Replace(".", "").Replace("-", "");
 				if (cpfConsumidorDict.ContainsKey(cpf))
 					return cpfConsumidorDict[cpf];
+			}
 
 			if (!string.IsNullOrWhiteSpace(nomeCompleto) && !string.IsNullOrWhiteSpace(codigo))
 			{

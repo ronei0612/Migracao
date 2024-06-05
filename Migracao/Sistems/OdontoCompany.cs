@@ -2547,18 +2547,6 @@ namespace Migracao.Sistems
                     throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
                 }
 
-       //     if (File.Exists(arquivoExcelNomesUTF8))
-			    //try
-			    //{
-				   // var workbookCidades = excelHelper.LerExcel(arquivoExcelNomesUTF8);
-				   // var sheetCidades = workbookCidades.GetSheetAt(0);
-				   // excelHelper.InitializeDictionaryNomesUTF8(sheetCidades);
-			    //}
-			    //catch (Exception ex)
-			    //{
-				   // throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelNomesUTF8}\": {ex.Message}");
-			    //}
-
 			if (!string.IsNullOrEmpty(arquivoPacientesAtuais))
 			    try
 			    {
@@ -2589,7 +2577,7 @@ namespace Migracao.Sistems
                     DateTime dataNascimento = dataHoje, dataCadastro = dataHoje;
                     int cep = 0;
 					byte? estadoCivil = null;
-					bool sexo = true;
+					bool sexo = true, ativo = true;
 					LogradouroTipos logradouroTipo = LogradouroTipos.Outros;
 					long? telefonePrinc = null, telefoneAltern = null, telefoneComercial = null, telefoneOutro = null, celular = null;
 					string? nomeCompleto = null, documento = null, rg = null, email = null, apelido = null, nascimentoLocal = null, profissaoOutra = null, logradouro = "",
@@ -2607,59 +2595,61 @@ namespace Migracao.Sistems
                             {
                                 switch (tituloColuna)
                                 {
-                                    case "CLIENTE":
-                                        cliente = celulaValor == "S" ? true : false;
+                                    case "Paciente(S/N)":
+										cliente = celulaValor == "S" ? true : false;
                                         break;
-                                    case "FORNECEDOR":
-                                        fornecedor = celulaValor == "S" ? true : false;
+                                    case "Ativo(S/N)":
+                                        ativo = celulaValor == "S" ? true : false;
                                         break;
-                                    case "NOME":
+                                    case "NomeCompleto":
 										nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
-                                        apelido = celulaValor.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
                                         break;
-                                    case "CGC_CPF":
+									case "Apelido":
+										apelido = celulaValor.GetLetras().GetPrimeiroNome().PrimeiraLetraMaiuscula();
+										break;
+									case "Documento(CPF,CNPJ,CGC)":
 										documento = celulaValor.ToCPF();
                                         break;
-                                    case "INSC_RG":
+                                    case "RG":
                                         rg = celulaValor.GetPrimeirosCaracteres(20);
                                         break;
-                                    case "SEXO_M_F":
-                                        sexo = celulaValor.ToSexo("m", "f");
+                                    case "Sexo(M/F)":
+										sexo = celulaValor.ToSexo("m", "f");
                                         break;
-                                    case "EMAIL":
+                                    case "Email":
                                         email = celulaValor.ToEmail();
                                         break;
-                                    case "FONE1":
+                                    case "TelefonePrincipal":
                                         telefonePrinc = celulaValor.ToFone();
                                         break;
-                                    case "FONE2":
+                                    case "TelefoneAlternativo":
                                         telefoneAltern = celulaValor.ToFone();
                                         break;
-                                    case "CELULAR":
+                                    case "Celular":
                                         celular = celulaValor.ToFone();
                                         break;
-                                    case "ENDERECO":
+                                    case "Logradouro":
                                         logradouro = celulaValor.PrimeiraLetraMaiuscula();
 										logradouroTipo = logradouro.GetLogradouroTipo();
 										if (logradouroTipo != LogradouroTipos.Outros)
 											logradouro = logradouro.RemoverPrimeiroNome();
 										break;
-                                    case "BAIRRO":
+                                    case "Bairro":
                                         bairro = celulaValor.PrimeiraLetraMaiuscula();
                                         break;
-                                    case "NUM_ENDERECO":
+                                    case "LogradouroNum":
                                         logradouroNum = celulaValor;
                                         break;
-                                    case "CIDADE":
+                                    case "Cidade":
                                         cidade = celulaValor;
                                         break;
-                                    case "ESTADO":
-                                        estado = celulaValor;
+                                    case "Estado(SP)":
+										estado = celulaValor;
                                         break;
-                                    case "CEP":
-                                        cep = celulaValor.ToNum();
+                                    case "CEP(00000-000)":
+										cep = celulaValor.ToNum();
                                         break;
-                                    case "OBS1":
+                                    case "Observações":
                                         observacao = celulaValor;
 										break;
                                     case "NUM_CONVENIO":
@@ -2667,10 +2657,10 @@ namespace Migracao.Sistems
                                     case "DT_CADASTRO":
                                         dataCadastro = celulaValor.ToData();
                                         break;
-                                    case "DT_NASCIMENTO":
+                                    case "NascimentoData":
                                         dataNascimento = celulaValor.ToData();
                                         break;
-									case "NUM_FICHA":
+									case "Código":
 										numcadastro = celulaValor;
 										break;
 								}
@@ -2685,7 +2675,7 @@ namespace Migracao.Sistems
 
 					if (!string.IsNullOrWhiteSpace(nomeCompleto))
                     {
-                        if (!fornecedor)
+                        if (cliente)
                         {
 							if (string.IsNullOrEmpty(pessoaIDValue) == false)
 							{
@@ -2695,7 +2685,7 @@ namespace Migracao.Sistems
 								{
 									consumidores.Add(new Consumidor()
 									{
-										Ativo = true,
+										Ativo = ativo,
 										DataInclusao = dataCadastro,
 										EstabelecimentoID = estabelecimentoID,
 										LGPDSituacaoID = 0,
@@ -2713,7 +2703,7 @@ namespace Migracao.Sistems
 										if (excelHelper.ConsumidorEnderecoExists(pessoaID, cep) == false)
 											consumidoresEnderecos.Add(new ConsumidorEndereco()
 											{
-												Ativo = true,
+												Ativo = ativo,
 												ConsumidorID = int.Parse(consumidorIDValue),
 												EnderecoTipoID = (short)EnderecoTipos.Residencial,
 												LogradouroTipoID = (int)logradouroTipo,

@@ -271,7 +271,7 @@ namespace Migracao.Sistems
 						var vencimentoData = valoresLinha.GetValueOrDefault("VENCTO").Trim();
 						//var emissaoData = valoresLinha.GetValueOrDefault("EMISSAO").Trim();
 
-						DataRow[] dataRowEncontrados = dataTable.Select($"DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND VALOR = {valor.ArredondarValorV2()}");
+						DataRow[] dataRowEncontrados = dataTable.Select($"DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND ValorOriginal = '{valor.ArredondarValorV2()}'");
 
 						if (dataRowEncontrados.Length > 1)
 							throw new Exception($"Mais de uma linha encontrada em Recebíveis: DocumentoRef = '{documento}' AND CPF = '{cpf.ToCPF()}' AND VALOR = {valor.ArredondarValorV2()}");

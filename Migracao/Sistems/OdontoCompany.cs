@@ -2109,17 +2109,17 @@ namespace Migracao.Sistems
 					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
 				}
 
-			if (!string.IsNullOrEmpty(arquivoFuncionariosAtuais))
-				try
-				{
-					var workbook = excelHelper.LerExcel(arquivoFuncionariosAtuais);
-					var sheet = workbook.GetSheetAt(0);
-					excelHelper.InitializeDictionary(sheet);
-				}
-				catch (Exception ex)
-				{
-					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoFuncionariosAtuais}\": {ex.Message}");
-				}
+			//if (!string.IsNullOrEmpty(arquivoFuncionariosAtuais))
+			//	try
+			//	{
+			//		var workbook = excelHelper.LerExcel(arquivoFuncionariosAtuais);
+			//		var sheet = workbook.GetSheetAt(0);
+			//		excelHelper.InitializeDictionary(sheet);
+			//	}
+			//	catch (Exception ex)
+			//	{
+			//		throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoFuncionariosAtuais}\": {ex.Message}");
+			//	}
 
 
 			try
@@ -2137,6 +2137,7 @@ namespace Migracao.Sistems
 					long? telefonePrinc = null;
 					string? nomeCompleto = null, departamento = null, cro = null, observacao = null, email = null;
 					string apelido = "";
+					bool funcionario = false;
 
 					foreach (var celula in linha.Cells)
 					{
@@ -2150,36 +2151,43 @@ namespace Migracao.Sistems
 							{
 								switch (tituloColuna)
 								{
-									case "CODIGO":
+									case "Código":
 										codigo = int.Parse(celulaValor);
 										break;
-									case "NOME":
-										nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
-										apelido = nomeCompleto.GetPrimeirosCaracteres(20);
-										break;
-									case "DEPARTAMENTO":
-										departamento = celulaValor;
-										break;
-									case "OBS":
-										observacao = celulaValor;
-										break;
-									case "ATIVO":
+									case "Ativo(S/N)":
 										ativo = celulaValor == "S" ? true : false;
 										break;
-									case "NOME_COMPLETO":
-										//nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+									case "NomeCompleto":
+										nomeCompleto = celulaValor.ToNome();
 										break;
-									case "EMAIL":
+									case "NomeSocial":
+										break;
+									case "Apelido":
+										apelido = celulaValor.GetPrimeirosCaracteres(20).ToNome();
+										break;
+									case "DataCadastro(01/12/2024)":
+										dataCadastro = celulaValor.ToData();
+										break;
+									case "Observações":
+										observacao = celulaValor;
+										break;
+									case "Email":
 										email = celulaValor.ToEmail();
 										break;
-									case "TELEFONE":
+									case "NascimentoData":
+										dataNascimento = celulaValor.ToData();
+										break;
+									case "Funcionario(S/N)":
+										funcionario = celulaValor == "S" ? true : false;
+										break;
+									case "TelefonePrincipal":
 										telefonePrinc = celulaValor.ToFone();
 										break;
-									case "CRO":
-										cro = celulaValor;
+									case "CEP(00000-000)":
+										cep = celulaValor.ToNum();
 										break;
-									case "MODIFICADO":
-										dataCadastro = celulaValor.ToData();
+									case "ConselhoCodigo":
+										cro = celulaValor;
 										break;
 								}
 							}
@@ -2188,19 +2196,15 @@ namespace Migracao.Sistems
 
 					pessoaID = indiceLinha;
 
-					if (!string.IsNullOrWhiteSpace(nomeCompleto))
+					if (funcionario)
 					{
-						if (string.IsNullOrWhiteSpace(apelido))
-							apelido = nomeCompleto.GetPrimeirosCaracteres(20);
-
 						var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto);
 						var funcionarioIDValue = excelHelper.GetFuncionarioID(nomeCompleto: nomeCompleto);
 
 						if (string.IsNullOrEmpty(arquivoFuncionariosAtuais) 
 							|| (!string.IsNullOrEmpty(arquivoFuncionariosAtuais) && !string.IsNullOrEmpty(pessoaIDValue) && string.IsNullOrEmpty(funcionarioIDValue)))
 						{
-							if (!string.IsNullOrEmpty(pessoaIDValue))
-								pessoaID = int.Parse(pessoaIDValue);
+							pessoaID = int.Parse(pessoaIDValue);
 
 							funcionarios.Add(new Funcionario()
 							{

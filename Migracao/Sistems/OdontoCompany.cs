@@ -305,7 +305,6 @@ namespace Migracao.Sistems
 									nome = dataRowPessoasEncontrados[0]["NomeCompleto"].ToString();
 							}
 
-
 							DataRow[] dataRowEncontrados = dataTable.AsEnumerable()
 							.Where(row =>
 								row.Field<string>("DocumentoRef") == documento &&

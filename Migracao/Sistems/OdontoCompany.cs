@@ -2710,10 +2710,10 @@ namespace Migracao.Sistems
 
                     pessoaID = indiceLinha;
 
-					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento);
+					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento, nascimentoData: dataNascimento);
 					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: documento);
 
-					if (!string.IsNullOrWhiteSpace(nomeCompleto))
+					if (!string.IsNullOrWhiteSpace(nomeCompleto) && (dataNascimento != dataHoje && !string.IsNullOrEmpty(documento)))
                     {
                         if (cliente)
                         {

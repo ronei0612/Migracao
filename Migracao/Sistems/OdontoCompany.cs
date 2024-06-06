@@ -1547,8 +1547,8 @@ namespace Migracao.Sistems
 					string? nomeCompleto = null, documento = null, rg = null, email = null, apelido = null, nascimentoLocal = null, profissaoOutra = null, logradouro = "",
 						 complemento = null, bairro = null, logradouroNum = null, numcadastro = null, cidade = "", estado = null, observacao = null;
 
-					if (indiceLinha == 2894)
-						indiceLinha = 0;
+					if (indiceLinha == 6255)
+						indiceLinha = indiceLinha;
 
 					foreach (var celula in linha.Cells)
 					{
@@ -1567,12 +1567,12 @@ namespace Migracao.Sistems
 									case "Ativo(S/N)":
 										break;
 									case "NomeCompleto":
-										nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+										nomeCompleto = celulaValor.ToNome();
 										break;
 									case "NomeSocial":
 										break;
 									case "Apelido":
-										apelido = nomeCompleto.GetPrimeirosCaracteres(19);
+										apelido = nomeCompleto.GetPrimeirosCaracteres(20).ToNome();
 										break;
 									case "Documento(CPF,CNPJ,CGC)":
 										documento = celulaValor.ToCPF();
@@ -1652,7 +1652,7 @@ namespace Migracao.Sistems
 					pessoaID = indiceLinha;
 					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento);
 
-					if (!fornecedor)
+					if (cliente)
 					{
 						if ((!string.IsNullOrEmpty(nomeCompleto) && string.IsNullOrEmpty(documento))
 							|| (!string.IsNullOrEmpty(documento) && documento.IsCPF()))

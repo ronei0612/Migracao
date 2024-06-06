@@ -139,6 +139,15 @@ namespace Migracao.Utils
 			return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(texto.ToLower());
 		}
 
+		public static string? ToNome(this string texto)
+		{
+			texto = texto.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+
+			return string.Join(" ", texto.Split(' ')
+				.Where(parte => parte.Length > 1)
+				.ToArray());
+		}
+
 
 		public static string GetLetras(this string texto)
 		{

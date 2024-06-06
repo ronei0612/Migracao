@@ -380,6 +380,9 @@ namespace Migracao
 
 			Tools.salvarNaPasta = textoLinhas[0];
 			Tools.ultimaPasta = textoLinhas[1];
+
+			if (!Directory.Exists(Tools.salvarNaPasta))
+				MessageBox.Show("Configure a pasta de saída clicando em \"Abrir Pasta\"", "Atenção!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 		}
 
 		private void salvarNaPastaToolStripMenuItem_Click(object sender, EventArgs e)

@@ -225,7 +225,7 @@ namespace Migracao.Sistems
 								nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
 						}
 
-						if (valor.ArredondarValorV2() > 1)
+						if (!string.IsNullOrEmpty(valor) && valor.ArredondarValorV2() > 1)
 						{
 							dataRow["CPF"] = cpf;
 							dataRow["Nome"] = nome;
@@ -293,47 +293,49 @@ namespace Migracao.Sistems
 						var baixaData = valoresLinha.GetValueOrDefault(cabecalhoDataBaixa).Trim();
 						var vencimentoData = valoresLinha.GetValueOrDefault(cabecalhoDataVencimento).Trim();
 
-
-						cpf = cpf.ToCPF();
-						string nome = "";
-
-						if (dataTablePacientes.Rows.Count > 0)
+						if (!string.IsNullOrEmpty(valor) && !string.IsNullOrEmpty(valorOriginal) && valor.ArredondarValorV2() > 1 && valorOriginal.ArredondarValorV2() > 1)
 						{
-							DataRow[] dataRowPessoasEncontrados = dataTablePacientes.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
-							if (dataRowPessoasEncontrados.Length > 0)
-								nome = dataRowPessoasEncontrados[0]["NomeCompleto"].ToString();
-						}
+							cpf = cpf.ToCPF();
+							string nome = "";
 
-
-						DataRow[] dataRowEncontrados = dataTable.AsEnumerable()
-						.Where(row =>
-							row.Field<string>("DocumentoRef") == documento &&
-							row.Field<string>("CPF") == cpf &&
-							row.Field<string>("ValorOriginal") == valorOriginal.ArredondarValorV2().ToString())
-						.ToArray();
-
-						if (dataRowEncontrados.Length > 0)
-						{
-							foreach (var dataRowEncontrado in dataRowEncontrados)
+							if (dataTablePacientes.Rows.Count > 0)
 							{
-								dataRowEncontrado["ValorPago"] = valor.ArredondarValorV2();
-								dataRowEncontrado["DataBaixa"] = baixaData.ToData().ToString("dd/MM/yyyy");
-								dataRowEncontrado["ObservaçãoRecebido"] = observacao;
+								DataRow[] dataRowPessoasEncontrados = dataTablePacientes.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
+								if (dataRowPessoasEncontrados.Length > 0)
+									nome = dataRowPessoasEncontrados[0]["NomeCompleto"].ToString();
 							}
-						}
 
-						else
-						{
-							dataRow["CPF"] = cpf;
-							dataRow["Nome"] = nome;
-							dataRow["DocumentoRef"] = documento;
-							dataRow["ValorPago"] = valor.ArredondarValorV2();
-							dataRow["DataBaixa"] = baixaData;
-							dataRow["Vencimento(01/12/2010)"] = vencimentoData.ToData();
-							dataRow["ObservaçãoRecebido"] = observacao;
-							dataRow["RecebívelExigível(R/E)"] = "R";
 
-							dataTable.Rows.Add(dataRow);
+							DataRow[] dataRowEncontrados = dataTable.AsEnumerable()
+							.Where(row =>
+								row.Field<string>("DocumentoRef") == documento &&
+								row.Field<string>("CPF") == cpf &&
+								row.Field<string>("ValorOriginal") == valorOriginal.ArredondarValorV2().ToString())
+							.ToArray();
+
+							if (dataRowEncontrados.Length > 0)
+							{
+								foreach (var dataRowEncontrado in dataRowEncontrados)
+								{
+									dataRowEncontrado["ValorPago"] = valor.ArredondarValorV2();
+									dataRowEncontrado["DataBaixa"] = baixaData.ToData().ToString("dd/MM/yyyy");
+									dataRowEncontrado["ObservaçãoRecebido"] = observacao;
+								}
+							}
+
+							else
+							{
+								dataRow["CPF"] = cpf;
+								dataRow["Nome"] = nome;
+								dataRow["DocumentoRef"] = documento;
+								dataRow["ValorPago"] = valor.ArredondarValorV2();
+								dataRow["DataBaixa"] = baixaData;
+								dataRow["Vencimento(01/12/2010)"] = vencimentoData.ToData();
+								dataRow["ObservaçãoRecebido"] = observacao;
+								dataRow["RecebívelExigível(R/E)"] = "R";
+
+								dataTable.Rows.Add(dataRow);
+							}
 						}
 					}
 					catch (Exception error)

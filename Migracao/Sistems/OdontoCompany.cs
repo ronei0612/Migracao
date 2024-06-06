@@ -477,7 +477,7 @@ namespace Migracao.Sistems
 						dataRow["Email"] = email.ToEmail();
 						dataRow["RG"] = rg.GetPrimeirosCaracteres(20);
 						dataRow["Sexo(M/F)"] = sexo.ToSexo("m", "f").ToSN();
-						dataRow["NascimentoData"] = dataNascimento.ToData();
+						dataRow["NascimentoData"] = dataNascimento.ToDataNull();
 						dataRow["NascimentoLocal"] = "";
 						dataRow["EstadoCivil(S/C/V)"] = "";
 						dataRow["Profissao"] = "";
@@ -2713,7 +2713,7 @@ namespace Migracao.Sistems
 					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento, nascimentoData: dataNascimento);
 					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: documento);
 
-					if (!string.IsNullOrWhiteSpace(nomeCompleto) && (dataNascimento != dataHoje && !string.IsNullOrEmpty(documento)))
+					if (!string.IsNullOrWhiteSpace(nomeCompleto))
                     {
                         if (cliente)
                         {

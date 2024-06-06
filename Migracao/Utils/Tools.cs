@@ -79,6 +79,26 @@ namespace Migracao.Utils
 			return texto.Substring(0, Math.Min(max, texto.Length));
 		}
 
+		public static DateTime? ToDataNull(this string texto)
+		{
+			if (string.IsNullOrEmpty(texto))
+				return null;
+
+			DateTime dataMinima = new(1900, 01, 01), dataMaxima = new(2079, 06, 06), dataHoje = DateTime.Now, data;
+
+			if (DateTime.TryParse(texto, out data))
+			{
+			}
+			else if (double.TryParse(texto, out double codigoData))
+				data = DateTime.FromOADate(codigoData);
+			else
+				throw new Exception("Erro na conversão de data");
+			if ((data >= dataMinima && data <= dataMaxima) == false)
+				data = dataHoje;
+
+			return data;
+		}
+
 		public static DateTime ToData(this string texto)
 		{
 			if (string.IsNullOrEmpty(texto))

@@ -1509,10 +1509,8 @@ namespace Migracao.Sistems
         }
 		public void ImportarPessoas(string arquivoExcel, string arquivoPessoasAtuais, int estabelecimentoID, int loginID)
 		{
-			//if (Path.GetFileNameWithoutExtension(arquivoExcel).Contains("CED006"))
-				ImportarPessoasDentistas(arquivoExcel, arquivoPessoasAtuais, estabelecimentoID, loginID);
-			//else if (Path.GetFileNameWithoutExtension(arquivoExcel).Contains("EMD101"))
-				//ImportarPessoasClientes(arquivoExcel, arquivoPessoasAtuais, estabelecimentoID, loginID);
+			ImportarPessoasDentistas(arquivoExcel, arquivoPessoasAtuais, estabelecimentoID, loginID);
+			ImportarPessoasClientes(arquivoExcel, arquivoPessoasAtuais, estabelecimentoID, loginID);
 		}
 
 		public void ImportarPessoasClientes(string arquivoExcel, string arquivoPessoasAtuais, int estabelecimentoID, int loginID)

@@ -17,6 +17,7 @@ namespace Migracao.Utils
         public static Dictionary<string, string> cpfConsumidorDict = new Dictionary<string, string>();
         public static Dictionary<string, string> nomeCodConsumidorDict = new Dictionary<string, string>();
 		public static Dictionary<string, string> nomePessoaDict = new Dictionary<string, string>();
+		public static Dictionary<string, string> nomeNascimentoPessoaDict = new Dictionary<string, string>();
 		public static Dictionary<string, string> cpfPessoaDict = new Dictionary<string, string>();
 		public static Dictionary<string, string> cpfFuncionarioDict = new Dictionary<string, string>();
 		public static Dictionary<string, string> nomeFuncionarioDict = new Dictionary<string, string>();
@@ -159,6 +160,7 @@ namespace Migracao.Utils
 			nomeConsumidorDict.Clear();
 			nomePessoaDict.Clear();
 			nomeFuncionarioDict.Clear();
+			nomeNascimentoPessoaDict.Clear();
 
 			this.sheet = sheet;
 			IRow headerRow = sheet.GetRow(0);
@@ -171,6 +173,7 @@ namespace Migracao.Utils
 			int nomefantasiaColumnIndex = GetColumnIndex(headerRow, "nomefantasia");
 			int consumidoridColumnIndex = GetColumnIndex(headerRow, "consumidorid");
 			int codigoantigoColumnIndex = GetColumnIndex(headerRow, "codigoantigo");
+			int nascimentoDataColumnIndex = GetColumnIndex(headerRow, "nascimentodata");
 
 			for (int row = 1; row <= sheet.LastRowNum; row++)
 			{
@@ -178,6 +181,7 @@ namespace Migracao.Utils
 				{
 					string cpf = sheet.GetRow(row).GetCell(cpfColumnIndex) != null ? sheet.GetRow(row).GetCell(cpfColumnIndex).ToString() : "";
 					string nomeCompleto = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex) != null ? sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString().ToLower() : "";
+					string nascimentoData = sheet.GetRow(row).GetCell(nascimentoDataColumnIndex) != null ? sheet.GetRow(row).GetCell(nascimentoDataColumnIndex).ToString().ToLower() : "";
 					string pessoaid = sheet.GetRow(row).GetCell(pessoaidColumnIndex) != null ? sheet.GetRow(row).GetCell(pessoaidColumnIndex).ToString() : "";
 					string funcionarioid = sheet.GetRow(row).GetCell(funcionarioidColumnIndex) != null ? sheet.GetRow(row).GetCell(funcionarioidColumnIndex).ToString() : "";
 					string fornecedorid = sheet.GetRow(row).GetCell(fornecedoridColumnIndex) != null ? sheet.GetRow(row).GetCell(fornecedoridColumnIndex).ToString() : "";
@@ -213,6 +217,10 @@ namespace Migracao.Utils
 
 					if (!nomeFuncionarioDict.ContainsKey(key))
 						nomeFuncionarioDict.Add(key, funcionarioid);
+
+					key = nomeCompleto + "|" + nascimentoData;
+					if (!nomeNascimentoPessoaDict.ContainsKey(key))
+						nomeNascimentoPessoaDict.Add(key, pessoaid);
 				}
 			}
 		}
@@ -485,7 +493,7 @@ namespace Migracao.Utils
 			return 0;
 		}
 
-		public string GetPessoaID(string cpf = "", string nomeCompleto = "")
+		public string GetPessoaID(string cpf = "", string nomeCompleto = "", DateTime? nascimentoData = null)
 		{
 			if (string.IsNullOrWhiteSpace(cpf) && string.IsNullOrWhiteSpace(nomeCompleto))
 				return "";
@@ -502,6 +510,14 @@ namespace Migracao.Utils
 			if (!string.IsNullOrWhiteSpace(nomeCompleto))
 				if (nomePessoaDict.ContainsKey(nomeCompleto))
 					return nomePessoaDict[nomeCompleto];
+
+			if (!string.IsNullOrWhiteSpace(nomeCompleto) && nascimentoData != null)
+			{
+				var nascimentoD = (DateTime)nascimentoData;
+				string key = nomeCompleto + "|" + nascimentoD.ToString("yyyy-MM-dd HH:mm:ss.fff");
+				if (nomeNascimentoPessoaDict.ContainsKey(key))
+					return nomeNascimentoPessoaDict[key];
+			}
 
 			return "";
 		}

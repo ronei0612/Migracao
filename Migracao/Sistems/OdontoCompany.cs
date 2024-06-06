@@ -1503,9 +1503,9 @@ namespace Migracao.Sistems
 		public void ImportarPessoas(string arquivoExcel, string arquivoPessoasAtuais, int estabelecimentoID, int loginID)
 		{
 			//if (Path.GetFileNameWithoutExtension(arquivoExcel).Contains("CED006"))
-				//ImportarPessoasDentistas(arquivoExcel, arquivoPessoasAtuais, estabelecimentoID, loginID);
+				ImportarPessoasDentistas(arquivoExcel, arquivoPessoasAtuais, estabelecimentoID, loginID);
 			//else if (Path.GetFileNameWithoutExtension(arquivoExcel).Contains("EMD101"))
-				ImportarPessoasClientes(arquivoExcel, arquivoPessoasAtuais, estabelecimentoID, loginID);
+				//ImportarPessoasClientes(arquivoExcel, arquivoPessoasAtuais, estabelecimentoID, loginID);
 		}
 
 		public void ImportarPessoasClientes(string arquivoExcel, string arquivoPessoasAtuais, int estabelecimentoID, int loginID)
@@ -1925,6 +1925,7 @@ namespace Migracao.Sistems
 			DateTime dataHoje = DateTime.Now;
 			var excelHelper = new ExcelHelper(arquivoExcel);
 			var sqlHelper = new SqlHelper();
+			bool funcionario = false;
 
 			if (!string.IsNullOrEmpty(arquivoPessoasAtuais))
 				try
@@ -1967,47 +1968,61 @@ namespace Migracao.Sistems
 							{
 								switch (tituloColuna)
 								{
-									case "CODIGO":
+									//case "DEPARTAMENTO":
+									//	departamento = celulaValor;
+									//	break;
+									//case "MODIFICADO":
+									//	dataCadastro = celulaValor.ToData();
+									//	break;
+
+									case "Código":
 										codigo = int.Parse(celulaValor);
 										break;
-									case "NOME":
-										nomeCompleto = celulaValor.GetLetras().PrimeiraLetraMaiuscula();
-										apelido = nomeCompleto.GetPrimeirosCaracteres(20);
-										break;
-									case "DEPARTAMENTO":
-										departamento = celulaValor;
-										break;
-									case "OBS":
-										observacao = celulaValor;
-										break;
-									case "ATIVO":
+									case "Ativo(S/N)":
 										ativo = celulaValor == "S" ? true : false;
 										break;
-									case "NOME_COMPLETO":
-										//nomeCompleto = celulaValor.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+									case "NomeCompleto":
+										nomeCompleto = celulaValor.ToNome();
 										break;
-									case "EMAIL":
+									case "NomeSocial":
+										break;
+									case "Apelido":
+										apelido = celulaValor.GetPrimeirosCaracteres(20).ToNome();
+										break;
+									case "Documento(CPF,CNPJ,CGC)":
+										documento = celulaValor.ToCPF();
+										break;
+									case "DataCadastro(01/12/2024)":
+										dataCadastro = celulaValor.ToData();
+										break;
+									case "Observações":
+										observacao = celulaValor;
+										break;
+									case "Email":
 										email = celulaValor.ToEmail();
 										break;
-									case "TELEFONE":
+									case "NascimentoData":
+										dataNascimento = celulaValor.ToData();
+										break;
+									case "Funcionario(S/N)":
+										funcionario = celulaValor == "S" ? true : false;
+										break;
+									case "TelefonePrincipal":
 										telefonePrinc = celulaValor.ToFone();
 										break;
-									case "CRO":
-										cro = celulaValor;
+									case "CEP(00000-000)":
+										cep = celulaValor.ToNum();
 										break;
-									case "MODIFICADO":
-										dataCadastro = celulaValor.ToData();
+									case "ConselhoCodigo":
+										cro = celulaValor;
 										break;
 								}
 							}
 						}
 					}
 
-					if (!string.IsNullOrWhiteSpace(apelido))
+					if (funcionario)
 					{
-						if (string.IsNullOrWhiteSpace(nomeCompleto))
-							nomeCompleto = apelido;
-
 						var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto);
 
 						if (string.IsNullOrEmpty(arquivoPessoasAtuais) 

@@ -23,7 +23,7 @@ namespace Migracao.Sistems
 		List<string> cabecalhos_Pacientes		= ["Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
 		List<string> cabecalhos_Recebiveis		= ["CPF", "Nome", "DocumentoRef", "RecebívelExigível(R/E)", "ValorOriginal", "ValorPago", "Prazo", "Vencimento(01/12/2010)", "DataBaixa", "Emissão(01/12/2010)", "ObservaçãoRecebível", "ObservaçãoRecebido"];
 		List<string> cabecalhos_Agendamentos	= ["ID", "CPF", "Nome Completo", "Telefone", "Data Início (01/12/2024 00:00)", "Data Término (01/12/2024 00:00)", "Data Inclusão (01/12/2024)", "NomeCompletoDentista", "Observacao"];
-		List<string> cabecalhos_Procedimentos	= ["Nome Tabela", "Ativo(S/N)", "Procedimento(Nome)", "Abreviação", "Especialidade", "Preço", "TUSS", "Diagnóstico(S/N)", "Prevenção(S/N)", "Odontopediatria(S/N)", "Dentística(S/N)", "Endodontia(S/N)", "Periodontia(S/N)", "Prótese(S/N)", "Cirurgia(S/N)", "Ortodontia(S/N)", "Radiologia(S/N)", "Estética(S/N)", "Implantodontia(S/N)", "Odontogeriatria(S/N)", "DTM(S/N)", "Orofacial(S/N)", ];
+		List<string> cabecalhos_Procedimentos	= ["Nome Tabela", "Ativo(S/N)", "Procedimento(Nome)", "Abreviação", "Especialidade", "Especialidade Código", "Preço", "TUSS", "Diagnóstico(S/N)", "Prevenção(S/N)", "Odontopediatria(S/N)", "Dentística(S/N)", "Endodontia(S/N)", "Periodontia(S/N)", "Prótese(S/N)", "Cirurgia(S/N)", "Ortodontia(S/N)", "Radiologia(S/N)", "Estética(S/N)", "Implantodontia(S/N)", "Odontogeriatria(S/N)", "DTM(S/N)", "Orofacial(S/N)", ];
 		List<string> cabecalhos_CodProcedimentos = ["ID", "Nome", "Usuário"];
 
 		HashSet<string> cadastroPaciente, registroRecebivel;
@@ -564,19 +564,19 @@ namespace Migracao.Sistems
 		{
 			try
 			{
-				var grupoCategoriaDict = new Dictionary<string, string>()
+				var grupoCategoriaDict = new Dictionary<string, string[]>()
 				{
-					{ "CIRURGIA", "Cirurgia" },
-					{ "ENDODONTIA", "Endodontia" },
-					{ "PERIODONTIA", "Periodontia" },
-					{ "PROTESE", "Protese" },
-					{ "CLINICO", "Outros" },
-					{ "MANUTENCAO", "Ortodontia" },
-					{ "ORTODONTIA", "Ortodontia" },
-					{ "ORTO", "Ortodontia" },
-					{ "PREVENCAO", "Prevencao" },
-					{ "OROFACIAL", "Orofacial" },
-					{ "HARMONIZACAO OROFACIAL", "Orofacial" }
+					{ "CIRURGIA", ["Cirurgia", ProcedimentosCategoriasID.Cirurgia.ToString()] },
+					{ "ENDODONTIA", ["Endodontia", ProcedimentosCategoriasID.Endodontia.ToString()] },
+					{ "PERIODONTIA", ["Periodontia", ProcedimentosCategoriasID.Periodontia.ToString()] },
+					{ "PROTESE", ["Protese", ProcedimentosCategoriasID.Prótese.ToString()] },
+					{ "CLINICO", ["Outros", ProcedimentosCategoriasID.Outros.ToString()] },
+					{ "MANUTENCAO", ["Ortodontia", ProcedimentosCategoriasID.Ortodontia.ToString()] },
+					{ "ORTODONTIA", ["Ortodontia", ProcedimentosCategoriasID.Ortodontia.ToString()] },
+					{ "ORTO", ["Ortodontia", ProcedimentosCategoriasID.Ortodontia.ToString()] },
+					{ "PREVENCAO", ["Prevencao", ProcedimentosCategoriasID.Prevenção.ToString()] },
+					{ "OROFACIAL", ["Orofacial", ProcedimentosCategoriasID.Orofacial.ToString()] },
+					{ "HARMONIZACAO OROFACIAL", ["Orofacial", ProcedimentosCategoriasID.Outros.ToString()] }
 				};
 				int linhaIndex = 0;
 
@@ -601,6 +601,7 @@ namespace Migracao.Sistems
 						var particular = valoresLinha.GetValueOrDefault("PARTICULAR").Trim();
 						var nomeTabela = "";
 						var especialidade = "";
+						var especialidadeCod = "";
 
 						DataRow[] dataRowEncontrados = codProcedimentos.AsEnumerable()
 						.Where(row =>
@@ -625,7 +626,11 @@ namespace Migracao.Sistems
 						var buscarEspecialidade = Tools.RemoverAcentos(especialidade).ToUpper();
 
 						if (grupoCategoriaDict.ContainsKey(buscarEspecialidade))
-							especialidade = grupoCategoriaDict[buscarEspecialidade];
+						{
+							var grupoCategoriaEncontrado = grupoCategoriaDict[buscarEspecialidade];
+							especialidade = grupoCategoriaEncontrado[0];
+							especialidadeCod = grupoCategoriaEncontrado[1];
+						}
 
 						if (nomeTabela.GetPrimeirosCaracteres(40).PrimeiraLetraMaiuscula() == "")
 							nomeTabela = nomeTabela;
@@ -637,6 +642,7 @@ namespace Migracao.Sistems
 						dataRow["Abreviação"] = abreviacao;
 						dataRow["Preço"] = valor.ArredondarValorV2();
 						dataRow["TUSS"] = tuss.ToNumV2();
+						dataRow["Especialidade Código"] = especialidadeCod;
 
 						dataTable.Rows.Add(dataRow);
 					}

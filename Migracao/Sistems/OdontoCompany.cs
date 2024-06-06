@@ -1544,7 +1544,8 @@ namespace Migracao.Sistems
 				foreach (var linha in excelHelper.linhas)
 				{
 					bool cliente = false, fornecedor = false;
-					DateTime dataNascimento = dataHoje, dataCadastro = dataHoje;
+					DateTime? dataNascimento = null;
+					DateTime dataCadastro = dataHoje;
 					int cep = 0;
 					byte? estadoCivil = null;
 					bool sexo = true;
@@ -1655,7 +1656,7 @@ namespace Migracao.Sistems
 					}
 
 					pessoaID = indiceLinha;
-					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento);
+					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento, nascimentoData: dataNascimento);
 
 					if (cliente)
 					{
@@ -1954,7 +1955,8 @@ namespace Migracao.Sistems
 				foreach (var linha in excelHelper.linhas)
 				{
 					bool ativo = false;
-					DateTime dataNascimento = dataHoje, dataCadastro = dataHoje;
+					DateTime? dataNascimento = null;
+					DateTime dataCadastro = dataHoje;
 					int cep = 0;
 					int? codigo = null;
 					long? telefonePrinc = null;
@@ -2080,7 +2082,7 @@ namespace Migracao.Sistems
 					{ "FoneticaNomeCompleto", pessoas.ConvertAll(pessoa => (object)pessoa.FoneticaNomeCompleto).ToArray() }
 				};
 
-				salvarArquivo = Tools.GerarNomeArquivo($"Pessoas_{estabelecimentoID}_OdontoCompany_Migração");
+				salvarArquivo = Tools.GerarNomeArquivo($"PessoasDentistas_{estabelecimentoID}_OdontoCompany_Migração");
 				sqlHelper.GerarSqlInsert("Pessoas", salvarArquivo, pessoasDict);
 				excelHelper.GravarExcel(salvarArquivo, pessoasDict);
 

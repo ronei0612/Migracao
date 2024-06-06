@@ -113,6 +113,8 @@ namespace Migracao
 						else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
 							odontoCompany.ImportarAgenda(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), txtReferencia.Text, int.Parse(txtLoginID.Text));
 					}
+
+					txtPessoas.Text = "";
 				}
 				catch (Exception ex)
 				{
@@ -460,6 +462,7 @@ namespace Migracao
 				}
 				catch (Exception ex)
 				{
+					txtPessoas.Text = "";
 					MessageBox.Show(ex.Message, "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				}
 		}

@@ -3,7 +3,7 @@
 	internal class ConsumidorEndereco
 	{
 		public int ID { get; set; }
-		public required int ConsumidorID { get; set; }
+		public int ConsumidorID { get; set; }
 		public required short EnderecoTipoID { get; set; }
 		public required int LogradouroTipoID { get; set; }
 		public required string Logradouro { get; set; }

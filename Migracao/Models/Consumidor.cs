@@ -3,7 +3,7 @@
     internal class Consumidor
     {
         public int ID { get; set; }
-        public required int PessoaID { get; set; }
+        public int PessoaID { get; set; }
         public int? Controle { get; set; }
         public int? IndicacaoTipoID { get; set; }
         public string IndicacaoTexto { get; set; }

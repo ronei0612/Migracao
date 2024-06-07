@@ -1,4 +1,5 @@
-﻿using NPOI.SS.UserModel;
+﻿using Migracao.Models;
+using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Data;
 using System.Text;
@@ -951,5 +952,25 @@ namespace Migracao.Utils
 			}
 		}
 
+		public static string GerarSqlScriptPessoas(List<Pessoa> pessoas, List<Consumidor> consumidores, List<Endereco> enderecos)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			// Iterate through the list of people and generate INSERT statements for Pessoas table
+			foreach (Pessoa pessoa in pessoas)
+			{
+				sb.AppendLine($"INSERT INTO Pessoas (NomeCompleto, Apelido) VALUES ('{pessoa.NomeCompleto}', '{pessoa.Apelido}');");
+				sb.AppendLine("DECLARE @PessoaID int;");
+				sb.AppendLine("SELECT @PessoaID = SCOPE_IDENTITY();");
+			}
+
+			// Iterate through the list of consumers and generate INSERT statements for Consumidores table
+			foreach (Consumidor consumidor in consumidores)
+			{
+				sb.AppendLine($"INSERT INTO Consumidores (Ativo, DataInclusao, EstabelecimentoID, LGPDSituacaoID, LoginID, PessoaID) VALUES ('{consumidor.Ativo}', '{consumidor.DataInclusao:yyyy-MM-dd HH:mm:ss.fff}', '{consumidor.EstabelecimentoID}', '{consumidor.LGPDSituacaoID}', '{consumidor.LoginID}', @PessoaID{consumidores.IndexOf(consumidor) + 1});");
+			}
+
+			return sb.ToString();
+		}
 	}
 }

@@ -1,3 +1,4 @@
+using Migracao.Imports;
 using Migracao.Sistems;
 using Migracao.Utils;
 
@@ -84,34 +85,34 @@ namespace Migracao
 
 					else if (comboBoxSistema.Text.Equals("odontocompany", StringComparison.CurrentCultureIgnoreCase))
 					{
-						var odontoCompany = new OdontoCompany();
+						var importacoes = new Importacoes();
 
 						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
-							odontoCompany.ImportarPacientes(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
+							importacoes.ImportarPacientes(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
 
 						else if (comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase))
-							odontoCompany.ImportarFornecedores(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
+							importacoes.ImportarFornecedores(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
 
 						else if (comboBoxImportacao.Text.Equals("funcionarios", StringComparison.CurrentCultureIgnoreCase))
-							odontoCompany.ImportarFuncionarios(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
+							importacoes.ImportarFuncionarios(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
 
 						else if (comboBoxImportacao.Text.Equals("pessoas", StringComparison.CurrentCultureIgnoreCase))
-							odontoCompany.ImportarPessoas(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
+							importacoes.ImportarPessoas(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
 
 						else if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
-							odontoCompany.ImportarRecebiveis(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
+							importacoes.ImportarRecebiveis(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
 
 						else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
-							odontoCompany.ImportarRecebidos(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text), txtExcel2.Text, txtReferencia.Text);
+							importacoes.ImportarRecebidos(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text), txtExcel2.Text, txtReferencia.Text);
 
 						else if (comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
-							odontoCompany.ImportarPrecosTabelas(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text), txtReferencia.Text);
+							importacoes.ImportarPrecosTabelas(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text), txtReferencia.Text);
 
 						else if (comboBoxImportacao.Text.Equals("preços procedimentos", StringComparison.CurrentCultureIgnoreCase))
-							odontoCompany.ImportarPrecos(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text), txtReferencia.Text);
+							importacoes.ImportarPrecos(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text), txtReferencia.Text);
 
 						else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
-							odontoCompany.ImportarAgenda(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), txtReferencia.Text, int.Parse(txtLoginID.Text));
+							importacoes.ImportarAgenda(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), txtReferencia.Text, int.Parse(txtLoginID.Text));
 					}
 
 					txtPessoas.Text = "";

@@ -1,8 +1,3 @@
-using Migracao.Models;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
-using System.Data;
-
 namespace Migracao
 {
 	internal static class Program

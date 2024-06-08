@@ -309,22 +309,22 @@ namespace Migracao.Models
 
 	public enum ProcedimentosCategoriasID
 	{
-		Diagnóstico = 0,
-		Prevenção = 1,
-		Odontopediatria = 2,
-		Dentística = 3,
-		Endodontia = 4,
-		Periodontia = 5,
-		Prótese = 6,
-		Cirurgia = 7,
-		Ortodontia = 8,
-		Radiologia = 9,
-		Estética = 11,
-		Implantodontia = 12,
-		Odontogeriatria = 13,
-		Outros = 99,
-		DTM = 15,
-		Orofacial = 20,
+		Diagnóstico = 1,
+		Prevenção = 2,
+		Odontopediatria = 3,
+		Dentística = 4,
+		Endodontia = 5,
+		Periodontia = 6,
+		Prótese = 7,
+		Cirurgia = 8,
+		Ortodontia = 9,
+		Radiologia = 10,
+		Estética = 12,
+		Implantodontia = 13,
+		Odontogeriatria = 14,
+		Outros = 15,
+		DTM = 16,
+		Orofacial = 3486,
 	}
 
 	public enum CargosID

@@ -228,6 +228,9 @@ namespace Migracao.Utils
 
 		public string ProcurarCelula(ISheet sheet, string coluna, string texto, string colunaRetorno)
 		{
+			if (sheet == null)
+				return "";
+
 			int columnIndex = sheet.GetRow(0)
 				.Cells
 				.FirstOrDefault(c => c.StringCellValue.Equals(coluna, StringComparison.OrdinalIgnoreCase))
@@ -259,6 +262,9 @@ namespace Migracao.Utils
 
 		public bool ExisteTexto(ISheet sheet, string coluna, string texto)
 		{
+			if (sheet == null)
+				return false;
+
 			int columnIndex = sheet.GetRow(0)
 				.Cells
 				.FirstOrDefault(c => c.StringCellValue.Equals(coluna, StringComparison.OrdinalIgnoreCase))

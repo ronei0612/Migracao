@@ -30,12 +30,12 @@ namespace Migracao.Utils
 		private Dictionary<string, string> nomeKeyDict = new Dictionary<string, string>();
 		private Dictionary<string, string> nomesUTF8Dict = new Dictionary<string, string>();
 
-		private Dictionary<string, string> pessoaIDTelefonesDict = new Dictionary<string, string>();
-		private Dictionary<string, string> pessoaIDEnderecosDict = new Dictionary<string, string>();
-		private Dictionary<string, string> cpfTelefonesDict = new Dictionary<string, string>();
-		private Dictionary<string, string> cpfEnderecosDict = new Dictionary<string, string>();
-		private Dictionary<string, string> nomeTelefonesDict = new Dictionary<string, string>();
-		private Dictionary<string, string> nomeEnderecosDict = new Dictionary<string, string>();
+		public static Dictionary<string, string> pessoaIDTelefonesDict = new Dictionary<string, string>();
+		public static Dictionary<string, string> pessoaIDEnderecosDict = new Dictionary<string, string>();
+		public static Dictionary<string, string> cpfTelefonesDict = new Dictionary<string, string>();
+		public static Dictionary<string, string> cpfEnderecosDict = new Dictionary<string, string>();
+		public static Dictionary<string, string> nomeTelefonesDict = new Dictionary<string, string>();
+		public static Dictionary<string, string> nomeEnderecosDict = new Dictionary<string, string>();
 
 		public static Dictionary<string, string> consumidorIDRecebiveisDict = new Dictionary<string, string>();
 		private Dictionary<string, string> consumidorIDRecebidosDict = new Dictionary<string, string>();
@@ -153,20 +153,27 @@ namespace Migracao.Utils
 		}
 
 		public void InitializeDictionaryPessoas(ISheet sheet)
-		{
+		{			
 			cpfFuncionarioDict.Clear();
 			cpfConsumidorDict.Clear();
 			cpfPessoaDict.Clear();
 			nomeCodConsumidorDict.Clear();
 			nomeConsumidorDict.Clear();
+			cpfTelefonesDict.Clear();
 			nomePessoaDict.Clear();
 			nomeFuncionarioDict.Clear();
 			nomeNascimentoPessoaDict.Clear();
+			pessoaIDTelefonesDict.Clear();
+			cpfEnderecosDict.Clear();
+			nomeTelefonesDict.Clear();
+			nomeEnderecosDict.Clear();
+			pessoaIDEnderecosDict.Clear();
 
 			this.sheet = sheet;
 			IRow headerRow = sheet.GetRow(0);
 
 			int cpfColumnIndex = GetColumnIndex(headerRow, "cpf");
+			int cepColumnIndex = GetColumnIndex(headerRow, "cep");
 			int nomeCompletoColumnIndex = GetColumnIndex(headerRow, "nomecompleto");
 			int pessoaidColumnIndex = GetColumnIndex(headerRow, "pessoaid");
 			int funcionarioidColumnIndex = GetColumnIndex(headerRow, "funcionarioid");
@@ -174,6 +181,8 @@ namespace Migracao.Utils
 			int nomefantasiaColumnIndex = GetColumnIndex(headerRow, "nomefantasia");
 			int consumidoridColumnIndex = GetColumnIndex(headerRow, "consumidorid");
 			int codigoantigoColumnIndex = GetColumnIndex(headerRow, "codigoantigo");
+			int logradouroColumnIndex = GetColumnIndex(headerRow, "logradouro");
+			int telefoneColumnIndex = GetColumnIndex(headerRow, "telefone");
 			int nascimentoDataColumnIndex = GetColumnIndex(headerRow, "nascimentodata");
 
 			for (int row = 1; row <= sheet.LastRowNum; row++)
@@ -181,28 +190,44 @@ namespace Migracao.Utils
 				if (sheet.GetRow(row) != null)
 				{
 					string cpf = sheet.GetRow(row).GetCell(cpfColumnIndex) != null ? sheet.GetRow(row).GetCell(cpfColumnIndex).ToString() : "";
+					string cep = sheet.GetRow(row).GetCell(cepColumnIndex) != null ? sheet.GetRow(row).GetCell(cepColumnIndex).ToString() : "";
 					string nomeCompleto = sheet.GetRow(row).GetCell(nomeCompletoColumnIndex) != null ? sheet.GetRow(row).GetCell(nomeCompletoColumnIndex).ToString().ToLower() : "";
-					string nascimentoData = sheet.GetRow(row).GetCell(nascimentoDataColumnIndex) != null ? sheet.GetRow(row).GetCell(nascimentoDataColumnIndex).ToString().ToLower() : "";
 					string pessoaid = sheet.GetRow(row).GetCell(pessoaidColumnIndex) != null ? sheet.GetRow(row).GetCell(pessoaidColumnIndex).ToString() : "";
 					string funcionarioid = sheet.GetRow(row).GetCell(funcionarioidColumnIndex) != null ? sheet.GetRow(row).GetCell(funcionarioidColumnIndex).ToString() : "";
 					string fornecedorid = sheet.GetRow(row).GetCell(fornecedoridColumnIndex) != null ? sheet.GetRow(row).GetCell(fornecedoridColumnIndex).ToString() : "";
 					string nomefantasia = sheet.GetRow(row).GetCell(nomefantasiaColumnIndex) != null ? sheet.GetRow(row).GetCell(nomefantasiaColumnIndex).ToString() : "";
 					string consumidorid = sheet.GetRow(row).GetCell(consumidoridColumnIndex) != null ? sheet.GetRow(row).GetCell(consumidoridColumnIndex).ToString() : "";
 					string codigoantigo = sheet.GetRow(row).GetCell(codigoantigoColumnIndex) != null ? sheet.GetRow(row).GetCell(codigoantigoColumnIndex).ToString() : "";
+					string logradouro = sheet.GetRow(row).GetCell(logradouroColumnIndex) != null ? sheet.GetRow(row).GetCell(logradouroColumnIndex).ToString() : "";
+					string telefone = sheet.GetRow(row).GetCell(telefoneColumnIndex) != null ? sheet.GetRow(row).GetCell(telefoneColumnIndex).ToString() : "";
+					string nascimentoData = sheet.GetRow(row).GetCell(nascimentoDataColumnIndex) != null ? sheet.GetRow(row).GetCell(nascimentoDataColumnIndex).ToString().ToLower() : "";
 
 					nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
 					cpf = cpf.Replace(".", "").Replace("-", "");
+					logradouro = Tools.RemoverAcentos(logradouro).ToLower();
 
 					string key = cpf;
 
 					if (!cpfConsumidorDict.ContainsKey(key))
 						cpfConsumidorDict.Add(key, consumidorid);
 
+					if (!cpfPessoaDict.ContainsKey(key))
+						cpfPessoaDict.Add(key, pessoaid);
+
 					if (!cpfFuncionarioDict.ContainsKey(key))
 						cpfFuncionarioDict.Add(key, funcionarioid);
 
-					if (!cpfPessoaDict.ContainsKey(key))
-						cpfPessoaDict.Add(key, pessoaid);
+					key = cpf + "|" + telefone;
+					if (!cpfTelefonesDict.ContainsKey(key))
+						cpfTelefonesDict.Add(key, telefone);
+
+					key = pessoaid + "|" + telefone;
+					if (!pessoaIDTelefonesDict.ContainsKey(key))
+						pessoaIDTelefonesDict.Add(key, telefone);
+
+					key = cpf + "|" + logradouro;
+					if (!cpfEnderecosDict.ContainsKey(key))
+						cpfEnderecosDict.Add(key, logradouro);
 
 					key = nomeCompleto + "|" + codigoantigo;
 					if (!nomeCodConsumidorDict.ContainsKey(key))
@@ -218,6 +243,18 @@ namespace Migracao.Utils
 
 					if (!nomeFuncionarioDict.ContainsKey(key))
 						nomeFuncionarioDict.Add(key, funcionarioid);
+
+					key = nomeCompleto + "|" + telefone;
+					if (!nomeTelefonesDict.ContainsKey(key))
+						nomeTelefonesDict.Add(key, funcionarioid);
+
+					key = nomeCompleto + "|" + cep;
+					if (!nomeEnderecosDict.ContainsKey(key))
+						nomeEnderecosDict.Add(key, funcionarioid);
+
+					key = pessoaid + "|" + cep;
+					if (!pessoaIDEnderecosDict.ContainsKey(key))
+						pessoaIDEnderecosDict.Add(key, consumidorid);
 
 					key = nomeCompleto + "|" + nascimentoData;
 					if (!nomeNascimentoPessoaDict.ContainsKey(key))

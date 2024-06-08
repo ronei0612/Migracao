@@ -1,5 +1,4 @@
-﻿using ExcelDataReader.Log.Logger;
-using Migracao.Models;
+﻿using Migracao.Models;
 using Migracao.Utils;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
@@ -12,20 +11,8 @@ namespace Migracao.Imports
 	{
 		string arquivoExcelCidades = "Files\\EnderecosCidades.xlsx";
 
-		public Importacoes() {
-			//ExcelHelper excelHelper = new ExcelHelper();
-
-			//if (File.Exists(arquivoExcelCidades))
-			//	try
-			//	{
-			//		var workbookCidades = excelHelper.LerExcel(arquivoExcelCidades);
-			//		var sheetCidades = workbookCidades.GetSheetAt(0);
-			//		excelHelper.InitializeDictionaryCidade(sheetCidades);
-			//	}
-			//	catch (Exception ex)
-			//	{
-			//		throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
-			//	}
+		public Importacoes()
+		{
 		}
 
 		public void Atendimentos(string filePath)
@@ -127,17 +114,17 @@ namespace Migracao.Imports
 			var sqlHelper = new SqlHelper();
 			List<string> linhasSql = new();
 
-			//if (!string.IsNullOrEmpty(arquivoPessoasAtuais))
-			//	try
-			//	{
-			//		var workbook = excelHelper.LerExcel(arquivoPessoasAtuais);
-			//		var sheet = workbook.GetSheetAt(0);
-			//		excelHelper.InitializeDictionary(sheet);
-			//	}
-			//	catch (Exception ex)
-			//	{
-			//		throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoPessoasAtuais}\": {ex.Message}");
-			//	}
+			if (File.Exists(arquivoExcelCidades))
+				try
+				{
+					var workbookCidades = excelHelper.LerExcel(arquivoExcelCidades);
+					var sheetCidades = workbookCidades.GetSheetAt(0);
+					excelHelper.InitializeDictionaryCidade(sheetCidades);
+				}
+				catch (Exception ex)
+				{
+					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
+				}
 
 			try
 			{

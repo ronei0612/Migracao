@@ -583,7 +583,7 @@ namespace Migracao.Utils
 		public bool PessoaFoneExists(int pessoaID, string telefone)
 		{
 			if (pessoaID <= 0)
-				return true;
+				return false;
 
 			string key = pessoaID + "|" + telefone;
 			if (!string.IsNullOrWhiteSpace(key))

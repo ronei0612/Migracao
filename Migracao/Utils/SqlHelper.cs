@@ -129,12 +129,16 @@ namespace Migracao.Utils
 					}
 				}
 				sql.Remove(sql.Length - 2, 2).Append($", @PessoaID{index}); " + Environment.NewLine);
+
+				// Obtendo ID da Pessoa inserida caso não tenha consumidor para adicionar endereço
+				sql.AppendLine($"DECLARE @ConsumidorID{index} int;");
+				sql.AppendLine($"SELECT @ConsumidorID{index} = SCOPE_IDENTITY();");
 			}
 
 
 			if (pessoaFonesDict != null)
 			{
-				sql = new StringBuilder($"INSERT INTO PessoaFones (");
+				sql.AppendLine("INSERT INTO PessoaFones (");
 
 				// Adiciona os nomes das colunas
 				foreach (var key in pessoaFonesDict.Keys)
@@ -182,13 +186,6 @@ namespace Migracao.Utils
 
 			if (consumidorEnderecoDict != null)
 			{
-				// Obtendo ID da Pessoa inserida caso não tenha consumidor para adicionar endereço
-				if (consumidorID <= 0)
-				{
-					sql.AppendLine($"DECLARE @ConsumidorID{index} int;");
-					sql.AppendLine($"SELECT @ConsumidorID{index} = SCOPE_IDENTITY();");
-				}
-
 				sql.AppendLine("INSERT INTO ConsumidorEnderecos (");
 
 				foreach (var key in consumidorEnderecoDict.Keys)

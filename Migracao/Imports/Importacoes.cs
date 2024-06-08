@@ -251,7 +251,7 @@ namespace Migracao.Imports
 					Consumidor consumidor = null;
 					ConsumidorEndereco consumidorEndereco = null;
 					//PessoaFone pessoaFone = null;
-					List<PessoaFone> pessoaFones = null;
+					List<PessoaFone> pessoaFones = new();
 
 					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento, nascimentoData: dataNascimento);
 					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: documento, codigo: codigo);

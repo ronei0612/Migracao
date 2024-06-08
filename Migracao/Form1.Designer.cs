@@ -29,7 +29,7 @@
 		private void InitializeComponent()
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-			label1 = new Label();
+			lbEstabelecimento = new Label();
 			btnImportar = new Button();
 			lbPessoaID = new Label();
 			openFileDialog1 = new OpenFileDialog();
@@ -68,15 +68,14 @@
 			menuStrip1.SuspendLayout();
 			SuspendLayout();
 			// 
-			// label1
+			// lbEstabelecimento
 			// 
-			label1.AutoSize = true;
-			label1.Location = new Point(10, 125);
-			label1.Name = "label1";
-			label1.Size = new Size(108, 15);
-			label1.TabIndex = 0;
-			label1.Text = "EstabelecimentoID:";
-			label1.Visible = false;
+			lbEstabelecimento.AutoSize = true;
+			lbEstabelecimento.Location = new Point(10, 125);
+			lbEstabelecimento.Name = "lbEstabelecimento";
+			lbEstabelecimento.Size = new Size(108, 15);
+			lbEstabelecimento.TabIndex = 0;
+			lbEstabelecimento.Text = "EstabelecimentoID:";
 			// 
 			// btnImportar
 			// 
@@ -222,7 +221,6 @@
 			txtEstabelecimentoID.Name = "txtEstabelecimentoID";
 			txtEstabelecimentoID.Size = new Size(113, 23);
 			txtEstabelecimentoID.TabIndex = 2;
-			txtEstabelecimentoID.Visible = false;
 			txtEstabelecimentoID.KeyPress += txtEstabelecimentoID_KeyPress;
 			// 
 			// txtPessoaID
@@ -457,7 +455,7 @@
 			Controls.Add(btnExcel);
 			Controls.Add(lbPessoaID);
 			Controls.Add(btnImportar);
-			Controls.Add(label1);
+			Controls.Add(lbEstabelecimento);
 			Controls.Add(menuStrip1);
 			Icon = (Icon)resources.GetObject("$this.Icon");
 			MainMenuStrip = menuStrip1;
@@ -474,7 +472,7 @@
 
 		#endregion
 
-		private Label label1;
+		private Label lbEstabelecimento;
 		private Button btnImportar;
 		private Label lbPessoaID;
 		private OpenFileDialog openFileDialog1;

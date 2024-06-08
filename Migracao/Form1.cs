@@ -1,6 +1,7 @@
 using Migracao.Imports;
 using Migracao.Sistems;
 using Migracao.Utils;
+using System.Windows.Forms;
 
 namespace Migracao
 {
@@ -29,12 +30,15 @@ namespace Migracao
 			{
 				textBoxExcel1.Text = openFileDialog.FileName;
 				Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta);
+				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
 			}
 		}
 
 		private void btnImportar_Click(object sender, EventArgs e)
 		{
+			Tools.ultimoEstabelecimentoID = txtEstabelecimentoID.Text;
+			File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+
 			if (ValidarCampos())
 			{
 				try
@@ -198,6 +202,9 @@ namespace Migracao
 			txtRecebiveis.Visible = true;
 			btnPessoas.Visible = true;
 			btnRecebiveis.Visible = true;
+
+			txtEstabelecimentoID.Visible = true;
+			lbEstabelecimento.Visible = true;
 		}
 
 		void AlterarNomesCampos()
@@ -246,8 +253,6 @@ namespace Migracao
 				else
 				{
 					comboBoxSistema.Visible = true;
-					txtEstabelecimentoID.Visible = true;
-					label1.Visible = true;
 					label3.Visible = true;
 					label5.Visible = true;
 					txtLoginID.Visible = true;
@@ -382,15 +387,26 @@ namespace Migracao
 		private void Form1_Load(object sender, EventArgs e)
 		{
 			if (!File.Exists(arquivoConfig))
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta);
+				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
 
 			var textoLinhas = File.ReadAllLines(arquivoConfig);
 
-			Tools.salvarNaPasta = textoLinhas[0];
-			Tools.ultimaPasta = textoLinhas[1];
+			try
+			{
+				Tools.salvarNaPasta = textoLinhas[0];
+				Tools.ultimaPasta = textoLinhas[1];
+				Tools.ultimoEstabelecimentoID = textoLinhas[2];
+			}
+			catch
+			{
+				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+			}
 
 			if (!Directory.Exists(Tools.salvarNaPasta))
-				MessageBox.Show("Configure a pasta de saída clicando em \"Abrir Pasta\"", "Atenção!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+			{
+				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+				MessageBox.Show("Configure a pasta de saída clicando em \"Configurações\"", "Atenção!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+			}
 		}
 
 		private void salvarNaPastaToolStripMenuItem_Click(object sender, EventArgs e)
@@ -400,7 +416,7 @@ namespace Migracao
 			if (!string.IsNullOrEmpty(pasta))
 			{
 				Tools.salvarNaPasta = pasta;
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta);
+				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
 			}
 		}
 
@@ -433,7 +449,7 @@ namespace Migracao
 			{
 				txtExcel2.Text = openFileDialog.FileName;
 				Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta);
+				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
 			}
 		}
 
@@ -450,7 +466,7 @@ namespace Migracao
 			{
 				txtReferencia.Text = openFileDialog.FileName;
 				Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta);
+				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
 			}
 		}
 
@@ -514,7 +530,7 @@ namespace Migracao
 			{
 				retorno = openFileDialog.FileName;
 				Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta);
+				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
 			}
 
 			return retorno;

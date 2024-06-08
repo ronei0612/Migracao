@@ -12,6 +12,7 @@ namespace Migracao.Utils
 		public static string mascaraCPF = "000.000.000-00";
 		public static string salvarNaPasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Documents");
 		public static string ultimaPasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Documents");
+		public static string ultimoEstabelecimentoID = "";
 
 		public static string? ToCPF(this string possivelCpf)
 		{
@@ -175,14 +176,14 @@ namespace Migracao.Utils
 			//return Regex.Replace(texto, @"[^\p{L}\s]", "").Trim();
 		}
 
-		public static string GerarNomeArquivo(string nomeArquivo)
+		public static string GerarNomeArquivo(string nomeArquivo, string extensao = ".xlsx")
 		{
 			var caminhoDoArquivo = Path.Combine(Tools.salvarNaPasta, nomeArquivo);
 
-			if (File.Exists(caminhoDoArquivo + ".xlsx"))
+			if (File.Exists(caminhoDoArquivo + extensao))
 			{
 				int count = 1;
-				while (File.Exists($"{caminhoDoArquivo} ({count}).xlsx"))
+				while (File.Exists($"{caminhoDoArquivo} ({count}){extensao}"))
 					count++;
 
 				caminhoDoArquivo = $"{caminhoDoArquivo} ({count++})";

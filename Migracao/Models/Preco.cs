@@ -3,7 +3,7 @@
 	internal class Preco
 	{
 		public int ID { get; set; }
-		public required int TabelaID { get; set; }
+		public int TabelaID { get; set; }
 		public string Codigo { get; set; }
 		public required string Titulo { get; set; }
 		public string Atalho { get; set; }

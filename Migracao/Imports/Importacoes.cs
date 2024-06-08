@@ -724,6 +724,8 @@ namespace Migracao.Imports
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
 			var excelHelper = new ExcelHelper(arquivoExcel);
 			var sqlHelper = new SqlHelper();
+			List<string> linhasSql = new();
+			List<string> tabelasAdicionadas = new();
 
 			var grupoCategoriaDict = new Dictionary<string, ProcedimentosCategoriasID>()
 			{
@@ -739,8 +741,8 @@ namespace Migracao.Imports
 				{ "OUTROS", ProcedimentosCategoriasID.Outros }
 			};
 
-			var precosTabelas = new List<PrecosTabela>();
-			var precos = new List<Preco>();
+			PrecosTabela precoTabela = null;
+			Preco preco = null;
 			ISheet sheet = null;
 
 			if (!string.IsNullOrEmpty(arquivoTabelaPrecosAtuais))
@@ -763,7 +765,7 @@ namespace Migracao.Imports
 					string? titulo = null, abreviacao = null;
 					decimal valor = 0;
 					string especialidade = "Outros", nomeTabela = "";
-					long tuss = 0;
+					long tuss = 0, tabelaID = 0;
 					bool ativo = true;
 					byte categoria = (byte)ProcedimentosCategoriasID.Outros;
 
@@ -808,50 +810,79 @@ namespace Migracao.Imports
 
 					if (!excelHelper.ExisteTexto(sheet, "Titulo", titulo))
 					{
-
 						var tabelaIdEcontrada = excelHelper.ProcurarCelula(sheet, "Nome", nomeTabela, "TabelaID");
 						if (string.IsNullOrEmpty(tabelaIdEcontrada))
 							tabelaIdEcontrada = excelHelper.ProcurarCelula(sheet, "Nome", "Migração - " + nomeTabela, "TabelaID");
+						
+						if (grupoCategoriaDict.ContainsKey(especialidade))
+							categoria = (byte)grupoCategoriaDict[especialidade];
 
-						if (string.IsNullOrEmpty(tabelaIdEcontrada))
+						if (!string.IsNullOrEmpty(tabelaIdEcontrada))
+							tabelaID = int.Parse(tabelaIdEcontrada);
+
+						else if (!tabelasAdicionadas.Contains(nomeTabela))
 						{
-							if (grupoCategoriaDict.ContainsKey(especialidade))
-								categoria = (byte)grupoCategoriaDict[especialidade];
-
-							precos.Add(new Preco
+							tabelasAdicionadas.Add(nomeTabela);
+							precoTabela = new PrecosTabela
 							{
 								Ativo = ativo,
-								CategoriaID = categoria,
 								DataInclusao = DateTime.Now,
 								LoginID = loginID,
-								TabelaID = int.Parse(tabelaIdEcontrada),
-								Titulo = titulo,
-								Valor = valor,
-								CodigoTISS = tuss,
-								Atalho = abreviacao
-							});
+								SeguimentoID = 1,
+								SolucaoID = 1,
+								EstabelecimentoID = estabelecimentoID,
+								Nome = nomeTabela
+							};
 						}
+
+						preco = new Preco
+						{
+							Ativo = ativo,
+							CategoriaID = categoria,
+							DataInclusao = DateTime.Now,
+							LoginID = loginID,
+							Titulo = titulo,
+							Valor = valor,
+							CodigoTISS = tuss,
+							Atalho = abreviacao
+						};
 					}
+
+					Dictionary<string, object> precoDict = null;
+					Dictionary<string, object> precoTabelaDict = null;
+
+					if (preco != null)
+						precoDict = new Dictionary<string, object>
+						{
+							{ "LoginID", preco.LoginID },
+							{ "Ativo", preco.Ativo },
+							{ "CategoriaID", preco.CategoriaID },
+							{ "DataInclusao", preco.DataInclusao },
+							{ "Titulo", preco.Titulo },
+							{ "Valor", preco.Valor },
+							{ "CodigoTISS", preco.CodigoTISS },
+							{ "Atalho", preco.Atalho }
+						};
+
+					if (precoTabela != null)
+						precoTabelaDict = new Dictionary<string, object>
+						{
+							{ "Ativo", precoTabela.Ativo },
+							{ "DataInclusao", precoTabela.DataInclusao },
+							{ "LoginID", precoTabela.LoginID },
+							{ "SeguimentoID", precoTabela.SeguimentoID },
+							{ "SolucaoID", precoTabela.SolucaoID },
+							{ "EstabelecimentoID", precoTabela.EstabelecimentoID },
+							{ "Nome", precoTabela.Nome }
+						};
+
+					linhasSql.Add(sqlHelper.GerarSqlInsertPrecos(indiceLinha, precoTabelaDict, tabelaID, precoDict));
 				}
 
 				indiceLinha = 0;
 
-				var dados = new Dictionary<string, object[]>
-				{
-					{ "LoginID", precos.ConvertAll(preco => (object)preco.LoginID).ToArray() },
-					{ "Ativo", precos.ConvertAll(preco => (object)preco.Ativo).ToArray() },
-					{ "CategoriaID", precos.ConvertAll(preco => (object)preco.CategoriaID).ToArray() },
-					{ "DataInclusao", precos.ConvertAll(preco => (object)preco.DataInclusao).ToArray() },
-					{ "TabelaID", precos.ConvertAll(preco => (object)preco.TabelaID).ToArray() },
-					{ "Titulo", precos.ConvertAll(preco => (object)preco.Titulo).ToArray() },
-					{ "Valor", precos.ConvertAll(preco => (object)preco.Valor).ToArray() },
-					{ "CodigoTISS", precos.ConvertAll(preco => (object)preco.CodigoTISS).ToArray() },
-					{ "Atalho", precos.ConvertAll(preco => (object)preco.Atalho).ToArray() }
-				};
-
 				var salvarArquivo = Tools.GerarNomeArquivo($"Precos_{estabelecimentoID}_OdontoCompany_Migração");
-				sqlHelper.GerarSqlInsert("Precos", salvarArquivo, dados);
-				excelHelper.GravarExcel(salvarArquivo, dados);
+				File.WriteAllLines(salvarArquivo + ".sql", linhasSql);
 
 				MessageBox.Show("Sucesso!");
 			}

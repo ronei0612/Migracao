@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using Migracao.Models;
+using System.Data;
 using System.Text;
 
 namespace Migracao.Utils
@@ -82,10 +83,10 @@ namespace Migracao.Utils
 							sql.Append("NULL, ");
 						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
 							sql.Append("NULL, ");
-						//else if (value is decimal)
-						//	sql.Append($"'{value.ToString().Replace(',', '.')}', ");
-						//else
-						//	sql.Append($"'{VerificarSeDateTime(value)}', ");
+						else if (value is decimal)
+							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
+						else
+							sql.Append($"'{VerificarSeDateTime(value)}', ");
 					}
 					catch
 					{
@@ -118,10 +119,10 @@ namespace Migracao.Utils
 							sql.Append("NULL, ");
 						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
 							sql.Append("NULL, ");
-						//else if (value is decimal)
-						//	sql.Append($"'{value.ToString().Replace(',', '.')}', ");
-						//else
-						//	sql.Append($"'{VerificarSeDateTime(value)}', ");
+						else if (value is decimal)
+							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
+						else
+							sql.Append($"'{VerificarSeDateTime(value)}', ");
 					}
 					catch
 					{
@@ -159,10 +160,10 @@ namespace Migracao.Utils
 								sql.Append($"NULL, ");
 							else if (valueArray[i].ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
 								sql.Append($"NULL, ");
-							//else if (valueArray[i] is decimal)
-							//	sql.Append($"'{valueArray[i].ToString().Replace(',', '.')}', ");
-							//else
-							//	sql.Append($"'{VerificarSeDateTime(valueArray[i])}', ");
+							else if (valueArray[i] is decimal)
+								sql.Append($"'{valueArray[i].ToString().Replace(',', '.')}', ");
+							else
+								sql.Append($"'{VerificarSeDateTime(valueArray[i])}', ");
 						}
 						catch
 						{
@@ -197,10 +198,10 @@ namespace Migracao.Utils
 							sql.Append("NULL, ");
 						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
 							sql.Append("NULL, ");
-						//else if (value is decimal)
-						//	sql.Append($"'{value.ToString().Replace(',', '.')}', ");
-						//else
-						//	sql.Append($"'{VerificarSeDateTime(value)}', ");
+						else if (value is decimal)
+							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
+						else
+							sql.Append($"'{VerificarSeDateTime(value)}', ");
 					}
 					catch
 					{
@@ -334,6 +335,88 @@ namespace Migracao.Utils
 			//			}
 			//		}
 			//	}
+		}
+
+		public string GerarSqlInsertPrecos(int index, Dictionary<string, object> tabelaDict, long tabelaID, Dictionary<string, object> precoDict)
+		{
+			var sql = new StringBuilder();
+
+			if (tabelaDict != null)
+			{
+				sql.AppendLine("INSERT INTO PrecosTabelas (");
+
+				foreach (var key in tabelaDict.Keys)
+					sql.Append($"{key}, ");
+
+				// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
+				sql.Remove(sql.Length - 2, 2).Append(") VALUES " + Environment.NewLine);
+
+				sql.Append('(');
+				foreach (var value in tabelaDict.Values)
+				{
+					try
+					{
+						if (value == null)
+							sql.Append("NULL, ");
+						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
+							sql.Append("NULL, ");
+						else if (value is decimal)
+							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
+						else
+							sql.Append($"'{VerificarSeDateTime(value)}', ");
+					}
+					catch
+					{
+						sql.Append("NULL, ");
+					}
+				}
+				sql.Remove(sql.Length - 2, 2).Append("); " + Environment.NewLine);
+
+				// Obtendo ID da Recebivel inserido
+				sql.AppendLine($"DECLARE @TabelaID{index} int;");
+				sql.AppendLine($"SELECT @TabelaID{index} = SCOPE_IDENTITY();");
+			}
+
+			if (precoDict != null)
+			{
+				sql.AppendLine("INSERT INTO Precos (");
+
+				foreach (var key in precoDict.Keys)
+					sql.Append($"{key}, ");
+
+				// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
+				sql.Remove(sql.Length - 2, 2).Append(", TabelaID) VALUES " + Environment.NewLine);
+
+				sql.Append('(');
+				foreach (var value in precoDict.Values)
+				{
+					try
+					{
+						if (value == null)
+							sql.Append("NULL, ");
+						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
+							sql.Append("NULL, ");
+						else if (value is decimal)
+							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
+						else
+							sql.Append($"'{VerificarSeDateTime(value)}', ");
+					}
+					catch
+					{
+						sql.Append("NULL, ");
+					}
+				}
+				if (tabelaID <= 0)
+					sql.Remove(sql.Length - 2, 2).Append($", @TabelaID{index}); " + Environment.NewLine);
+				else
+					sql.Remove(sql.Length - 2, 2).Append($", {tabelaID}); " + Environment.NewLine);
+				
+			}
+
+			// Remove a última quebra de linha e vírgula e espaço e adiciona um ponto e vírgula
+			sql.Remove(sql.Length - 4, 4).Append(';' + Environment.NewLine);
+
+			return sql.ToString();
 		}
 
 		public void GerarSqlUpdate(string tableName, string salvarArquivo, Dictionary<string, object[]> dataDict)

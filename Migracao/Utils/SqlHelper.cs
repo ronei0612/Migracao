@@ -59,7 +59,7 @@ namespace Migracao.Utils
 			File.WriteAllText(salvarArquivo + ".sql", sql.ToString());
 		}
 
-		public string GerarSqlInsert(int index, Dictionary<string, object> pessoaDict, int pessoaID, Dictionary<string, object[]> pessoaFonesDict, Dictionary<string, object> consumidorDict, int consumidorID, Dictionary<string, object> consumidorEnderecoDict)
+		public string GerarSqlInsertPessoas(int index, Dictionary<string, object> pessoaDict, int pessoaID, Dictionary<string, object[]> pessoaFonesDict, Dictionary<string, object> consumidorDict, int consumidorID, Dictionary<string, object> consumidorEnderecoDict)
 		{
 			var sql = new StringBuilder();
 
@@ -82,10 +82,10 @@ namespace Migracao.Utils
 							sql.Append("NULL, ");
 						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
 							sql.Append("NULL, ");
-						else if (value is decimal)
-							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
-						else
-							sql.Append($"'{VerificarSeDateTime(value)}', ");
+						//else if (value is decimal)
+						//	sql.Append($"'{value.ToString().Replace(',', '.')}', ");
+						//else
+						//	sql.Append($"'{VerificarSeDateTime(value)}', ");
 					}
 					catch
 					{
@@ -118,10 +118,10 @@ namespace Migracao.Utils
 							sql.Append("NULL, ");
 						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
 							sql.Append("NULL, ");
-						else if (value is decimal)
-							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
-						else
-							sql.Append($"'{VerificarSeDateTime(value)}', ");
+						//else if (value is decimal)
+						//	sql.Append($"'{value.ToString().Replace(',', '.')}', ");
+						//else
+						//	sql.Append($"'{VerificarSeDateTime(value)}', ");
 					}
 					catch
 					{
@@ -159,10 +159,10 @@ namespace Migracao.Utils
 								sql.Append($"NULL, ");
 							else if (valueArray[i].ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
 								sql.Append($"NULL, ");
-							else if (valueArray[i] is decimal)
-								sql.Append($"'{valueArray[i].ToString().Replace(',', '.')}', ");
-							else
-								sql.Append($"'{VerificarSeDateTime(valueArray[i])}', ");
+							//else if (valueArray[i] is decimal)
+							//	sql.Append($"'{valueArray[i].ToString().Replace(',', '.')}', ");
+							//else
+							//	sql.Append($"'{VerificarSeDateTime(valueArray[i])}', ");
 						}
 						catch
 						{
@@ -174,12 +174,6 @@ namespace Migracao.Utils
 						sql.Remove(sql.Length - 2, 2).Append($", @PessoaID{index}); " + Environment.NewLine);
 					else
 						sql.Remove(sql.Length - 2, 2).Append($", {pessoaID}); " + Environment.NewLine);
-
-					//sql.Remove(sql.Length - 4, 4).Append(';');
-					//sql.Append(Environment.NewLine + $"INSERT INTO {tableName} (");
-					//foreach (var key in dataDict.Keys)
-					//	sql.Append($"{key}, ");
-					//sql.Remove(sql.Length - 2, 2).Append(") VALUES " + Environment.NewLine);
 				}
 			}
 
@@ -203,10 +197,10 @@ namespace Migracao.Utils
 							sql.Append("NULL, ");
 						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
 							sql.Append("NULL, ");
-						else if (value is decimal)
-							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
-						else
-							sql.Append($"'{VerificarSeDateTime(value)}', ");
+						//else if (value is decimal)
+						//	sql.Append($"'{value.ToString().Replace(',', '.')}', ");
+						//else
+						//	sql.Append($"'{VerificarSeDateTime(value)}', ");
 					}
 					catch
 					{
@@ -224,6 +218,122 @@ namespace Migracao.Utils
 			sql.Remove(sql.Length - 4, 4).Append(';' + Environment.NewLine);
 
 			return sql.ToString();
+		}
+
+		public string GerarSqlInsertRecebiveis(int index, Dictionary<string, object> recebivelDict, Dictionary<string, object> fluxoCaixaDict)//Dictionary<string, object[]> fluxoCaixasDict)
+		{
+			var sql = new StringBuilder();
+
+			if (recebivelDict != null)
+			{
+				sql.AppendLine("INSERT INTO Recebiveis (");
+
+				foreach (var key in recebivelDict.Keys)
+					sql.Append($"{key}, ");
+
+				// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
+				sql.Remove(sql.Length - 2, 2).Append(") VALUES " + Environment.NewLine);
+
+				sql.Append('(');
+				foreach (var value in recebivelDict.Values)
+				{
+					try
+					{
+						if (value == null)
+							sql.Append("NULL, ");
+						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
+							sql.Append("NULL, ");
+						else if (value is decimal)
+							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
+						else
+							sql.Append($"'{VerificarSeDateTime(value)}', ");
+					}
+					catch
+					{
+						sql.Append("NULL, ");
+					}
+				}
+				sql.Remove(sql.Length - 2, 2).Append("); " + Environment.NewLine);
+
+				// Obtendo ID da Recebivel inserido
+				sql.AppendLine($"DECLARE @RecebivelID{index} int;");
+				sql.AppendLine($"SELECT @RecebivelID{index} = SCOPE_IDENTITY();");
+			}
+
+			if (fluxoCaixaDict != null)
+			{
+				sql.AppendLine("INSERT INTO FluxoCaixa (");
+
+				// Adiciona os nomes das colunas
+				foreach (var key in fluxoCaixaDict.Keys)
+					sql.Append($"{key}, ");
+
+				// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
+				sql.Remove(sql.Length - 2, 2).Append(", RecebivelID) VALUES " + Environment.NewLine);
+
+				// Adiciona os valores das colunas para cada linha
+				sql.Append('(');
+				foreach (var valueArray in fluxoCaixaDict.Values)
+				{
+					try
+					{
+						if (valueArray == null)
+							sql.Append($"NULL, ");
+						else if (valueArray.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
+							sql.Append($"NULL, ");
+						else if (valueArray is decimal)
+							sql.Append($"'{valueArray.ToString().Replace(',', '.')}', ");
+						else
+							sql.Append($"'{VerificarSeDateTime(valueArray)}', ");
+					}
+					catch
+					{
+						sql.Append($"NULL, ");
+					}
+				}
+
+				sql.Remove(sql.Length - 2, 2).Append($", @RecebivelID{index}); " + Environment.NewLine);
+			}
+
+			// Remove a última quebra de linha e vírgula e espaço e adiciona um ponto e vírgula
+			sql.Remove(sql.Length - 4, 4).Append(';' + Environment.NewLine);
+
+			return sql.ToString();
+
+			//if (fluxoCaixasDict != null)
+			//{
+			//	sql.AppendLine("INSERT INTO FluxoCaixa (");
+
+			//	// Adiciona os nomes das colunas
+			//	foreach (var key in fluxoCaixasDict.Keys)
+			//		sql.Append($"{key}, ");
+
+			//	// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
+			//	sql.Remove(sql.Length - 2, 2).Append(", RecebivelID) VALUES " + Environment.NewLine);
+
+			//	// Adiciona os valores das colunas para cada linha
+			//	for (int i = 0; i < fluxoCaixasDict.Values.First().Length; i++)
+			//	{
+			//		sql.Append('(');
+			//		foreach (var valueArray in fluxoCaixasDict.Values)
+			//		{
+			//			try
+			//			{
+			//				if (valueArray[i] == null)
+			//					sql.Append($"NULL, ");
+			//				else if (valueArray[i].ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
+			//					sql.Append($"NULL, ");
+			//				else if (valueArray[i] is decimal)
+			//					sql.Append($"'{valueArray[i].ToString().Replace(',', '.')}', ");
+			//				else
+			//					sql.Append($"'{VerificarSeDateTime(valueArray[i])}', ");
+			//			}
+			//			catch
+			//			{
+			//				sql.Append($"NULL, ");
+			//			}
+			//		}
+			//	}
 		}
 
 		public void GerarSqlUpdate(string tableName, string salvarArquivo, Dictionary<string, object[]> dataDict)

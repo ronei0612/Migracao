@@ -440,7 +440,7 @@ namespace Migracao.Imports
 								{ "LoginID", pessoaFones.ConvertAll(pessoaFone => (object)pessoaFone.LoginID).ToArray() }
 							};
 
-						linhasSql.Add(sqlHelper.GerarSqlInsert(indiceLinha, pessoaDict, pessoaID, pessoaFonesDict, consumidorDict, consumidorID, consumidorEnderecoDict));
+						linhasSql.Add(sqlHelper.GerarSqlInsertPessoas(indiceLinha, pessoaDict, pessoaID, pessoaFonesDict, consumidorDict, consumidorID, consumidorEnderecoDict));
 
 						indiceLinha++;
 					}
@@ -868,6 +868,7 @@ namespace Migracao.Imports
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
 			var excelHelper = new ExcelHelper(arquivoExcel);
 			var sqlHelper = new SqlHelper();
+			List<string> linhasSql = new();
 
 			ISheet sheetConsumidores;
 			try
@@ -881,10 +882,8 @@ namespace Migracao.Imports
 				throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelRecebiveisProd}\": {ex.Message}");
 			}
 
-			//var excelRecebidosDict = ExcelRecebidosToDictionary(arquivoExcelBaixa);
-
-			var fluxoCaixas = new List<FluxoCaixa>();
-			var recebiveis = new List<Recebivel>();
+			FluxoCaixa fluxoCaixa = null;
+			Recebivel recebivel = null;
 
 			try
 			{
@@ -893,13 +892,13 @@ namespace Migracao.Imports
 					indiceLinha++;
 
 					string nomeCompleto = "", cpf = "";
-					string? outroSacadoNome = null, observacoes = null, documento = null;
+					string? outroSacadoNome = null, observacaoRecebido = null, observacaoRecebivel = null, documento = null;
 					int recibo = 0, codigo = 0;
 					int? consumidorID = null, fornecedorID = null, colaboradorID = null, funcionarioID = null, clienteID = null;
-					decimal pagoValor = 0, valor = 0;
-					bool recebivel = false, baixa = false;
+					decimal pagoValor = 0, valorOriginal = 0, valorDevido = 0;
+					bool isrecebivel = false, isbaixa = false;
 					byte formaPagamento = (byte)TitulosEspeciesID.DepositoEmConta;
-					DateTime dataPagamento = dataHoje, nascimentoData = dataHoje, dataVencimento = dataHoje, dataInclusao = dataHoje;
+					DateTime dataPagamento = dataHoje, nascimentoData = dataHoje, dataVencimento = dataHoje, dataInclusao = dataHoje, dataBaixa = dataHoje;
 
 					foreach (var celula in linha.Cells)
 					{
@@ -929,28 +928,36 @@ namespace Migracao.Imports
 										dataInclusao = celulaValor.ToData();
 										break;
 									case "ObservaçãoRecebível":
-										observacoes = celulaValor;//.ToTipoPagamento()
+										observacaoRecebivel = celulaValor;//.ToTipoPagamento()
 										break;
 									case "ValorOriginal":
-										valor = celulaValor.ArredondarValor();
+										valorOriginal = celulaValor.ArredondarValorV2();
 										break;
 									case "RecebívelExigível(R/E)":
-										recebivel = celulaValor == "R" ? true : false;
+										isrecebivel = celulaValor == "R" ? true : false;
 										break;
 									case "DataBaixa":
-										baixa = !string.IsNullOrEmpty(celulaValor) ? true : false;
+										dataBaixa = celulaValor.ToData();
+										isbaixa = !string.IsNullOrEmpty(celulaValor) ? true : false;
+										break;
+									case "ValorPago":
+										pagoValor = celulaValor.ArredondarValorV2();
+										break;
+									case "ObservaçãoRecebido":
+										observacaoRecebido = celulaValor;
 										break;
 								}
 							}
 						}
 					}
 
-					if (recebivel && !baixa)
+					if (isrecebivel)
 					{
 						if (dataVencimento == dataHoje)
 							dataVencimento = new DateTime(dataInclusao.Year, dataVencimento.Month, dataVencimento.Day);
 
 						var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: cpf, codigo: codigo.ToString());
+						//var consumidorIDValue = excelHelper.GetConsumidorID(cpf: cpf);
 						var fornecedorIDValue = excelHelper.GetFornecedorID(nomeCompleto: nomeCompleto, cpf: cpf);
 						var funcionarioIDValue = excelHelper.GetFuncionarioID(nomeCompleto: nomeCompleto, cpf: cpf);
 
@@ -963,68 +970,151 @@ namespace Migracao.Imports
 						else
 							outroSacadoNome = cpf;
 
-						if (consumidorID == 18283648)
-							consumidorID = consumidorID;
-
 						if (!string.IsNullOrEmpty(consumidorIDValue))
 						{
-							if (!excelHelper.RecebivelExists((int)consumidorID, valor, dataVencimento))
-								recebiveis.Add(new Recebivel()
+							if (!excelHelper.RecebivelExists((int)consumidorID, valorOriginal, dataVencimento))
+							{
+								if (valorOriginal >= 1)
+									recebivel = new Recebivel()
+									{
+										ConsumidorID = consumidorID,
+										FornecedorID = fornecedorID,
+										ClienteID = clienteID,
+										ColaboradorID = colaboradorID,
+										SacadoNome = outroSacadoNome,
+										EspecieID = (byte)formaPagamento,
+										DataEmissao = dataInclusao,
+										ValorOriginal = valorOriginal,
+										ValorDevido = valorDevido,
+										DataBaseCalculo = dataInclusao,
+										DataInclusao = dataInclusao,
+										DataVencimento = dataVencimento,
+										FinanceiroID = respFinanceiroPessoaID,
+										LoginID = loginID,
+										EstabelecimentoID = estabelecimentoID,
+										SituacaoID = (byte)TituloSituacoesID.Normal,
+										Observacoes = observacaoRecebivel,
+										ExclusaoMotivo = documento,
+										DataBaixa = dataBaixa,
+										ValorBaixa = pagoValor
+										//OrcamentoID
+										//PlanoContasID
+										//Documento = contratoControle
+										//ContratoID = contratoID
+									};
+
+								if (pagoValor >= 1)
 								{
-									ConsumidorID = consumidorID,
-									FornecedorID = fornecedorID,
-									ClienteID = clienteID,
-									ColaboradorID = colaboradorID,
-									SacadoNome = outroSacadoNome,
-									EspecieID = (byte)formaPagamento,
-									DataEmissao = dataInclusao,
-									ValorOriginal = valor,
-									ValorDevido = valor,
-									DataBaseCalculo = dataInclusao,
-									DataInclusao = dataInclusao,
-									DataVencimento = dataVencimento,
-									FinanceiroID = respFinanceiroPessoaID,
-									LoginID = loginID,
-									EstabelecimentoID = estabelecimentoID,
-									SituacaoID = (byte)TituloSituacoesID.Normal,
-									Observacoes = observacoes,
-									ExclusaoMotivo = documento
-									//OrcamentoID
-									//PlanoContasID
-									//Documento = contratoControle
-									//ContratoID = contratoID
-								});
+									var tituloTransacao = TituloTransacoes.Liquidacao;
+									if (pagoValor < valorOriginal)
+									{
+										tituloTransacao = TituloTransacoes.PagamentoParcial;
+										valorDevido = valorOriginal - pagoValor;
+									}
+
+									fluxoCaixa = new FluxoCaixa()
+									{
+										ConsumidorID = consumidorID,
+										SituacaoID = 1,
+										PagoMulta = 0,
+										PagoJuros = 0,
+										PagoDescontos = 0,
+										PagoDespesas = 0,
+										TipoID = (byte)TransacaoTiposID.Recebimento,
+										Data = dataBaixa,
+										TransacaoID = (byte)tituloTransacao,
+										EspecieID = formaPagamento,
+										DataBaseCalculo = dataBaixa,
+										DevidoValor = valorDevido,
+										PagoValor = pagoValor,
+										EstabelecimentoID = estabelecimentoID,
+										LoginID = loginID,
+										DataInclusao = dataBaixa,
+										FinanceiroID = respFinanceiroPessoaID,
+										Observacoes = observacaoRecebido,
+										OutroSacadoNome = outroSacadoNome
+									};
+								}
+							}
+
+							Dictionary<string, object> recebivelDict = null;
+							Dictionary<string, object> fluxoCaixaDict = null;
+
+							if (recebivel != null)
+								recebivelDict = new Dictionary<string, object>
+								{
+									{ "ConsumidorID", recebivel.ConsumidorID },
+									{ "FornecedorID", recebivel.FornecedorID },
+									{ "ClienteID", recebivel.ClienteID },
+									{ "ColaboradorID", recebivel.ColaboradorID },
+									{ "SacadoNome", recebivel.SacadoNome },
+									{ "EspecieID", recebivel.EspecieID },
+									{ "DataEmissao", recebivel.DataEmissao },
+									{ "ValorOriginal", recebivel.ValorOriginal },
+									{ "ValorDevido", recebivel.ValorDevido },
+									{ "DataBaseCalculo", recebivel.DataBaseCalculo },
+									{ "DataInclusao", recebivel.DataInclusao },
+									{ "DataVencimento", recebivel.DataVencimento },
+									{ "FinanceiroID", recebivel.FinanceiroID },
+									{ "LoginID", recebivel.LoginID },
+									{ "EstabelecimentoID", recebivel.EstabelecimentoID },
+									{ "SituacaoID", recebivel.SituacaoID },
+									{ "Observacoes", recebivel.Observacoes },
+									{ "ExclusaoMotivo", recebivel.ExclusaoMotivo },
+									{ "ValorBaixa", recebivel.ValorBaixa },
+									{ "DataBaixa", recebivel.DataBaixa }
+								};
+
+							if (fluxoCaixa != null)
+								fluxoCaixaDict = new Dictionary<string, object>
+								{
+									//{ "ConsumidorID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.ConsumidorID).ToArray() },
+									//{ "RecebivelID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.RecebivelID).ToArray() },
+									//{ "SituacaoID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.SituacaoID).ToArray() },
+									//{ "PagoMulta", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.PagoMulta).ToArray() },
+									//{ "PagoJuros", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.PagoJuros).ToArray() },
+									//{ "TipoID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.TipoID).ToArray() },
+									//{ "Data", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.Data).ToArray() },
+									//{ "TransacaoID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.TransacaoID).ToArray() },
+									//{ "EspecieID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.EspecieID).ToArray() },
+									//{ "DataBaseCalculo", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DataBaseCalculo).ToArray() },
+									//{ "DevidoValor", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DevidoValor).ToArray() },
+									//{ "PagoValor", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.PagoValor).ToArray() },
+									//{ "EstabelecimentoID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.EstabelecimentoID).ToArray() },
+									//{ "LoginID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.LoginID).ToArray() },
+									//{ "DataInclusao", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.DataInclusao).ToArray() },
+									//{ "FinanceiroID", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.FinanceiroID).ToArray() },
+									//{ "Observacoes", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.Observacoes).ToArray() },
+									//{ "OutroSacadoNome", fluxoCaixas.ConvertAll(fluxoCaixa => (object)fluxoCaixa.OutroSacadoNome).ToArray() }
+									{ "ConsumidorID", fluxoCaixa.ConsumidorID },
+									{ "SituacaoID", fluxoCaixa.SituacaoID },
+									{ "PagoMulta", fluxoCaixa.PagoMulta },
+									{ "PagoJuros", fluxoCaixa.PagoJuros },
+									{ "TipoID", fluxoCaixa.TipoID },
+									{ "Data", fluxoCaixa.Data },
+									{ "TransacaoID", fluxoCaixa.TransacaoID },
+									{ "EspecieID", fluxoCaixa.EspecieID },
+									{ "DataBaseCalculo", fluxoCaixa.DataBaseCalculo },
+									{ "DevidoValor", fluxoCaixa.DevidoValor },
+									{ "PagoValor", fluxoCaixa.PagoValor },
+									{ "EstabelecimentoID", fluxoCaixa.EstabelecimentoID },
+									{ "LoginID", fluxoCaixa.LoginID },
+									{ "DataInclusao", fluxoCaixa.DataInclusao },
+									{ "FinanceiroID", fluxoCaixa.FinanceiroID },
+									{ "Observacoes", fluxoCaixa.Observacoes },
+									{ "OutroSacadoNome", fluxoCaixa.OutroSacadoNome }
+								};
+
+							if (recebivelDict != null || fluxoCaixaDict != null)
+								linhasSql.Add(sqlHelper.GerarSqlInsertRecebiveis(indiceLinha, recebivelDict, fluxoCaixaDict));
 						}
 					}
 				}
 
 				indiceLinha = 0;
 
-				var dados = new Dictionary<string, object[]>
-				{
-					{ "ConsumidorID", recebiveis.ConvertAll(recebivel => (object)recebivel.ConsumidorID).ToArray() },
-					{ "FornecedorID", recebiveis.ConvertAll(recebivel => (object)recebivel.FornecedorID).ToArray() },
-					{ "ClienteID", recebiveis.ConvertAll(recebivel => (object)recebivel.ClienteID).ToArray() },
-					{ "ColaboradorID", recebiveis.ConvertAll(recebivel => (object)recebivel.ColaboradorID).ToArray() },
-					{ "SacadoNome", recebiveis.ConvertAll(recebivel => (object)recebivel.SacadoNome).ToArray() },
-					{ "EspecieID", recebiveis.ConvertAll(recebivel => (object)recebivel.EspecieID).ToArray() },
-					{ "DataEmissao", recebiveis.ConvertAll(recebivel => (object)recebivel.DataEmissao).ToArray() },
-					{ "ValorOriginal", recebiveis.ConvertAll(recebivel => (object)recebivel.ValorOriginal).ToArray() },
-					{ "ValorDevido", recebiveis.ConvertAll(recebivel => (object)recebivel.ValorDevido).ToArray() },
-					{ "DataBaseCalculo", recebiveis.ConvertAll(recebivel => (object)recebivel.DataBaseCalculo).ToArray() },
-					{ "DataInclusao", recebiveis.ConvertAll(recebivel => (object)recebivel.DataInclusao).ToArray() },
-					{ "DataVencimento", recebiveis.ConvertAll(recebivel => (object)recebivel.DataVencimento).ToArray() },
-					{ "FinanceiroID", recebiveis.ConvertAll(recebivel => (object)recebivel.FinanceiroID).ToArray() },
-					{ "LoginID", recebiveis.ConvertAll(recebivel => (object)recebivel.LoginID).ToArray() },
-					{ "EstabelecimentoID", recebiveis.ConvertAll(recebivel => (object)recebivel.EstabelecimentoID).ToArray() },
-					{ "SituacaoID", recebiveis.ConvertAll(recebivel => (object)recebivel.SituacaoID).ToArray() },
-					{ "Observacoes", recebiveis.ConvertAll(recebivel => (object)recebivel.Observacoes).ToArray() },
-					{ "ExclusaoMotivo", recebiveis.ConvertAll(recebivel => (object)recebivel.ExclusaoMotivo).ToArray() }
-				};
-
 				var salvarArquivo = Tools.GerarNomeArquivo($"Recebiveis_{estabelecimentoID}_OdontoCompany_Migração");
-				sqlHelper.GerarSqlInsert("Recebiveis", salvarArquivo, dados);
-				excelHelper.GravarExcel(salvarArquivo, dados);
+				File.WriteAllLines(salvarArquivo + ".sql", linhasSql);
 
 				MessageBox.Show("Sucesso!");
 			}

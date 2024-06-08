@@ -37,7 +37,7 @@ namespace Migracao.Utils
 		private Dictionary<string, string> nomeTelefonesDict = new Dictionary<string, string>();
 		private Dictionary<string, string> nomeEnderecosDict = new Dictionary<string, string>();
 
-		private Dictionary<string, string> consumidorIDRecebiveisDict = new Dictionary<string, string>();
+		public static Dictionary<string, string> consumidorIDRecebiveisDict = new Dictionary<string, string>();
 		private Dictionary<string, string> consumidorIDRecebidosDict = new Dictionary<string, string>();
 
 		private Dictionary<string, string> pessoaIDDataAgendaDict = new Dictionary<string, string>();
@@ -575,9 +575,6 @@ namespace Migracao.Utils
 
 		public bool RecebivelExists(int consumidorID, decimal valorOriginal, DateTime dataVencimento)
 		{
-			if (consumidorID == 18283648)
-				consumidorID = consumidorID;
-
 			string key = consumidorID + "|" + valorOriginal.ToString("F2") + "|" + dataVencimento.ToString("yyyy-MM-dd HH:mm:ss.fff");
 			if (!string.IsNullOrWhiteSpace(key))
 				if (consumidorIDRecebiveisDict.ContainsKey(key))

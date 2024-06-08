@@ -621,111 +621,14 @@ namespace Migracao.Imports
 			}
 		}
 
-		public void ImportarPrecosTabelas(string arquivoExcel, int estabelecimentoID, int loginID, string arquivoTabelaPrecosAtuais)
-		{
-			var indiceLinha = 0;
-			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
-			var excelHelper = new ExcelHelper(arquivoExcel);
-			var sqlHelper = new SqlHelper();
-			var adicionados = new List<string>();
-			var precosTabelas = new List<PrecosTabela>();
-			ISheet sheet = null;
-
-			if (!string.IsNullOrEmpty(arquivoTabelaPrecosAtuais))
-				try
-				{
-					var workbook = excelHelper.LerExcel(arquivoTabelaPrecosAtuais);
-					sheet = workbook.GetSheetAt(0);
-				}
-				catch (Exception ex)
-				{
-					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoTabelaPrecosAtuais}\": {ex.Message}");
-				}
-
-
-			try
-			{
-				foreach (var linha in excelHelper.linhas)
-				{
-					indiceLinha++;
-
-					string? nome = null, abreviacao = null;
-					decimal valor = 0;
-					string especialidade = "Outros";
-					long tuss = 0;
-					bool ativo = true;
-					byte categoria = (byte)ProcedimentosCategoriasID.Outros;
-
-					foreach (var celula in linha.Cells)
-					{
-						if (celula != null)
-						{
-							celulaValor = celula.ToString().Trim().Replace("'", "’");
-							tituloColuna = excelHelper.cabecalhos[celula.Address.Column];
-							colunaLetra = excelHelper.GetColumnLetter(celula);
-
-							if (!string.IsNullOrWhiteSpace(celulaValor))
-							{
-								switch (tituloColuna)
-								{
-									case "Nome Tabela":
-										nome = celulaValor.PrimeiraLetraMaiuscula();
-										break;
-								}
-							}
-						}
-					}
-
-					if (!adicionados.Contains(nome) && (!excelHelper.ExisteTexto(sheet, "Nome", nome) && !excelHelper.ExisteTexto(sheet, "Nome", "Migração - " + nome)))
-					{
-						adicionados.Add(nome);
-
-						precosTabelas.Add(new PrecosTabela
-						{
-							Ativo = ativo,
-							DataInclusao = DateTime.Now,
-							LoginID = loginID,
-							SeguimentoID = 1,
-							SolucaoID = 1,
-							EstabelecimentoID = estabelecimentoID,
-							Nome = nome
-						});
-					}
-				}
-
-				indiceLinha = 0;
-
-				var dados = new Dictionary<string, object[]>
-				{
-					{ "Ativo", precosTabelas.ConvertAll(precotabela => (object)precotabela.Ativo).ToArray() },
-					{ "DataInclusao", precosTabelas.ConvertAll(precotabela => (object)precotabela.DataInclusao).ToArray() },
-					{ "LoginID", precosTabelas.ConvertAll(precotabela => (object)precotabela.LoginID).ToArray() },
-					{ "SeguimentoID", precosTabelas.ConvertAll(precotabela => (object)precotabela.SeguimentoID).ToArray() },
-					{ "SolucaoID", precosTabelas.ConvertAll(precotabela => (object)precotabela.SolucaoID).ToArray() },
-					{ "EstabelecimentoID", precosTabelas.ConvertAll(precotabela => (object)precotabela.EstabelecimentoID).ToArray() },
-					{ "Nome", precosTabelas.ConvertAll(precotabela => (object)precotabela.Nome).ToArray() }
-				};
-
-				var salvarArquivo = Tools.GerarNomeArquivo($"PrecosTabelas_{estabelecimentoID}_OdontoCompany_Migração");
-				sqlHelper.GerarSqlInsert("PrecosTabelas", salvarArquivo, dados);
-				excelHelper.GravarExcel(salvarArquivo, dados);
-
-				MessageBox.Show("Limpar o Redis" + Environment.NewLine + "redis-cli.exe -h 127.0.0.1 -n 0 del Tabelas:Tabelas-" + estabelecimentoID.ToString("D6"), "Sucesso!");
-			}
-			catch (Exception error)
-			{
-				throw new Exception(Tools.TratarMensagemErro(arquivoExcel, error.Message, indiceLinha++, colunaLetra, tituloColuna, celulaValor, variaveisValor));
-			}
-		}
-
 		public void ImportarPrecos(string arquivoExcel, int estabelecimentoID, int loginID, string arquivoTabelaPrecosAtuais)
 		{
 			var indiceLinha = 0;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
 			var excelHelper = new ExcelHelper(arquivoExcel);
 			var sqlHelper = new SqlHelper();
-			List<string> linhasSql = new();
-			List<string> tabelasAdicionadas = new();
+			List<string> linhasSql = [];
+			List<string> tabelasAdicionadas = [];
 
 			var grupoCategoriaDict = new Dictionary<string, ProcedimentosCategoriasID>()
 			{
@@ -741,9 +644,9 @@ namespace Migracao.Imports
 				{ "OUTROS", ProcedimentosCategoriasID.Outros }
 			};
 
-			PrecosTabela precoTabela = null;
-			Preco preco = null;
-			ISheet sheet = null;
+			PrecosTabela? precoTabela = null;
+			Preco? preco = null;
+			ISheet? sheet = null;
 
 			if (!string.IsNullOrEmpty(arquivoTabelaPrecosAtuais))
 				try
@@ -848,8 +751,8 @@ namespace Migracao.Imports
 						};
 					}
 
-					Dictionary<string, object> precoDict = null;
-					Dictionary<string, object> precoTabelaDict = null;
+					Dictionary<string, object>? precoDict = null;
+					Dictionary<string, object>? precoTabelaDict = null;
 
 					if (preco != null)
 						precoDict = new Dictionary<string, object>
@@ -901,17 +804,17 @@ namespace Migracao.Imports
 			var sqlHelper = new SqlHelper();
 			List<string> linhasSql = new();
 
-			ISheet sheetConsumidores;
-			try
-			{
-				IWorkbook workbookConsumidores = excelHelper.LerExcel(arquivoExcelRecebiveisProd);
-				sheetConsumidores = workbookConsumidores.GetSheetAt(0);
-				excelHelper.InitializeDictionaryRecebiveis(sheetConsumidores);
-			}
-			catch (Exception ex)
-			{
-				throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelRecebiveisProd}\": {ex.Message}");
-			}
+			//ISheet sheetConsumidores;
+			//try
+			//{
+			//	IWorkbook workbookConsumidores = excelHelper.LerExcel(arquivoExcelRecebiveisProd);
+			//	sheetConsumidores = workbookConsumidores.GetSheetAt(0);
+			//	excelHelper.InitializeDictionaryRecebiveis(sheetConsumidores);
+			//}
+			//catch (Exception ex)
+			//{
+			//	throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelRecebiveisProd}\": {ex.Message}");
+			//}
 
 			FluxoCaixa fluxoCaixa = null;
 			Recebivel recebivel = null;

@@ -115,7 +115,7 @@ namespace Migracao
 							importacoes.ImportarAgenda(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), txtReferencia.Text, int.Parse(txtLoginID.Text));
 					}
 
-					txtPessoas.Text = "";
+					//txtPessoas.Text = "";
 				}
 				catch (Exception ex)
 				{
@@ -210,10 +210,10 @@ namespace Migracao
 			else if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
 				lbReferencia.Text = "Pessoas (Prod):";
 
-			else if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
-				lbReferencia.Text = "Recebíveis (Prod):";
+			//else if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
+			//	lbReferencia.Text = "Recebíveis (Prod):";
 
-			else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase) || comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
+			else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
 				lbReferencia.Text = "Agendamentos (Prod):";
 			//|| comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
 			//|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
@@ -261,7 +261,7 @@ namespace Migracao
 
 						if (comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
 							//|| comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase)
-							|| comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase)
+							//|| comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase)
 							//|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("preços procedimentos", StringComparison.CurrentCultureIgnoreCase)
@@ -283,11 +283,18 @@ namespace Migracao
 								btnExcel2.Visible = true;
 							}
 
-							if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase) || comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
+							if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
 							{
 								lbPessoaID.Visible = true;
 								txtPessoaID.Visible = true;
 							}
+						}
+
+
+						if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
+						{
+							lbPessoaID.Visible = true;
+							txtPessoaID.Visible = true;
 						}
 
 						AlterarNomesCampos();
@@ -454,38 +461,42 @@ namespace Migracao
 
 		private void btnPessoas_Click(object sender, EventArgs e)
 		{
-			txtPessoas.Text = EscolherArquivoExcel("Arquivo Pessoas.xlsx");
+			var arquivoPessoas = EscolherArquivoExcel("Arquivo Pessoas.xlsx");
 
-			if (string.IsNullOrEmpty(txtPessoas.Text) == false)
+			if (string.IsNullOrEmpty(arquivoPessoas) == false)
 				try
 				{
-					var excelHelper = new ExcelHelper(txtPessoas.Text);
-					var workbook = excelHelper.LerExcel(txtPessoas.Text);
+					var excelHelper = new ExcelHelper();
+					var workbook = excelHelper.LerExcel(arquivoPessoas);
 					var sheet = workbook.GetSheetAt(0);
 					excelHelper.InitializeDictionaryPessoas(sheet);
+
+					txtPessoas.Text = arquivoPessoas;
 				}
 				catch (Exception ex)
 				{
-					txtPessoas.Text = "";
 					MessageBox.Show(ex.Message, "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				}
 		}
 
 		private void btnRecebiveis_Click(object sender, EventArgs e)
 		{
-			//txtRecebiveis.Text = EscolherArquivoExcel("Arquivo Recebiveis.xlsx");
+			var arquivoRecebiveis = EscolherArquivoExcel("Arquivo Recebiveis.xlsx");
 
-			//try
-			//{
-			//	var excelHelper = new ExcelHelper(txtPessoas.Text);
-			//	var workbook = excelHelper.LerExcel(txtPessoas.Text);
-			//	var sheet = workbook.GetSheetAt(0);
-			//	excelHelper.InitializeDictionaryPessoas(sheet);
-			//}
-			//catch (Exception ex)
-			//{
-			//	MessageBox.Show(ex.Message, "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-			//}
+			if (string.IsNullOrEmpty(arquivoRecebiveis) == false)
+				try
+				{
+					var excelHelper = new ExcelHelper();
+					var workbook = excelHelper.LerExcel(arquivoRecebiveis);
+					var sheet = workbook.GetSheetAt(0);
+					excelHelper.InitializeDictionaryRecebiveis(sheet);
+
+					txtRecebiveis.Text = arquivoRecebiveis;
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show(ex.Message, "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+				}
 		}
 
 		string EscolherArquivoExcel(string titulo = "Selecione um arquivo")

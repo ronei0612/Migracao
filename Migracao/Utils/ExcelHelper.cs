@@ -358,7 +358,7 @@ namespace Migracao.Utils
 					if (!nomeTelefonesDict.ContainsKey(key))
 						nomeTelefonesDict.Add(key, funcionarioid);
 
-					key = nomeCompleto + "|" + logradouro;
+					key = nomeCompleto + "|" + cep;
 					if (!nomeEnderecosDict.ContainsKey(key))
 						nomeEnderecosDict.Add(key, funcionarioid);
 
@@ -625,6 +625,23 @@ namespace Migracao.Utils
 			if (!string.IsNullOrWhiteSpace(key))
 				if (pessoaIDEnderecosDict.ContainsKey(key))
 					return true;
+
+			return false;
+		}
+
+		public bool ConsumidorEnderecoExists(string nomeCompleto = "", int? cep = null)
+		{
+			if (cep == null && string.IsNullOrWhiteSpace(nomeCompleto))
+				return true;
+
+			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
+
+			if (!string.IsNullOrWhiteSpace(nomeCompleto) && cep != null)
+			{
+				string key = nomeCompleto + "|" + cep.ToString();
+				if (nomeEnderecosDict.ContainsKey(key))
+					return true;
+			}
 
 			return false;
 		}

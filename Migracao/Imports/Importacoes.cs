@@ -121,25 +121,23 @@ namespace Migracao.Imports
 		public void ImportarConsumidoresPessoas(string arquivoExcel, string arquivoPessoasAtuais, int estabelecimentoID, int loginID)
 		{
 			var indiceLinha = 1;
-			var consumidorID = 1;
-			var pessoaID = 1;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
 			DateTime dataHoje = DateTime.Now;
 			var excelHelper = new ExcelHelper(arquivoExcel);
 			var sqlHelper = new SqlHelper();
 			List<string> linhasSql = new();
 
-			if (!string.IsNullOrEmpty(arquivoPessoasAtuais))
-				try
-				{
-					var workbook = excelHelper.LerExcel(arquivoPessoasAtuais);
-					var sheet = workbook.GetSheetAt(0);
-					excelHelper.InitializeDictionary(sheet);
-				}
-				catch (Exception ex)
-				{
-					throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoPessoasAtuais}\": {ex.Message}");
-				}
+			//if (!string.IsNullOrEmpty(arquivoPessoasAtuais))
+			//	try
+			//	{
+			//		var workbook = excelHelper.LerExcel(arquivoPessoasAtuais);
+			//		var sheet = workbook.GetSheetAt(0);
+			//		excelHelper.InitializeDictionary(sheet);
+			//	}
+			//	catch (Exception ex)
+			//	{
+			//		throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoPessoasAtuais}\": {ex.Message}");
+			//	}
 
 			try
 			{
@@ -154,11 +152,10 @@ namespace Migracao.Imports
 					byte? estadoCivil = null;
 					bool sexo = true;
 					long? telefonePrinc = null, telefoneAltern = null, telefoneComercial = null, telefoneOutro = null, celular = null;
-					string? nomeCompleto = null, documento = null, rg = null, email = null, apelido = null, nascimentoLocal = null, profissaoOutra = null, logradouro = "",
+					string? nomeCompleto = null, documento = null, rg = null, email = null, apelido = null, nascimentoLocal = null, profissaoOutra = null, logradouro = "", codigo = "",
 						 complemento = null, bairro = null, logradouroNum = null, numcadastro = null, cidade = "", estado = null, observacao = null;
+					LogradouroTipos logradouroTipo = LogradouroTipos.Outros;
 
-					if (indiceLinha == 6255)
-						indiceLinha = indiceLinha;
 
 					foreach (var celula in linha.Cells)
 					{
@@ -173,6 +170,7 @@ namespace Migracao.Imports
 								switch (tituloColuna)
 								{
 									case "Código":
+										codigo = celulaValor;
 										break;
 									case "Ativo(S/N)":
 										break;
@@ -200,7 +198,7 @@ namespace Migracao.Imports
 										rg = celulaValor.GetPrimeirosCaracteres(20);
 										break;
 									case "Sexo(M/F)":
-										sexo = celulaValor.ToSexo("m", "f");
+										sexo = celulaValor == "S" ? true : celulaValor == "N" ? false : celulaValor.ToSexo("m", "f");
 										break;
 									case "NascimentoData":
 										dataNascimento = celulaValor.ToData();
@@ -236,6 +234,9 @@ namespace Migracao.Imports
 										break;
 									case "Logradouro":
 										logradouro = celulaValor.PrimeiraLetraMaiuscula();
+										logradouroTipo = logradouro.GetLogradouroTipo();
+										if (logradouroTipo != LogradouroTipos.Outros)
+											logradouro = logradouro.RemoverPrimeiroNome();
 										break;
 									case "LogradouroNum":
 										logradouroNum = celulaValor;
@@ -262,15 +263,18 @@ namespace Migracao.Imports
 					Pessoa pessoa = null;
 					Consumidor consumidor = null;
 					ConsumidorEndereco consumidorEndereco = null;
-					PessoaFone pessoaFone = null;
-					pessoaID = indiceLinha;
+					//PessoaFone pessoaFone = null;
+					var pessoaFones = new List<PessoaFone>();
+
 					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: nomeCompleto, cpf: documento, nascimentoData: dataNascimento);
+					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: documento, codigo: codigo);
 
 					if (cliente)
 					{
 						if ((!string.IsNullOrEmpty(nomeCompleto) && string.IsNullOrEmpty(documento))
 							|| (!string.IsNullOrEmpty(documento) && documento.IsCPF()))
-							if (string.IsNullOrEmpty(pessoaIDValue))
+							if (string.IsNullOrEmpty(consumidorIDValue))
+							{
 								pessoa = new Pessoa()
 								{
 									ID = indiceLinha,
@@ -292,27 +296,29 @@ namespace Migracao.Imports
 									FoneticaNomeCompleto = nomeCompleto.Fonetizar()
 								};
 
-						consumidor = new Consumidor()
-						{
-							Ativo = true,
-							DataInclusao = dataCadastro,
-							EstabelecimentoID = estabelecimentoID,
-							LGPDSituacaoID = 0,
-							LoginID = loginID,
-							PessoaID = pessoaID,
-							CodigoAntigo = numcadastro,
-							Observacoes = observacao
-						};
-					}
-					else
-					{
+								consumidor = new Consumidor()
+								{
+									Ativo = true,
+									DataInclusao = dataCadastro,
+									EstabelecimentoID = estabelecimentoID,
+									LGPDSituacaoID = 0,
+									LoginID = loginID,
+									CodigoAntigo = numcadastro,
+									Observacoes = observacao
+								};
+							}
+
+						int consumidorID = 0;
+						if (!string.IsNullOrEmpty(consumidorIDValue))
+							consumidorID = int.Parse(consumidorIDValue);
 						var cidadeID = excelHelper.GetCidadeID(cidade, estado);
 
 						if (cidadeID > 0)
-							if (excelHelper.ConsumidorEnderecoExists(pessoaID, cep) == false)
+							if (excelHelper.ConsumidorEnderecoExists(nomeCompleto, cep) == false)
 								consumidorEndereco = new ConsumidorEndereco()
 								{
 									Ativo = true,
+									ConsumidorID = consumidorID,
 									EnderecoTipoID = (short)EnderecoTipos.Residencial,
 									LogradouroTipoID = (int)logradouroTipo,
 									Logradouro = logradouro,
@@ -324,126 +330,133 @@ namespace Migracao.Imports
 									Complemento = complemento,
 									LoginID = loginID
 								};
+
+						int pessoaID = 0;
+						if (!string.IsNullOrEmpty(pessoaIDValue))
+							pessoaID = int.Parse(pessoaIDValue);
+
+						if (celular != null)
+							if (excelHelper.PessoaFoneExists(pessoaID, celular.ToString()) == false)
+								pessoaFones.Add(new PessoaFone()
+								{
+									PessoaID = pessoaID,
+									FoneTipoID = (short)FoneTipos.Celular,
+									Telefone = (long)celular,
+									DataInclusao = dataCadastro,
+									LoginID = loginID
+								});
+
+						if (telefonePrinc != null)
+							if (excelHelper.PessoaFoneExists(pessoaID, telefonePrinc.ToString()) == false)
+								pessoaFones.Add(new PessoaFone()
+								{
+									PessoaID = pessoaID,
+									FoneTipoID = (short)FoneTipos.Principal,
+									Telefone = (long)telefonePrinc,
+									DataInclusao = dataCadastro,
+									LoginID = loginID
+								});
+
+						if (telefoneAltern != null)
+							if (excelHelper.PessoaFoneExists(pessoaID, telefoneAltern.ToString()) == false)
+								pessoaFones.Add(new PessoaFone()
+								{
+									PessoaID = pessoaID,
+									FoneTipoID = (short)FoneTipos.Alternativo,
+									Telefone = (long)telefoneAltern,
+									DataInclusao = dataCadastro,
+									LoginID = loginID
+								});
+
+						if (telefoneComercial != null)
+							if (excelHelper.PessoaFoneExists(pessoaID, telefoneComercial.ToString()) == false)
+								pessoaFones.Add(new PessoaFone()
+								{
+									PessoaID = pessoaID,
+									FoneTipoID = (short)FoneTipos.Comercial,
+									Telefone = (long)telefoneComercial,
+									DataInclusao = dataCadastro,
+									LoginID = loginID
+								});
+
+						if (telefoneOutro != null)
+							if (excelHelper.PessoaFoneExists(pessoaID, telefoneOutro.ToString()) == false)
+								pessoaFones.Add(new PessoaFone()
+								{
+									PessoaID = pessoaID,
+									FoneTipoID = (short)FoneTipos.Outros,
+									Telefone = (long)telefoneOutro,
+									DataInclusao = dataCadastro,
+									LoginID = loginID
+								});
+
+						Dictionary<string, object> pessoaDict = null;
+						Dictionary<string, object> consumidorDict = null;
+						Dictionary<string, object> consumidorEnderecoDict = null;
+						Dictionary<string, object[]> pessoaFonesDict = null;
+
+						if (pessoa != null)
+						{
+							pessoaDict = new Dictionary<string, object>
+							{
+								{ "NomeCompleto", pessoa.NomeCompleto },
+								{ "Apelido", pessoa.Apelido },
+								{ "CPF", pessoa.CPF },
+								{ "DataInclusao", pessoa.DataInclusao },
+								{ "Email", pessoa.Email },
+								{ "RG", pessoa.RG },
+								{ "Sexo", pessoa.Sexo },
+								{ "NascimentoData", pessoa.NascimentoData },
+								{ "NascimentoLocal", pessoa.NascimentoLocal },
+								{ "ProfissaoOutra", pessoa.ProfissaoOutra },
+								{ "EstadoCivilID", pessoa.EstadoCivilID },
+								{ "EstabelecimentoID", pessoa.EstabelecimentoID },
+								{ "LoginID", pessoa.LoginID },
+								{ "Guid", pessoa.Guid },
+								{ "FoneticaApelido", pessoa.FoneticaApelido },
+								{ "FoneticaNomeCompleto", pessoa.FoneticaNomeCompleto }
+							};
+
+							consumidorDict = new Dictionary<string, object>
+							{
+								{ "Ativo", consumidor.Ativo },
+								{ "DataInclusao", consumidor.DataInclusao },
+								{ "EstabelecimentoID", consumidor.EstabelecimentoID },
+								{ "LGPDSituacaoID", consumidor.LGPDSituacaoID },
+								{ "LoginID", consumidor.LoginID },
+								{ "CodigoAntigo", consumidor.CodigoAntigo }
+							};
+						}
+
+						if (consumidorEndereco != null)
+							consumidorEnderecoDict = new Dictionary<string, object>
+							{
+								{ "LoginID", consumidorEndereco.LoginID },
+								{ "Ativo", consumidorEndereco.Ativo },
+								{ "EnderecoTipoID", consumidorEndereco.EnderecoTipoID },
+								{ "LogradouroTipoID", consumidorEndereco.LogradouroTipoID },
+								{ "Logradouro", consumidorEndereco.Logradouro },
+								{ "CidadeID", consumidorEndereco.CidadeID },
+								{ "Cep", consumidorEndereco.Cep },
+								{ "DataInclusao", consumidorEndereco.DataInclusao },
+								{ "Bairro", consumidorEndereco.Bairro },
+								{ "LogradouroNum", consumidorEndereco.LogradouroNum },
+								{ "Complemento", consumidorEndereco.Complemento }
+							};
+
+						if (pessoaFones.Count > 0)
+							pessoaFonesDict = new Dictionary<string, object[]>
+							{
+								{ "FoneTipoID", pessoaFones.ConvertAll(pessoaFone => (object)pessoaFone.FoneTipoID).ToArray() },
+								{ "Telefone", pessoaFones.ConvertAll(pessoaFone => (object)pessoaFone.Telefone).ToArray() },
+								{ "DataInclusao", pessoaFones.ConvertAll(pessoaFone => (object)pessoaFone.DataInclusao).ToArray() },
+								{ "LoginID", pessoaFones.ConvertAll(pessoaFone => (object)pessoaFone.LoginID).ToArray() }
+							};
+
+						linhasSql.Add(sqlHelper.GerarSqlInsert(indiceLinha, pessoaDict, pessoaID, pessoaFonesDict, consumidorDict, consumidorID, consumidorEnderecoDict));
+
+						indiceLinha++;
 					}
-
-
-					if (celular != null)
-						if (excelHelper.PessoaFoneExists(pessoaID, celular.ToString()) == false)
-							pessoaFone = new PessoaFone()
-							{
-								PessoaID = pessoaID,
-								FoneTipoID = (short)FoneTipos.Celular,
-								Telefone = (long)celular,
-								DataInclusao = dataCadastro,
-								LoginID = loginID
-							};
-
-					if (telefonePrinc != null)
-						if (excelHelper.PessoaFoneExists(pessoaID, telefonePrinc.ToString()) == false)
-							pessoaFone = new PessoaFone()
-							{
-								PessoaID = pessoaID,
-								FoneTipoID = (short)FoneTipos.Principal,
-								Telefone = (long)telefonePrinc,
-								DataInclusao = dataCadastro,
-								LoginID = loginID
-							});
-
-					if (telefoneAltern != null)
-						if (excelHelper.PessoaFoneExists(pessoaID, telefoneAltern.ToString()) == false)
-							pessoaFone = new PessoaFone()
-							{
-								PessoaID = pessoaID,
-								FoneTipoID = (short)FoneTipos.Alternativo,
-								Telefone = (long)telefoneAltern,
-								DataInclusao = dataCadastro,
-								LoginID = loginID
-							};
-
-					if (telefoneComercial != null)
-						if (excelHelper.PessoaFoneExists(pessoaID, telefoneComercial.ToString()) == false)
-							pessoaFone = new PessoaFone()
-							{
-								PessoaID = pessoaID,
-								FoneTipoID = (short)FoneTipos.Comercial,
-								Telefone = (long)telefoneComercial,
-								DataInclusao = dataCadastro,
-								LoginID = loginID
-							};
-
-					if (telefoneOutro != null)
-						if (excelHelper.PessoaFoneExists(pessoaID, telefoneOutro.ToString()) == false)
-							pessoaFone = new PessoaFone()
-							{
-								PessoaID = pessoaID,
-								FoneTipoID = (short)FoneTipos.Outros,
-								Telefone = (long)telefoneOutro,
-								DataInclusao = dataCadastro,
-								LoginID = loginID
-							};
-
-					indiceLinha++;
-
-
-					var pessoaDict = new Dictionary<string, object>
-					{
-						{ "NomeCompleto", pessoa.NomeCompleto },
-						{ "Apelido", pessoa.Apelido },
-						{ "CPF", pessoa.CPF },
-						{ "DataInclusao", pessoa.DataInclusao },
-						{ "Email", pessoa.Email },
-						{ "RG", pessoa.RG },
-						{ "Sexo", pessoa.Sexo },
-						{ "NascimentoData", pessoa.NascimentoData },
-						{ "NascimentoLocal", pessoa.NascimentoLocal },
-						{ "ProfissaoOutra", pessoa.ProfissaoOutra },
-						{ "EstadoCivilID", pessoa.EstadoCivilID },
-						{ "EstabelecimentoID", pessoa.EstabelecimentoID },
-						{ "LoginID", pessoa.LoginID },
-						{ "Guid", pessoa.Guid },
-						{ "FoneticaApelido", pessoa.FoneticaApelido },
-						{ "FoneticaNomeCompleto", pessoa.FoneticaNomeCompleto }
-					};
-
-					var consumidorDict = new Dictionary<string, object>
-					{
-						{ "Ativo", consumidor.Ativo },
-						{ "DataInclusao", consumidor.DataInclusao },
-						{ "EstabelecimentoID", consumidor.EstabelecimentoID },
-						{ "LGPDSituacaoID", consumidor.LGPDSituacaoID },
-						{ "LoginID", consumidor.LoginID },
-						{ "PessoaID", consumidor.PessoaID },
-						{ "CodigoAntigo", consumidor.CodigoAntigo }
-					};
-
-
-					var consumidorEnderecoDict = new Dictionary<string, object>
-					{
-						{ "LoginID", consumidorEndereco.LoginID },
-						{ "Ativo", consumidorEndereco.Ativo },
-						{ "ConsumidorID", consumidorEndereco.ConsumidorID },
-						{ "EnderecoTipoID", consumidorEndereco.EnderecoTipoID },
-						{ "LogradouroTipoID", consumidorEndereco.LogradouroTipoID },
-						{ "Logradouro", consumidorEndereco.Logradouro },
-						{ "CidadeID", consumidorEndereco.CidadeID },
-						{ "Cep", consumidorEndereco.Cep },
-						{ "DataInclusao", consumidorEndereco.DataInclusao },
-						{ "Bairro", consumidorEndereco.Bairro },
-						{ "LogradouroNum", consumidorEndereco.LogradouroNum },
-						{ "Complemento", consumidorEndereco.Complemento }
-					};
-
-
-					var pessoaFoneDict = new Dictionary<string, object>
-					{
-						{ "PessoaID", pessoaFone.PessoaID },
-						{ "FoneTipoID", pessoaFone.FoneTipoID },
-						{ "Telefone", pessoaFone.Telefone },
-						{ "DataInclusao", pessoaFone.DataInclusao },
-						{ "LoginID", pessoaFone.LoginID }
-					};
-
-					linhasSql.Add(sqlHelper.GerarSqlInsert(1, pessoaDict, consumidorDict));
 				}
 
 				indiceLinha = 0;
@@ -1219,8 +1232,9 @@ namespace Migracao.Imports
 		}
 		public void ImportarPessoas(string arquivoExcel, string arquivoPessoasAtuais, int estabelecimentoID, int loginID)
 		{
-			ImportarPessoasDentistas(arquivoExcel, arquivoPessoasAtuais, estabelecimentoID, loginID);
-			ImportarPessoasClientes(arquivoExcel, arquivoPessoasAtuais, estabelecimentoID, loginID);
+			ImportarConsumidoresPessoas(arquivoExcel, arquivoPessoasAtuais, estabelecimentoID, loginID);
+			//ImportarPessoasDentistas(arquivoExcel, arquivoPessoasAtuais, estabelecimentoID, loginID);
+			//ImportarPessoasClientes(arquivoExcel, arquivoPessoasAtuais, estabelecimentoID, loginID);
 		}
 
 		public void ImportarPessoasClientes(string arquivoExcel, string arquivoPessoasAtuais, int estabelecimentoID, int loginID)

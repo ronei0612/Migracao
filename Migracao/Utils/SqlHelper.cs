@@ -214,9 +214,9 @@ namespace Migracao.Utils
 					sql.Remove(sql.Length - 2, 2).Append($", {consumidorID}); " + Environment.NewLine);
 			}
 
-
 			// Remove a última quebra de linha e vírgula e espaço e adiciona um ponto e vírgula
-			sql.Remove(sql.Length - 4, 4).Append(';' + Environment.NewLine);
+			if (pessoaDict != null || pessoaFonesDict != null || consumidorDict != null || consumidorEnderecoDict != null)
+				sql.Remove(sql.Length - 4, 4).Append(';' + Environment.NewLine);
 
 			return sql.ToString();
 		}

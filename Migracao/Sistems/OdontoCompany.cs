@@ -1,7 +1,5 @@
 ﻿using Migracao.Models;
 using Migracao.Utils;
-using NPOI.SS.UserModel;
-using OfficeOpenXml;
 using System.Data;
 using System.Text;
 
@@ -25,7 +23,7 @@ namespace Migracao.Sistems
 		List<string> cabecalhos_Procedimentos	= ["Nome Tabela", "Ativo(S/N)", "Procedimento(Nome)", "Abreviação", "Especialidade", "Especialidade Código", "Preço", "TUSS", "Diagnóstico(S/N)", "Prevenção(S/N)", "Odontopediatria(S/N)", "Dentística(S/N)", "Endodontia(S/N)", "Periodontia(S/N)", "Prótese(S/N)", "Cirurgia(S/N)", "Ortodontia(S/N)", "Radiologia(S/N)", "Estética(S/N)", "Implantodontia(S/N)", "Odontogeriatria(S/N)", "DTM(S/N)", "Orofacial(S/N)", ];
 		List<string> cabecalhos_CodProcedimentos = ["ID", "Nome", "Usuário"];
 
-		HashSet<string> cadastroPaciente, registroRecebivel;
+		//Dictionary<string, string> pessoaCSVDict;
 
 		public Tuple<List<string[]>, List<string>> LerArquivosExcelCsv(string arquivo, Encoding encoding)
 		{
@@ -75,10 +73,9 @@ namespace Migracao.Sistems
 				var resultado = LerArquivosExcelCsv(excel_CED006.Text, Encoding.UTF8);
 				var linhasCSV = resultado.Item1;
 				var cabecalhosCSV = resultado.Item2;
-				dataTablePessoas = ConvertExcelPessoasDentistas(dataTablePessoas, cabecalhosCSV, linhasCSV);
 
 				if (CED006_Dentistas.All(cabecalhosCSV.Contains))
-					dataTablePessoas = ConvertExcelPessoasPacientes(dataTablePessoas, cabecalhosCSV, linhasCSV);
+					dataTablePessoas = ConvertExcelPessoasDentistas(dataTablePessoas, cabecalhosCSV, linhasCSV);
 			}
 
 			if (excel_CED006 != null || excel_EMD101 != null)
@@ -368,18 +365,16 @@ namespace Migracao.Sistems
 						var cro = valoresLinha.GetValueOrDefault("CRO").Trim();
 						var modificado = valoresLinha.GetValueOrDefault("MODIFICADO").Trim();
 
+						//pessoaCSVDict.Add("dentista|" + nome, codigo);
+
 						dataRow["Código"] = codigo.ToNum();
 						dataRow["Ativo(S/N)"] = "S";
-						dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+						dataRow["NomeCompleto"] = nome.ToNome();
 						dataRow["NomeSocial"] = "";
-						dataRow["Apelido"] = nome.GetLetras().GetPrimeirosCaracteres(19).PrimeiraLetraMaiuscula();
-						//dataRow["Documento(CPF,CNPJ,CGC)"] = cgcCpf.ToCPF();
+						dataRow["Apelido"] = nome.GetPrimeirosCaracteres(20).ToNome();
 						dataRow["DataCadastro(01/12/2024)"] = modificado.ToData();
 						dataRow["Observações"] = obs;
 						dataRow["Email"] = email.ToEmail();
-						//dataRow["RG"] = rg.GetPrimeirosCaracteres(20);
-						//dataRow["Sexo(M/F)"] = sexo.ToSexo("m", "f").ToSN();
-						//dataRow["NascimentoData"] = dataNascimento.ToData();
 						dataRow["NascimentoLocal"] = "";
 						dataRow["EstadoCivil(S/C/V)"] = "";
 						dataRow["Profissao"] = "";
@@ -447,6 +442,9 @@ namespace Migracao.Sistems
 						var dataCadastro = valoresLinha.GetValueOrDefault("DT_CADASTRO").Trim();
 						var dataNascimento = valoresLinha.GetValueOrDefault("DT_NASCIMENTO").Trim();
 
+						//if (cliente == "S")
+						//	pessoas.Add("paciente|" + nome, numFicha);
+
 						if (cliente != "S" && fornecedor != "S")
 							cliente = "S";
 
@@ -455,9 +453,9 @@ namespace Migracao.Sistems
 
 						//dataRow["Codigo"] = numFicha.ToNum();
 						dataRow["Ativo(S/N)"] = "S";
-						dataRow["NomeCompleto"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+						dataRow["NomeCompleto"] = nome.ToNome();
 						dataRow["NomeSocial"] = "";
-						dataRow["Apelido"] = nome.GetLetras().GetPrimeirosCaracteres(19).PrimeiraLetraMaiuscula();
+						dataRow["Apelido"] = nome.GetPrimeirosCaracteres(20).ToNome();
 						dataRow["Documento(CPF,CNPJ,CGC)"] = cgcCpf.ToCPF();
 						dataRow["DataCadastro(01/12/2024)"] = dataCadastro.ToData();
 						dataRow["Observações"] = obs;
@@ -683,15 +681,13 @@ namespace Migracao.Sistems
 						{
 							ids.Add(id);
 
-							DataRow[] dataRowEncontrados = dataTablePessoas.AsEnumerable()
-								.Where(row =>
-								row.Field<string>("Código") == cod_responsavel)
-								.ToArray();
+							//DataRow[] dataRowEncontrados = dataTablePessoas.AsEnumerable()
+							//	.Where(row =>
+							//	row.Field<string>("Código") == cod_responsavel)
+							//	.ToArray();
 
-							//DataRow[] dataRowEncontrados = dataTablePessoas.Select($"Código = '{cod_responsavel}'");
-							
-							if (dataRowEncontrados.Length > 0)
-								responsavel = dataRowEncontrados[0]["NomeCompleto"].ToString();
+							//if (dataRowEncontrados.Length > 0)
+							//	responsavel = dataRowEncontrados[0]["NomeCompleto"].ToString();
 
 							var minutos = hora.Split(':')[1];
 							var horas = hora.Split(':')[0];
@@ -711,7 +707,7 @@ namespace Migracao.Sistems
 
 							dataRow["ID"] = id;
 							dataRow["CPF"] = cpf.ToCPF();
-							dataRow["Nome Completo"] = nome.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+							dataRow["Nome Completo"] = nome.ToNome();
 							dataRow["Data Início (01/12/2024 00:00)"] = dataInicio;
 							dataRow["Data Término (01/12/2024 00:00)"] = dataTermino;
 							dataRow["Data Inclusão (01/12/2024)"] = dataInclusao.ToData();

@@ -60,7 +60,7 @@ namespace Migracao.Utils
 			File.WriteAllText(salvarArquivo + ".sql", sql.ToString());
 		}
 
-		public string GerarSqlInsertPessoas(int index, Dictionary<string, object> pessoaDict, int pessoaID, Dictionary<string, object[]> pessoaFonesDict, Dictionary<string, object> consumidorDict, int consumidorID, Dictionary<string, object> consumidorEnderecoDict)
+		public string GerarSqlInsertPessoas(int index, Dictionary<string, object> pessoaDict, int pessoaID, Dictionary<string, object[]> pessoaFonesDict, Dictionary<string, object> consumidorDict, int consumidorID, Dictionary<string, object> consumidorEnderecoDict, Dictionary<string, object> funcionarioDict, Dictionary<string, object> enderecoDict)
 		{
 			var sql = new StringBuilder();
 
@@ -136,6 +136,40 @@ namespace Migracao.Utils
 				sql.AppendLine($"SELECT @ConsumidorID{index} = SCOPE_IDENTITY();");
 			}
 
+			else if (funcionarioDict != null)
+			{
+				sql.AppendLine("INSERT INTO Funcionarios (");
+
+				foreach (var key in funcionarioDict.Keys)
+					sql.Append($"{key}, ");
+
+				// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
+				sql.Remove(sql.Length - 2, 2).Append(", PessoaID) VALUES " + Environment.NewLine);
+
+				sql.Append('(');
+				foreach (var value in funcionarioDict.Values)
+				{
+					try
+					{
+						if (value == null)
+							sql.Append("NULL, ");
+						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
+							sql.Append("NULL, ");
+						else if (value is decimal)
+							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
+						else
+							sql.Append($"'{VerificarSeDateTime(value)}', ");
+					}
+					catch
+					{
+						sql.Append("NULL, ");
+					}
+				}
+				if (pessoaID <= 0)
+					sql.Remove(sql.Length - 2, 2).Append($", @PessoaID{index}); " + Environment.NewLine);
+				else
+					sql.Remove(sql.Length - 2, 2).Append($", {pessoaID}); " + Environment.NewLine);
+			}
 
 			if (pessoaFonesDict != null)
 			{
@@ -178,7 +212,6 @@ namespace Migracao.Utils
 				}
 			}
 
-
 			if (consumidorEnderecoDict != null)
 			{
 				sql.AppendLine("INSERT INTO ConsumidorEnderecos (");
@@ -214,8 +247,43 @@ namespace Migracao.Utils
 					sql.Remove(sql.Length - 2, 2).Append($", {consumidorID}); " + Environment.NewLine);
 			}
 
+			else if (enderecoDict != null)
+			{
+				sql.AppendLine("INSERT INTO Enderecos (");
+
+				foreach (var key in enderecoDict.Keys)
+					sql.Append($"{key}, ");
+
+				// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
+				sql.Remove(sql.Length - 2, 2).Append(", PessoaID) VALUES " + Environment.NewLine);
+
+				sql.Append('(');
+				foreach (var value in enderecoDict.Values)
+				{
+					try
+					{
+						if (value == null)
+							sql.Append("NULL, ");
+						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
+							sql.Append("NULL, ");
+						else if (value is decimal)
+							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
+						else
+							sql.Append($"'{VerificarSeDateTime(value)}', ");
+					}
+					catch
+					{
+						sql.Append("NULL, ");
+					}
+				}
+				if (pessoaID <= 0)
+					sql.Remove(sql.Length - 2, 2).Append($", @PessoaID{index}); " + Environment.NewLine);
+				else
+					sql.Remove(sql.Length - 2, 2).Append($", {pessoaID}); " + Environment.NewLine);
+			}
+
 			// Remove a última quebra de linha e vírgula e espaço e adiciona um ponto e vírgula
-			if (pessoaDict != null || pessoaFonesDict != null || consumidorDict != null || consumidorEnderecoDict != null)
+			if (pessoaDict != null || pessoaFonesDict != null || consumidorDict != null || consumidorEnderecoDict != null || funcionarioDict != null || enderecoDict != null)
 				sql.Remove(sql.Length - 4, 4).Append(';' + Environment.NewLine);
 
 			return sql.ToString();

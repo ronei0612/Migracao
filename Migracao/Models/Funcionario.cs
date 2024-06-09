@@ -3,7 +3,7 @@
     internal class Funcionario
     {
         public int ID { get; set; }
-        public required int PessoaID { get; set; }
+        public int PessoaID { get; set; }
         public string Matricula { get; set; }
         public System.DateTime DataAdmissao { get; set; }
         public System.DateTime DataDemissao { get; set; }

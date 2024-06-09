@@ -4,7 +4,7 @@
     {
 		public int ID { get; set; }
 		public required int TableID { get; set; }
-		public required int ParentID { get; set; }
+		public int ParentID { get; set; }
 		public required short EnderecoTipoID { get; set; }
 		public required int LogradouroTipoID { get; set; }
 		public required string Logradouro { get; set; }

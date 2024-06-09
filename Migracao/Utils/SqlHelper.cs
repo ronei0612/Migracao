@@ -60,233 +60,82 @@ namespace Migracao.Utils
 			File.WriteAllText(salvarArquivo + ".sql", sql.ToString());
 		}
 
+		private string FormatValue(object value)
+		{
+			//if (value == null || value.ToString().Equals("null", StringComparison.OrdinalIgnoreCase))
+			//	return "NULL";
+
+			//if (value is decimal)
+			//	return $"'{value.ToString().Replace(',', '.')}'";
+
+			//return $"'{value}'";
+
+			try
+			{
+				if (value == null)
+					return "NULL";
+				else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
+					return "NULL";
+				else if (value is decimal)
+					return $"'{value.ToString().Replace(',', '.')}'";
+				else
+					return $"'{VerificarSeDateTime(value)}'";
+			}
+			catch
+			{
+				return "NULL";
+			}
+		}
+
 		public string GerarSqlInsertPessoas(int index, Dictionary<string, object> pessoaDict, int pessoaID, Dictionary<string, object[]> pessoaFonesDict, Dictionary<string, object> consumidorDict, int consumidorID, Dictionary<string, object> consumidorEnderecoDict, Dictionary<string, object> funcionarioDict, Dictionary<string, object> enderecoDict)
 		{
 			var sql = new StringBuilder();
 
 			if (pessoaDict != null)
 			{
-				sql.AppendLine("INSERT INTO Pessoas (");
-
-				foreach (var key in pessoaDict.Keys)
-					sql.Append($"{key}, ");
-
-				// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
-				sql.Remove(sql.Length - 2, 2).Append(") VALUES " + Environment.NewLine);
-
-				sql.Append('(');
-				foreach (var value in pessoaDict.Values)
-				{
-					try
-					{
-						if (value == null)
-							sql.Append("NULL, ");
-						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
-							sql.Append("NULL, ");
-						else if (value is decimal)
-							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
-						else
-							sql.Append($"'{VerificarSeDateTime(value)}', ");
-					}
-					catch
-					{
-						sql.Append("NULL, ");
-					}
-				}
-				sql.Remove(sql.Length - 2, 2).Append("); " + Environment.NewLine);
-
-				// Obtendo ID da Pessoa inserida
+				sql.AppendLine($"INSERT INTO Pessoas ({string.Join(", ", pessoaDict.Keys)}) " +
+					$"VALUES ({string.Join(", ", pessoaDict.Values.Select(FormatValue))});");
 				sql.AppendLine($"DECLARE @PessoaID{index} int;");
 				sql.AppendLine($"SELECT @PessoaID{index} = SCOPE_IDENTITY();");
 			}
 
 			if (consumidorDict != null)
 			{
-				sql.AppendLine("INSERT INTO Consumidores (");
-
-				foreach (var key in consumidorDict.Keys)
-					sql.Append($"{key}, ");
-
-				// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
-				sql.Remove(sql.Length - 2, 2).Append(", PessoaID) VALUES " + Environment.NewLine);
-
-				sql.Append('(');
-				foreach (var value in consumidorDict.Values)
-				{
-					try
-					{
-						if (value == null)
-							sql.Append("NULL, ");
-						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
-							sql.Append("NULL, ");
-						else if (value is decimal)
-							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
-						else
-							sql.Append($"'{VerificarSeDateTime(value)}', ");
-					}
-					catch
-					{
-						sql.Append("NULL, ");
-					}
-				}
-				sql.Remove(sql.Length - 2, 2).Append($", @PessoaID{index}); " + Environment.NewLine);
-
-				// Obtendo ID da Pessoa inserida caso não tenha consumidor para adicionar endereço
+				sql.AppendLine($"INSERT INTO Consumidores ({string.Join(", ", consumidorDict.Keys)}, PessoaID) " +
+					$"VALUES ({string.Join(", ", consumidorDict.Values.Select(FormatValue))}, @PessoaID{index});");
 				sql.AppendLine($"DECLARE @ConsumidorID{index} int;");
 				sql.AppendLine($"SELECT @ConsumidorID{index} = SCOPE_IDENTITY();");
 			}
 
-			else if (funcionarioDict != null)
+			if (funcionarioDict != null)
 			{
-				sql.AppendLine("INSERT INTO Funcionarios (");
-
-				foreach (var key in funcionarioDict.Keys)
-					sql.Append($"{key}, ");
-
-				// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
-				sql.Remove(sql.Length - 2, 2).Append(", PessoaID) VALUES " + Environment.NewLine);
-
-				sql.Append('(');
-				foreach (var value in funcionarioDict.Values)
-				{
-					try
-					{
-						if (value == null)
-							sql.Append("NULL, ");
-						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
-							sql.Append("NULL, ");
-						else if (value is decimal)
-							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
-						else
-							sql.Append($"'{VerificarSeDateTime(value)}', ");
-					}
-					catch
-					{
-						sql.Append("NULL, ");
-					}
-				}
-				if (pessoaID <= 0)
-					sql.Remove(sql.Length - 2, 2).Append($", @PessoaID{index}); " + Environment.NewLine);
-				else
-					sql.Remove(sql.Length - 2, 2).Append($", {pessoaID}); " + Environment.NewLine);
+				sql.AppendLine($"INSERT INTO Funcionarios ({string.Join(", ", funcionarioDict.Keys)}, PessoaID) " +
+					$"VALUES ({string.Join(", ", funcionarioDict.Values.Select(FormatValue))}, {(pessoaID > 0 ? pessoaID.ToString() : $"@PessoaID{index}")});");
 			}
 
 			if (pessoaFonesDict != null)
 			{
-				sql.AppendLine("INSERT INTO PessoaFones (");
+				sql.AppendLine($"INSERT INTO PessoaFones ({string.Join(", ", pessoaFonesDict.Keys)}, PessoaID) VALUES (");
 
-				// Adiciona os nomes das colunas
-				foreach (var key in pessoaFonesDict.Keys)
-					sql.Append($"{key}, ");
+				foreach (var valueArray in pessoaFonesDict.Values)
+					sql.Append($"{FormatValue(valueArray[0])}, ");
 
-				// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
-				sql.Remove(sql.Length - 2, 2).Append(", PessoaID) VALUES " + Environment.NewLine);
-
-				// Adiciona os valores das colunas para cada linha
-				for (int i = 0; i < pessoaFonesDict.Values.First().Length; i++)
-				{
-					sql.Append('(');
-					foreach (var valueArray in pessoaFonesDict.Values)
-					{
-						try
-						{
-							if (valueArray[i] == null)
-								sql.Append($"NULL, ");
-							else if (valueArray[i].ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
-								sql.Append($"NULL, ");
-							else if (valueArray[i] is decimal)
-								sql.Append($"'{valueArray[i].ToString().Replace(',', '.')}', ");
-							else
-								sql.Append($"'{VerificarSeDateTime(valueArray[i])}', ");
-						}
-						catch
-						{
-							sql.Append($"NULL, ");
-						}
-					}
-
-					if (consumidorID <= 0)
-						sql.Remove(sql.Length - 2, 2).Append($", @PessoaID{index}); " + Environment.NewLine);
-					else
-						sql.Remove(sql.Length - 2, 2).Append($", {pessoaID}); " + Environment.NewLine);
-				}
+				sql.Append($"{(consumidorID > 0 ? consumidorID.ToString() : $"@PessoaID{index}")});");
 			}
 
 			if (consumidorEnderecoDict != null)
 			{
-				sql.AppendLine("INSERT INTO ConsumidorEnderecos (");
-
-				foreach (var key in consumidorEnderecoDict.Keys)
-					sql.Append($"{key}, ");
-
-				// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
-				sql.Remove(sql.Length - 2, 2).Append(", ConsumidorID) VALUES " + Environment.NewLine);
-
-				sql.Append('(');
-				foreach (var value in consumidorEnderecoDict.Values)
-				{
-					try
-					{
-						if (value == null)
-							sql.Append("NULL, ");
-						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
-							sql.Append("NULL, ");
-						else if (value is decimal)
-							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
-						else
-							sql.Append($"'{VerificarSeDateTime(value)}', ");
-					}
-					catch
-					{
-						sql.Append("NULL, ");
-					}
-				}
-				if (consumidorID <= 0)
-					sql.Remove(sql.Length - 2, 2).Append($", @ConsumidorID{index}); " + Environment.NewLine);
-				else
-					sql.Remove(sql.Length - 2, 2).Append($", {consumidorID}); " + Environment.NewLine);
+				sql.AppendLine($"INSERT INTO ConsumidorEnderecos ({string.Join(", ", consumidorEnderecoDict.Keys)}, ConsumidorID) " +
+					$"VALUES ({string.Join(", ", consumidorEnderecoDict.Values.Select(FormatValue))}, {(consumidorID > 0 ? consumidorID.ToString() : $"@ConsumidorID{index}")});");
 			}
 
-			else if (enderecoDict != null)
+			if (enderecoDict != null)
 			{
-				sql.AppendLine("INSERT INTO Enderecos (");
-
-				foreach (var key in enderecoDict.Keys)
-					sql.Append($"{key}, ");
-
-				// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
-				sql.Remove(sql.Length - 2, 2).Append(", PessoaID) VALUES " + Environment.NewLine);
-
-				sql.Append('(');
-				foreach (var value in enderecoDict.Values)
-				{
-					try
-					{
-						if (value == null)
-							sql.Append("NULL, ");
-						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
-							sql.Append("NULL, ");
-						else if (value is decimal)
-							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
-						else
-							sql.Append($"'{VerificarSeDateTime(value)}', ");
-					}
-					catch
-					{
-						sql.Append("NULL, ");
-					}
-				}
-				if (pessoaID <= 0)
-					sql.Remove(sql.Length - 2, 2).Append($", @PessoaID{index}); " + Environment.NewLine);
-				else
-					sql.Remove(sql.Length - 2, 2).Append($", {pessoaID}); " + Environment.NewLine);
+				sql.AppendLine($"INSERT INTO Enderecos ({string.Join(", ", enderecoDict.Keys)}, PessoaID) " +
+					$"VALUES ({string.Join(", ", enderecoDict.Values.Select(FormatValue))}, {(pessoaID > 0 ? pessoaID.ToString() : $"@PessoaID{index}")});");
 			}
 
-			// Remove a última quebra de linha e vírgula e espaço e adiciona um ponto e vírgula
-			if (pessoaDict != null || pessoaFonesDict != null || consumidorDict != null || consumidorEnderecoDict != null || funcionarioDict != null || enderecoDict != null)
-				sql.Remove(sql.Length - 4, 4).Append(';' + Environment.NewLine);
-
-			return sql.ToString();
+			return sql.ToString().TrimEnd(';');
 		}
 
 		public string GerarSqlInsertRecebiveis(int index, Dictionary<string, object> recebivelDict, Dictionary<string, object> fluxoCaixaDict)//Dictionary<string, object[]> fluxoCaixasDict)

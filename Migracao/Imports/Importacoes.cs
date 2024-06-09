@@ -105,7 +105,7 @@ namespace Migracao.Imports
 
 
 
-		public void ImportarPessoas(string arquivoExcel, string arquivoPessoasAtuais, int estabelecimentoID, int loginID)
+		public void ImportarPessoas(string arquivoExcel, int estabelecimentoID, int loginID)
 		{
 			var indiceLinha = 1;
 			string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "";
@@ -877,7 +877,7 @@ namespace Migracao.Imports
 			}
 		}
 
-		public void ImportarRecebiveis(string arquivoExcel, string arquivoExcelRecebiveisProd, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
+		public void ImportarRecebiveis(string arquivoExcel, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
 		{
 			var dataHoje = DateTime.Now;
 			var indiceLinha = 0;
@@ -885,18 +885,6 @@ namespace Migracao.Imports
 			var excelHelper = new ExcelHelper(arquivoExcel);
 			var sqlHelper = new SqlHelper();
 			List<string> linhasSql = new();
-
-			//ISheet sheetConsumidores;
-			//try
-			//{
-			//	IWorkbook workbookConsumidores = excelHelper.LerExcel(arquivoExcelRecebiveisProd);
-			//	sheetConsumidores = workbookConsumidores.GetSheetAt(0);
-			//	excelHelper.InitializeDictionaryRecebiveis(sheetConsumidores);
-			//}
-			//catch (Exception ex)
-			//{
-			//	throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelRecebiveisProd}\": {ex.Message}");
-			//}
 
 			FluxoCaixa fluxoCaixa = null;
 			Recebivel recebivel = null;

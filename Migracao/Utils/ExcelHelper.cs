@@ -24,6 +24,7 @@ namespace Migracao.Utils
 		public static Dictionary<string, string> nomeFuncionarioDict = new Dictionary<string, string>();
 
 		private Dictionary<string, string> cidadeDict = new Dictionary<string, string>();
+		private Dictionary<string, string> cepEstadoDict = new Dictionary<string, string>();
 		private Dictionary<string, string> cidadeEstadoDict = new Dictionary<string, string>();
 
 		private Dictionary<string, string> cpfKeyDict = new Dictionary<string, string>();
@@ -419,6 +420,7 @@ namespace Migracao.Utils
 			int cidadeIdColumnIndex = GetColumnIndex(headerRow, "id");
 			int cidadeColumnIndex = GetColumnIndex(headerRow, "nome");
 			int estadoColumnIndex = GetColumnIndex(headerRow, "estado");
+			int cepColumnIndex = GetColumnIndex(headerRow, "cep");
 
 			for (int row = 1; row <= sheet.LastRowNum; row++)
 			{
@@ -427,10 +429,18 @@ namespace Migracao.Utils
 					string cidadeIdCellValue = sheet.GetRow(row).GetCell(cidadeIdColumnIndex) != null ? sheet.GetRow(row).GetCell(cidadeIdColumnIndex).ToString() : "";
 					string cidadeCellValue = sheet.GetRow(row).GetCell(cidadeColumnIndex) != null ? sheet.GetRow(row).GetCell(cidadeColumnIndex).ToString() : "";
 					string estadoCellValue = sheet.GetRow(row).GetCell(estadoColumnIndex) != null ? sheet.GetRow(row).GetCell(estadoColumnIndex).ToString() : "";
+					string cepCellValue = sheet.GetRow(row).GetCell(cepColumnIndex) != null ? sheet.GetRow(row).GetCell(cepColumnIndex).ToString() : "";
 
 					string key = Tools.RemoverAcentos(cidadeCellValue).ToLower() + "|" + estadoCellValue.ToLower();
 					if (!cidadeEstadoDict.ContainsKey(key))
 						cidadeEstadoDict.Add(key, cidadeIdCellValue);
+
+					if (cepCellValue != "0" && !string.IsNullOrEmpty(cepCellValue))
+					{
+						key = cepCellValue + "|" + estadoCellValue.ToLower();
+						if (!cepEstadoDict.ContainsKey(key))
+							cepEstadoDict.Add(key, cidadeIdCellValue);
+					}
 				}
 			}
 		}
@@ -507,12 +517,22 @@ namespace Migracao.Utils
 			return false;
 		}
 
-		public int GetCidadeID(string cidade, string estado)
+		public int GetCidadeID(string cidade, string estado, int cep = 0)
 		{
 			cidade = Tools.RemoverAcentos(cidade).ToLower();
 
 			if (!string.IsNullOrWhiteSpace(cidade))
             {
+				string key = "";
+
+				if (!string.IsNullOrEmpty(estado) && cep > 0) {
+					string cepFormat = cep.ToString().Substring(0, 5) + "000";
+
+					key = cepFormat + "|" + estado.ToLower();
+					if (cepEstadoDict.ContainsKey(key))
+						return int.Parse(cepEstadoDict[key]);
+				}
+
 				if (string.IsNullOrEmpty(estado))
 				{
 					if (cidadeDict.ContainsKey(cidade))
@@ -521,7 +541,7 @@ namespace Migracao.Utils
 						return 0;
 				}
 
-				string key = cidade + "|" + estado.ToLower();
+				key = cidade + "|" + estado.ToLower();
                 if (cidadeEstadoDict.ContainsKey(key))
                     return int.Parse(cidadeEstadoDict[key]);
 

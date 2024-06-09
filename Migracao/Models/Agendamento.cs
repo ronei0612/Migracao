@@ -5,7 +5,7 @@
 		public int ID { get; set; }
 		public short AgendaTipoID { get; set; }
 		public short AtendeTipoID { get; set; }
-		public string Titulo { get; set; }
+		public string? Titulo { get; set; }
 		public string Descricao { get; set; }
 		public DateTime DataInicio { get; set; }
 		public DateTime DataTermino { get; set; }
@@ -19,7 +19,7 @@
 		public DateTime DataRealizado { get; set; }
 		public int PessoaID { get; set; }
 		public int ClienteID { get; set; }
-		public int ConsumidorID { get; set; }
+		public int? ConsumidorID { get; set; }
 		public int ContatoEmpresaID { get; set; }
 		public int ConsumidorPessoaID { get; set; }
 		public string ConsumidorPessoaNome { get; set; }
@@ -29,7 +29,7 @@
 		public bool ConsumidorPessoaFone2SMS { get; set; }
 		public int ConvenioID { get; set; }
 		public decimal AtendimentoValor { get; set; }
-		public int FuncionarioID { get; set; }
+		public int? FuncionarioID { get; set; }
 		public int EstabelecimentoID { get; set; }
 		public int EmpresaID { get; set; }
 		public int SecretariaID { get; set; }

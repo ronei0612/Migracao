@@ -591,8 +591,6 @@ namespace Migracao.Utils
 			if (string.IsNullOrWhiteSpace(cpf) && string.IsNullOrWhiteSpace(nomeCompleto))
 				return "";
 
-			nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
-
 			if (!string.IsNullOrWhiteSpace(cpf))
 			{
 				cpf = cpf.Replace(".", "").Replace("-", "");
@@ -602,14 +600,19 @@ namespace Migracao.Utils
 
 			if (!string.IsNullOrWhiteSpace(nomeCompleto) && !string.IsNullOrWhiteSpace(codigo))
 			{
+				nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
+
 				string key = nomeCompleto + "|" + codigo;
 				if (nomeCodConsumidorDict.ContainsKey(key))
 					return nomeCodConsumidorDict[key];
 			}
 
 			if (!string.IsNullOrWhiteSpace(nomeCompleto))
+			{
+				nomeCompleto = Tools.RemoverAcentos(nomeCompleto).ToLower();
 				if (nomeConsumidorDict.ContainsKey(nomeCompleto))
 					return nomeConsumidorDict[nomeCompleto];
+			}
 
             return "";
         }

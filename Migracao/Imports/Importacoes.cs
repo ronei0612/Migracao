@@ -1,4 +1,5 @@
 ﻿using Migracao.Models;
+using Migracao.Sistems;
 using Migracao.Utils;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
@@ -543,7 +544,7 @@ namespace Migracao.Imports
 			}
 		}
 
-		public void ImportarAgenda(string arquivoExcel, int estabelecimentoID, string arquivoExcelAgenda, int loginID)
+		public void ImportarAgenda(string arquivoExcel, int estabelecimentoID, string arquivoExcelAgenda, int loginID, int dentistaPessoaID)
 		{
 			var dataHoje = DateTime.Now;
 			var indiceLinha = 0;
@@ -574,15 +575,15 @@ namespace Migracao.Imports
 				{
 					indiceLinha++;
 
-					string nomeCompleto = "", cpf = "", dentistaResponsavel = "";
+					string cpf = "", dentistaResponsavel = "";
 					bool faltou = false;
-					string? titulo = null, observacoes = null, documento = null;
+					string? titulo = null, observacoes = null, documento = null, nomeCompleto = null;
 					int recibo = 0, codigo = 0;
 					int? consumidorID = null, fornecedorID = null, colaboradorID = null, funcionarioID = null, clienteID = null, pessoaID = null;
 					decimal pagoValor = 0, valor = 0;
 					long? telefone = null;
 					byte formaPagamento = (byte)TitulosEspeciesID.DepositoEmConta;
-					DateTime dataConsulta = dataHoje, dataInclusao = dataHoje;
+					DateTime dataInicioConsulta = dataHoje, dataInclusao = dataHoje, dataTerminoConsulta = dataHoje;
 
 					foreach (var celula in linha.Cells)
 					{
@@ -599,22 +600,25 @@ namespace Migracao.Imports
 									case "CPF":
 										cpf = celulaValor.ToCPF();
 										break;
-									case "NomeCompleto":
-										nomeCompleto = celulaValor;
+									case "Nome Completo":
+										nomeCompleto = celulaValor.ToNome();
 										break;
 									case "Telefone":
 										telefone = celulaValor.ToFone();
 										break;
-									case "DataHoraConsulta(01/12/2024 00:00)":
-										dataConsulta = celulaValor.ToData();
+									case "Data Início (01/12/2024 00:00)":
+										dataInicioConsulta = celulaValor.ToData();
+										break;
+									case "Data Término (01/12/2024 00:00)":
+										dataTerminoConsulta = celulaValor.ToData();
 										break;
 									case "NomeCompletoDentista":
-										dentistaResponsavel = celulaValor;
+										dentistaResponsavel = celulaValor.ToNome();
 										break;
 									case "Observacao":
 										observacoes = celulaValor;
 										break;
-									case "DataInclusao(01/12/2024)":
+									case "Data Inclusão (01/12/2024)":
 										dataInclusao = celulaValor.ToData();
 										break;
 								}
@@ -622,43 +626,52 @@ namespace Migracao.Imports
 						}
 					}
 
-					if (dataConsulta == dataHoje)
-						dataConsulta = dataInclusao;
+					if (dataInicioConsulta == dataHoje)
+						dataInicioConsulta = dataInclusao;
+					if (dataTerminoConsulta == dataHoje)
+						dataTerminoConsulta = dataInicioConsulta.AddMinutes(15);
 
 					var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: cpf, codigo: codigo.ToString());
-					var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: dentistaResponsavel);
+					//var pessoaIDValue = excelHelper.GetPessoaID(nomeCompleto: dentistaResponsavel);
 					var funcionarioIDValue = excelHelper.GetFuncionarioID(nomeCompleto: dentistaResponsavel);
 
 					if (!string.IsNullOrEmpty(consumidorIDValue))
+					{
 						consumidorID = int.Parse(consumidorIDValue);
-					if (!string.IsNullOrEmpty(pessoaIDValue))
-						pessoaID = int.Parse(pessoaIDValue);
+						nomeCompleto = "";
+					}
+					//if (!string.IsNullOrEmpty(pessoaIDValue))
+					//	pessoaID = int.Parse(pessoaIDValue);
 					if (!string.IsNullOrEmpty(funcionarioIDValue))
 						funcionarioID = int.Parse(funcionarioIDValue);
 					else
+					{
+						funcionarioID = dentistaPessoaID;
 						titulo = nomeCompleto;
+					}
 
-					if (!excelHelper.AgendamentoExists(nomeCompleto, dataConsulta, consumidorID))
+					if (!excelHelper.AgendamentoExists(nomeCompleto, dataInicioConsulta, consumidorID))
 					{
 						if (telefone == null)
 							telefone = 0;
 
-						if (!string.IsNullOrEmpty(funcionarioIDValue) && !string.IsNullOrEmpty(consumidorIDValue) && !string.IsNullOrEmpty(pessoaIDValue))
+						//if (!string.IsNullOrEmpty(funcionarioIDValue) && !string.IsNullOrEmpty(consumidorIDValue) && !string.IsNullOrEmpty(pessoaIDValue))
 							agendamentos.Add(new Agendamento()
 							{
 								LoginID = loginID,
 								EstabelecimentoID = estabelecimentoID,
 								AtendeTipoID = 1,
-								DataInicio = dataConsulta,
-								DataTermino = dataConsulta.AddMinutes(15),
-								ConsumidorID = (int)consumidorID,
+								DataInicio = dataInicioConsulta,
+								DataTermino = dataTerminoConsulta,
+								ConsumidorID = consumidorID,
 								ConsumidorPessoaNome = nomeCompleto,
 								Titulo = titulo,
-								FuncionarioID = (int)funcionarioID,
+								FuncionarioID = funcionarioID,
 								DataInclusao = dataInclusao,
 								ConsumidorPessoaFone1 = (long)telefone,
 								Descricao = observacoes,
-								PessoaID = (int)pessoaID
+								PessoaID = 2
+
 								//ConsumidorPessoaID = (int)pessoaID,
 								//DataCancelamento = ,
 								//

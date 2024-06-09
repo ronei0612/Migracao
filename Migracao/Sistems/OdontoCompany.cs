@@ -23,7 +23,7 @@ namespace Migracao.Sistems
 		List<string> cabecalhos_Procedimentos	= ["Nome Tabela", "Ativo(S/N)", "Procedimento(Nome)", "Abreviação", "Especialidade", "Especialidade Código", "Preço", "TUSS", "Diagnóstico(S/N)", "Prevenção(S/N)", "Odontopediatria(S/N)", "Dentística(S/N)", "Endodontia(S/N)", "Periodontia(S/N)", "Prótese(S/N)", "Cirurgia(S/N)", "Ortodontia(S/N)", "Radiologia(S/N)", "Estética(S/N)", "Implantodontia(S/N)", "Odontogeriatria(S/N)", "DTM(S/N)", "Orofacial(S/N)", ];
 		List<string> cabecalhos_CodProcedimentos = ["ID", "Nome", "Usuário"];
 
-		//Dictionary<string, string> pessoaCSVDict;
+		//public static Dictionary<string, string> pessoaCSVDict;
 
 		public Tuple<List<string[]>, List<string>> LerArquivosExcelCsv(string arquivo, Encoding encoding)
 		{
@@ -365,7 +365,7 @@ namespace Migracao.Sistems
 						var cro = valoresLinha.GetValueOrDefault("CRO").Trim();
 						var modificado = valoresLinha.GetValueOrDefault("MODIFICADO").Trim();
 
-						//pessoaCSVDict.Add("dentista|" + nome, codigo);
+						//pessoaCSVDict.Add("dentista|" + nome, nome.ToNome());
 
 						dataRow["Código"] = codigo.ToNum();
 						dataRow["Ativo(S/N)"] = "S";

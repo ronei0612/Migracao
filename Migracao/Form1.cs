@@ -1,4 +1,5 @@
 using Migracao.Imports;
+using Migracao.Models;
 using Migracao.Sistems;
 using Migracao.Utils;
 using System.Windows.Forms;
@@ -104,7 +105,7 @@ namespace Migracao
 							importacoes.ImportarPrecos(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text), txtReferencia.Text);
 
 						else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
-							importacoes.ImportarAgenda(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), txtReferencia.Text, int.Parse(txtLoginID.Text));
+							importacoes.ImportarAgenda(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), txtReferencia.Text, int.Parse(txtLoginID.Text), int.Parse(txtPessoaID.Text));
 					}
 				}
 				catch (Exception ex)
@@ -195,6 +196,8 @@ namespace Migracao
 
 		void AlterarNomesCampos()
 		{
+			txtPessoaID.Text = "PessoaID RespFin:";
+
 			if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
 			{
 				lbExcel2.Text = "Recebíveis (Prod):";
@@ -207,7 +210,10 @@ namespace Migracao
 			//	lbReferencia.Text = "Recebíveis (Prod):";
 
 			else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
+			{
 				lbReferencia.Text = "Agendamentos (Prod):";
+				txtPessoaID.Text = "FuncionarioID Dent:";
+			}
 			//|| comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
 			//|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
 
@@ -274,7 +280,7 @@ namespace Migracao
 								btnExcel2.Visible = true;
 							}
 
-							if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
+							if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase) || comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
 							{
 								lbPessoaID.Visible = true;
 								txtPessoaID.Visible = true;

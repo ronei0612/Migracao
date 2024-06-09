@@ -93,11 +93,11 @@
 			// lbPessoaID
 			// 
 			lbPessoaID.AutoSize = true;
-			lbPessoaID.Location = new Point(449, 125);
+			lbPessoaID.Location = new Point(463, 125);
 			lbPessoaID.Name = "lbPessoaID";
-			lbPessoaID.Size = new Size(104, 15);
+			lbPessoaID.Size = new Size(88, 15);
 			lbPessoaID.TabIndex = 4;
-			lbPessoaID.Text = "PessoaID Resp Fin:";
+			lbPessoaID.Text = "PessoaID RespFin:";
 			lbPessoaID.Visible = false;
 			// 
 			// openFileDialog1

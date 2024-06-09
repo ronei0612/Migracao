@@ -91,14 +91,8 @@ namespace Migracao
 					{
 						var importacoes = new Importacoes();
 
-						//if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
-							//importacoes.ImportarPacientes(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
-
 						if (comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase))
 							importacoes.ImportarFornecedores(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
-
-						else if (comboBoxImportacao.Text.Equals("funcionarios", StringComparison.CurrentCultureIgnoreCase))
-							importacoes.ImportarFuncionarios(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
 
 						else if (comboBoxImportacao.Text.Equals("pessoas", StringComparison.CurrentCultureIgnoreCase))
 							importacoes.ImportarPessoas(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
@@ -106,20 +100,12 @@ namespace Migracao
 						else if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
 							importacoes.ImportarRecebiveis(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
 
-						//else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
-							//importacoes.ImportarRecebidos(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text), txtExcel2.Text, txtReferencia.Text);
-
-						//else if (comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
-							//importacoes.ImportarPrecosTabelas(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text), txtReferencia.Text);
-
-						else if (comboBoxImportacao.Text.Equals("preços procedimentos", StringComparison.CurrentCultureIgnoreCase) || comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
+						else if (comboBoxImportacao.Text.Equals("preços", StringComparison.CurrentCultureIgnoreCase))
 							importacoes.ImportarPrecos(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text), txtReferencia.Text);
 
 						else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
 							importacoes.ImportarAgenda(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), txtReferencia.Text, int.Parse(txtLoginID.Text));
 					}
-
-					//txtPessoas.Text = "";
 				}
 				catch (Exception ex)
 				{
@@ -491,6 +477,7 @@ namespace Migracao
 				}
 				catch (Exception ex)
 				{
+					txtPessoas.Text = "";
 					MessageBox.Show(ex.Message, "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				}
 		}
@@ -511,6 +498,7 @@ namespace Migracao
 				}
 				catch (Exception ex)
 				{
+					txtRecebiveis.Text = "";
 					MessageBox.Show(ex.Message, "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				}
 		}

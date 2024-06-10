@@ -114,6 +114,8 @@ namespace Migracao.Imports
 			var excelHelper = new ExcelHelper(arquivoExcel);
 			var sqlHelper = new SqlHelper();
 			List<string> linhasSql = new();
+			linhasSql.Add("DECLARE @PessoaID int;");
+			linhasSql.Add("DECLARE @ConsumidorID int;");
 
 			if (File.Exists(arquivoExcelCidades))
 				try

@@ -62,14 +62,6 @@ namespace Migracao.Utils
 
 		private string FormatValue(object value)
 		{
-			//if (value == null || value.ToString().Equals("null", StringComparison.OrdinalIgnoreCase))
-			//	return "NULL";
-
-			//if (value is decimal)
-			//	return $"'{value.ToString().Replace(',', '.')}'";
-
-			//return $"'{value}'";
-
 			try
 			{
 				if (value == null)
@@ -94,45 +86,45 @@ namespace Migracao.Utils
 			if (pessoaDict != null)
 			{
 				sql.AppendLine($"INSERT INTO Pessoas ({string.Join(", ", pessoaDict.Keys)}) " +
-					$"VALUES ({string.Join(", ", pessoaDict.Values.Select(FormatValue))});");
-				sql.AppendLine($"DECLARE @PessoaID{index} int;");
-				sql.AppendLine($"SELECT @PessoaID{index} = SCOPE_IDENTITY();");
+					$"{Environment.NewLine}    VALUES ({string.Join(", ", pessoaDict.Values.Select(FormatValue))});");
+				sql.AppendLine($"SET @PessoaID = NULL;");
+				sql.AppendLine($"SELECT @PessoaID = SCOPE_IDENTITY();");
 			}
 
 			if (consumidorDict != null)
 			{
 				sql.AppendLine($"INSERT INTO Consumidores ({string.Join(", ", consumidorDict.Keys)}, PessoaID) " +
-					$"VALUES ({string.Join(", ", consumidorDict.Values.Select(FormatValue))}, {(pessoaID > 0 ? pessoaID.ToString() : $"@PessoaID{index}")});");
-				sql.AppendLine($"DECLARE @ConsumidorID{index} int;");
-				sql.AppendLine($"SELECT @ConsumidorID{index} = SCOPE_IDENTITY();");
+					$"{Environment.NewLine}    VALUES ({string.Join(", ", consumidorDict.Values.Select(FormatValue))}, {(pessoaID > 0 ? pessoaID.ToString() : $"@PessoaID")});");
+				sql.AppendLine($"SET @ConsumidorID = NULL;");
+				sql.AppendLine($"SELECT @ConsumidorID = SCOPE_IDENTITY();");
 			}
 
 			if (funcionarioDict != null)
 			{
 				sql.AppendLine($"INSERT INTO Funcionarios ({string.Join(", ", funcionarioDict.Keys)}, PessoaID) " +
-					$"VALUES ({string.Join(", ", funcionarioDict.Values.Select(FormatValue))}, {(pessoaID > 0 ? pessoaID.ToString() : $"@PessoaID{index}")});");
+					$"{Environment.NewLine}    VALUES ({string.Join(", ", funcionarioDict.Values.Select(FormatValue))}, {(pessoaID > 0 ? pessoaID.ToString() : $"@PessoaID")});");
 			}
 
 			if (pessoaFonesDict != null)
 			{
-				sql.AppendLine($"INSERT INTO PessoaFones ({string.Join(", ", pessoaFonesDict.Keys)}, PessoaID) VALUES (");
+				sql.AppendLine($"INSERT INTO PessoaFones ({string.Join(", ", pessoaFonesDict.Keys)}, PessoaID){Environment.NewLine}    VALUES (");
 
 				foreach (var valueArray in pessoaFonesDict.Values)
 					sql.Append($"{FormatValue(valueArray[0])}, ");
 
-				sql.Append($"{(consumidorID > 0 ? consumidorID.ToString() : $"@PessoaID{index}")});");
+				sql.Append($"{(consumidorID > 0 ? consumidorID.ToString() : $"@PessoaID")});");
 			}
 
 			if (consumidorEnderecoDict != null)
 			{
 				sql.AppendLine($"INSERT INTO ConsumidorEnderecos ({string.Join(", ", consumidorEnderecoDict.Keys)}, ConsumidorID) " +
-					$"VALUES ({string.Join(", ", consumidorEnderecoDict.Values.Select(FormatValue))}, {(consumidorID > 0 ? consumidorID.ToString() : $"@ConsumidorID{index}")});");
+					$"{Environment.NewLine}    VALUES ({string.Join(", ", consumidorEnderecoDict.Values.Select(FormatValue))}, {(consumidorID > 0 ? consumidorID.ToString() : $"@ConsumidorID")});");
 			}
 
 			if (enderecoDict != null)
 			{
 				sql.AppendLine($"INSERT INTO Enderecos ({string.Join(", ", enderecoDict.Keys)}, PessoaID) " +
-					$"VALUES ({string.Join(", ", enderecoDict.Values.Select(FormatValue))}, {(pessoaID > 0 ? pessoaID.ToString() : $"@PessoaID{index}")});");
+					$"{Environment.NewLine}    VALUES ({string.Join(", ", enderecoDict.Values.Select(FormatValue))}, {(pessoaID > 0 ? pessoaID.ToString() : $"@PessoaID")});");
 			}
 
 			return sql.ToString().TrimEnd(';');
@@ -141,7 +133,6 @@ namespace Migracao.Utils
 		public string GerarSqlInsertRecebiveis(int index, Dictionary<string, object> recebivelDict, Dictionary<string, object> fluxoCaixaDict)
 		{
 			var sql = new StringBuilder();
-			//sql.AppendLine($"DECLARE @RecebivelID int;");
 
 			if (recebivelDict != null)
 			{

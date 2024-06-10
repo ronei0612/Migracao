@@ -144,114 +144,19 @@ namespace Migracao.Utils
 
 			if (recebivelDict != null)
 			{
-				sql.AppendLine("INSERT INTO Recebiveis (");
-
-				foreach (var key in recebivelDict.Keys)
-					sql.Append($"{key}, ");
-
-				// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
-				sql.Remove(sql.Length - 2, 2).Append(") VALUES " + Environment.NewLine);
-
-				sql.Append('(');
-				foreach (var value in recebivelDict.Values)
-				{
-					try
-					{
-						if (value == null)
-							sql.Append("NULL, ");
-						else if (value.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
-							sql.Append("NULL, ");
-						else if (value is decimal)
-							sql.Append($"'{value.ToString().Replace(',', '.')}', ");
-						else
-							sql.Append($"'{VerificarSeDateTime(value)}', ");
-					}
-					catch
-					{
-						sql.Append("NULL, ");
-					}
-				}
-				sql.Remove(sql.Length - 2, 2).Append("); " + Environment.NewLine);
-
-				// Obtendo ID da Recebivel inserido
+				sql.AppendLine($"INSERT INTO Recebiveis ({string.Join(", ", recebivelDict.Keys)}) " +
+					$"VALUES ({string.Join(", ", recebivelDict.Values.Select(FormatValue))});");
 				sql.AppendLine($"DECLARE @RecebivelID{index} int;");
 				sql.AppendLine($"SELECT @RecebivelID{index} = SCOPE_IDENTITY();");
 			}
 
 			if (fluxoCaixaDict != null)
 			{
-				sql.AppendLine("INSERT INTO FluxoCaixa (");
-
-				// Adiciona os nomes das colunas
-				foreach (var key in fluxoCaixaDict.Keys)
-					sql.Append($"{key}, ");
-
-				// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
-				sql.Remove(sql.Length - 2, 2).Append(", RecebivelID) VALUES " + Environment.NewLine);
-
-				// Adiciona os valores das colunas para cada linha
-				sql.Append('(');
-				foreach (var valueArray in fluxoCaixaDict.Values)
-				{
-					try
-					{
-						if (valueArray == null)
-							sql.Append($"NULL, ");
-						else if (valueArray.ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
-							sql.Append($"NULL, ");
-						else if (valueArray is decimal)
-							sql.Append($"'{valueArray.ToString().Replace(',', '.')}', ");
-						else
-							sql.Append($"'{VerificarSeDateTime(valueArray)}', ");
-					}
-					catch
-					{
-						sql.Append($"NULL, ");
-					}
-				}
-
-				sql.Remove(sql.Length - 2, 2).Append($", @RecebivelID{index}); " + Environment.NewLine);
+				sql.AppendLine($"INSERT INTO FluxoCaixa ({string.Join(", ", fluxoCaixaDict.Keys)}, RecebivelID) " +
+					$"VALUES ({string.Join(", ", fluxoCaixaDict.Values.Select(FormatValue))}, {$"@RecebivelID{index}"});");
 			}
 
-			// Remove a última quebra de linha e vírgula e espaço e adiciona um ponto e vírgula
-			sql.Remove(sql.Length - 4, 4).Append(';' + Environment.NewLine);
-
 			return sql.ToString();
-
-			//if (fluxoCaixasDict != null)
-			//{
-			//	sql.AppendLine("INSERT INTO FluxoCaixa (");
-
-			//	// Adiciona os nomes das colunas
-			//	foreach (var key in fluxoCaixasDict.Keys)
-			//		sql.Append($"{key}, ");
-
-			//	// Remove a última vírgula e espaço e adiciona um parêntese de fechamento e a palavra VALUES
-			//	sql.Remove(sql.Length - 2, 2).Append(", RecebivelID) VALUES " + Environment.NewLine);
-
-			//	// Adiciona os valores das colunas para cada linha
-			//	for (int i = 0; i < fluxoCaixasDict.Values.First().Length; i++)
-			//	{
-			//		sql.Append('(');
-			//		foreach (var valueArray in fluxoCaixasDict.Values)
-			//		{
-			//			try
-			//			{
-			//				if (valueArray[i] == null)
-			//					sql.Append($"NULL, ");
-			//				else if (valueArray[i].ToString().Equals("null", StringComparison.CurrentCultureIgnoreCase))
-			//					sql.Append($"NULL, ");
-			//				else if (valueArray[i] is decimal)
-			//					sql.Append($"'{valueArray[i].ToString().Replace(',', '.')}', ");
-			//				else
-			//					sql.Append($"'{VerificarSeDateTime(valueArray[i])}', ");
-			//			}
-			//			catch
-			//			{
-			//				sql.Append($"NULL, ");
-			//			}
-			//		}
-			//	}
 		}
 
 		public string GerarSqlInsertPrecos(int index, Dictionary<string, object> tabelaDict, long tabelaID, Dictionary<string, object> precoDict)

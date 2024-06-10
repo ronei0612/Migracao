@@ -144,16 +144,16 @@ namespace Migracao.Utils
 
 			if (recebivelDict != null)
 			{
-				sql.AppendLine($"INSERT INTO Recebiveis ({string.Join(", ", recebivelDict.Keys)}) ");
-				sql.AppendLine($"VALUES ({string.Join(", ", recebivelDict.Values.Select(FormatValue))});");
+				sql.AppendLine($"INSERT INTO Recebiveis ({string.Join(", ", recebivelDict.Keys)}) " +
+					$"VALUES ({string.Join(", ", recebivelDict.Values.Select(FormatValue))});");
 				sql.AppendLine($"DECLARE @RecebivelID{index} int;");
 				sql.AppendLine($"SELECT @RecebivelID{index} = SCOPE_IDENTITY();");
 			}
 
 			if (fluxoCaixaDict != null)
 			{
-				sql.AppendLine($"INSERT INTO FluxoCaixa ({string.Join(", ", fluxoCaixaDict.Keys)}, RecebivelID) " +
-				sql.AppendLine($"VALUES ({string.Join(", ", fluxoCaixaDict.Values.Select(FormatValue))}, {$"@RecebivelID{index}"});"));
+				sql.AppendLine($"INSERT INTO FluxoCaixa ({string.Join(", ", fluxoCaixaDict.Keys)}, RecebivelID) " + 
+					$"VALUES ({string.Join(", ", fluxoCaixaDict.Values.Select(FormatValue))}, {$"@RecebivelID{index}"});");
 			}
 
 			return sql.ToString().TrimEnd(';');

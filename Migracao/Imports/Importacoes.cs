@@ -143,7 +143,6 @@ namespace Migracao.Imports
 						 complemento = null, bairro = null, logradouroNum = null, numcadastro = null, cidade = "", estado = null, observacao = null;
 					LogradouroTipos logradouroTipo = LogradouroTipos.Outros;
 
-
 					foreach (var celula in linha.Cells)
 					{
 						if (celula != null)
@@ -738,8 +737,6 @@ namespace Migracao.Imports
 				{ "OUTROS", ProcedimentosCategoriasID.Outros }
 			};
 
-			PrecosTabela? precoTabela = null;
-			Preco? preco = null;
 			ISheet? sheet = null;
 
 			if (!string.IsNullOrEmpty(arquivoTabelaPrecosAtuais))
@@ -804,6 +801,8 @@ namespace Migracao.Imports
 						}
 					}
 
+					PrecosTabela? precoTabela = null;
+					Preco? preco = null;
 
 					if (!excelHelper.ExisteTexto(sheet, "Titulo", titulo))
 					{
@@ -897,9 +896,8 @@ namespace Migracao.Imports
 			var excelHelper = new ExcelHelper(arquivoExcel);
 			var sqlHelper = new SqlHelper();
 			List<string> linhasSql = new();
-
-			FluxoCaixa fluxoCaixa = null;
-			Recebivel recebivel = null;
+			List<FluxoCaixa> fluxoCaixas = new();
+			List<Recebivel> recebiveis = new();
 
 			try
 			{
@@ -914,7 +912,8 @@ namespace Migracao.Imports
 					decimal pagoValor = 0, valorOriginal = 0, valorDevido = 0;
 					bool isrecebivel = false, isbaixa = false;
 					byte formaPagamento = (byte)TitulosEspeciesID.DepositoEmConta;
-					DateTime dataPagamento = dataHoje, nascimentoData = dataHoje, dataVencimento = dataHoje, dataInclusao = dataHoje, dataBaixa = dataHoje;
+					DateTime dataBaseCalculo = dataHoje, nascimentoData = dataHoje, dataVencimento = dataHoje, dataInclusao = dataHoje;
+					DateTime? dataBaixa = dataHoje;
 
 					foreach (var celula in linha.Cells)
 					{
@@ -970,10 +969,15 @@ namespace Migracao.Imports
 					if (cpf == "345.781.969-68")
 						cpf = cpf;
 
+					FluxoCaixa fluxoCaixa = null;
+					Recebivel recebivel = null;
+
 					if (isrecebivel)
 					{
 						if (dataVencimento == dataHoje)
 							dataVencimento = new DateTime(dataInclusao.Year, dataVencimento.Month, dataVencimento.Day);
+
+						dataBaseCalculo = dataVencimento;
 
 						var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: cpf, codigo: codigo.ToString());
 						//var consumidorIDValue = excelHelper.GetConsumidorID(cpf: cpf);
@@ -989,10 +993,21 @@ namespace Migracao.Imports
 						else
 							outroSacadoNome = cpf;
 
+						if (consumidorID == 18305574 && valorOriginal.ToString() == "300,00")
+							consumidorID = consumidorID;
+
 						if (!string.IsNullOrEmpty(consumidorIDValue))
 						{
-							if (!excelHelper.RecebivelExists((int)consumidorID, valorOriginal, dataVencimento))
+							if (!excelHelper.RecebivelExists((int)consumidorID, valorOriginal, dataVencimento, pagoValor, dataBaixa))
 							{
+								if (pagoValor < 1)
+								{
+									pagoValor = 0;
+									dataBaixa = null;
+								}
+								else
+									dataBaseCalculo = (DateTime)dataBaixa;
+
 								if (valorOriginal >= 1)
 									recebivel = new Recebivel()
 									{
@@ -1005,7 +1020,7 @@ namespace Migracao.Imports
 										DataEmissao = dataInclusao,
 										ValorOriginal = valorOriginal,
 										ValorDevido = valorDevido,
-										DataBaseCalculo = dataInclusao,
+										DataBaseCalculo = dataBaseCalculo,
 										DataInclusao = dataInclusao,
 										DataVencimento = dataVencimento,
 										FinanceiroID = respFinanceiroPessoaID,
@@ -1040,15 +1055,15 @@ namespace Migracao.Imports
 										PagoDescontos = 0,
 										PagoDespesas = 0,
 										TipoID = (byte)TransacaoTiposID.Recebimento,
-										Data = dataBaixa,
+										Data = (DateTime)dataBaixa,
 										TransacaoID = (byte)tituloTransacao,
 										EspecieID = formaPagamento,
-										DataBaseCalculo = dataBaixa,
+										DataBaseCalculo = dataBaseCalculo,
 										DevidoValor = valorDevido,
 										PagoValor = pagoValor,
 										EstabelecimentoID = estabelecimentoID,
 										LoginID = loginID,
-										DataInclusao = dataBaixa,
+										DataInclusao = dataInclusao,
 										FinanceiroID = respFinanceiroPessoaID,
 										Observacoes = observacaoRecebido,
 										OutroSacadoNome = outroSacadoNome
@@ -1107,7 +1122,12 @@ namespace Migracao.Imports
 								};
 
 							if (recebivelDict != null || fluxoCaixaDict != null)
+							{
+								recebiveis.Add(recebivel);
+								fluxoCaixas.Add(fluxoCaixa);
+
 								linhasSql.Add(sqlHelper.GerarSqlInsertRecebiveis(indiceLinha, recebivelDict, fluxoCaixaDict));
+							}
 						}
 					}
 				}

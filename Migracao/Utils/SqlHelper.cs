@@ -138,14 +138,14 @@ namespace Migracao.Utils
 			return sql.ToString().TrimEnd(';');
 		}
 
-		public string GerarSqlInsertRecebiveis(int index, Dictionary<string, object> recebivelDict, Dictionary<string, object> fluxoCaixaDict)//Dictionary<string, object[]> fluxoCaixasDict)
+		public string GerarSqlInsertRecebiveis(int index, Dictionary<string, object> recebivelDict, Dictionary<string, object> fluxoCaixaDict)
 		{
 			var sql = new StringBuilder();
 
 			if (recebivelDict != null)
 			{
-				sql.AppendLine($"INSERT INTO Recebiveis ({string.Join(", ", recebivelDict.Keys)}) " +
-					$"VALUES ({string.Join(", ", recebivelDict.Values.Select(FormatValue))});");
+				sql.AppendLine($"INSERT INTO Recebiveis ({string.Join(", ", recebivelDict.Keys)}) ");
+				sql.AppendLine($"VALUES ({string.Join(", ", recebivelDict.Values.Select(FormatValue))});");
 				sql.AppendLine($"DECLARE @RecebivelID{index} int;");
 				sql.AppendLine($"SELECT @RecebivelID{index} = SCOPE_IDENTITY();");
 			}
@@ -153,10 +153,10 @@ namespace Migracao.Utils
 			if (fluxoCaixaDict != null)
 			{
 				sql.AppendLine($"INSERT INTO FluxoCaixa ({string.Join(", ", fluxoCaixaDict.Keys)}, RecebivelID) " +
-					$"VALUES ({string.Join(", ", fluxoCaixaDict.Values.Select(FormatValue))}, {$"@RecebivelID{index}"});");
+				sql.AppendLine($"VALUES ({string.Join(", ", fluxoCaixaDict.Values.Select(FormatValue))}, {$"@RecebivelID{index}"});"));
 			}
 
-			return sql.ToString();
+			return sql.ToString().TrimEnd(';');
 		}
 
 		public string GerarSqlInsertPrecos(int index, Dictionary<string, object> tabelaDict, long tabelaID, Dictionary<string, object> precoDict)

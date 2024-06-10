@@ -490,7 +490,7 @@ namespace Migracao
 
 		private void btnRecebiveis_Click(object sender, EventArgs e)
 		{
-			var arquivoRecebiveis = EscolherArquivoExcel("Arquivo Recebiveis.xlsx");
+			var arquivoRecebiveis = EscolherArquivoExcel("Recebiveis");
 
 			if (string.IsNullOrEmpty(arquivoRecebiveis) == false)
 				try
@@ -515,7 +515,7 @@ namespace Migracao
 
 			var openFileDialog = new OpenFileDialog()
 			{
-				Filter = "Arquivo Excel |*.xlsx",
+				Filter = "Arquivo Excel |*.xlsx;*.csv",
 				Title = titulo,
 				InitialDirectory = Tools.ultimaPasta
 			};

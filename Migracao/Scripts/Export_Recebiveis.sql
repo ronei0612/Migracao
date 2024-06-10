@@ -4,7 +4,7 @@ SELECT
     *
 FROM Recebiveis r
 LEFT JOIN FluxoCaixa fc ON fc.RecebivelID = r.ID
-WHERE fc.pagovalor IS NULL
-AND r.databaixa IS NULL
-AND r.ExclusaoData IS NULL
+--WHERE fc.pagovalor IS NULL
+--AND r.databaixa IS NULL
+WHERE r.ExclusaoData IS NULL
 AND r.EstabelecimentoID = @EstabelecimentoID;

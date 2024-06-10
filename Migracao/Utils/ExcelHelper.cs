@@ -39,7 +39,7 @@ namespace Migracao.Utils
 		public static Dictionary<string, string> nomeEnderecosDict = new Dictionary<string, string>();
 
 		public static Dictionary<string, string> consumidorIDRecebiveisDict = new Dictionary<string, string>();
-		private Dictionary<string, string> consumidorIDRecebidosDict = new Dictionary<string, string>();
+		public static Dictionary<string, string> consumidorIDRecebidosDict = new Dictionary<string, string>();
 
 		private Dictionary<string, string> pessoaIDDataAgendaDict = new Dictionary<string, string>();
 		private Dictionary<string, string> tituloDataAgendaDict = new Dictionary<string, string>();
@@ -71,6 +71,8 @@ namespace Migracao.Utils
 			int consumidorIDColumnIndex = GetColumnIndex(headerRow, "consumidorid");
 			int dataVencimentoColumnIndex = GetColumnIndex(headerRow, "datavencimento");
 			int valorOriginalColumnIndex = GetColumnIndex(headerRow, "valororiginal");
+			int pagoValorColumnIndex = GetColumnIndex(headerRow, "pagoValor");
+			int dataBaixaColumnIndex = GetColumnIndex(headerRow, "databaixa");
 
 			for (int row = 1; row <= sheet.LastRowNum; row++)
 			{
@@ -79,15 +81,22 @@ namespace Migracao.Utils
 					string consumidorID = sheet.GetRow(row).GetCell(consumidorIDColumnIndex) != null ? sheet.GetRow(row).GetCell(consumidorIDColumnIndex).ToString() : "";
 					string dataVencimento = sheet.GetRow(row).GetCell(dataVencimentoColumnIndex) != null ? sheet.GetRow(row).GetCell(dataVencimentoColumnIndex).ToString().ToLower() : "";
 					string valorOriginal = sheet.GetRow(row).GetCell(valorOriginalColumnIndex) != null ? sheet.GetRow(row).GetCell(valorOriginalColumnIndex).ToString().ToLower() : "";
+					string pagoValor = sheet.GetRow(row).GetCell(pagoValorColumnIndex) != null ? sheet.GetRow(row).GetCell(pagoValorColumnIndex).ToString().ToLower() : "";
+					string dataBaixa = sheet.GetRow(row).GetCell(dataBaixaColumnIndex) != null ? sheet.GetRow(row).GetCell(dataBaixaColumnIndex).ToString().ToLower() : "";
 
 					if (!valorOriginal.Contains('.') && !valorOriginal.Contains(','))
 						valorOriginal = valorOriginal.Insert(valorOriginal.Length - 4, ".");
 
-					valorOriginal = Tools.ArredondarValor(valorOriginal).ToString("F2");
+					valorOriginal = Tools.ArredondarValorV2(valorOriginal).ToString("F2");
+					pagoValor = Tools.ArredondarValorV2(pagoValor).ToString("F2");
 
 					string key = consumidorID + "|" + valorOriginal + "|" + dataVencimento;
 					if (!consumidorIDRecebiveisDict.ContainsKey(key))
 						consumidorIDRecebiveisDict.Add(key, consumidorID);
+
+					key = consumidorID + "|" + pagoValor + "|" + dataBaixa;
+					if (!consumidorIDRecebidosDict.ContainsKey(key))
+						consumidorIDRecebidosDict.Add(key, consumidorID);
 				}
 			}
 		}
@@ -633,12 +642,24 @@ namespace Migracao.Utils
 			return false;
 		}
 
-		public bool RecebivelExists(int consumidorID, decimal valorOriginal, DateTime dataVencimento)
+		public bool RecebivelExists(int consumidorID, decimal valorOriginal, DateTime dataVencimento, decimal pagoValor = 0, DateTime? dataBaixa = null)
 		{
-			string key = consumidorID + "|" + valorOriginal.ToString("F2") + "|" + dataVencimento.ToString("yyyy-MM-dd HH:mm:ss.fff");
-			if (!string.IsNullOrWhiteSpace(key))
-				if (consumidorIDRecebiveisDict.ContainsKey(key))
-					return true;
+			if (pagoValor > 0 && dataBaixa != null)
+			{
+				var dataBaixa_ = (DateTime)dataBaixa;
+				string key = consumidorID + "|" + pagoValor.ToString("F2") + "|" + dataBaixa_.ToString("yyyy-MM-dd HH:mm:ss.fff");
+				if (!string.IsNullOrWhiteSpace(key))
+					if (consumidorIDRecebidosDict.ContainsKey(key))
+						return true;
+			}
+
+			else
+			{
+				string key = consumidorID + "|" + valorOriginal.ToString("F2") + "|" + dataVencimento.ToString("yyyy-MM-dd HH:mm:ss.fff");
+				if (!string.IsNullOrWhiteSpace(key))
+					if (consumidorIDRecebiveisDict.ContainsKey(key))
+						return true;
+			}
 
 			return false;
 		}
@@ -779,7 +800,10 @@ namespace Migracao.Utils
 
 		public IWorkbook LerExcel(string filePath)
         {
-            IWorkbook workbook;
+			if (Path.GetExtension(filePath).ToLower() == ".csv")
+				return LerExcelCSV(filePath);
+
+			IWorkbook workbook;
             using (FileStream file = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
                 workbook = WorkbookFactory.Create(file);
@@ -787,7 +811,44 @@ namespace Migracao.Utils
             return workbook;
         }
 
-        public List<string> GetCabecalhosExcel(IWorkbook workbook)
+		public static IWorkbook LerExcelCSV(string caminhoCSV)
+		{
+			var separador = DetectarSeparadorCSV(caminhoCSV);
+			List<string> cabecalhosCSV = GetCabecalhosCSV(caminhoCSV, separador, Encoding.UTF8);
+			List<string[]> linhasCSV = GetLinhasCSV(caminhoCSV, separador, cabecalhosCSV.Count(), Encoding.UTF8);
+
+			// Criar o workbook e a planilha
+			IWorkbook workbook = new XSSFWorkbook();
+			ISheet sheet = workbook.CreateSheet("Planilha1");
+
+			// Adicionar os cabeçalhos na primeira linha da planilha
+			int linha = 0;
+			IRow headerRow = sheet.CreateRow(linha);
+			for (int coluna = 0; coluna < cabecalhosCSV.Count; coluna++)
+			{
+				ICell cell = headerRow.CreateCell(coluna);
+				cell.SetCellValue(cabecalhosCSV[coluna]);
+			}
+
+			// Adicionar os dados do CSV na planilha
+			linha++; // Avançar para a próxima linha para os dados
+			int numeroColunas = cabecalhosCSV.Count();
+
+			foreach (var registro in linhasCSV)
+			{
+				IRow row = sheet.CreateRow(linha);
+				for (int coluna = 0; coluna < numeroColunas; coluna++)
+				{
+					ICell cell = row.CreateCell(coluna);
+					cell.SetCellValue(registro[coluna]);
+				}
+				linha++;
+			}
+
+			return workbook;
+		}
+
+		public List<string> GetCabecalhosExcel(IWorkbook workbook)
         {
             ISheet sheet1 = workbook.GetSheetAt(0);
             IRow headerRow = sheet1.GetRow(0);

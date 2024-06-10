@@ -93,9 +93,9 @@
 			// lbPessoaID
 			// 
 			lbPessoaID.AutoSize = true;
-			lbPessoaID.Location = new Point(463, 125);
+			lbPessoaID.Location = new Point(452, 125);
 			lbPessoaID.Name = "lbPessoaID";
-			lbPessoaID.Size = new Size(88, 15);
+			lbPessoaID.Size = new Size(101, 15);
 			lbPessoaID.TabIndex = 4;
 			lbPessoaID.Text = "PessoaID RespFin:";
 			lbPessoaID.Visible = false;

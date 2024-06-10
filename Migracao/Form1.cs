@@ -196,7 +196,7 @@ namespace Migracao
 
 		void AlterarNomesCampos()
 		{
-			txtPessoaID.Text = "PessoaID RespFin:";
+			lbPessoaID.Text = "PessoaID RespFin:";
 
 			if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
 			{
@@ -212,7 +212,7 @@ namespace Migracao
 			else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
 			{
 				lbReferencia.Text = "Agendamentos (Prod):";
-				txtPessoaID.Text = "FuncionarioID Dent:";
+				lbPessoaID.Text = "FuncionarioID Dent:";
 			}
 			//|| comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
 			//|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)

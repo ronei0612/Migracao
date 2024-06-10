@@ -276,8 +276,7 @@ namespace Migracao.Imports
 					if (!isfornecedor)
 					{
 						if (string.IsNullOrEmpty(consumidorIDValue) && string.IsNullOrEmpty(pessoaIDValue) && !string.IsNullOrEmpty(nomeCompleto)
-							&& ((!string.IsNullOrEmpty(documento) && documento.IsCPF())
-								|| string.IsNullOrEmpty(documento)))
+							&& (documento.IsCPF() || string.IsNullOrEmpty(documento)))
 						{
 							pessoa = new Pessoa()
 							{
@@ -391,7 +390,7 @@ namespace Migracao.Imports
 							};
 						}
 
-						else if (iscliente)
+						else if (iscliente && string.IsNullOrEmpty(consumidorIDValue))
 						{
 							if (string.IsNullOrEmpty(consumidorIDValue))
 								consumidor = new Consumidor()

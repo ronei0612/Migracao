@@ -102,7 +102,7 @@ namespace Migracao.Utils
 			if (consumidorDict != null)
 			{
 				sql.AppendLine($"INSERT INTO Consumidores ({string.Join(", ", consumidorDict.Keys)}, PessoaID) " +
-					$"VALUES ({string.Join(", ", consumidorDict.Values.Select(FormatValue))}, @PessoaID{index});");
+					$"VALUES ({string.Join(", ", consumidorDict.Values.Select(FormatValue))}, {(pessoaID > 0 ? pessoaID.ToString() : $"@PessoaID{index}")});");
 				sql.AppendLine($"DECLARE @ConsumidorID{index} int;");
 				sql.AppendLine($"SELECT @ConsumidorID{index} = SCOPE_IDENTITY();");
 			}

@@ -896,6 +896,8 @@ namespace Migracao.Imports
 			var excelHelper = new ExcelHelper(arquivoExcel);
 			var sqlHelper = new SqlHelper();
 			List<string> linhasSql = new();
+			linhasSql.Add("DECLARE @RecebivelID int;");
+
 			List<FluxoCaixa> fluxoCaixas = new();
 			List<Recebivel> recebiveis = new();
 
@@ -966,9 +968,6 @@ namespace Migracao.Imports
 						}
 					}
 
-					if (cpf == "345.781.969-68")
-						cpf = cpf;
-
 					FluxoCaixa fluxoCaixa = null;
 					Recebivel recebivel = null;
 
@@ -993,9 +992,6 @@ namespace Migracao.Imports
 						else
 							outroSacadoNome = cpf;
 
-						if (consumidorID == 18305574 && valorOriginal.ToString() == "300,00")
-							consumidorID = consumidorID;
-
 						if (!string.IsNullOrEmpty(consumidorIDValue))
 						{
 							if (!excelHelper.RecebivelExists((int)consumidorID, valorOriginal, dataVencimento, pagoValor, dataBaixa))
@@ -1007,6 +1003,10 @@ namespace Migracao.Imports
 								}
 								else
 									dataBaseCalculo = (DateTime)dataBaixa;
+
+								valorDevido = valorOriginal;
+								if (pagoValor >= valorOriginal)
+									valorDevido = 0;
 
 								if (valorOriginal >= 1)
 									recebivel = new Recebivel()
@@ -1040,6 +1040,7 @@ namespace Migracao.Imports
 								if (pagoValor >= 1)
 								{
 									var tituloTransacao = TituloTransacoes.Liquidacao;
+
 									if (pagoValor < valorOriginal)
 									{
 										tituloTransacao = TituloTransacoes.PagamentoParcial;
@@ -1078,47 +1079,47 @@ namespace Migracao.Imports
 								recebivelDict = new Dictionary<string, object>
 								{
 									{ "ConsumidorID", recebivel.ConsumidorID },
+									{ "ValorOriginal", recebivel.ValorOriginal },
+									{ "ValorDevido", recebivel.ValorDevido },
+									{ "DataVencimento", recebivel.DataVencimento },
+									{ "ValorBaixa", recebivel.ValorBaixa },
+									{ "DataBaixa", recebivel.DataBaixa },
+									{ "DataInclusao", recebivel.DataInclusao },
+									{ "ExclusaoMotivo", recebivel.ExclusaoMotivo },
 									{ "FornecedorID", recebivel.FornecedorID },
 									{ "ClienteID", recebivel.ClienteID },
 									{ "ColaboradorID", recebivel.ColaboradorID },
 									{ "SacadoNome", recebivel.SacadoNome },
 									{ "EspecieID", recebivel.EspecieID },
 									{ "DataEmissao", recebivel.DataEmissao },
-									{ "ValorOriginal", recebivel.ValorOriginal },
-									{ "ValorDevido", recebivel.ValorDevido },
 									{ "DataBaseCalculo", recebivel.DataBaseCalculo },
-									{ "DataInclusao", recebivel.DataInclusao },
-									{ "DataVencimento", recebivel.DataVencimento },
 									{ "FinanceiroID", recebivel.FinanceiroID },
 									{ "LoginID", recebivel.LoginID },
 									{ "EstabelecimentoID", recebivel.EstabelecimentoID },
 									{ "SituacaoID", recebivel.SituacaoID },
-									{ "Observacoes", recebivel.Observacoes },
-									{ "ExclusaoMotivo", recebivel.ExclusaoMotivo },
-									{ "ValorBaixa", recebivel.ValorBaixa },
-									{ "DataBaixa", recebivel.DataBaixa }
+									{ "Observacoes", recebivel.Observacoes }
 								};
 
 							if (fluxoCaixa != null)
 								fluxoCaixaDict = new Dictionary<string, object>
 								{
 									{ "ConsumidorID", fluxoCaixa.ConsumidorID },
+									{ "DevidoValor", fluxoCaixa.DevidoValor },
+									{ "DataBaseCalculo", fluxoCaixa.DataBaseCalculo },
+									{ "PagoValor", fluxoCaixa.PagoValor },
+									{ "Data", fluxoCaixa.Data },
+									{ "DataInclusao", fluxoCaixa.DataInclusao },
+									{ "OutroSacadoNome", fluxoCaixa.OutroSacadoNome },
 									{ "SituacaoID", fluxoCaixa.SituacaoID },
 									{ "PagoMulta", fluxoCaixa.PagoMulta },
 									{ "PagoJuros", fluxoCaixa.PagoJuros },
 									{ "TipoID", fluxoCaixa.TipoID },
-									{ "Data", fluxoCaixa.Data },
 									{ "TransacaoID", fluxoCaixa.TransacaoID },
 									{ "EspecieID", fluxoCaixa.EspecieID },
-									{ "DataBaseCalculo", fluxoCaixa.DataBaseCalculo },
-									{ "DevidoValor", fluxoCaixa.DevidoValor },
-									{ "PagoValor", fluxoCaixa.PagoValor },
 									{ "EstabelecimentoID", fluxoCaixa.EstabelecimentoID },
 									{ "LoginID", fluxoCaixa.LoginID },
-									{ "DataInclusao", fluxoCaixa.DataInclusao },
 									{ "FinanceiroID", fluxoCaixa.FinanceiroID },
-									{ "Observacoes", fluxoCaixa.Observacoes },
-									{ "OutroSacadoNome", fluxoCaixa.OutroSacadoNome }
+									{ "Observacoes", fluxoCaixa.Observacoes }
 								};
 
 							if (recebivelDict != null || fluxoCaixaDict != null)

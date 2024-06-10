@@ -141,19 +141,20 @@ namespace Migracao.Utils
 		public string GerarSqlInsertRecebiveis(int index, Dictionary<string, object> recebivelDict, Dictionary<string, object> fluxoCaixaDict)
 		{
 			var sql = new StringBuilder();
+			//sql.AppendLine($"DECLARE @RecebivelID int;");
 
 			if (recebivelDict != null)
 			{
 				sql.AppendLine($"INSERT INTO Recebiveis ({string.Join(", ", recebivelDict.Keys)}) " +
-					$"VALUES ({string.Join(", ", recebivelDict.Values.Select(FormatValue))});");
-				sql.AppendLine($"DECLARE @RecebivelID{index} int;");
-				sql.AppendLine($"SELECT @RecebivelID{index} = SCOPE_IDENTITY();");
+					$"{Environment.NewLine}    VALUES ({string.Join(", ", recebivelDict.Values.Select(FormatValue))});");
+				sql.AppendLine($"SET @RecebivelID = NULL;");
+				sql.AppendLine($"SELECT @RecebivelID = SCOPE_IDENTITY();");
 			}
 
 			if (fluxoCaixaDict != null)
 			{
 				sql.AppendLine($"INSERT INTO FluxoCaixa ({string.Join(", ", fluxoCaixaDict.Keys)}, RecebivelID) " + 
-					$"VALUES ({string.Join(", ", fluxoCaixaDict.Values.Select(FormatValue))}, {$"@RecebivelID{index}"});");
+					$"{Environment.NewLine}    VALUES ({string.Join(", ", fluxoCaixaDict.Values.Select(FormatValue))}, {$"@RecebivelID"});");
 			}
 
 			return sql.ToString().TrimEnd(';');

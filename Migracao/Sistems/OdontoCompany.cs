@@ -106,14 +106,14 @@ namespace Migracao.Sistems
 			}
 
 			var excel_CXD555 = listView.Items.Cast<ListViewItem>()
-			//	.FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("CXD555")));
-			//if (excel_CXD555 != null)
-			//{
-			//	var resultado = LerArquivosExcelCsv(excel_CXD555.Text, Encoding.UTF8);
-			//	var linhasCSV = resultado.Item1;
-			//	var cabecalhosCSV = resultado.Item2;
-			//	dataTableRecebiveis = ConvertExcelRecebidos(dataTableRecebiveis, cabecalhosCSV, linhasCSV);
-			//}
+				.FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("CXD555")));
+			if (excel_CXD555 != null)
+			{
+				var resultado = LerArquivosExcelCsv(excel_CXD555.Text, Encoding.UTF8);
+				var linhasCSV = resultado.Item1;
+				var cabecalhosCSV = resultado.Item2;
+				dataTableRecebiveis = ConvertExcelRecebidos(dataTableRecebiveis, cabecalhosCSV, linhasCSV, dataTablePessoas);
+			}
 
 			if (excel_BXD111 != null || excel_CRD111 != null)
 			{
@@ -260,6 +260,7 @@ namespace Migracao.Sistems
 						var cabecalhoObs = "OBS";
 						var cabecalhoDataBaixa = "BAIXA";
 						var cabecalhoDataVencimento = "VENCTO";
+						var cabecalhoParcela = "VR_PARCELA";
 
 						if (cabecalhos.Contains("CNPJ_CPF"))
 						{
@@ -267,12 +268,13 @@ namespace Migracao.Sistems
 							cabecalhoObs = "OBS1";
 							cabecalhoDataBaixa = "DATA";
 							cabecalhoDataVencimento = "DATA";
+							cabecalhoParcela = "VALOR";
 						}
 
 						var cpf = valoresLinha.GetValueOrDefault(cabecalhoCpf).Trim();
 						var documento = valoresLinha.GetValueOrDefault("DOCUMENTO").Trim();
 						var valor = valoresLinha.GetValueOrDefault("VALOR").Trim();
-						var valorOriginal = valoresLinha.GetValueOrDefault("VR_PARCELA").Trim();
+						var valorOriginal = valoresLinha.GetValueOrDefault(cabecalhoParcela).Trim();
 						var observacao = valoresLinha.GetValueOrDefault(cabecalhoObs).Trim();
 						var baixaData = valoresLinha.GetValueOrDefault(cabecalhoDataBaixa).Trim();
 						var vencimentoData = valoresLinha.GetValueOrDefault(cabecalhoDataVencimento).Trim();
@@ -445,7 +447,7 @@ namespace Migracao.Sistems
 						//if (cliente == "S")
 						//	pessoas.Add("paciente|" + nome, numFicha);
 
-						if (cliente != "S" && fornecedor != "S")
+						//if (cliente != "S" && fornecedor != "S")
 							cliente = "S";
 
 						if (!excelHelper.CidadeExists(cidade.PrimeiraLetraMaiuscula(), estado))
@@ -461,13 +463,13 @@ namespace Migracao.Sistems
 						dataRow["Observações"] = obs;
 						dataRow["Email"] = email.ToEmail();
 						dataRow["RG"] = rg.GetPrimeirosCaracteres(20);
-						dataRow["Sexo(M/F)"] = sexo.ToSexo("m", "f").ToSN();
+						dataRow["Sexo(M/F)"] = sexo.ToSexo("m", "f") ? "M" : "F";
 						dataRow["NascimentoData"] = dataNascimento.ToDataNull();
 						dataRow["NascimentoLocal"] = "";
 						dataRow["EstadoCivil(S/C/V)"] = "";
 						dataRow["Profissao"] = "";
 						dataRow["CargoNaClinica"] = "";
-						dataRow["Dentista(S/N)"] = "N";
+						dataRow["Dentista(S/N)"] = "";
 						dataRow["ConselhoCodigo"] = "";
 						dataRow["Paciente(S/N)"] = cliente;
 						dataRow["Funcionario(S/N)"] = "N";

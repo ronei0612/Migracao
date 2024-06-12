@@ -890,7 +890,7 @@ namespace Migracao.Imports
 			}
 		}
 
-		public void ImportarRecebiveis(string arquivoExcel, int estabelecimentoID, int respFinanceiroPessoaID, int loginID)
+		public void ImportarRecebiveis(string arquivoExcel, int estabelecimentoID, int respFinanceiroID, int loginID)
 		{
 			var dataHoje = DateTime.Now;
 			var indiceLinha = 0;
@@ -1025,7 +1025,7 @@ namespace Migracao.Imports
 										DataBaseCalculo = dataBaseCalculo,
 										DataInclusao = dataInclusao,
 										DataVencimento = dataVencimento,
-										FinanceiroID = respFinanceiroPessoaID,
+							FinanceiroID = respFinanceiroID,
 										LoginID = loginID,
 										EstabelecimentoID = estabelecimentoID,
 										SituacaoID = (byte)TituloSituacoesID.Normal,

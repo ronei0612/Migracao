@@ -130,7 +130,7 @@ namespace Migracao.Utils
 			return sql.ToString().TrimEnd(';');
 		}
 
-		public string GerarSqlInsertRecebiveis(int index, Dictionary<string, object> recebivelDict, Dictionary<string, object> fluxoCaixaDict)
+		public string GerarSqlInsertRecebiveis(Dictionary<string, object> recebivelDict, Dictionary<string, object> fluxoCaixaDict)
 		{
 			var sql = new StringBuilder();
 

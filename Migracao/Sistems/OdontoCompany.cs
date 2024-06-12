@@ -105,7 +105,7 @@ namespace Migracao.Sistems
 				dataTableRecebiveis = ConvertExcelRecebidos(dataTableRecebiveis, cabecalhosCSV, linhasCSV, dataTablePessoas);
 			}
 
-			//var excel_CXD555 = listView.Items.Cast<ListViewItem>()
+			var excel_CXD555 = listView.Items.Cast<ListViewItem>()
 			//	.FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("CXD555")));
 			//if (excel_CXD555 != null)
 			//{

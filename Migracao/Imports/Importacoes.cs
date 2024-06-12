@@ -898,7 +898,9 @@ namespace Migracao.Imports
 			var excelHelper = new ExcelHelper(arquivoExcel);
 			var sqlHelper = new SqlHelper();
 			List<string> linhasSql = new();
+			List<string> linhasSqlSemConsumidor = new();
 			linhasSql.Add("DECLARE @RecebivelID int;");
+			linhasSqlSemConsumidor.Add("DECLARE @RecebivelID int;");
 
 			List<FluxoCaixa> fluxoCaixas = new();
 			List<Recebivel> recebiveis = new();
@@ -994,144 +996,155 @@ namespace Migracao.Imports
 						else
 							outroSacadoNome = cpf;
 
-						if (!string.IsNullOrEmpty(consumidorIDValue))
+						if (indiceLinha == 86)
+							indiceLinha = indiceLinha;
+
+						//if (!string.IsNullOrEmpty(consumidorIDValue))
+						//{
+						//if (!excelHelper.RecebivelExists((int)consumidorID, valorOriginal, dataVencimento, pagoValor, dataBaixa))
+						//{
+						if (pagoValor < 1)
 						{
-							if (!excelHelper.RecebivelExists((int)consumidorID, valorOriginal, dataVencimento, pagoValor, dataBaixa))
-							{
-								if (pagoValor < 1)
-								{
-									pagoValor = 0;
-									dataBaixa = null;
-								}
-								else
-									dataBaseCalculo = (DateTime)dataBaixa;
-
-								valorDevido = valorOriginal;
-								if (pagoValor >= valorOriginal)
-									valorDevido = 0;
-
-								if (valorOriginal >= 1)
-									recebivel = new Recebivel()
-									{
-										ConsumidorID = consumidorID,
-										FornecedorID = fornecedorID,
-										ClienteID = clienteID,
-										ColaboradorID = colaboradorID,
-										SacadoNome = outroSacadoNome,
-										EspecieID = (byte)formaPagamento,
-										DataEmissao = dataInclusao,
-										ValorOriginal = valorOriginal,
-										ValorDevido = valorDevido,
-										DataBaseCalculo = dataBaseCalculo,
-										DataInclusao = dataInclusao,
-										DataVencimento = dataVencimento,
-							FinanceiroID = respFinanceiroID,
-										LoginID = loginID,
-										EstabelecimentoID = estabelecimentoID,
-										SituacaoID = (byte)TituloSituacoesID.Normal,
-										Observacoes = observacaoRecebivel,
-										ExclusaoMotivo = documento,
-										DataBaixa = dataBaixa,
-										ValorBaixa = pagoValor
-										//OrcamentoID
-										//PlanoContasID
-										//Documento = contratoControle
-										//ContratoID = contratoID
-									};
-
-								if (pagoValor >= 1)
-								{
-									var tituloTransacao = TituloTransacoes.Liquidacao;
-
-									if (pagoValor < valorOriginal)
-									{
-										tituloTransacao = TituloTransacoes.PagamentoParcial;
-										valorDevido = valorOriginal - pagoValor;
-									}
-
-									fluxoCaixa = new FluxoCaixa()
-									{
-										ConsumidorID = consumidorID,
-										SituacaoID = 1,
-										PagoMulta = 0,
-										PagoJuros = 0,
-										PagoDescontos = 0,
-										PagoDespesas = 0,
-										TipoID = (byte)TransacaoTiposID.Recebimento,
-										Data = (DateTime)dataBaixa,
-										TransacaoID = (byte)tituloTransacao,
-										EspecieID = formaPagamento,
-										DataBaseCalculo = dataBaseCalculo,
-										DevidoValor = valorDevido,
-										PagoValor = pagoValor,
-										EstabelecimentoID = estabelecimentoID,
-										LoginID = loginID,
-										DataInclusao = dataInclusao,
-										FinanceiroID = respFinanceiroPessoaID,
-										Observacoes = observacaoRecebido,
-										OutroSacadoNome = outroSacadoNome
-									};
-								}
-							}
-
-							Dictionary<string, object> recebivelDict = null;
-							Dictionary<string, object> fluxoCaixaDict = null;
-
-							if (recebivel != null)
-								recebivelDict = new Dictionary<string, object>
-								{
-									{ "ConsumidorID", recebivel.ConsumidorID },
-									{ "ValorOriginal", recebivel.ValorOriginal },
-									{ "ValorDevido", recebivel.ValorDevido },
-									{ "DataVencimento", recebivel.DataVencimento },
-									{ "ValorBaixa", recebivel.ValorBaixa },
-									{ "DataBaixa", recebivel.DataBaixa },
-									{ "DataInclusao", recebivel.DataInclusao },
-									{ "ExclusaoMotivo", recebivel.ExclusaoMotivo },
-									{ "FornecedorID", recebivel.FornecedorID },
-									{ "ClienteID", recebivel.ClienteID },
-									{ "ColaboradorID", recebivel.ColaboradorID },
-									{ "SacadoNome", recebivel.SacadoNome },
-									{ "EspecieID", recebivel.EspecieID },
-									{ "DataEmissao", recebivel.DataEmissao },
-									{ "DataBaseCalculo", recebivel.DataBaseCalculo },
-									{ "FinanceiroID", recebivel.FinanceiroID },
-									{ "LoginID", recebivel.LoginID },
-									{ "EstabelecimentoID", recebivel.EstabelecimentoID },
-									{ "SituacaoID", recebivel.SituacaoID },
-									{ "Observacoes", recebivel.Observacoes }
-								};
-
-							if (fluxoCaixa != null)
-								fluxoCaixaDict = new Dictionary<string, object>
-								{
-									{ "ConsumidorID", fluxoCaixa.ConsumidorID },
-									{ "DevidoValor", fluxoCaixa.DevidoValor },
-									{ "DataBaseCalculo", fluxoCaixa.DataBaseCalculo },
-									{ "PagoValor", fluxoCaixa.PagoValor },
-									{ "Data", fluxoCaixa.Data },
-									{ "DataInclusao", fluxoCaixa.DataInclusao },
-									{ "OutroSacadoNome", fluxoCaixa.OutroSacadoNome },
-									{ "SituacaoID", fluxoCaixa.SituacaoID },
-									{ "PagoMulta", fluxoCaixa.PagoMulta },
-									{ "PagoJuros", fluxoCaixa.PagoJuros },
-									{ "TipoID", fluxoCaixa.TipoID },
-									{ "TransacaoID", fluxoCaixa.TransacaoID },
-									{ "EspecieID", fluxoCaixa.EspecieID },
-									{ "EstabelecimentoID", fluxoCaixa.EstabelecimentoID },
-									{ "LoginID", fluxoCaixa.LoginID },
-									{ "FinanceiroID", fluxoCaixa.FinanceiroID },
-									{ "Observacoes", fluxoCaixa.Observacoes }
-								};
-
-							if (recebivelDict != null || fluxoCaixaDict != null)
-							{
-								recebiveis.Add(recebivel);
-								fluxoCaixas.Add(fluxoCaixa);
-
-								linhasSql.Add(sqlHelper.GerarSqlInsertRecebiveis(indiceLinha, recebivelDict, fluxoCaixaDict));
-							}
+							pagoValor = 0;
+							dataBaixa = null;
 						}
+						else
+							dataBaseCalculo = (DateTime)dataBaixa;
+
+						valorDevido = valorOriginal;
+						if (pagoValor >= valorOriginal)
+							valorDevido = 0;
+
+						//Novas linhas
+						var tituloTransacao = TituloTransacoes.Liquidacao;
+
+						if (pagoValor < valorOriginal)
+						{
+							tituloTransacao = TituloTransacoes.PagamentoParcial;
+							valorDevido = valorOriginal - pagoValor;
+						}
+
+						//if (valorOriginal >= 1)
+						recebivel = new Recebivel()
+						{
+							ConsumidorID = consumidorID,
+							FornecedorID = fornecedorID,
+							ClienteID = clienteID,
+							ColaboradorID = colaboradorID,
+							SacadoNome = outroSacadoNome,
+							EspecieID = (byte)formaPagamento,
+							DataEmissao = dataInclusao,
+							ValorOriginal = valorOriginal,
+							ValorDevido = valorDevido,
+							DataBaseCalculo = dataBaseCalculo,
+							DataInclusao = dataInclusao,
+							DataVencimento = dataVencimento,
+							FinanceiroID = respFinanceiroID,
+							LoginID = loginID,
+							EstabelecimentoID = estabelecimentoID,
+							SituacaoID = (byte)TituloSituacoesID.Normal,
+							Observacoes = observacaoRecebivel,
+							ExclusaoMotivo = documento,
+							DataBaixa = dataBaixa,
+							ValorBaixa = pagoValor
+						};
+
+						//if (pagoValor >= 1)
+						//{
+						//var tituloTransacao = TituloTransacoes.Liquidacao;
+
+						//if (pagoValor < valorOriginal)
+						//{
+						//	tituloTransacao = TituloTransacoes.PagamentoParcial;
+						//	valorDevido = valorOriginal - pagoValor;
+						//}
+						if (valorDevido > 0 && dataBaixa != null)
+							fluxoCaixa = new FluxoCaixa()
+							{
+								ConsumidorID = consumidorID,
+								SituacaoID = 1,
+								PagoMulta = 0,
+								PagoJuros = 0,
+								PagoDescontos = 0,
+								PagoDespesas = 0,
+								TipoID = (byte)TransacaoTiposID.Recebimento,
+								Data = (DateTime)dataBaixa,
+								TransacaoID = (byte)tituloTransacao,
+								EspecieID = formaPagamento,
+								DataBaseCalculo = dataBaseCalculo,
+								DevidoValor = valorDevido,
+								PagoValor = pagoValor,
+								EstabelecimentoID = estabelecimentoID,
+								LoginID = loginID,
+								DataInclusao = dataInclusao,
+								FinanceiroID = respFinanceiroID,
+								Observacoes = observacaoRecebido,
+								OutroSacadoNome = outroSacadoNome
+							};
+						//}
+						//}
+
+						Dictionary<string, object> recebivelDict = null;
+						Dictionary<string, object> fluxoCaixaDict = null;
+
+						if (recebivel != null)
+							recebivelDict = new Dictionary<string, object>
+							{
+								{ "ConsumidorID", recebivel.ConsumidorID },
+								{ "ValorOriginal", recebivel.ValorOriginal },
+								{ "ValorDevido", recebivel.ValorDevido },
+								{ "DataVencimento", recebivel.DataVencimento },
+								{ "ValorBaixa", recebivel.ValorBaixa },
+								{ "DataBaixa", recebivel.DataBaixa },
+								{ "DataInclusao", recebivel.DataInclusao },
+								{ "ExclusaoMotivo", recebivel.ExclusaoMotivo },
+								{ "FornecedorID", recebivel.FornecedorID },
+								{ "ClienteID", recebivel.ClienteID },
+								{ "ColaboradorID", recebivel.ColaboradorID },
+								{ "SacadoNome", recebivel.SacadoNome },
+								{ "EspecieID", recebivel.EspecieID },
+								{ "DataEmissao", recebivel.DataEmissao },
+								{ "DataBaseCalculo", recebivel.DataBaseCalculo },
+								{ "FinanceiroID", recebivel.FinanceiroID },
+								{ "LoginID", recebivel.LoginID },
+								{ "EstabelecimentoID", recebivel.EstabelecimentoID },
+								{ "SituacaoID", recebivel.SituacaoID },
+								{ "Observacoes", recebivel.Observacoes }
+							};
+
+						if (fluxoCaixa != null)
+							fluxoCaixaDict = new Dictionary<string, object>
+							{
+								{ "ConsumidorID", fluxoCaixa.ConsumidorID },
+								{ "DevidoValor", fluxoCaixa.DevidoValor },
+								{ "DataBaseCalculo", fluxoCaixa.DataBaseCalculo },
+								{ "PagoValor", fluxoCaixa.PagoValor },
+								{ "Data", fluxoCaixa.Data },
+								{ "DataInclusao", fluxoCaixa.DataInclusao },
+								{ "OutroSacadoNome", fluxoCaixa.OutroSacadoNome },
+								{ "SituacaoID", fluxoCaixa.SituacaoID },
+								{ "PagoMulta", fluxoCaixa.PagoMulta },
+								{ "PagoJuros", fluxoCaixa.PagoJuros },
+								{ "TipoID", fluxoCaixa.TipoID },
+								{ "TransacaoID", fluxoCaixa.TransacaoID },
+								{ "EspecieID", fluxoCaixa.EspecieID },
+								{ "EstabelecimentoID", fluxoCaixa.EstabelecimentoID },
+								{ "LoginID", fluxoCaixa.LoginID },
+								{ "FinanceiroID", fluxoCaixa.FinanceiroID },
+								{ "Observacoes", fluxoCaixa.Observacoes }
+							};
+
+						if (recebivelDict != null || fluxoCaixaDict != null)
+						{
+							recebiveis.Add(recebivel);
+							fluxoCaixas.Add(fluxoCaixa);
+
+							if (consumidorID != null)
+								linhasSql.Add(sqlHelper.GerarSqlInsertRecebiveis( recebivelDict, fluxoCaixaDict));
+							else
+								linhasSqlSemConsumidor.Add(sqlHelper.GerarSqlInsertRecebiveis(recebivelDict, fluxoCaixaDict));
+						}
+						//}
 					}
 				}
 
@@ -1139,6 +1152,7 @@ namespace Migracao.Imports
 
 				var salvarArquivo = Tools.GerarNomeArquivo($"Recebiveis_{estabelecimentoID}_OdontoCompany_Migração", ".sql");
 				File.WriteAllLines(salvarArquivo + ".sql", linhasSql);
+				File.WriteAllLines(salvarArquivo + "SEMCONSUMIDOR.sql", linhasSqlSemConsumidor);
 
 				MessageBox.Show("Sucesso!");
 			}

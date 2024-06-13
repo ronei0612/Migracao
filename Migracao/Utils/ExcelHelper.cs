@@ -40,6 +40,7 @@ namespace Migracao.Utils
 
 		public static Dictionary<string, string> consumidorIDRecebiveisDict = new Dictionary<string, string>();
 		public static Dictionary<string, string> consumidorIDRecebidosDict = new Dictionary<string, string>();
+		public static Dictionary<string, string> consumidorIDDocumentoRecebiveisDict = new Dictionary<string, string>();
 
 		private Dictionary<string, string> pessoaIDDataAgendaDict = new Dictionary<string, string>();
 		private Dictionary<string, string> tituloDataAgendaDict = new Dictionary<string, string>();
@@ -73,6 +74,7 @@ namespace Migracao.Utils
 			int valorOriginalColumnIndex = GetColumnIndex(headerRow, "valororiginal");
 			int pagoValorColumnIndex = GetColumnIndex(headerRow, "pagoValor");
 			int dataBaixaColumnIndex = GetColumnIndex(headerRow, "databaixa");
+			int exclusaoMotivoColumnIndex = GetColumnIndex(headerRow, "exclusaomotivo");
 
 			for (int row = 1; row <= sheet.LastRowNum; row++)
 			{
@@ -83,6 +85,7 @@ namespace Migracao.Utils
 					string valorOriginal = sheet.GetRow(row).GetCell(valorOriginalColumnIndex) != null ? sheet.GetRow(row).GetCell(valorOriginalColumnIndex).ToString().ToLower() : "";
 					string pagoValor = sheet.GetRow(row).GetCell(pagoValorColumnIndex) != null ? sheet.GetRow(row).GetCell(pagoValorColumnIndex).ToString().ToLower() : "";
 					string dataBaixa = sheet.GetRow(row).GetCell(dataBaixaColumnIndex) != null ? sheet.GetRow(row).GetCell(dataBaixaColumnIndex).ToString().ToLower() : "";
+					string exclusaoMotivo = sheet.GetRow(row).GetCell(exclusaoMotivoColumnIndex) != null ? sheet.GetRow(row).GetCell(exclusaoMotivoColumnIndex).ToString().ToLower() : "";
 
 					if (!valorOriginal.Contains('.') && !valorOriginal.Contains(','))
 						valorOriginal = valorOriginal.Insert(valorOriginal.Length - 4, ".");
@@ -97,6 +100,10 @@ namespace Migracao.Utils
 					key = consumidorID + "|" + pagoValor + "|" + dataBaixa;
 					if (!consumidorIDRecebidosDict.ContainsKey(key))
 						consumidorIDRecebidosDict.Add(key, consumidorID);
+
+					key = consumidorID + "|" + exclusaoMotivo;
+					if (!consumidorIDDocumentoRecebiveisDict.ContainsKey(key))
+						consumidorIDDocumentoRecebiveisDict.Add(key, consumidorID);
 				}
 			}
 		}
@@ -642,23 +649,33 @@ namespace Migracao.Utils
 			return false;
 		}
 
-		public bool RecebivelExists(int consumidorID, decimal valorOriginal, DateTime dataVencimento, decimal pagoValor = 0, DateTime? dataBaixa = null)
+		public bool RecebivelExists(int consumidorID, string documentoRef, decimal valorOriginal, DateTime dataVencimento, decimal pagoValor = 0, DateTime? dataBaixa = null)
 		{
-			if (pagoValor > 0 && dataBaixa != null)
+			if (!string.IsNullOrEmpty(documentoRef) && consumidorID > 0)
 			{
-				var dataBaixa_ = (DateTime)dataBaixa;
-				string key = consumidorID + "|" + pagoValor.ToString("F2") + "|" + dataBaixa_.ToString("yyyy-MM-dd HH:mm:ss.fff");
+				string key = consumidorID + "|" + documentoRef;
 				if (!string.IsNullOrWhiteSpace(key))
-					if (consumidorIDRecebidosDict.ContainsKey(key))
+					if (consumidorIDDocumentoRecebiveisDict.ContainsKey(key))
 						return true;
 			}
-
 			else
 			{
-				string key = consumidorID + "|" + valorOriginal.ToString("F2") + "|" + dataVencimento.ToString("yyyy-MM-dd HH:mm:ss.fff");
-				if (!string.IsNullOrWhiteSpace(key))
-					if (consumidorIDRecebiveisDict.ContainsKey(key))
-						return true;
+				if (pagoValor > 0 && dataBaixa != null)
+				{
+					var dataBaixa_ = (DateTime)dataBaixa;
+					string key = consumidorID + "|" + pagoValor.ToString("F2") + "|" + dataBaixa_.ToString("yyyy-MM-dd HH:mm:ss.fff");
+					if (!string.IsNullOrWhiteSpace(key))
+						if (consumidorIDRecebidosDict.ContainsKey(key))
+							return true;
+				}
+
+				else
+				{
+					string key = consumidorID + "|" + valorOriginal.ToString("F2") + "|" + dataVencimento.ToString("yyyy-MM-dd HH:mm:ss.fff");
+					if (!string.IsNullOrWhiteSpace(key))
+						if (consumidorIDRecebiveisDict.ContainsKey(key))
+							return true;
+				}
 			}
 
 			return false;

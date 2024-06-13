@@ -191,7 +191,7 @@ namespace Migracao.Sistems
                 var cabecalhosCSV = resultado.Item2;
 
                 if (MAN001_DesenvClinico.All(cabecalhosCSV.Contains))
-                    dataTableDesenvClinico = ConvertExcelDesenvolvimentoClinico(dataTableDesenvClinico, cabecalhosCSV, linhasCSV, dataTableDesenvClinico);
+                    dataTableDesenvClinico = ConvertExcelDesenvolvimentoClinico(dataTableDesenvClinico, cabecalhosCSV, linhasCSV, dataTablePessoas);
             }
 
             if (dataTableProcedimentos.Rows.Count > 0)
@@ -841,7 +841,7 @@ namespace Migracao.Sistems
             }
         }
 
-        public DataTable ConvertExcelDesenvolvimentoClinico(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePacientes = null)
+        public DataTable ConvertExcelDesenvolvimentoClinico(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null)
         {
             try
             {
@@ -873,20 +873,20 @@ Concatenar OBS, diagnostico e obs classe
                         var dataModificado = valoresLinha.GetValueOrDefault("DATA_MODIFICADO").Trim();
 
                         cpf = cpf.ToCPF();
+                        string? nome = null;
 
-                        //if (dataTablePacientes.Rows.Count > 0)
-                        //{
-                        //    DataRow[] dataRowEncontrados = dataTablePacientes.AsEnumerable().Where(row => row.Field<string>("Documento(CNPJ_CPF)") == cpf).ToArray();
-                        //    //if (dataRowEncontrados.Length > 0)
-                        //    //    nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
-                        //}
+                        if (dataTablePessoas.Rows.Count > 0)
+                        {
+                            DataRow[] dataRowEncontrados = dataTablePessoas.AsEnumerable().Where(row => row.Field<string>("Documento(CNPJ_CPF)") == cpf).ToArray();
+                            if (dataRowEncontrados.Length > 0)
+                                nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
+                        }
 
-
+                        dataRow["Nome"] = nome;
                         dataRow["CNPJ_CPF"] = cpf;
-                        dataRow["Observação"] = observacao;
+                        dataRow["Observação"] = observacao + " - " + diagnostico + " - " + obsClasse; ;
                         dataRow["Diagnostico"] = diagnostico;
                         dataRow["DataModificado"] = dataModificado.ToData().ToString();
-                        dataRow["ObservaçãoClasse"] = observacao + " - " + diagnostico + " - " + obsClasse;
 
                         dataTable.Rows.Add(dataRow);
                     }

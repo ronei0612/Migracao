@@ -933,7 +933,10 @@ namespace Migracao.Imports
 							{
 								switch (tituloColuna)
 								{
-									case "CPF":
+									case "Nome":
+										nomeCompleto = celulaValor; 
+										break;
+									case "CPF": 
 										cpf = celulaValor.ToCPF();
 										break;
 									case "Emitente":

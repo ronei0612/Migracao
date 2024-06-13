@@ -2,6 +2,7 @@
 {
     internal class FluxoCaixa
     {
+        public string? Nome { get; set; }
         public int ID { get; set; }
         public required byte TipoID { get; set; }
         public required DateTime Data { get; set; }

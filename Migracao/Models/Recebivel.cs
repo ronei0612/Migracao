@@ -2,6 +2,7 @@
 {
     internal class Recebivel
     {
+        public string? Nome { get; set; }
         public int ID { get; set; }
         public long? Documento { get; set; }
         public short? Sequencia { get; set; }

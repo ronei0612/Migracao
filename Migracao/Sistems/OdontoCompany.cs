@@ -26,7 +26,7 @@ namespace Migracao.Sistems
         List<string> cabecalhos_Agendamentos = ["ID", "CPF", "Nome Completo", "Telefone", "Data Início (01/12/2024 00:00)", "Data Término (01/12/2024 00:00)", "Data Inclusão (01/12/2024)", "NomeCompletoDentista", "Observacao"];
         List<string> cabecalhos_Procedimentos = ["Nome Tabela", "Ativo(S/N)", "Procedimento(Nome)", "Abreviação", "Especialidade", "Especialidade Código", "Especialidade ID", "Preço", "TUSS", "Diagnóstico(S/N)", "Prevenção(S/N)", "Odontopediatria(S/N)", "Dentística(S/N)", "Endodontia(S/N)", "Periodontia(S/N)", "Prótese(S/N)", "Cirurgia(S/N)", "Ortodontia(S/N)", "Radiologia(S/N)", "Estética(S/N)", "Implantodontia(S/N)", "Odontogeriatria(S/N)", "DTM(S/N)", "Orofacial(S/N)",];
         List<string> cabecalhos_CodProcedimentos = ["ID", "Nome", "Usuário"];
-        List<string> cabecalhos_DesenvClinico = ["CNPJ_CPF", "Observação", "DataModificado", "Diagnostico", "ObservaçãoClasse"];
+        List<string> cabecalhos_DesenvClinico = ["Nome", "CNPJ_CPF", "Observação", "DataModificado", "Diagnostico", "ObservaçãoClasse"];
 
         //public static Dictionary<string, string> pessoaCSVDict;
 
@@ -183,9 +183,9 @@ namespace Migracao.Sistems
 
             var excel_MAN001 = listView.Items.Cast<ListViewItem>()
                 .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("MAN001")));
-            if (excel_MAN001 != null)
-            {
 
+            if (excel_MAN001 != null )
+            {
                 var resultado = LerArquivosExcelCsv(excel_MAN001.Text, Encoding.UTF8);
                 var linhasCSV = resultado.Item1;
                 var cabecalhosCSV = resultado.Item2;
@@ -591,7 +591,7 @@ namespace Migracao.Sistems
 
                     catch (Exception error)
                     {
-                        throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
+                        //throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
                     }
 
                     linhaIndex++;
@@ -859,13 +859,6 @@ namespace Migracao.Sistems
                             if (i < linha.Length)
                                 valoresLinha.Add(cabecalhos[i], linha[i]);
 
-                        /*
-                         * [08:36] Jorge Caldas Neto
-CPF, OBS, Data Modificado, Diagnostico, obs classe
-[08:36] Jorge Caldas Neto
-Concatenar OBS, diagnostico e obs classe
-                         */
-
                         var cpf = valoresLinha.GetValueOrDefault("CNPJ_CPF").Trim();
                         var observacao = valoresLinha.GetValueOrDefault("OBS").Trim();
                         var diagnostico = valoresLinha.GetValueOrDefault("DIAGNOSTICO").Trim();
@@ -877,7 +870,7 @@ Concatenar OBS, diagnostico e obs classe
 
                         if (dataTablePessoas.Rows.Count > 0)
                         {
-                            DataRow[] dataRowEncontrados = dataTablePessoas.AsEnumerable().Where(row => row.Field<string>("Documento(CNPJ_CPF)") == cpf).ToArray();
+                            DataRow[] dataRowEncontrados = dataTablePessoas.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
                             if (dataRowEncontrados.Length > 0)
                                 nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
                         }
@@ -892,7 +885,7 @@ Concatenar OBS, diagnostico e obs classe
                     }
                     catch (Exception error)
                     {
-                        throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}    {dataModificadoTeste}");
+                        throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
                     }
 
                     linhaIndex++;

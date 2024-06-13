@@ -351,7 +351,21 @@ namespace Migracao.Utils
 			File.WriteAllText(salvarArquivo + ".sql", sql.ToString());
 		}
 
-		public object VerificarSeDateTime(object input)
+        public string GerarSqlInsertAtendimento(Dictionary<string, object> atendimentoDict)
+        {
+            var sql = new StringBuilder();
+
+            if (atendimentoDict != null)
+            {
+                sql.AppendLine($"INSERT INTO Recebiveis ({string.Join(", ", atendimentoDict.Keys)}) " +
+                    $"{Environment.NewLine}    VALUES ({string.Join(", ", atendimentoDict.Values.Select(FormatValue))});");
+                sql.AppendLine($"SET @RecebivelID = NULL;");
+                sql.AppendLine($"SELECT @RecebivelID = SCOPE_IDENTITY();");
+            }
+            return sql.ToString().TrimEnd(';');
+        }
+
+        public object VerificarSeDateTime(object input)
 		{
 			if (input is DateTime dateTime)
 				return dateTime.ToString("yyyy-MM-dd HH:mm:ss.f");

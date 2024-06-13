@@ -1643,7 +1643,7 @@ namespace Migracao.Imports
             linhasSql.Add("DECLARE @RecebivelID int;");
             linhasSqlSemConsumidor.Add("DECLARE @RecebivelID int;");
 
-            //List<FluxoCaixa> fluxoCaixas = new();
+            List<Atendimento> lstAtendimentos = new();
 
             try
             {
@@ -1652,7 +1652,7 @@ namespace Migracao.Imports
                     indiceLinha++;
 
                     string cpf = "";
-                    string? observacao = null, diagnostico = null, obsClasse = null;
+                    string? nome = null, observacao = null, diagnostico = null, obsClasse = null;
                     int recibo = 0, codigo = 0;
                     DateTime? dataModificado = dataHoje;
 
@@ -1668,6 +1668,9 @@ namespace Migracao.Imports
                             {
                                 switch (tituloColuna)
                                 {
+                                    case "Nome":
+                                        nome = celulaValor;
+                                        break;
                                     case "CNPJ_CPF":
                                         cpf = celulaValor.ToCPF();
                                         break;
@@ -1688,96 +1691,41 @@ namespace Migracao.Imports
                         }
                     }
 
-                    FluxoCaixa fluxoCaixa = null;
-                    Recebivel recebivel = null;
+                    Atendimento atendimento = null;
 
-                   // if (isrecebivel)
+                    atendimento = new Atendimento()
                     {
-                        //if (dataVencimento == dataHoje)
-                        //    dataVencimento = new DateTime(dataInclusao.Year, dataVencimento.Month, dataVencimento.Day);
+                        
+                    };
 
-                        //dataBaseCalculo = dataVencimento;
+                    Dictionary<string, object> atendimentoDict = null;
 
-                        //var consumidorIDValue = excelHelper.GetConsumidorID(nomeCompleto: nomeCompleto, cpf: cpf, codigo: codigo.ToString());
-                        ////var consumidorIDValue = excelHelper.GetConsumidorID(cpf: cpf);
-                        //var fornecedorIDValue = excelHelper.GetFornecedorID(nomeCompleto: nomeCompleto, cpf: cpf);
-                        //var funcionarioIDValue = excelHelper.GetFuncionarioID(nomeCompleto: nomeCompleto, cpf: cpf);
+                    if (atendimento != null)
+                        atendimentoDict = new Dictionary<string, object>
+                        {
+                            { "ConsumidorID", atendimento.ConsumidorID },
+                            { "ValorOriginal", atendimento.AtendeTipoID },
+                            //{ "ValorDevido", atendimento.ValorDevido },
+                            //{ "DataVencimento", atendimento.DataVencimento },
+                            //{ "ValorBaixa", atendimento.ValorBaixa },
+                            //{ "DataBaixa", atendimento.DataBaixa },
+                            //{ "DataInclusao", atendimento.DataInclusao },
+                            //{ "ExclusaoMotivo", atendimento.ExclusaoMotivo },
+                            //{ "FornecedorID", atendimento.FornecedorID },
+                            //{ "ClienteID", atendimento.ClienteID },
+                            //{ "ColaboradorID", atendimento.ColaboradorID },
+                            //{ "SacadoNome", atendimento.SacadoNome },
+                            //{ "EspecieID", atendimento.EspecieID }
+                        };
 
-                        //if (!string.IsNullOrEmpty(consumidorIDValue))
-                        //    consumidorID = int.Parse(consumidorIDValue);
-                        //else if (!string.IsNullOrEmpty(fornecedorIDValue))
-                        //    fornecedorID = int.Parse(fornecedorIDValue);
-                        //else if (!string.IsNullOrEmpty(funcionarioIDValue))
-                        //    funcionarioID = int.Parse(funcionarioIDValue);
+                    if (atendimento != null)
+                    {
+                        lstAtendimentos.Add(atendimento);
+
+                        //if (consumidorID != null)
+                        //    linhasSql.Add(sqlHelper.GerarSqlInsertAtendimento(atendimentoDict));
                         //else
-                        //    outroSacadoNome = cpf;
-
-                        //if (indiceLinha == 86)
-                        //    indiceLinha = indiceLinha;
-
-                        ////if (valorOriginal >= 1)
-                        //recebivel = new Recebivel()
-                        //{
-                        //    ConsumidorID = consumidorID,
-                        //    FornecedorID = fornecedorID,
-                        //    ClienteID = clienteID,
-                        //    ColaboradorID = colaboradorID,
-                        //    SacadoNome = outroSacadoNome,
-                        //    EspecieID = (byte)formaPagamento,
-                        //    DataEmissao = dataInclusao,
-                        //    ValorOriginal = valorOriginal,
-                        //    ValorDevido = valorDevido,
-                        //    DataBaseCalculo = dataBaseCalculo,
-                        //    DataInclusao = dataInclusao,
-                        //    DataVencimento = dataVencimento,
-                        //    FinanceiroID = respFinanceiroID,
-                        //    LoginID = loginID,
-                        //    EstabelecimentoID = estabelecimentoID,
-                        //    SituacaoID = (byte)TituloSituacoesID.Normal,
-                        //    Observacoes = observacaoRecebivel,
-                        //    ExclusaoMotivo = documento,
-                        //    DataBaixa = dataBaixa,
-                        //    ValorBaixa = pagoValor
-                        //};
-
-                        //Dictionary<string, object> recebivelDict = null;
-                        //Dictionary<string, object> fluxoCaixaDict = null;
-
-                        //if (recebivel != null)
-                        //    recebivelDict = new Dictionary<string, object>
-                        //    {
-                        //        { "ConsumidorID", recebivel.ConsumidorID },
-                        //        { "ValorOriginal", recebivel.ValorOriginal },
-                        //        { "ValorDevido", recebivel.ValorDevido },
-                        //        { "DataVencimento", recebivel.DataVencimento },
-                        //        { "ValorBaixa", recebivel.ValorBaixa },
-                        //        { "DataBaixa", recebivel.DataBaixa },
-                        //        { "DataInclusao", recebivel.DataInclusao },
-                        //        { "ExclusaoMotivo", recebivel.ExclusaoMotivo },
-                        //        { "FornecedorID", recebivel.FornecedorID },
-                        //        { "ClienteID", recebivel.ClienteID },
-                        //        { "ColaboradorID", recebivel.ColaboradorID },
-                        //        { "SacadoNome", recebivel.SacadoNome },
-                        //        { "EspecieID", recebivel.EspecieID },
-                        //        { "DataEmissao", recebivel.DataEmissao },
-                        //        { "DataBaseCalculo", recebivel.DataBaseCalculo },
-                        //        { "FinanceiroID", recebivel.FinanceiroID },
-                        //        { "LoginID", recebivel.LoginID },
-                        //        { "EstabelecimentoID", recebivel.EstabelecimentoID },
-                        //        { "SituacaoID", recebivel.SituacaoID },
-                        //        { "Observacoes", recebivel.Observacoes }
-                        //    };
-
-                        //if (recebivelDict != null || fluxoCaixaDict != null)
-                        //{
-                        //    recebiveis.Add(recebivel);
-                        //    fluxoCaixas.Add(fluxoCaixa);
-
-                        //    if (consumidorID != null)
-                        //        linhasSql.Add(sqlHelper.GerarSqlInsertRecebiveis(recebivelDict, fluxoCaixaDict));
-                        //    else
-                        //        linhasSqlSemConsumidor.Add(sqlHelper.GerarSqlInsertRecebiveis(recebivelDict, fluxoCaixaDict));
-                        //}
+                        //    linhasSqlSemConsumidor.Add(sqlHelper.GerarSqlInsertAtendimento(atendimentoDict));
                     }
                 }
 

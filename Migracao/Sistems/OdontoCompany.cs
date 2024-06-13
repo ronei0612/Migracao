@@ -18,12 +18,15 @@ namespace Migracao.Sistems
         string[] CED006_Dentistas = ["ADMISSAO", "AGENCIA", "AGENCIA2", "AXON_ID", "BAIRRO", "BANCO", "BANCO2", "CAIXA_POSTAL", "CEP", "CGC_CPF", "CIDADE", "CLIENTE", "CODIGO", "CODIGO_CLIENTE", "CODIGO_INDICACAO", "CODIGO_VALIDADE", "COD_MUNICIPIO", "COD_PRAMELHOR", "COD_UF", "COD_VENDEDOR", "CONJUGE", "CONTA", "CONTA2", "CPF_FIA", "CPF_INDICACAO", "DATA_APROVACAO_DRCASH", "DATA_BLOQUEIO", "DATA_DEP_EXCLUIDO", "DATA_LGPD", "DATA_VALIDADE", "DEPENDENTE", "DT_AXON", "DT_CADASTRO", "DT_NASC_FIA", "DT_NASCIMENTO", "DT_NASCIMENTO_DEP", "DT_ULTMOV", "EMAIL", "ENDERECO", "ENDERECO_FIA", "ESTADO", "ESTADO_FIA", "FAX", "FONE1", "FONE2", "FONE_FIA", "FONE_REF_1", "FONE_REF_2", "F_OU_J", "FORNECEDOR", "FUNCAO", "ID_DRCASH", "INSC_RG", "INSTITUTO_ODC", "LGPD_CPF", "LGPD_DATA_HORA", "LGPD_IMAGEM", "LGPD_MENSAGEM", "LGPD_TELEFONE", "LGPD_USUARIO", "LOJA", "MAE", "MODIFICADO", "NOME", "NOME_FIA", "NOME_GRUPO", "NOME_LOCAL", "NOME_REF_1", "NOME_REF_2", "NOME_VALIDADE", "NUM_BLOQUEIO", "NUM_CONVENIO", "NUM_ENDERECO", "NUM_FICHA", "OBS1", "OBS_VALIDADE", "ONDE_TRABALHA", "PAI", "PARENTESCO_FIA", "PRESTADOR", "PROFISSAO", "PROFISSAO_FIA", "PROTETICO", "PROTETICO_ATIVO", "QTDE_DEPENDENTES", "RENDA_FIA", "RENDA_MES", "RG_FIA", "SEXO_M_F", "TITULAR", "TITULAR_DEP_EXCLUIDO", "TRANSMISSAO", "USU_BLOQUEIO", "USU_CADASTRO", "USUARIO", "USUARIO_LGPD", "USUARIO_VALIDADE", "VALOR_MAXIMO_DRCASH", "VR_LIMITE"];
         string[] CED001_Procedimentos = ["CODIGO", "NOME", "SIMBOLO", "GRUPO", "CODIGO_TUSS", "VRVENDA", "ATIVO", "OBS", "PARTICULAR"];
         string[] CED002_CodProcedimentos = ["CODIGO", "NOME", "USUARIO"];
+        string[] MAN001_DesenvClinico = ["CNPJ_CPF","QTDE_MANUT","OBS","ATIVO","INICIO_MANUT","FINAL_MANUT","MODIFICADO","USUARIO","DATA_ATIVO","USU_ATIVO","USU_INSTALACAO","USU_RETIRADA","MOTIVO_ATIVO","DIAGNOSTICO","PROGNOSTICO","OBS_CLASSE","CLASSE","DATA_ALTERACAO","HORA_ALTERACAO","USUARIO_ALTERACAO","DATA_MODIFICADO","DT_AXON","AXON_ID"
+];
 
         List<string> cabecalhos_Pacientes = ["Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
         List<string> cabecalhos_Recebiveis = ["CPF", "Nome", "DocumentoRef", "RecebívelExigível(R/E)", "ValorOriginal", "ValorPago", "Prazo", "Vencimento(01/12/2010)", "DataBaixa", "Emissão(01/12/2010)", "ObservaçãoRecebível", "ObservaçãoRecebido"];
         List<string> cabecalhos_Agendamentos = ["ID", "CPF", "Nome Completo", "Telefone", "Data Início (01/12/2024 00:00)", "Data Término (01/12/2024 00:00)", "Data Inclusão (01/12/2024)", "NomeCompletoDentista", "Observacao"];
         List<string> cabecalhos_Procedimentos = ["Nome Tabela", "Ativo(S/N)", "Procedimento(Nome)", "Abreviação", "Especialidade", "Especialidade Código", "Especialidade ID", "Preço", "TUSS", "Diagnóstico(S/N)", "Prevenção(S/N)", "Odontopediatria(S/N)", "Dentística(S/N)", "Endodontia(S/N)", "Periodontia(S/N)", "Prótese(S/N)", "Cirurgia(S/N)", "Ortodontia(S/N)", "Radiologia(S/N)", "Estética(S/N)", "Implantodontia(S/N)", "Odontogeriatria(S/N)", "DTM(S/N)", "Orofacial(S/N)",];
         List<string> cabecalhos_CodProcedimentos = ["ID", "Nome", "Usuário"];
+        List<string> cabecalhos_DesenvClinico = ["CNPJ_CPF", "Observação", "DataModificado", "Diagnostico", "ObservaçãoClasse"];
 
         //public static Dictionary<string, string> pessoaCSVDict;
 
@@ -45,6 +48,7 @@ namespace Migracao.Sistems
             DataTable dataTableAgendamentos = new();
             DataTable dataTableProcedimentos = new();
             DataTable dataTableCodProcedimentos = new();
+            DataTable dataTableDesenvClinico = new();
             //registroRecebivel = new HashSet<string>();
 
             foreach (string coluna in cabecalhos_Pacientes)
@@ -55,6 +59,9 @@ namespace Migracao.Sistems
 
             foreach (string coluna in cabecalhos_Agendamentos)
                 dataTableAgendamentos.Columns.Add(coluna, typeof(string));
+
+            foreach (string coluna in cabecalhos_DesenvClinico)
+                dataTableDesenvClinico.Columns.Add(coluna, typeof(string));
 
             var excel_EMD101 = listView.Items.Cast<ListViewItem>()
                 .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("EMD101")));
@@ -115,24 +122,17 @@ namespace Migracao.Sistems
                 var linhasCSV = resultado.Item1;
                 var cabecalhosCSV = resultado.Item2;
                 //dataTableRecebiveis = ConvertExcelRecebidos(dataTableRecebiveis, cabecalhosCSV, linhasCSV, dataTablePessoas);
-                List<string[]>? lstVendaCSV = new List<string[]>(); 
+                List<string[]>? lstVendaCSV = new List<string[]>();
 
                 foreach (var linha in linhasCSV)
                 {
                     if (linha[1].Contains("VENDA - "))
-                            lstVendaCSV.Add(linha);
+                        lstVendaCSV.Add(linha);
                 }
 
                 dataTableRecebiveis = ConvertExcelRecebiveisHistoricoVendas(dataTableRecebiveis, cabecalhosCSV, lstVendaCSV, dataTablePessoas);
 
             }
-
-            if (excel_BXD111 != null || excel_CRD111 != null || excel_CXD555 != null)
-            {
-                var salvarArquivoRecebiveis = Tools.GerarNomeArquivo($"CadastroRecebiveis_{estabelecimentoID}_OdontoCompany");
-                excelHelper.CriarExcelArquivo(salvarArquivoRecebiveis + ".xlsx", dataTableRecebiveis);
-            }
-
 
             var excel_AGENDA = listView.Items.Cast<ListViewItem>()
                 .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("AGENDA")));
@@ -181,10 +181,35 @@ namespace Migracao.Sistems
                     dataTableProcedimentos = ConvertExcelProcedimentos(dataTableProcedimentos, cabecalhosCSV, linhasCSV, dataTableCodProcedimentos);
             }
 
+            var excel_MAN001 = listView.Items.Cast<ListViewItem>()
+                .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("MAN001")));
+            if (excel_MAN001 != null)
+            {
+
+                var resultado = LerArquivosExcelCsv(excel_MAN001.Text, Encoding.UTF8);
+                var linhasCSV = resultado.Item1;
+                var cabecalhosCSV = resultado.Item2;
+
+                if (MAN001_DesenvClinico.All(cabecalhosCSV.Contains))
+                    dataTableDesenvClinico = ConvertExcelDesenvolvimentoClinico(dataTableDesenvClinico, cabecalhosCSV, linhasCSV, dataTableDesenvClinico);
+            }
+
             if (dataTableProcedimentos.Rows.Count > 0)
             {
                 var salvarArquivoAgenda = Tools.GerarNomeArquivo($"CadastroProcedimentos_{estabelecimentoID}_OdontoCompany");
                 excelHelper.CriarExcelArquivo(salvarArquivoAgenda + ".xlsx", dataTableProcedimentos);
+            }
+
+            if (excel_BXD111 != null || excel_CRD111 != null || excel_CXD555 != null)
+            {
+                var salvarArquivoRecebiveis = Tools.GerarNomeArquivo($"CadastroRecebiveis_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarArquivoRecebiveis + ".xlsx", dataTableRecebiveis);
+            }
+
+            if(excel_MAN001 != null)
+            {
+                var salvarDesenvolvimentoCLinico = Tools.GerarNomeArquivo($"CadastroDesenvolvimentoCLinico_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarDesenvolvimentoCLinico + ".xlsx", dataTableDesenvClinico);
             }
         }
 
@@ -813,6 +838,71 @@ namespace Migracao.Sistems
             catch (Exception error)
             {
                 throw new Exception($"Erro ao converter Excel para Pessoas Pacientes: {error.Message}");
+            }
+        }
+
+        public DataTable ConvertExcelDesenvolvimentoClinico(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePacientes = null)
+        {
+            try
+            {
+                int linhaIndex = 0;
+                string dataModificadoTeste = null;
+
+                foreach (string[] linha in linhas)
+                {
+                    try
+                    {
+                        DataRow dataRow = dataTable.NewRow();
+                        var valoresLinha = new Dictionary<string, string>();
+
+                        for (int i = 0; i < cabecalhos.Count; i++)
+                            if (i < linha.Length)
+                                valoresLinha.Add(cabecalhos[i], linha[i]);
+
+                        /*
+                         * [08:36] Jorge Caldas Neto
+CPF, OBS, Data Modificado, Diagnostico, obs classe
+[08:36] Jorge Caldas Neto
+Concatenar OBS, diagnostico e obs classe
+                         */
+
+                        var cpf = valoresLinha.GetValueOrDefault("CNPJ_CPF").Trim();
+                        var observacao = valoresLinha.GetValueOrDefault("OBS").Trim();
+                        var diagnostico = valoresLinha.GetValueOrDefault("DIAGNOSTICO").Trim();
+                        var obsClasse = valoresLinha.GetValueOrDefault("OBS_CLASSE").Trim();
+                        var dataModificado = valoresLinha.GetValueOrDefault("DATA_MODIFICADO").Trim();
+
+                        cpf = cpf.ToCPF();
+
+                        //if (dataTablePacientes.Rows.Count > 0)
+                        //{
+                        //    DataRow[] dataRowEncontrados = dataTablePacientes.AsEnumerable().Where(row => row.Field<string>("Documento(CNPJ_CPF)") == cpf).ToArray();
+                        //    //if (dataRowEncontrados.Length > 0)
+                        //    //    nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
+                        //}
+
+
+                        dataRow["CNPJ_CPF"] = cpf;
+                        dataRow["Observação"] = observacao;
+                        dataRow["Diagnostico"] = diagnostico;
+                        dataRow["DataModificado"] = dataModificado.ToData().ToString();
+                        dataRow["ObservaçãoClasse"] = observacao + " - " + diagnostico + " - " + obsClasse;
+
+                        dataTable.Rows.Add(dataRow);
+                    }
+                    catch (Exception error)
+                    {
+                        throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}    {dataModificadoTeste}");
+                    }
+
+                    linhaIndex++;
+                }
+
+                return dataTable;
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Excel Recebíveis: {error.Message}");
             }
         }
     }

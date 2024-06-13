@@ -106,7 +106,11 @@ namespace Migracao
 
 						else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
 							importacoes.ImportarAgenda(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), txtReferencia.Text, int.Parse(txtLoginID.Text), int.Parse(txtPessoaID.Text));
-					}
+
+                        else if (comboBoxImportacao.Text.Equals("Desenv Clinico", StringComparison.CurrentCultureIgnoreCase))
+                            importacoes.ImportarDesenvolvimentoClinico(textBoxExcel1.Text, 
+								int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
+                    }
 				}
 				catch (Exception ex)
 				{
@@ -285,6 +289,12 @@ namespace Migracao
 								lbPessoaID.Visible = true;
 								txtPessoaID.Visible = true;
 							}
+
+							if(comboBoxImportacao.Text.Equals("Desenv clinico", StringComparison.CurrentCultureIgnoreCase))
+							{
+                                lbPessoaID.Visible = true;
+                                txtPessoaID.Visible = true;
+                            }
 						}
 
 
@@ -321,7 +331,9 @@ namespace Migracao
 					nomeArquivoExcel = "CED001";
 				else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
 					nomeArquivoExcel = "AGENDA";
-			}
+                else if (comboBoxImportacao.Text.Equals("Desenv clinico", StringComparison.CurrentCultureIgnoreCase))
+                    nomeArquivoExcel = "MAN001";
+            }
 		}
 
 		private void comboBoxSistema_SelectedIndexChanged(object sender, EventArgs e)

@@ -292,8 +292,10 @@ namespace Migracao.Sistems
                             dataRow["ObservaçãoRecebível"] = observacao;
                             dataRow["DocumentoRef"] = documento;
                             dataRow["ValorOriginal"] = valor.ArredondarValorV2();
-                            //dataRow["Prazo"] = prazo;
-                            dataRow["Vencimento(01/12/2010)"] = vencimentoData.ToData().ToString("dd/MM/yyyy");
+							dataRow["ValorPago"] = valor.ArredondarValorV2();
+							dataRow["DataBaixa"] = vencimentoData.ToData().ToString("dd/MM/yyyy");
+							//dataRow["Prazo"] = prazo;
+							dataRow["Vencimento(01/12/2010)"] = vencimentoData.ToData().ToString("dd/MM/yyyy");
                             dataRow["Emissão(01/12/2010)"] = emissaoData.ToData().ToString("dd/MM/yyyy");
                             dataRow["RecebívelExigível(R/E)"] = "R";
 

@@ -8,9 +8,9 @@ namespace Migracao
 {
 	public partial class Form1 : Form
 	{
-		string arquivoConfig = "config.config";
-		string nomeArquivoExcel = "";
-		string janelaArquivoExcel = "Selecione um arquivo";
+		private const string arquivoConfig = "config.config";
+		private string nomeArquivoExcel = "";
+		private string janelaArquivoExcel = "Selecione um arquivo";
 
 		public Form1()
 		{
@@ -19,7 +19,7 @@ namespace Migracao
 
 		private void btnExcel_Click(object sender, EventArgs e)
 		{
-			var openFileDialog = new OpenFileDialog()
+			using var openFileDialog = new OpenFileDialog
 			{
 				Filter = "Arquivo Excel |*.xlsx",
 				Title = janelaArquivoExcel,
@@ -31,20 +31,20 @@ namespace Migracao
 			{
 				textBoxExcel1.Text = openFileDialog.FileName;
 				Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+				SalvarConfiguracoes();
 			}
 		}
 
 		private void btnImportar_Click(object sender, EventArgs e)
 		{
 			Tools.ultimoEstabelecimentoID = txtEstabelecimentoID.Text;
-			File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+			SalvarConfiguracoes();
 
 			if (ValidarCampos())
 			{
 				try
 				{
-					if (listView1.Visible == true)
+					if (listView1.Visible)
 					{
 						if (comboBoxImportacao.Text.Equals("todos", StringComparison.CurrentCultureIgnoreCase))
 						{
@@ -53,59 +53,109 @@ namespace Migracao
 
 							MessageBox.Show("Sucesso");
 						}
-
 						else if (comboBoxImportacao.Text.Equals("json", StringComparison.CurrentCultureIgnoreCase))
 						{
-							ConverterHelper converterHelper = new ConverterHelper();
+							var converterHelper = new ConverterHelper();
 							var nomeArquivo = "";
-
 							foreach (ListViewItem item in listView1.Items)
 							{
-								nomeArquivo = Tools.TratarCaracteres(Path.GetFileNameWithoutExtension(item.Text));
-								var pastaArquivo = Path.GetDirectoryName(item.Text);
-								nomeArquivo = Path.Combine(pastaArquivo, nomeArquivo) + ".xlsx";
-
+								nomeArquivo = Path.Combine(
+									Path.GetDirectoryName(item.Text),
+									Tools.TratarCaracteres(Path.GetFileNameWithoutExtension(item.Text)) + ".xlsx"
+								);
 								converterHelper.JsonExcel(item.Text, nomeArquivo);
 							}
 
 							Tools.AbrirPastaSelecionandoArquivo(nomeArquivo);
 						}
 					}
-
-					else if (comboBoxSistema.Text.Equals("dentaloffice", StringComparison.CurrentCultureIgnoreCase))
+					else
 					{
-						var dentalOffice = new DentalOffice();
+						var sistema = comboBoxSistema.Text.ToLower();
+						var importacao = comboBoxImportacao.Text.ToLower();
 
-						if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
-							dentalOffice.ImportarPacientes(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text));
-
-						else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase)
-							&& !string.IsNullOrEmpty(txtPessoaID.Text))
-							dentalOffice.ImportarRecebidos(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
-
-						else if (comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
-							&& !string.IsNullOrEmpty(txtPessoaID.Text))
-							dentalOffice.ImportarPagos(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
-					}
-
-					else if (comboBoxSistema.Text.Equals("odontocompany", StringComparison.CurrentCultureIgnoreCase))
-					{
-						var importacoes = new Importacoes();
-
-						if (comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase))
-							importacoes.ImportarFornecedores(textBoxExcel1.Text, txtReferencia.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
-
-						else if (comboBoxImportacao.Text.Equals("pessoas", StringComparison.CurrentCultureIgnoreCase))
-							importacoes.ImportarPessoas(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text));
-
-						else if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
-							importacoes.ImportarRecebiveis(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
-
-						else if (comboBoxImportacao.Text.Equals("preços", StringComparison.CurrentCultureIgnoreCase))
-							importacoes.ImportarPrecos(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), int.Parse(txtLoginID.Text), txtReferencia.Text);
-
-						else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
-							importacoes.ImportarAgenda(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), txtReferencia.Text, int.Parse(txtLoginID.Text), int.Parse(txtPessoaID.Text));
+						switch (sistema)
+						{
+							case "dentaloffice":
+								var dentalOffice = new DentalOffice();
+								switch (importacao)
+								{
+									case "pacientes":
+										dentalOffice.ImportarPacientes(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text));
+										break;
+									case "recebidos":
+										if (!string.IsNullOrEmpty(txtPessoaID.Text))
+										{
+											dentalOffice.ImportarRecebidos(
+												textBoxExcel1.Text,
+												txtReferencia.Text,
+												int.Parse(txtEstabelecimentoID.Text),
+												int.Parse(txtPessoaID.Text),
+												int.Parse(txtLoginID.Text)
+											);
+										}
+										break;
+									case "pagos":
+										if (!string.IsNullOrEmpty(txtPessoaID.Text))
+										{
+											dentalOffice.ImportarPagos(
+												textBoxExcel1.Text,
+												txtReferencia.Text,
+												int.Parse(txtEstabelecimentoID.Text),
+												int.Parse(txtPessoaID.Text),
+												int.Parse(txtLoginID.Text)
+											);
+										}
+										break;
+								}
+								break;
+							case "odontocompany":
+								var importacoes = new Importacoes();
+								switch (importacao)
+								{
+									case "fornecedores":
+										importacoes.ImportarFornecedores(
+											textBoxExcel1.Text,
+											txtReferencia.Text,
+											int.Parse(txtEstabelecimentoID.Text),
+											int.Parse(txtLoginID.Text)
+										);
+										break;
+									case "pessoas":
+										importacoes.ImportarPessoas(
+											textBoxExcel1.Text,
+											int.Parse(txtEstabelecimentoID.Text),
+											int.Parse(txtLoginID.Text)
+										);
+										break;
+									case "recebíveis":
+										importacoes.ImportarRecebiveis(
+											textBoxExcel1.Text,
+											int.Parse(txtEstabelecimentoID.Text),
+											int.Parse(txtPessoaID.Text),
+											int.Parse(txtLoginID.Text)
+										);
+										break;
+									case "preços":
+										importacoes.ImportarPrecos(
+											textBoxExcel1.Text,
+											int.Parse(txtEstabelecimentoID.Text),
+											int.Parse(txtLoginID.Text),
+											txtReferencia.Text
+										);
+										break;
+									case "agendamentos":
+										importacoes.ImportarAgenda(
+											textBoxExcel1.Text,
+											int.Parse(txtEstabelecimentoID.Text),
+											txtReferencia.Text,
+											int.Parse(txtLoginID.Text),
+											int.Parse(txtPessoaID.Text)
+										);
+										break;
+								}
+								break;
+						}
 					}
 				}
 				catch (Exception ex)
@@ -117,35 +167,39 @@ namespace Migracao
 
 		private bool ValidarCampos()
 		{
-			if (listView1.Visible == true)
+			if (listView1.Visible)
 			{
 				foreach (ListViewItem item in listView1.SelectedItems)
+				{
 					if (!File.Exists(item.Text))
 					{
 						MessageBox.Show("Arquivo não existe:" + Environment.NewLine + item.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 						return false;
 					}
+				}
 			}
-
 			else
 			{
-				if (comboBoxSistema.SelectedIndex == -1 || comboBoxSistema.SelectedIndex == -1 || string.IsNullOrWhiteSpace(txtEstabelecimentoID.Text)
-					 || string.IsNullOrWhiteSpace(textBoxExcel1.Text) || string.IsNullOrEmpty(txtLoginID.Text))
+				if (comboBoxSistema.SelectedIndex == -1 || comboBoxImportacao.SelectedIndex == -1 ||
+					string.IsNullOrWhiteSpace(txtEstabelecimentoID.Text) || string.IsNullOrWhiteSpace(textBoxExcel1.Text) ||
+					string.IsNullOrEmpty(txtLoginID.Text))
+				{
 					return false;
+				}
 
 				if (!File.Exists(textBoxExcel1.Text))
 				{
 					MessageBox.Show("Arquivo não existe:" + Environment.NewLine + textBoxExcel1.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 					return false;
 				}
-
 				else if (!Path.GetExtension(textBoxExcel1.Text).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
 				{
 					MessageBox.Show("Arquivo não é um Excel (.xlsx):" + Environment.NewLine + textBoxExcel1.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 					return false;
 				}
 
-				if (txtReferencia.Visible == true && !string.IsNullOrWhiteSpace(txtReferencia.Text))
+				if (txtReferencia.Visible && !string.IsNullOrWhiteSpace(txtReferencia.Text))
+				{
 					if (!File.Exists(txtReferencia.Text))
 					{
 						MessageBox.Show("Arquivo não existe:" + Environment.NewLine + txtReferencia.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -156,15 +210,18 @@ namespace Migracao
 						MessageBox.Show("Arquivo não é um Excel (.xlsx):" + Environment.NewLine + txtReferencia.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 						return false;
 					}
+				}
 
-				if (txtExcel2.Visible == true && !string.IsNullOrWhiteSpace(txtExcel2.Text))
+				if (txtExcel2.Visible && !string.IsNullOrWhiteSpace(txtExcel2.Text))
+				{
 					if (!File.Exists(txtExcel2.Text))
 					{
 						MessageBox.Show("Arquivo não existe:" + Environment.NewLine + txtExcel2.Text, "Erro de Arquivo!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 						return false;
 					}
+				}
 
-				if (txtPessoaID.Visible == true && string.IsNullOrWhiteSpace(txtPessoaID.Text))
+				if (txtPessoaID.Visible && string.IsNullOrWhiteSpace(txtPessoaID.Text))
 				{
 					MessageBox.Show("Preencher campo Responsável Financeiro (PessoaID):", "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 					return false;
@@ -174,10 +231,12 @@ namespace Migracao
 			return true;
 		}
 
-		void OcultarCampos()
+		private void OcultarCampos()
 		{
 			foreach (Control control in this.Controls)
+			{
 				control.Visible = false;
+			}
 
 			label4.Visible = true;
 			comboBoxImportacao.Visible = true;
@@ -194,54 +253,43 @@ namespace Migracao
 			lbEstabelecimento.Visible = true;
 		}
 
-		void AlterarNomesCampos()
+		private void AlterarNomesCampos()
 		{
 			lbPessoaID.Text = "PessoaID RespFin:";
 
-			if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
+			var importacao = comboBoxImportacao.Text.ToLower();
+
+			switch (importacao)
 			{
-				lbExcel2.Text = "Recebíveis (Prod):";
-				lbReferencia.Text = "Recebidos (Prod):";
+				case "recebidos":
+					lbExcel2.Text = "Recebíveis (Prod):";
+					lbReferencia.Text = "Recebidos (Prod):";
+					break;
+				case "pacientes":
+					lbReferencia.Text = "Pessoas (Prod):";
+					break;
+				case "agendamentos":
+					lbReferencia.Text = "Agendamentos (Prod):";
+					lbPessoaID.Text = "FuncionarioID Dent:";
+					break;
 			}
-			else if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
-				lbReferencia.Text = "Pessoas (Prod):";
-
-			//else if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
-			//	lbReferencia.Text = "Recebíveis (Prod):";
-
-			else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
-			{
-				lbReferencia.Text = "Agendamentos (Prod):";
-				lbPessoaID.Text = "FuncionarioID Dent:";
-			}
-			//|| comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
-			//|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
-
-			//|| comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
 		}
 
-		void MostrarCampos()
+		private void MostrarCampos()
 		{
 			OcultarCampos();
 
 			if (comboBoxImportacao.SelectedIndex > -1)
 			{
-				if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "JSON")
+				var importacao = comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex].ToString();
+
+				if (importacao == "JSON" || importacao == "Todos")
 				{
 					listView1.Visible = true;
 					btnAddToList.Visible = true;
 					btnDelFromList.Visible = true;
 					btnImportar.Visible = true;
 				}
-
-				else if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "Todos")
-				{
-					listView1.Visible = true;
-					btnAddToList.Visible = true;
-					btnDelFromList.Visible = true;
-					btnImportar.Visible = true;
-				}
-
 				else
 				{
 					comboBoxSistema.Visible = true;
@@ -249,46 +297,40 @@ namespace Migracao
 					label5.Visible = true;
 					txtLoginID.Visible = true;
 
-					if (comboBoxSistema.SelectedIndex > -1 && comboBoxImportacao.SelectedIndex > -1)
+					if (comboBoxSistema.SelectedIndex > -1)
 					{
 						labelExcel1.Text = comboBoxImportacao.Text + ":";
 						labelExcel1.Visible = true;
 						textBoxExcel1.Visible = true;
 						btnExcel.Visible = true;
 
-						if (comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
-							//|| comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase)
-							//|| comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase)
-							|| comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase)
-							//|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
-							|| comboBoxImportacao.Text.Equals("preços procedimentos", StringComparison.CurrentCultureIgnoreCase)
-							|| comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase)
-							|| comboBoxImportacao.Text.Equals("funcionarios", StringComparison.CurrentCultureIgnoreCase)
-							|| comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
+						var importacaoLower = comboBoxImportacao.Text.ToLower();
+						if (importacaoLower == "fornecedores" ||
+							importacaoLower == "recebidos" ||
+							importacaoLower == "preços procedimentos" ||
+							importacaoLower == "tabela de preços" ||
+							importacaoLower == "funcionarios" ||
+							importacaoLower == "agendamentos")
 						{
 							lbReferencia.Visible = true;
 							txtReferencia.Visible = true;
 							btnReferencia.Visible = true;
 
-							if (comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase)
-								|| comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
-								//|| )
-							//if (comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
+							if (importacaoLower == "tabela de preços" || importacaoLower == "recebidos")
 							{
 								lbExcel2.Visible = true;
 								txtExcel2.Visible = true;
 								btnExcel2.Visible = true;
 							}
 
-							if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase) || comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
+							if (importacaoLower == "recebidos" || importacaoLower == "agendamentos")
 							{
 								lbPessoaID.Visible = true;
 								txtPessoaID.Visible = true;
 							}
 						}
 
-
-						if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
+						if (importacaoLower == "recebíveis")
 						{
 							lbPessoaID.Visible = true;
 							txtPessoaID.Visible = true;
@@ -301,26 +343,41 @@ namespace Migracao
 			}
 		}
 
-		void NomeArquivoOpenFile()
+		private void NomeArquivoOpenFile()
 		{
 			nomeArquivoExcel = "";
 
-			if (comboBoxSistema.Text.Equals("odontocompany", StringComparison.CurrentCultureIgnoreCase))
+			var sistema = comboBoxSistema.Text.ToLower();
+			var importacao = comboBoxImportacao.Text.ToLower();
+
+			switch (sistema)
 			{
-				if (comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase))
-					nomeArquivoExcel = "CRD111";
-				else if (comboBoxImportacao.Text.Equals("funcionarios", StringComparison.CurrentCultureIgnoreCase))
-					nomeArquivoExcel = "CED006";
-				else if (comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase))
-					nomeArquivoExcel = "EMD101";
-				else if (comboBoxImportacao.Text.Equals("pessoas", StringComparison.CurrentCultureIgnoreCase))
-					nomeArquivoExcel = "Pacient:EMD101 | Funcion:CED006";
-				else if (comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase))
-					nomeArquivoExcel = "BXD111";
-				else if (comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase))
-					nomeArquivoExcel = "CED001";
-				else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
-					nomeArquivoExcel = "AGENDA";
+				case "odontocompany":
+					switch (importacao)
+					{
+						case "recebíveis":
+							nomeArquivoExcel = "CRD111";
+							break;
+						case "funcionarios":
+							nomeArquivoExcel = "CED006";
+							break;
+						case "pacientes":
+							nomeArquivoExcel = "EMD101";
+							break;
+						case "pessoas":
+							nomeArquivoExcel = "Pacient:EMD101 | Funcion:CED006";
+							break;
+						case "recebidos":
+							nomeArquivoExcel = "BXD111";
+							break;
+						case "tabela de preços":
+							nomeArquivoExcel = "CED001";
+							break;
+						case "agendamentos":
+							nomeArquivoExcel = "AGENDA";
+							break;
+					}
+					break;
 			}
 		}
 
@@ -356,81 +413,76 @@ namespace Migracao
 		private void btnDelFromList_Click(object sender, EventArgs e)
 		{
 			foreach (ListViewItem item in listView1.SelectedItems)
+			{
 				listView1.Items.Remove(item);
+			}
 		}
 
 		private void btnAddToList_Click(object sender, EventArgs e)
 		{
-			var openFileDialog = new OpenFileDialog();
-			if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "Todos")
-				openFileDialog.Filter = "Arquivo Excel |*.csv";
-			//openFileDialog.Filter = "Arquivo Excel |*.csv;*.xlsx";
-			else if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "JSON")
-				openFileDialog.Filter = "Arquivo Json |*.json";
-
-			openFileDialog.Title = "Selecione os arquivos";
-			openFileDialog.Multiselect = true;
+			using var openFileDialog = new OpenFileDialog
+			{
+				Filter = comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex].ToString() == "Todos" ?
+					"Arquivo Excel |*.csv" : "Arquivo Json |*.json",
+				Title = "Selecione os arquivos",
+				Multiselect = true
+			};
 
 			if (openFileDialog.ShowDialog() == DialogResult.OK)
+			{
 				foreach (var file in openFileDialog.FileNames)
+				{
 					listView1.Items.Add(file);
+				}
+			}
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
 		{
-			if (!File.Exists(arquivoConfig))
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
-
-			var textoLinhas = File.ReadAllLines(arquivoConfig);
-
-			try
-			{
-				Tools.salvarNaPasta = textoLinhas[0];
-				Tools.ultimaPasta = textoLinhas[1];
-				Tools.ultimoEstabelecimentoID = textoLinhas[2];
-			}
-			catch
-			{
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
-			}
+			CarregarConfiguracoes();
 
 			if (!Directory.Exists(Tools.salvarNaPasta))
 			{
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
 				MessageBox.Show("Configure a pasta de saída clicando em \"Configurações\"", "Atenção!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 			}
 		}
 
 		private void salvarNaPastaToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			string pasta = AbrirPasta();
+			var pasta = AbrirPasta();
 
 			if (!string.IsNullOrEmpty(pasta))
 			{
 				Tools.salvarNaPasta = pasta;
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+				SalvarConfiguracoes();
 			}
 		}
 
 		private string AbrirPasta(string titulo = "Abrir")
 		{
 			string retorno = "";
-			var folderBrowser = new OpenFileDialog();
-			folderBrowser.ValidateNames = false;
-			folderBrowser.InitialDirectory = Tools.salvarNaPasta;
-			folderBrowser.CheckFileExists = false;
-			folderBrowser.CheckPathExists = true;
-			folderBrowser.Filter = "|Pasta";
-			folderBrowser.FileName = "Abrir Pasta";
-			folderBrowser.Title = titulo;
+			using var folderBrowser = new OpenFileDialog
+			{
+				ValidateNames = false,
+				InitialDirectory = Tools.salvarNaPasta,
+				CheckFileExists = false,
+				CheckPathExists = true,
+				Filter = "|Pasta",
+				FileName = "Abrir Pasta",
+				Title = titulo
+			};
+
 			if (folderBrowser.ShowDialog() == DialogResult.OK)
+			{
 				retorno = Path.GetDirectoryName(folderBrowser.FileName);
+			}
+
 			return retorno;
 		}
 
 		private void btnExcel2_Click_1(object sender, EventArgs e)
 		{
-			var openFileDialog = new OpenFileDialog()
+			using var openFileDialog = new OpenFileDialog
 			{
 				Filter = "Arquivo Excel |*.xlsx",
 				Title = "Selecione um arquivo",
@@ -441,13 +493,13 @@ namespace Migracao
 			{
 				txtExcel2.Text = openFileDialog.FileName;
 				Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+				SalvarConfiguracoes();
 			}
 		}
 
 		private void btnReferencia_Click(object sender, EventArgs e)
 		{
-			var openFileDialog = new OpenFileDialog()
+			using var openFileDialog = new OpenFileDialog
 			{
 				Filter = "Arquivo Excel |*.xlsx",
 				Title = "Selecione um arquivo",
@@ -458,7 +510,7 @@ namespace Migracao
 			{
 				txtReferencia.Text = openFileDialog.FileName;
 				Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+				SalvarConfiguracoes();
 			}
 		}
 
@@ -471,7 +523,8 @@ namespace Migracao
 		{
 			var arquivoPessoas = EscolherArquivoExcel("Arquivo Pessoas.xlsx");
 
-			if (string.IsNullOrEmpty(arquivoPessoas) == false)
+			if (!string.IsNullOrEmpty(arquivoPessoas))
+			{
 				try
 				{
 					var excelHelper = new ExcelHelper();
@@ -486,13 +539,15 @@ namespace Migracao
 					txtPessoas.Text = "";
 					MessageBox.Show(ex.Message, "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				}
+			}
 		}
 
 		private void btnRecebiveis_Click(object sender, EventArgs e)
 		{
 			var arquivoRecebiveis = EscolherArquivoExcel("Recebiveis");
 
-			if (string.IsNullOrEmpty(arquivoRecebiveis) == false)
+			if (!string.IsNullOrEmpty(arquivoRecebiveis))
+			{
 				try
 				{
 					var excelHelper = new ExcelHelper();
@@ -507,13 +562,14 @@ namespace Migracao
 					txtRecebiveis.Text = "";
 					MessageBox.Show(ex.Message, "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				}
+			}
 		}
 
-		string EscolherArquivoExcel(string titulo = "Selecione um arquivo")
+		private string EscolherArquivoExcel(string titulo = "Selecione um arquivo")
 		{
 			string retorno = "";
 
-			var openFileDialog = new OpenFileDialog()
+			using var openFileDialog = new OpenFileDialog
 			{
 				Filter = "Arquivo Excel |*.xlsx;*.csv",
 				Title = titulo,
@@ -524,10 +580,40 @@ namespace Migracao
 			{
 				retorno = openFileDialog.FileName;
 				Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-				File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+				SalvarConfiguracoes();
 			}
 
 			return retorno;
+		}
+
+		private void CarregarConfiguracoes()
+		{
+			if (!File.Exists(arquivoConfig))
+			{
+				SalvarConfiguracoes();
+			}
+
+			var textoLinhas = File.ReadAllLines(arquivoConfig);
+
+			try
+			{
+				Tools.salvarNaPasta = textoLinhas[0];
+				Tools.ultimaPasta = textoLinhas[1];
+				Tools.ultimoEstabelecimentoID = textoLinhas[2];
+			}
+			catch
+			{
+				SalvarConfiguracoes();
+			}
+		}
+
+		private void SalvarConfiguracoes()
+		{
+			File.WriteAllText(arquivoConfig,
+				Tools.salvarNaPasta + Environment.NewLine +
+				Tools.ultimaPasta + Environment.NewLine +
+				Tools.ultimoEstabelecimentoID
+			);
 		}
 	}
 }

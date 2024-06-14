@@ -18,15 +18,23 @@ namespace Migracao.Sistems
         string[] CED006_Dentistas = ["ADMISSAO", "AGENCIA", "AGENCIA2", "AXON_ID", "BAIRRO", "BANCO", "BANCO2", "CAIXA_POSTAL", "CEP", "CGC_CPF", "CIDADE", "CLIENTE", "CODIGO", "CODIGO_CLIENTE", "CODIGO_INDICACAO", "CODIGO_VALIDADE", "COD_MUNICIPIO", "COD_PRAMELHOR", "COD_UF", "COD_VENDEDOR", "CONJUGE", "CONTA", "CONTA2", "CPF_FIA", "CPF_INDICACAO", "DATA_APROVACAO_DRCASH", "DATA_BLOQUEIO", "DATA_DEP_EXCLUIDO", "DATA_LGPD", "DATA_VALIDADE", "DEPENDENTE", "DT_AXON", "DT_CADASTRO", "DT_NASC_FIA", "DT_NASCIMENTO", "DT_NASCIMENTO_DEP", "DT_ULTMOV", "EMAIL", "ENDERECO", "ENDERECO_FIA", "ESTADO", "ESTADO_FIA", "FAX", "FONE1", "FONE2", "FONE_FIA", "FONE_REF_1", "FONE_REF_2", "F_OU_J", "FORNECEDOR", "FUNCAO", "ID_DRCASH", "INSC_RG", "INSTITUTO_ODC", "LGPD_CPF", "LGPD_DATA_HORA", "LGPD_IMAGEM", "LGPD_MENSAGEM", "LGPD_TELEFONE", "LGPD_USUARIO", "LOJA", "MAE", "MODIFICADO", "NOME", "NOME_FIA", "NOME_GRUPO", "NOME_LOCAL", "NOME_REF_1", "NOME_REF_2", "NOME_VALIDADE", "NUM_BLOQUEIO", "NUM_CONVENIO", "NUM_ENDERECO", "NUM_FICHA", "OBS1", "OBS_VALIDADE", "ONDE_TRABALHA", "PAI", "PARENTESCO_FIA", "PRESTADOR", "PROFISSAO", "PROFISSAO_FIA", "PROTETICO", "PROTETICO_ATIVO", "QTDE_DEPENDENTES", "RENDA_FIA", "RENDA_MES", "RG_FIA", "SEXO_M_F", "TITULAR", "TITULAR_DEP_EXCLUIDO", "TRANSMISSAO", "USU_BLOQUEIO", "USU_CADASTRO", "USUARIO", "USUARIO_LGPD", "USUARIO_VALIDADE", "VALOR_MAXIMO_DRCASH", "VR_LIMITE"];
         string[] CED001_Procedimentos = ["CODIGO", "NOME", "SIMBOLO", "GRUPO", "CODIGO_TUSS", "VRVENDA", "ATIVO", "OBS", "PARTICULAR"];
         string[] CED002_CodProcedimentos = ["CODIGO", "NOME", "USUARIO"];
-        string[] MAN001_DesenvClinico = ["CNPJ_CPF","QTDE_MANUT","OBS","ATIVO","INICIO_MANUT","FINAL_MANUT","MODIFICADO","USUARIO","DATA_ATIVO","USU_ATIVO","USU_INSTALACAO","USU_RETIRADA","MOTIVO_ATIVO","DIAGNOSTICO","PROGNOSTICO","OBS_CLASSE","CLASSE","DATA_ALTERACAO","HORA_ALTERACAO","USUARIO_ALTERACAO","DATA_MODIFICADO","DT_AXON","AXON_ID"
-];
+        //string[] MAN001_DesenvClinico = ["CNPJ_CPF", "QTDE_MANUT", "OBS", "ATIVO", "INICIO_MANUT", "FINAL_MANUT", "MODIFICADO", "USUARIO", "DATA_ATIVO", "USU_ATIVO", "USU_INSTALACAO", "USU_RETIRADA", "MOTIVO_ATIVO", "DIAGNOSTICO", "PROGNOSTICO", "OBS_CLASSE", "CLASSE", "DATA_ALTERACAO", "HORA_ALTERACAO", "USUARIO_ALTERACAO", "DATA_MODIFICADO", "DT_AXON", "AXON_ID"];
+        //string[] MAN101_DesenvClinico = ["LANCTO", "NUM_MAN", "CNPJ_CPF", "CONTROLE", "DATA_PAGO", "DATA_RETORNO", "RESP_ATEND", "NOME_RESP_ATEND", "OBS_ATEND", "TIPO_ATEND", "DATA_LANC", "DATA_MANUT", "DATA_MODIFICADO"];
+        string[] MAN001_Manutencao = ["CNPJ_CPF", "QTDE_MANUT", "OBS", "ATIVO", "INICIO_MANUT", "FINAL_MANUT", "MODIFICADO", "USUARIO", "DATA_ATIVO", "USU_ATIVO", "USU_INSTALACAO", "USU_RETIRADA", "MOTIVO_ATIVO", "DIAGNOSTICO", "PROGNOSTICO", "OBS_CLASSE", "CLASSE", "DATA_ALTERACAO", "HORA_ALTERACAO", "USUARIO_ALTERACAO", "DATA_MODIFICADO", "DT_AXON", "AXON_ID"];
+        string[] MAN101_Procedimentos = ["LANCTO", "NUM_MAN", "CNPJ_CPF", "CONTROLE", "DATA_PAGO", "DATA_RETORNO", "RESP_ATEND", "NOME_RESP_ATEND", "OBS_ATEND", "TIPO_ATEND", "DATA_LANC", "DATA_MANUT", "DATA_MODIFICADO"];
+        string[] ATD222_Atendimentos = ["DOCUMENTO", "CNPJ_CPF", "PRODUTO", "TIPO", "NOME_PRODUTO", "DATA", "VALOR", "OBS", "CAMPOX", "RESPONSAVEL", "DATA_ATEND", "RESP_ATEND", "NOME_RESP_ATEND", "NUMERO", "CONTROLE", "CBARRA", "TERMINAL", "USUARIO", "QTDE_SESSAO", "QTDE_SESSAO_ORIG", "MODIFICADO", "DATA_CANCELADO", "USUARIO_CANCELADO", "DATA_INCLUIDO", "USUARIO_INCLUIDO", "FORMA_MEDIDA", "QTDE_MEDIDA", "DT_AXON", "AXON_ID"];
 
         List<string> cabecalhos_Pacientes = ["Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
         List<string> cabecalhos_Recebiveis = ["CPF", "Nome", "DocumentoRef", "RecebívelExigível(R/E)", "ValorOriginal", "ValorPago", "Prazo", "Vencimento(01/12/2010)", "DataBaixa", "Emissão(01/12/2010)", "ObservaçãoRecebível", "ObservaçãoRecebido"];
         List<string> cabecalhos_Agendamentos = ["ID", "CPF", "Nome Completo", "Telefone", "Data Início (01/12/2024 00:00)", "Data Término (01/12/2024 00:00)", "Data Inclusão (01/12/2024)", "NomeCompletoDentista", "Observacao"];
         List<string> cabecalhos_Procedimentos = ["Nome Tabela", "Ativo(S/N)", "Procedimento(Nome)", "Abreviação", "Especialidade", "Especialidade Código", "Especialidade ID", "Preço", "TUSS", "Diagnóstico(S/N)", "Prevenção(S/N)", "Odontopediatria(S/N)", "Dentística(S/N)", "Endodontia(S/N)", "Periodontia(S/N)", "Prótese(S/N)", "Cirurgia(S/N)", "Ortodontia(S/N)", "Radiologia(S/N)", "Estética(S/N)", "Implantodontia(S/N)", "Odontogeriatria(S/N)", "DTM(S/N)", "Orofacial(S/N)",];
         List<string> cabecalhos_CodProcedimentos = ["ID", "Nome", "Usuário"];
-        List<string> cabecalhos_DesenvClinico = ["Nome", "CNPJ_CPF", "Observação", "DataModificado", "Diagnostico", "ObservaçãoClasse"];
+        List<string> cabecalhos_ManutencaoMan001 = ["Nome", "CNPJ_CPF", "Observação", "DataModificado", "Diagnostico", "DataInicial", "DataFinal"];
+        List<string> cabecalhos_ProcedimentosMan101 = ["DataPago", "DataRetorno", "RespAtendimento", "NomeRespAtendimento", "TipoAtendimento", "DataLancamento"];
+        List<string> cabecalhos_AtendimentosATD = ["Nome", "Paciente Apelido", "Observações", "Medico", "Preço", "Procedimento", "Dente", "Data de Inclusão"];
+
+        //List<string> cabecalhos_DesenvClinicoMan001 = ["Nome", "CNPJ_CPF", "Observação", "DataModificado", "Diagnostico", "DataInicial", "DataFinal"];
+        //List<string> cabecalhos_DesenvClinicoMan101 = ["DataPago", "DataRetorno", "RespAtendimento", "NomeRespAtendimento", "TipoAtendimento", "DataLancamento"];
 
         //public static Dictionary<string, string> pessoaCSVDict;
 
@@ -48,7 +56,12 @@ namespace Migracao.Sistems
             DataTable dataTableAgendamentos = new();
             DataTable dataTableProcedimentos = new();
             DataTable dataTableCodProcedimentos = new();
-            DataTable dataTableDesenvClinico = new();
+            DataTable dataTableManutencaoMan001 = new();
+            DataTable dataTableProcedimentosMan101= new();
+            DataTable dataTableAtendimentosATD222 = new();
+            //DataTable dataTableDesenvClinicoMan001 = new();
+            //DataTable dataTableDesenvClinicoMan101= new();
+            //DataTable dataTableDesenvClinicoMerge = new();
             //registroRecebivel = new HashSet<string>();
 
             foreach (string coluna in cabecalhos_Pacientes)
@@ -60,8 +73,14 @@ namespace Migracao.Sistems
             foreach (string coluna in cabecalhos_Agendamentos)
                 dataTableAgendamentos.Columns.Add(coluna, typeof(string));
 
-            foreach (string coluna in cabecalhos_DesenvClinico)
-                dataTableDesenvClinico.Columns.Add(coluna, typeof(string));
+            foreach (string coluna in cabecalhos_ManutencaoMan001)
+                dataTableManutencaoMan001.Columns.Add(coluna, typeof(string));
+
+            foreach (string coluna in cabecalhos_ProcedimentosMan101)
+                dataTableProcedimentosMan101.Columns.Add(coluna, typeof(string));
+
+            foreach (string coluna in cabecalhos_AtendimentosATD)
+                dataTableAtendimentosATD222.Columns.Add(coluna, typeof(string));
 
             var excel_EMD101 = listView.Items.Cast<ListViewItem>()
                 .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("EMD101")));
@@ -183,16 +202,64 @@ namespace Migracao.Sistems
 
             var excel_MAN001 = listView.Items.Cast<ListViewItem>()
                 .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("MAN001")));
-
-            if (excel_MAN001 != null )
+          
+            if (excel_MAN001 != null)
             {
                 var resultado = LerArquivosExcelCsv(excel_MAN001.Text, Encoding.UTF8);
+                var linhasCSV1 = resultado.Item1;
+                var cabecalhosCSV = resultado.Item2;
+
+                if (MAN001_Manutencao.All(cabecalhosCSV.Contains))
+                    dataTableManutencaoMan001 = ConvertExcelDesenvolvimentoClinicoMan001(dataTableManutencaoMan001, cabecalhosCSV, linhasCSV1, dataTablePessoas);
+
+                if(dataTableManutencaoMan001 != null)
+                {
+                    var salvarManutencaoMan001 = Tools.GerarNomeArquivo($"CadastroManutencaoMan001_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarManutencaoMan001 + ".xlsx", dataTableManutencaoMan001);
+                }
+            }
+
+            var excel_MAN101 = listView.Items.Cast<ListViewItem>()
+                .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("MAN101")));
+
+            if (excel_MAN101 != null)
+            {
+                var resultado = LerArquivosExcelCsv(excel_MAN101.Text, Encoding.UTF8);
                 var linhasCSV = resultado.Item1;
                 var cabecalhosCSV = resultado.Item2;
 
-                if (MAN001_DesenvClinico.All(cabecalhosCSV.Contains))
-                    dataTableDesenvClinico = ConvertExcelDesenvolvimentoClinico(dataTableDesenvClinico, cabecalhosCSV, linhasCSV, dataTablePessoas);
+                if (MAN101_Procedimentos.All(cabecalhosCSV.Contains))
+                    dataTableProcedimentosMan101 = ConvertExcelProcedimentosMAN101(dataTableProcedimentosMan101, cabecalhosCSV, linhasCSV, dataTablePessoas);
+
+                if (dataTableProcedimentosMan101 != null)
+                {
+                    var salvarProcedimentosMan101 = Tools.GerarNomeArquivo($"CadastroProcedimentosMan101_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosMan101 + ".xlsx", dataTableProcedimentosMan101);
+                }
             }
+
+            var excel_ATD222 = listView.Items.Cast<ListViewItem>()
+                .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("ATD222")));
+
+            if (excel_ATD222 != null)
+            {
+                var resultado = LerArquivosExcelCsv(excel_ATD222.Text, Encoding.UTF8);
+                var linhasCSV = resultado.Item1;
+                var cabecalhosCSV = resultado.Item2;
+
+                if (ATD222_Atendimentos.All(cabecalhosCSV.Contains))
+                    dataTableAtendimentosATD222 = ConvertExcelAtendimentosATD22(dataTableAtendimentosATD222, cabecalhosCSV, linhasCSV, dataTablePessoas);
+
+                if (dataTableAtendimentosATD222 != null)
+                {
+                    var salvarAtendimentosATD222 = Tools.GerarNomeArquivo($"CadastroAtendimentosATD222_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarAtendimentosATD222 + ".xlsx", dataTableAtendimentosATD222);
+                }
+
+            }
+
+            //if (dataTableDesenvClinicoMan001 != null && dataTableDesenvClinicoMan101 != null)
+            //    dataTableDesenvClinicoMerge = MergeDataTables(dataTableDesenvClinicoMan001, dataTableDesenvClinicoMan101);
 
             if (dataTableProcedimentos.Rows.Count > 0)
             {
@@ -206,11 +273,11 @@ namespace Migracao.Sistems
                 excelHelper.CriarExcelArquivo(salvarArquivoRecebiveis + ".xlsx", dataTableRecebiveis);
             }
 
-            if(excel_MAN001 != null)
-            {
-                var salvarDesenvolvimentoCLinico = Tools.GerarNomeArquivo($"CadastroDesenvolvimentoCLinico_{estabelecimentoID}_OdontoCompany");
-                excelHelper.CriarExcelArquivo(salvarDesenvolvimentoCLinico + ".xlsx", dataTableDesenvClinico);
-            }
+            //if(excel_MAN001 != null)
+            //{
+            //    var salvarDesenvolvimentoCLinico = Tools.GerarNomeArquivo($"CadastroDesenvolvimentoCLinico_{estabelecimentoID}_OdontoCompany");
+            //    excelHelper.CriarExcelArquivo(salvarDesenvolvimentoCLinico + ".xlsx", dataTableDesenvClinicoMerge);
+            //}
         }
 
         public DataTable ConvertExcelRecebiveis(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePacientes)
@@ -841,12 +908,11 @@ namespace Migracao.Sistems
             }
         }
 
-        public DataTable ConvertExcelDesenvolvimentoClinico(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null)
+        public DataTable ConvertExcelDesenvolvimentoClinicoMan001(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null)
         {
             try
             {
                 int linhaIndex = 0;
-                string dataModificadoTeste = null;
 
                 foreach (string[] linha in linhas)
                 {
@@ -864,6 +930,9 @@ namespace Migracao.Sistems
                         var diagnostico = valoresLinha.GetValueOrDefault("DIAGNOSTICO").Trim();
                         var obsClasse = valoresLinha.GetValueOrDefault("OBS_CLASSE").Trim();
                         var dataModificado = valoresLinha.GetValueOrDefault("DATA_MODIFICADO").Trim();
+                        var dataInicial = valoresLinha.GetValueOrDefault("INICIO_MANUT").Trim();
+                        var dataFinal = valoresLinha.GetValueOrDefault("FINAL_MANUT").Trim();
+
 
                         cpf = cpf.ToCPF();
                         string? nome = null;
@@ -880,6 +949,8 @@ namespace Migracao.Sistems
                         dataRow["Observação"] = observacao + " - " + diagnostico + " - " + obsClasse; ;
                         dataRow["Diagnostico"] = diagnostico;
                         dataRow["DataModificado"] = dataModificado.ToData().ToString();
+                        dataRow["DataInicial"] = dataInicial.ToData().ToString();
+                        dataRow["DataFinal"] = dataFinal.ToData().ToString();
 
                         dataTable.Rows.Add(dataRow);
                     }
@@ -898,5 +969,257 @@ namespace Migracao.Sistems
                 throw new Exception($"Erro ao converter Excel Recebíveis: {error.Message}");
             }
         }
+
+        public DataTable ConvertExcelDesenvolvimentoClinicoMan101(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null)
+        {
+            try
+            {
+                int linhaIndex = 0;
+
+                foreach (string[] linha in linhas)
+                {
+                    try
+                    {
+                        DataRow dataRow = dataTable.NewRow();
+                        var valoresLinha = new Dictionary<string, string>();
+
+                        for (int i = 0; i < cabecalhos.Count; i++)
+                            if (i < linha.Length)
+                                valoresLinha.Add(cabecalhos[i], linha[i]);
+
+                        var dataRetorno = valoresLinha.GetValueOrDefault("DATA_RETORNO").Trim();
+                        var respAtendimento = valoresLinha.GetValueOrDefault("RESP_ATEND").Trim();
+                        var nomeRespAtendimento = valoresLinha.GetValueOrDefault("NOME_RESP_ATEND").Trim();
+                        var tipoAtendimento = valoresLinha.GetValueOrDefault("TIPO_ATEND").Trim();
+                        var dataLancamento = valoresLinha.GetValueOrDefault("DATA_LANC").Trim();
+                        
+
+                        dataRow["DataRetorno"] = dataRetorno.ToData().ToString();
+                        dataRow["RespAtendimento"] = respAtendimento;
+                        dataRow["NomeRespAtendimento"] = nomeRespAtendimento;
+                        dataRow["TipoAtendimento"] = tipoAtendimento;
+                        dataRow["DataLancamento"] = dataLancamento;
+
+                        dataTable.Rows.Add(dataRow);
+                    }
+                    catch (Exception error)
+                    {
+                        throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
+                    }
+
+                    linhaIndex++;
+                }
+
+                return dataTable;
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Excel Recebíveis: {error.Message}");
+            }
+        }
+
+        public DataTable MergeDataTables(DataTable dt1, DataTable dt2)
+        {
+            DataTable dtNew = new DataTable();
+            foreach (DataColumn col in dt1.Columns)
+            {
+                dtNew.Columns.Add(col.ColumnName);
+            }
+            foreach (DataColumn col in dt2.Columns)
+            {
+                dtNew.Columns.Add(col.ColumnName);
+            }
+
+            for (int i = 0; i < dt1.Rows.Count; i++)
+            {
+                DataRow item = dtNew.NewRow();
+                foreach (DataColumn col in dt1.Columns)
+                {
+                    item[col.ColumnName] = dt1.Rows[i][col.ColumnName];
+                }
+                foreach (DataColumn col in dt2.Columns)
+                {
+                    item[col.ColumnName] = dt2.Rows[i][col.ColumnName];
+                }
+                dtNew.Rows.Add(item);
+                dtNew.AcceptChanges();
+            }
+            return dtNew;
+        }
+
+        public DataTable ConvertExcelManutencaoMAM001(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null)
+        {
+            try
+            {
+                int linhaIndex = 0;
+
+                foreach (string[] linha in linhas)
+                {
+                    try
+                    {
+                        DataRow dataRow = dataTable.NewRow();
+                        var valoresLinha = new Dictionary<string, string>();
+
+                        for (int i = 0; i < cabecalhos.Count; i++)
+                            if (i < linha.Length)
+                                valoresLinha.Add(cabecalhos[i], linha[i]);
+
+                        var cpf = valoresLinha.GetValueOrDefault("CNPJ_CPF").Trim();
+                        var observacao = valoresLinha.GetValueOrDefault("OBS").Trim();
+                        var diagnostico = valoresLinha.GetValueOrDefault("DIAGNOSTICO").Trim();
+                        var obsClasse = valoresLinha.GetValueOrDefault("OBS_CLASSE").Trim();
+                        var dataModificado = valoresLinha.GetValueOrDefault("DATA_MODIFICADO").Trim();
+                        var dataInicial = valoresLinha.GetValueOrDefault("INICIO_MANUT").Trim();
+                        var dataFinal = valoresLinha.GetValueOrDefault("FINAL_MANUT").Trim();
+
+
+                        cpf = cpf.ToCPF();
+                        string? nome = null;
+
+                        if (dataTablePessoas.Rows.Count > 0)
+                        {
+                            DataRow[] dataRowEncontrados = dataTablePessoas.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
+                            if (dataRowEncontrados.Length > 0)
+                                nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
+                        }
+
+                        dataRow["Nome"] = nome;
+                        dataRow["CNPJ_CPF"] = cpf;
+                        dataRow["Observação"] = observacao + " - " + diagnostico + " - " + obsClasse; ;
+                        dataRow["Diagnostico"] = diagnostico;
+                        dataRow["DataModificado"] = dataModificado.ToData().ToString();
+                        dataRow["DataInicial"] = dataInicial.ToData().ToString();
+                        dataRow["DataFinal"] = dataFinal.ToData().ToString();
+
+                        dataTable.Rows.Add(dataRow);
+                    }
+                    catch (Exception error)
+                    {
+                        throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
+                    }
+
+                    linhaIndex++;
+                }
+
+                return dataTable;
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Excel Recebíveis: {error.Message}");
+            }
+        }
+
+        public DataTable ConvertExcelProcedimentosMAN101(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null)
+        {
+            try
+            {
+                int linhaIndex = 0;
+
+                foreach (string[] linha in linhas)
+                {
+                    try
+                    {
+                        DataRow dataRow = dataTable.NewRow();
+                        var valoresLinha = new Dictionary<string, string>();
+
+                        for (int i = 0; i < cabecalhos.Count; i++)
+                            if (i < linha.Length)
+                                valoresLinha.Add(cabecalhos[i], linha[i]);
+
+                        var dataRetorno = valoresLinha.GetValueOrDefault("DATA_RETORNO").Trim();
+                        var respAtendimento = valoresLinha.GetValueOrDefault("RESP_ATEND").Trim();
+                        var nomeRespAtendimento = valoresLinha.GetValueOrDefault("NOME_RESP_ATEND").Trim();
+                        var tipoAtendimento = valoresLinha.GetValueOrDefault("TIPO_ATEND").Trim();
+                        var dataLancamento = valoresLinha.GetValueOrDefault("DATA_LANC").Trim();
+
+
+                        dataRow["DataRetorno"] = dataRetorno.ToData().ToString();
+                        dataRow["RespAtendimento"] = respAtendimento;
+                        dataRow["NomeRespAtendimento"] = nomeRespAtendimento;
+                        dataRow["TipoAtendimento"] = tipoAtendimento;
+                        dataRow["DataLancamento"] = dataLancamento;
+
+                        dataTable.Rows.Add(dataRow);
+                    }
+                    catch (Exception error)
+                    {
+                        throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
+                    }
+
+                    linhaIndex++;
+                }
+
+                return dataTable;
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Excel AtendimentoATD222: {error.Message}");
+            }
+        }
+
+        public DataTable ConvertExcelAtendimentosATD22(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null)
+        {
+            try
+            {
+                int linhaIndex = 0;
+
+                foreach (string[] linha in linhas)
+                {
+                    try
+                    {
+                        DataRow dataRow = dataTable.NewRow();
+                        var valoresLinha = new Dictionary<string, string>();
+
+                        for (int i = 0; i < cabecalhos.Count; i++)
+                            if (i < linha.Length)
+                                valoresLinha.Add(cabecalhos[i], linha[i]);
+                        //RESPONSAVEL","DATA_ATEND","RESP_ATEND","NOME_RESP_ATEND","NUMERO","CONTROLE","CBARRA","TERMINAL","USUARIO","QTDE_SESSAO","QTDE_SESSAO_ORIG","MODIFICADO","DATA_CANCELADO","USUARIO_CANCELADO","DATA_INCLUIDO","USUARIO_INCLUIDO","FORMA_MEDIDA","QTDE_MEDIDA","DT_AXON","AXON_ID
+
+                        var cpf = valoresLinha.GetValueOrDefault("CNPJ_CPF").Trim();
+                        var nomeProduto = valoresLinha.GetValueOrDefault("NOME_PRODUTO").Trim();
+                        var valor = valoresLinha.GetValueOrDefault("VALOR").Trim();
+                        var observacao = valoresLinha.GetValueOrDefault("OBS").Trim();
+                        var dataAtendimento = valoresLinha.GetValueOrDefault("DATA_ATEND").Trim();
+                        var nomeRespAtendimento = valoresLinha.GetValueOrDefault("NOME_RESP_ATEND").Trim();
+                        var numero = valoresLinha.GetValueOrDefault("NUMERO").Trim();
+
+
+                        cpf = cpf.ToCPF();
+                        string? nome = null;
+
+                        if (dataTablePessoas.Rows.Count > 0)
+                        {
+                            DataRow[] dataRowEncontrados = dataTablePessoas.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
+                            if (dataRowEncontrados.Length > 0)
+                                nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
+                        }
+
+                        dataRow["Nome"] = nome;
+                        dataRow["Paciente Apelido"] = cpf;
+                        dataRow["Observações"] = observacao;
+                        dataRow["Medico"] = nomeRespAtendimento;
+                        dataRow["Preço"] = valor;
+                        dataRow["Procedimento"] = nomeProduto;
+                        dataRow["Dente"] = numero;
+                        dataRow["Data de Inclusão"] = dataAtendimento.ToData().ToString();
+
+                        dataTable.Rows.Add(dataRow);
+                    }
+                    catch (Exception error)
+                    {
+                        throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
+                    }
+
+                    linhaIndex++;
+                }
+
+                return dataTable;
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Excel Recebíveis: {error.Message}");
+            }
+        }
+
     }
 }

@@ -1651,10 +1651,11 @@ namespace Migracao.Imports
                 {
                     indiceLinha++;
 
-                    string cpf = "";
-                    string? nome = null, observacao = null, diagnostico = null, obsClasse = null;
+                    string? cpf = "";
+                    string? nome = null, observacao = null, diagnostico = null, obsClasse = null,
+                        respAtendimento = null, nomeRespAtendimento = null, tipoAtendimento = null;
                     int recibo = 0, codigo = 0;
-                    DateTime? dataModificado = dataHoje;
+                    DateTime dataModificado = dataHoje, dataRetorno, dataInicial, dataFinal;
 
                     foreach (var celula in linha.Cells)
                     {
@@ -1677,65 +1678,78 @@ namespace Migracao.Imports
                                     case "Observação":
                                         observacao = celulaValor;
                                         break;
-                                    case "Diagnostico":
-                                        diagnostico = celulaValor;
-                                        break;
                                     case "DataModificado":
                                         dataModificado = celulaValor.ToData();
                                         break;
-                                    case "ObservaçãoClasse":
-                                        obsClasse = celulaValor;
+                                    case "DataRetorno":
+                                        dataRetorno = celulaValor.ToData();
+                                        break;
+                                    case "RespAtendimento":
+                                        respAtendimento = celulaValor;
+                                        break;
+                                    case "NomeRespAtendimento":
+                                        nomeRespAtendimento = celulaValor;
+                                        break;
+                                    case "TipoAtendimento":
+                                        tipoAtendimento = celulaValor;
+                                        break;
+                                    case "DataInicial":
+                                        dataInicial = celulaValor.ToData();
+                                        break;
+                                    case "DataFinal":
+                                        dataFinal = celulaValor.ToData();
                                         break;
                                 }
                             }
                         }
-                    }
 
-                    Atendimento atendimento = null;
+                        Atendimento? atendimento = null;
 
-                    atendimento = new Atendimento()
-                    {
-                        
-                    };
-
-                    Dictionary<string, object> atendimentoDict = null;
-
-                    if (atendimento != null)
-                        atendimentoDict = new Dictionary<string, object>
+                        atendimento = new Atendimento()
                         {
-                            { "ConsumidorID", atendimento.ConsumidorID },
-                            { "ValorOriginal", atendimento.AtendeTipoID },
-                            //{ "ValorDevido", atendimento.ValorDevido },
-                            //{ "DataVencimento", atendimento.DataVencimento },
-                            //{ "ValorBaixa", atendimento.ValorBaixa },
-                            //{ "DataBaixa", atendimento.DataBaixa },
-                            //{ "DataInclusao", atendimento.DataInclusao },
-                            //{ "ExclusaoMotivo", atendimento.ExclusaoMotivo },
-                            //{ "FornecedorID", atendimento.FornecedorID },
-                            //{ "ClienteID", atendimento.ClienteID },
-                            //{ "ColaboradorID", atendimento.ColaboradorID },
-                            //{ "SacadoNome", atendimento.SacadoNome },
-                            //{ "EspecieID", atendimento.EspecieID }
+                            ConsumidorID = 1,
+                            EstabelecimentoID = estabelecimentoID,
+                            LoginID = loginID,
+                            ResponsavelID = respFinanceiroID,                    
+                            Observacoes = observacao,
+                            DataUltAlteracao = dataModificado
+                            //DataInicio = dataInicial,
+                            //DataTermino = dataFinal
+                           
                         };
 
-                    if (atendimento != null)
-                    {
-                        lstAtendimentos.Add(atendimento);
+                        Dictionary<string, object> atendimentoDict = null;
 
-                        //if (consumidorID != null)
-                        //    linhasSql.Add(sqlHelper.GerarSqlInsertAtendimento(atendimentoDict));
-                        //else
-                        //    linhasSqlSemConsumidor.Add(sqlHelper.GerarSqlInsertAtendimento(atendimentoDict));
+                        if (atendimento != null)
+                            atendimentoDict = new Dictionary<string, object>
+                        {
+                            { "ValorOriginal", atendimento.AtendeTipoID },
+                            { "Observacoes", atendimento.Observacoes },
+                            { "DataUltAlteracao", atendimento.DataUltAlteracao },
+                            //{ "DiagnosticoID", atendimento.DiagnosticoID },
+                            //{ "DataBaixa", atendimento. },
+                            //{ "DataInclusao", atendimento.DataInclusao }
+                        };
+
+                        if (atendimento != null)
+                        {
+                            lstAtendimentos.Add(atendimento);
+
+                            //if (consumidorID != null)
+                            //    linhasSql.Add(sqlHelper.GerarSqlInsertAtendimento(atendimentoDict));
+                            //else
+                            //    linhasSqlSemConsumidor.Add(sqlHelper.GerarSqlInsertAtendimento(atendimentoDict));
+                        }
                     }
+
+                    indiceLinha = 0;
+
+                    var salvarArquivo = Tools.GerarNomeArquivo($"DesenvolvimentoClinico{estabelecimentoID}_OdontoCompany_Migração", ".sql");
+                    File.WriteAllLines(salvarArquivo + ".sql", linhasSql);
+                    File.WriteAllLines(salvarArquivo + "SEMCONSUMIDOR.sql", linhasSqlSemConsumidor);
+
+                    MessageBox.Show("Sucesso!");
                 }
-
-                indiceLinha = 0;
-
-                var salvarArquivo = Tools.GerarNomeArquivo($"DesenvolvimentoClinico{estabelecimentoID}_OdontoCompany_Migração", ".sql");
-                File.WriteAllLines(salvarArquivo + ".sql", linhasSql);
-                File.WriteAllLines(salvarArquivo + "SEMCONSUMIDOR.sql", linhasSqlSemConsumidor);
-
-                MessageBox.Show("Sucesso!");
             }
             catch (Exception error)
             {

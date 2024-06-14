@@ -34,7 +34,7 @@ namespace Migracao.Models
         public int LoginID { get; set; }
 
         [StringLength(2147483647)]
-        public string Observacoes { get; set; }
+        public string? Observacoes { get; set; }
         [Required(ErrorMessage = "O campo é obrigatório")]
         public System.DateTime DataInclusao { get; set; }
         public Nullable<System.DateTime> DataUltAlteracao { get; set; }

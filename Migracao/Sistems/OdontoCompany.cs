@@ -1,10 +1,13 @@
-﻿using MathNet.Numerics.Distributions;
+﻿using MathNet.Numerics;
+using MathNet.Numerics.Distributions;
 using Migracao.Models;
 using Migracao.Utils;
 using NPOI.SS.Formula.Functions;
+using NPOI.SS.UserModel;
 using System.Data;
 using System.Text;
 using static System.Windows.Forms.LinkLabel;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace Migracao.Sistems
 {
@@ -26,12 +29,13 @@ namespace Migracao.Sistems
         List<string> cabecalhos_Pacientes = ["Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
         List<string> cabecalhos_Recebiveis = ["CPF", "Nome", "DocumentoRef", "RecebívelExigível(R/E)", "ValorOriginal", "ValorPago", "Prazo", "Vencimento(01/12/2010)", "DataBaixa", "Emissão(01/12/2010)", "ObservaçãoRecebível", "ObservaçãoRecebido"];
         List<string> cabecalhos_Agendamentos = ["ID", "CPF", "Nome Completo", "Telefone", "Data Início (01/12/2024 00:00)", "Data Término (01/12/2024 00:00)", "Data Inclusão (01/12/2024)", "NomeCompletoDentista", "Observacao"];
-        List<string> cabecalhos_Procedimentos = ["Nome Tabela", "Ativo(S/N)", "Procedimento(Nome)", "Abreviação", "Especialidade", "Especialidade Código", "Especialidade ID", "Preço", "TUSS", "Diagnóstico(S/N)", "Prevenção(S/N)", "Odontopediatria(S/N)", "Dentística(S/N)", "Endodontia(S/N)", "Periodontia(S/N)", "Prótese(S/N)", "Cirurgia(S/N)", "Ortodontia(S/N)", "Radiologia(S/N)", "Estética(S/N)", "Implantodontia(S/N)", "Odontogeriatria(S/N)", "DTM(S/N)", "Orofacial(S/N)",];
+        List<string> cabecalhos_Procedimentos = ["Nome Tabela", "Especialidade", "Ativo (Sim/Não)", "Nome do Procedimento", "Abreviação", "Preço", "TUSS", "Especialidade Código"];
         List<string> cabecalhos_CodProcedimentos = ["ID", "Nome", "Usuário"];
         List<string> cabecalhos_ManutencaoMan001 = ["PacienteNomeCompleto", "PacienteCPF", "Observação", "DataModificado", "Diagnostico", "DataInicial", "DataFinal"];
         List<string> cabecalhos_ManutencaoMan101 = ["PacienteCPF", "PacienteNomeCompleto", "DentistaCPF", "DentistaNome", "DentistaCodigo", "Procedimento", "DataAtendimento", "DataInicio", "DataRetorno"];
-        List<string> cabecalhos_ProcedimentosATD = ["PacienteCPF", "PacienteNomeCompleto", "DentistaCPF", "Dentista Nome", "Dente", "Procedimento", "Dentista Codigo", "Preço", "Observações", "DataAtendimento", "DataInicio"];
-
+        List<string> cabecalhos_ProcedimentosATD = ["PacienteCPF", "PacienteNomeCompleto", "DentistaCPF", "Dentista Nome", "Dente", "Procedimento", "Dentista Codigo", "Preço", "Observações", "Data Termino", "Data Início", "Número do Controle"];
+        List<string> cabecalhos_ManutencaoManMerge001_101 = ["PacienteNomeCompleto001", "PacienteCPF001", "Observação", "DataModificado", "Diagnostico", "DataInicial", "DataFinal", "PacienteCPF101", "PacienteNomeCompleto", "DentistaCPF", "DentistaNome", "DentistaCodigo", "Procedimento", "DataAtendimento", "DataInicio", "DataRetorno"];
+        
         //public static Dictionary<string, string> pessoaCSVDict;
 
         public Tuple<List<string[]>, List<string>> LerArquivosExcelCsv(string arquivo, Encoding encoding)
@@ -55,9 +59,9 @@ namespace Migracao.Sistems
             DataTable dataTableManutencaoMan001 = new();
             DataTable dataTableManutencaoMan101 = new();
             DataTable dataTableProcedimentosATD222 = new();
-            //DataTable dataTableDesenvClinicoMan001 = new();
-            //DataTable dataTableDesenvClinicoMan101= new();
-            //DataTable dataTableDesenvClinicoMerge = new();
+            DataTable dataTableProcedimentosParticular = new();
+            DataTable dataTableManutencaoMerge = new();
+
             //registroRecebivel = new HashSet<string>();
 
             foreach (string coluna in cabecalhos_Pacientes)
@@ -192,6 +196,9 @@ namespace Migracao.Sistems
 
                 if (CED001_Procedimentos.All(cabecalhosCSV.Contains))
                     dataTableProcedimentos = ConvertExcelProcedimentos(dataTableProcedimentos, cabecalhosCSV, linhasCSV, dataTableCodProcedimentos);
+
+                if (dataTableProcedimentos != null)
+                    RetornaProcedimentosPorTipo(dataTableProcedimentos, estabelecimentoID);
             }
 
             var excel_MAN001 = listView.Items.Cast<ListViewItem>()
@@ -230,6 +237,16 @@ namespace Migracao.Sistems
                     var salvarManutencaoMan101 = Tools.GerarNomeArquivo($"CadastroManutencaoMan101_{estabelecimentoID}_OdontoCompany");
                     excelHelper.CriarExcelArquivo(salvarManutencaoMan101 + ".xlsx", dataTableManutencaoMan101);
                 }
+
+                //if (dataTableManutencaoMan001 != null && dataTableManutencaoMan101 != null)
+                //    dataTableManutencaoMerge = MergeDataTables(dataTableManutencaoMan001, dataTableManutencaoMan101);
+
+
+                //if (dataTableManutencaoMerge != null)
+                //{
+                //    var salvarManutencaoMergeMan = Tools.GerarNomeArquivo($"CadastroManutencaoManMerge_001_101_{estabelecimentoID}_OdontoCompany");
+                //    excelHelper.CriarExcelArquivo(salvarManutencaoMergeMan + ".xlsx", dataTableManutencaoMerge);
+                //}
             }
 
             var excel_ATD222 = listView.Items.Cast<ListViewItem>()
@@ -251,9 +268,6 @@ namespace Migracao.Sistems
                 }
 
             }
-
-            //if (dataTableDesenvClinicoMan001 != null && dataTableDesenvClinicoMan101 != null)
-            //    dataTableDesenvClinicoMerge = MergeDataTables(dataTableDesenvClinicoMan001, dataTableDesenvClinicoMan101);
 
             if (dataTableProcedimentos.Rows.Count > 0)
             {
@@ -331,8 +345,7 @@ namespace Migracao.Sistems
                 throw new Exception($"Erro ao converter Excel Recebíveis: {error.Message}");
             }
         }
-        public DataTable ConvertExcelRecebiveisHistoricoVendas
-            (DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePacientes)
+        public DataTable ConvertExcelRecebiveisHistoricoVendas(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePacientes)
         {
             try
             {
@@ -780,15 +793,17 @@ namespace Migracao.Sistems
                         if (nomeTabela.GetPrimeirosCaracteres(40).PrimeiraLetraMaiuscula() == "")
                             nomeTabela = nomeTabela;
 
+                        List<string> cabecalhos_Procedimentos = ["Nome Tabela", "Especialidade", "Ativo (Sim/Não)", "Nome do Procedimento", "Abreviação", "Preço", "TUSS", "Especialidade Código"];
+
+
                         dataRow["Nome Tabela"] = nomeTabela.GetPrimeirosCaracteres(40).PrimeiraLetraMaiuscula();
                         dataRow["Especialidade"] = especialidade;
-                        dataRow["Ativo(S/N)"] = ativo == "N" ? "N" : "S";
-                        dataRow["Procedimento(Nome)"] = nome.GetPrimeirosCaracteres(100).PrimeiraLetraMaiuscula();
+                        dataRow["Ativo (Sim/Não)"] = ativo == "N" ? "N" : "S";
+                        dataRow["Nome do Procedimento"] = nome.GetPrimeirosCaracteres(100).PrimeiraLetraMaiuscula();
                         dataRow["Abreviação"] = abreviacao;
                         dataRow["Preço"] = valor.ArredondarValorV2();
                         dataRow["TUSS"] = tuss.ToNumV2();
-                        dataRow["Especialidade Código"] = especialidadeCod;
-                        dataRow["Especialidade ID"] = especialidadeCodID;
+                        dataRow["Especialidade Código"] = especialidadeCodID;
 
                         dataTable.Rows.Add(dataRow);
                     }
@@ -1008,31 +1023,84 @@ namespace Migracao.Sistems
 
         public DataTable MergeDataTables(DataTable dt1, DataTable dt2)
         {
-            DataTable dtNew = new DataTable();
-            foreach (DataColumn col in dt1.Columns)
+            //Merge dos Datatables Man001 e Man101 linkando ambos pelo cnpj
+
+            var mergedDataTable = from row1 in dt1.AsEnumerable()
+                                  join row2 in dt2.AsEnumerable() on row1.Field<string>("PacienteCPF") equals row2.Field<string>("PacienteCPF")
+                                  select new
+                                  {
+                                      PacienteNomeCompleto001 = row1.Field<string>("PacienteNomeCompleto"),
+                                      PacienteCPF001 = row1.Field<string>("PacienteCPF"),
+                                      Observacao = row1.Field<string>("Observação"),
+                                      DataModificado = row1.Field<string>("DataModificado"),
+                                      Diagnostico = row1.Field<string>("Diagnostico"),
+                                      DataInicial = row1.Field<string>("DataInicial"),
+                                      DataFinal = row1.Field<string>("DataFinal"),
+                                      PacienteCPF101 = row2.Field<string>("PacienteCPF"),
+                                      PacienteNomeCompleto101 = row2.Field<string>("PacienteNomeCompleto"),
+                                      DentistaCPF = row2.Field<string>("DentistaCPF"),
+                                      DentistaNome = row2.Field<string>("DentistaNome"),
+                                      DentistaCodigo = row2.Field<string>("DentistaCodigo"),
+                                      Procedimento = row2.Field<string>("Procedimento"),
+                                      DataAtendimento = row2.Field<string>("DataAtendimento"),
+                                      DataInicio = row2.Field<string>("DataInicio"),
+                                      DataRetorno = row2.Field<string>("DataRetorno")
+                                  };
+
+            DataTable resultDataTable = new DataTable();
+            resultDataTable.Columns.Add("PacienteNomeCompleto001");
+            resultDataTable.Columns.Add("PacienteCPF001");
+            resultDataTable.Columns.Add("Observação");
+            resultDataTable.Columns.Add("DataModificado");
+            resultDataTable.Columns.Add("Diagnostico");
+            resultDataTable.Columns.Add("DataInicial");
+            resultDataTable.Columns.Add("DataFinal");
+            resultDataTable.Columns.Add("PacienteCPF101");
+            resultDataTable.Columns.Add("PacienteNomeCompleto101");
+            resultDataTable.Columns.Add("DentistaCPF");
+            resultDataTable.Columns.Add("DentistaNome");
+            resultDataTable.Columns.Add("DentistaCodigo");
+            resultDataTable.Columns.Add("Procedimento");
+            resultDataTable.Columns.Add("DataAtendimento");
+            resultDataTable.Columns.Add("DataInicio");
+            resultDataTable.Columns.Add("DataRetorno");
+
+            foreach (var item in mergedDataTable)
             {
-                dtNew.Columns.Add(col.ColumnName);
-            }
-            foreach (DataColumn col in dt2.Columns)
-            {
-                dtNew.Columns.Add(col.ColumnName);
+                resultDataTable.Rows.Add(item.PacienteNomeCompleto001, item.PacienteCPF001, item.Observacao,item.Diagnostico,
+                                         item.DataInicial, item.DataFinal, item.PacienteCPF101, item.PacienteNomeCompleto101,
+                                         item.DentistaNome,item.DentistaCodigo,item.Procedimento,item.DataAtendimento,
+                                         item.DataInicio,item.DataRetorno);
             }
 
-            for (int i = 0; i < dt1.Rows.Count; i++)
-            {
-                DataRow item = dtNew.NewRow();
-                foreach (DataColumn col in dt1.Columns)
-                {
-                    item[col.ColumnName] = dt1.Rows[i][col.ColumnName];
-                }
-                foreach (DataColumn col in dt2.Columns)
-                {
-                    item[col.ColumnName] = dt2.Rows[i][col.ColumnName];
-                }
-                dtNew.Rows.Add(item);
-                dtNew.AcceptChanges();
-            }
-            return dtNew;
+
+            //Merge dos Datatables Man001 e Man101 sem linkar os cnpj
+
+            //DataTable resultDataTable = new DataTable();          
+            //foreach (DataColumn col in dt1.Columns)
+            //{
+            //    resultDataTable.Columns.Add(col.ColumnName);
+            //}
+            //foreach (DataColumn col in dt2.Columns)
+            //{
+            //    resultDataTable.Columns.Add(col.ColumnName);
+            //}
+
+            //for (int i = 0; i < dt1.Rows.Count; i++)
+            //{
+            //    DataRow item = resultDataTable.NewRow();
+            //    foreach (DataColumn col in dt1.Columns)
+            //    {
+            //        item[col.ColumnName] = dt1.Rows[i][col.ColumnName];
+            //    }
+            //    foreach (DataColumn col in dt2.Columns)
+            //    {
+            //        item[col.ColumnName] = dt2.Rows[i][col.ColumnName];
+            //    }
+            //    resultDataTable.Rows.Add(item);
+            //    resultDataTable.AcceptChanges();
+            //}
+            return resultDataTable;
         }
 
         public DataTable ConvertExcelManutencaoMAM001(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null)
@@ -1075,7 +1143,7 @@ namespace Migracao.Sistems
                         dataRow["PacienteCPF"] = cpf;
                         dataRow["PacienteNomeCompleto"] = nome;
                         dataRow["Diagnostico"] = diagnostico;
-                        dataRow["Observação"] = observacao + " - " + diagnostico + " - " + obsClasse;                        
+                        dataRow["Observação"] = observacao + " - " + diagnostico + " - " + obsClasse;
                         dataRow["DataModificado"] = dataModificado.ToData().ToString();
                         dataRow["DataInicial"] = dataInicial.ToData().ToString();
                         dataRow["DataFinal"] = dataFinal.ToData().ToString();
@@ -1136,7 +1204,7 @@ namespace Migracao.Sistems
                         dataRow["PacienteCPF"] = cpf;
                         dataRow["PacienteNomeCompleto"] = nome;
                         dataRow["DentistaCPF"] = string.Empty;
-                        dataRow["DentistaNome"] = nomeRespAtendimento;                        
+                        dataRow["DentistaNome"] = nomeRespAtendimento;
                         dataRow["DentistaCodigo"] = respAtendimento;
                         dataRow["Procedimento"] = procedimento;
                         dataRow["DataAtendimento"] = dataModificado.ToData().ToShortDateString();
@@ -1187,6 +1255,7 @@ namespace Migracao.Sistems
                         var nomeRespAtendimento = valoresLinha.GetValueOrDefault("NOME_RESP_ATEND").Trim();
                         var codRespAtendimento = valoresLinha.GetValueOrDefault("RESP_ATEND").Trim();
                         var numero = valoresLinha.GetValueOrDefault("NUMERO").Trim();
+                        var documento = valoresLinha.GetValueOrDefault("DOCUMENTO").Trim();
 
 
                         cpf = cpf.ToCPF();
@@ -1207,10 +1276,10 @@ namespace Migracao.Sistems
                             dataRow["Dentista Codigo"] = codRespAtendimento;
                             dataRow["Preço"] = valor;
                             dataRow["Observações"] = observacao;
-                            dataRow["DataAtendimento"] = dataAtendimento.ToData().ToShortDateString();
-                            dataRow["DataInicio"] = dataInicio.ToData().ToShortDateString();
-                            
-                            
+                            dataRow["Data Termino"] = dataAtendimento.ToData().ToShortDateString();
+                            dataRow["Data Início"] = dataInicio.ToData().ToShortDateString();
+                            dataRow["Número do Controle"] = documento;
+
                             dataTable.Rows.Add(dataRow);
                         }
                     }
@@ -1230,5 +1299,263 @@ namespace Migracao.Sistems
             }
         }
 
+        public void RetornaProcedimentosPorTipo(DataTable dt, string estabelecimentoID)
+        {
+            ExcelHelper excelHelper = new();
+            DataTable dataTableProcedimentos = new ();
+            dataTableProcedimentos.Columns.Add("Nome Tabela");
+            dataTableProcedimentos.Columns.Add("Especialidade");
+            dataTableProcedimentos.Columns.Add("tivo (Sim/Não)");
+            dataTableProcedimentos.Columns.Add("Nome do Procedimento");
+            dataTableProcedimentos.Columns.Add("Abreviação");
+            dataTableProcedimentos.Columns.Add("Preço");
+            dataTableProcedimentos.Columns.Add("TUSS");
+            dataTableProcedimentos.Columns.Add("Especialidade Código");
+
+            #region DataRows pormtipo de plano
+
+            DataRow[] dataRowParticular = dt.AsEnumerable().Where(row => row.Field<string>("Nome Tabela") == "Particular").ToArray();
+            DataRow[] dataRowOdc = dt.AsEnumerable().Where(row => row.Field<string>("Nome Tabela") == "Odc").ToArray();
+            DataRow[] dataRowAmil = dt.AsEnumerable().Where(row => row.Field<string>("Nome Tabela") == "Amil").ToArray();
+            DataRow[] dataRowOdontomaxi = dt.AsEnumerable().Where(row => row.Field<string>("Nome Tabela") == "Odontomaxi").ToArray();
+            DataRow[] dataRowUnimed = dt.AsEnumerable().Where(row => row.Field<string>("Nome Tabela") == "Unimed").ToArray();
+            DataRow[] dataRowPrimavida = dt.AsEnumerable().Where(row => row.Field<string>("Nome Tabela") == "Primavida").ToArray();
+            DataRow[] dataRowPortoSeguro = dt.AsEnumerable().Where(row => row.Field<string>("Nome Tabela") == "Porto Seguro").ToArray();
+            DataRow[] dataRowAesp = dt.AsEnumerable().Where(row => row.Field<string>("Nome Tabela") == "Aesp").ToArray();
+            DataRow[] dataRowRodriguesLeira = dt.AsEnumerable().Where(row => row.Field<string>("Nome Tabela") == "Rodrigues Leira").ToArray();
+            DataRow[] dataRowInpao = dt.AsEnumerable().Where(row => row.Field<string>("Nome Tabela") == "Inpao").ToArray();
+            DataRow[] dataRowDentalIntegral = dt.AsEnumerable().Where(row => row.Field<string>("Nome Tabela") == "Dental Integral").ToArray();
+            DataRow[] dataRowProasa = dt.AsEnumerable().Where(row => row.Field<string>("Nome Tabela") == "Proasa").ToArray();
+            DataRow[] dataRowIdealOdonto = dt.AsEnumerable().Where(row => row.Field<string>("Nome Tabela") == "Ideal Odonto").ToArray();
+            DataRow[] dataRowOdontoart = dt.AsEnumerable().Where(row => row.Field<string>("Nome Tabela") == "Odontoart").ToArray();
+            DataRow[] dataRowBrazilDental = dt.AsEnumerable().Where(row => row.Field<string>("Nome Tabela") == "Brazil Dental").ToArray();
+            
+            #endregion
+
+            #region Particular
+
+            dataTableProcedimentos?.Clear();
+
+            foreach (var x in dataRowParticular)
+                dataTableProcedimentos?.Rows.Add(x.ItemArray);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentosParticular = Tools.GerarNomeArquivo($"CadastroProcedimentos_Particular_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosParticular + ".xlsx", dataTableProcedimentos);
+            }
+
+            #endregion
+
+            #region Odc
+
+            dataTableProcedimentos?.Clear();
+
+            foreach (var x in dataRowOdc)
+                dataTableProcedimentos?.Rows.Add(x.ItemArray);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentosOdc = Tools.GerarNomeArquivo($"CadastroProcedimentos_Odc_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosOdc + ".xlsx", dataTableProcedimentos);
+            }
+
+            #endregion
+
+            #region Amil
+
+            dataTableProcedimentos?.Clear();
+
+            foreach (var x in dataRowAmil)
+                dataTableProcedimentos?.Rows.Add(x.ItemArray);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentosAmil = Tools.GerarNomeArquivo($"CadastroProcedimentos_Amil_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosAmil + ".xlsx", dataTableProcedimentos);
+            }
+
+            #endregion
+
+            #region Odontomaxi
+
+            dataTableProcedimentos?.Clear();
+
+            foreach (var x in dataRowOdontomaxi)
+                dataTableProcedimentos?.Rows.Add(x.ItemArray);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentosOdontomaxi = Tools.GerarNomeArquivo($"CadastroProcedimentos_Odontomaxi_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosOdontomaxi + ".xlsx", dataTableProcedimentos);
+            }
+
+            #endregion
+
+            #region Unimed
+
+            dataTableProcedimentos?.Clear();
+
+            foreach (var x in dataRowUnimed)
+                dataTableProcedimentos?.Rows.Add(x.ItemArray);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentosUnimed = Tools.GerarNomeArquivo($"CadastroProcedimentos_Unimed_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosUnimed + ".xlsx", dataTableProcedimentos);
+            }
+
+            #endregion
+
+            #region Primavida
+
+            dataTableProcedimentos?.Clear();
+
+            foreach (var x in dataRowPrimavida)
+                dataTableProcedimentos?.Rows.Add(x.ItemArray);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentosPrimavida = Tools.GerarNomeArquivo($"CadastroProcedimentos_Primavida_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosPrimavida + ".xlsx", dataTableProcedimentos);
+            }
+
+            #endregion
+
+            #region Porto Seguro
+
+            dataTableProcedimentos?.Clear();
+
+            foreach (var x in dataRowPortoSeguro)
+                dataTableProcedimentos?.Rows.Add(x.ItemArray);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentosPortoSeguro = Tools.GerarNomeArquivo($"CadastroProcedimentos_PortoSeguro_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosPortoSeguro + ".xlsx", dataTableProcedimentos);
+            }
+
+            #endregion
+
+            #region Aesp
+
+            dataTableProcedimentos?.Clear();
+
+            foreach (var x in dataRowAesp)
+                dataTableProcedimentos?.Rows.Add(x.ItemArray);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentosAesp = Tools.GerarNomeArquivo($"CadastroProcedimentos_Aesp_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosAesp + ".xlsx", dataTableProcedimentos);
+            }
+
+            #endregion
+
+            #region Rodrigues Leira
+
+            dataTableProcedimentos?.Clear();
+
+            foreach (var x in dataRowRodriguesLeira)
+                dataTableProcedimentos?.Rows.Add(x.ItemArray);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentosRodriguesLeira = Tools.GerarNomeArquivo($"CadastroProcedimentos_RodriguesLeira_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosRodriguesLeira + ".xlsx", dataTableProcedimentos);
+            }
+
+            #endregion
+
+            #region Inpao
+
+            dataTableProcedimentos?.Clear();
+
+            foreach (var x in dataRowInpao)
+                dataTableProcedimentos?.Rows.Add(x.ItemArray);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentosInpao = Tools.GerarNomeArquivo($"CadastroProcedimentos_Inpao_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosInpao + ".xlsx", dataTableProcedimentos);
+            }
+
+            #endregion
+
+            #region Dental Integral
+
+            dataTableProcedimentos?.Clear();
+
+            foreach (var x in dataRowDentalIntegral)
+                dataTableProcedimentos?.Rows.Add(x.ItemArray);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentosDentalIntegral = Tools.GerarNomeArquivo($"CadastroProcedimentos_DentalIntegral_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosDentalIntegral + ".xlsx", dataTableProcedimentos);
+            }
+
+            #endregion
+
+            #region Proasa
+
+            dataTableProcedimentos?.Clear();
+
+            foreach (var x in dataRowProasa)
+                dataTableProcedimentos?.Rows.Add(x.ItemArray);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentosProasa = Tools.GerarNomeArquivo($"CadastroProcedimentos_Proasa_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosProasa + ".xlsx", dataTableProcedimentos);
+            }
+
+            #endregion
+
+            #region Ideal Odonto
+
+            dataTableProcedimentos?.Clear();
+
+            foreach (var x in dataRowIdealOdonto)
+                dataTableProcedimentos?.Rows.Add(x.ItemArray);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentosIdealOdonto = Tools.GerarNomeArquivo($"CadastroProcedimentos_IdealOdonto_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosIdealOdonto + ".xlsx", dataTableProcedimentos);
+            }
+
+            #endregion
+
+            #region Odontoart
+
+            dataTableProcedimentos?.Clear();
+
+            foreach (var x in dataRowOdontoart)
+                dataTableProcedimentos?.Rows.Add(x.ItemArray);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentosOdontoart = Tools.GerarNomeArquivo($"CadastroProcedimentosOdontoart_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosOdontoart + ".xlsx", dataTableProcedimentos);
+            }
+
+            #endregion
+
+            #region Brazil Dental
+
+            dataTableProcedimentos?.Clear();
+
+            foreach (var x in dataRowBrazilDental)
+                dataTableProcedimentos?.Rows.Add(x.ItemArray);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentosBrazilDental = Tools.GerarNomeArquivo($"CadastroProcedimentos_BrazilDental_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosBrazilDental + ".xlsx", dataTableProcedimentos);
+            }
+
+            #endregion
+        }
     }
 }

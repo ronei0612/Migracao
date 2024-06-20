@@ -2,11 +2,13 @@
 using MathNet.Numerics.Distributions;
 using Migracao.Models;
 using Migracao.Utils;
+using NPOI.POIFS.Crypt.Dsig;
 using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using System.Data;
 using System.Diagnostics.Metrics;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using static System.Windows.Forms.LinkLabel;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView;
@@ -296,15 +298,15 @@ namespace Migracao.Sistems
                     excelHelper.CriarExcelArquivo(salvarManutencaoMan111 + ".xlsx", dataTableManutencaoMan111);
                 }
 
-                if (dataTableManutencaoMan111 != null && dataTableManutencaoMan101 != null)
-                    dataTableProcedimentosManutencaoMerge = MergeDataTablesProcedimentosManutencao(dataTableManutencaoMan111, dataTableManutencaoMan101);
+                if (dataTableManutencaoMan111 != null && dataTableProcedimentosATD222 != null)
+                    dataTableProcedimentosManutencaoMerge = MergeDataTablesProcedimentosManutencao(dataTableProcedimentosATD222, dataTableManutencaoMan111);
 
 
-                //if (dataTableManutencaoMerge != null)
-                //{
-                //    var salvarManutencaoMergeMan = Tools.GerarNomeArquivo($"CadastroManutencaoManMerge_001_101_{estabelecimentoID}_OdontoCompany");
-                //    excelHelper.CriarExcelArquivo(salvarManutencaoMergeMan + ".xlsx", dataTableManutencaoMerge);
-                //}
+                if (dataTableProcedimentosManutencaoMerge != null)
+                {
+                    var salvarProcedimentosManutencaoMerge = Tools.GerarNomeArquivo($"cadastroProcedimentosManutencaoMerge_{estabelecimentoID}_odontocompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosManutencaoMerge + ".xlsx", dataTableProcedimentosManutencaoMerge);
+                }
             }
 
             if (dataTableProcedimentos.Rows.Count > 0)
@@ -838,7 +840,7 @@ namespace Migracao.Sistems
                         dataRow["Especialidade"] = especialidade;
                         dataRow["Ativo (Sim/Não)"] = ativo == "N" ? "N" : "S";
                         dataRow["Nome do Procedimento"] = nome.GetPrimeirosCaracteres(100).PrimeiraLetraMaiuscula();
-                        dataRow["Abreviação"] = abreviacao;
+                        dataRow["Abreviação"] = abreviacao.GetPrimeirosCaracteres(10);
                         dataRow["Preço"] = valor.ArredondarValorV2();
                         dataRow["TUSS"] = tuss.ToNumV2();
                         dataRow["Especialidade Código"] = especialidadeCodID;
@@ -1059,176 +1061,6 @@ namespace Migracao.Sistems
             }
         }
 
-        public DataTable MergeDataTables(DataTable dt1, DataTable dt2)
-        {
-            //Merge dos Datatables Man001 e Man101 linkando ambos pelo cnpj
-
-            var mergedDataTable = from row1 in dt1.AsEnumerable()
-                                  join row2 in dt2.AsEnumerable() on row1.Field<string>("PacienteCPF") equals row2.Field<string>("PacienteCPF")
-                                  select new
-                                  {
-                                      PacienteNomeCompleto001 = row1.Field<string>("PacienteNomeCompleto"),
-                                      PacienteCPF001 = row1.Field<string>("PacienteCPF"),
-                                      Observacao = row1.Field<string>("Observação"),
-                                      DataModificado = row1.Field<string>("DataModificado"),
-                                      Diagnostico = row1.Field<string>("Diagnostico"),
-                                      DataInicial = row1.Field<string>("DataInicial"),
-                                      DataFinal = row1.Field<string>("DataFinal"),
-                                      PacienteCPF101 = row2.Field<string>("PacienteCPF"),
-                                      PacienteNomeCompleto101 = row2.Field<string>("PacienteNomeCompleto"),
-                                      DentistaCPF = row2.Field<string>("DentistaCPF"),
-                                      DentistaNome = row2.Field<string>("DentistaNome"),
-                                      DentistaCodigo = row2.Field<string>("DentistaCodigo"),
-                                      Procedimento = row2.Field<string>("Procedimento"),
-                                      DataAtendimento = row2.Field<string>("DataAtendimento"),
-                                      DataInicio = row2.Field<string>("DataInicio"),
-                                      DataRetorno = row2.Field<string>("DataRetorno")
-                                  };
-
-            DataTable resultDataTable = new DataTable();
-            resultDataTable.Columns.Add("PacienteNomeCompleto001");
-            resultDataTable.Columns.Add("PacienteCPF001");
-            resultDataTable.Columns.Add("Observação");
-            resultDataTable.Columns.Add("DataModificado");
-            resultDataTable.Columns.Add("Diagnostico");
-            resultDataTable.Columns.Add("DataInicial");
-            resultDataTable.Columns.Add("DataFinal");
-            resultDataTable.Columns.Add("PacienteCPF101");
-            resultDataTable.Columns.Add("PacienteNomeCompleto101");
-            resultDataTable.Columns.Add("DentistaCPF");
-            resultDataTable.Columns.Add("DentistaNome");
-            resultDataTable.Columns.Add("DentistaCodigo");
-            resultDataTable.Columns.Add("Procedimento");
-            resultDataTable.Columns.Add("DataAtendimento");
-            resultDataTable.Columns.Add("DataInicio");
-            resultDataTable.Columns.Add("DataRetorno");
-
-            foreach (var item in mergedDataTable)
-            {
-                resultDataTable.Rows.Add(item.PacienteNomeCompleto001, item.PacienteCPF001, item.Observacao,item.Diagnostico,
-                                         item.DataInicial, item.DataFinal, item.PacienteCPF101, item.PacienteNomeCompleto101,
-                                         item.DentistaNome,item.DentistaCodigo,item.Procedimento,item.DataAtendimento,
-                                         item.DataInicio,item.DataRetorno);
-            }
-
-
-            //Merge dos Datatables Man001 e Man101 sem linkar os cnpj
-
-            //DataTable resultDataTable = new DataTable();          
-            //foreach (DataColumn col in dt1.Columns)
-            //{
-            //    resultDataTable.Columns.Add(col.ColumnName);
-            //}
-            //foreach (DataColumn col in dt2.Columns)
-            //{
-            //    resultDataTable.Columns.Add(col.ColumnName);
-            //}
-
-            //for (int i = 0; i < dt1.Rows.Count; i++)
-            //{
-            //    DataRow item = resultDataTable.NewRow();
-            //    foreach (DataColumn col in dt1.Columns)
-            //    {
-            //        item[col.ColumnName] = dt1.Rows[i][col.ColumnName];
-            //    }
-            //    foreach (DataColumn col in dt2.Columns)
-            //    {
-            //        item[col.ColumnName] = dt2.Rows[i][col.ColumnName];
-            //    }
-            //    resultDataTable.Rows.Add(item);
-            //    resultDataTable.AcceptChanges();
-            //}
-            return resultDataTable;
-        }
-
-        public DataTable MergeDataTablesProcedimentosManutencao(DataTable dt1, DataTable dt2)
-        {
-
-            //var mergedDataTable = from row1 in dt1.AsEnumerable()
-            //                      from row2 in dt2.AsEnumerable()
-            //                      where row1.Field<string>("Paciente CPF") == row2.Field<string>("Paciente CPF")
-            //                      && row1.Field<string>("LANCTO") == row2.Field<string>("LANCTO")
-            //                      select new
-            //                      {
-            //                          PacienteNomeCompleto001 = row1.Field<string>("PacienteNomeCompleto"),
-            //                          PacienteCPF001 = row1.Field<string>("PacienteCPF"),
-            //                          Observacao = row1.Field<string>("Observação"),
-            //                          DataModificado = row1.Field<string>("DataModificado"),
-            //                          Diagnostico = row1.Field<string>("Diagnostico"),
-            //                          DataInicial = row1.Field<string>("DataInicial"),
-            //                          DataFinal = row1.Field<string>("DataFinal"),
-            //                          PacienteCPF101 = row2.Field<string>("PacienteCPF"),
-            //                          PacienteNomeCompleto101 = row2.Field<string>("PacienteNomeCompleto"),
-            //                          DentistaCPF = row2.Field<string>("DentistaCPF"),
-            //                          DentistaNome = row2.Field<string>("DentistaNome"),
-            //                          DentistaCodigo = row2.Field<string>("DentistaCodigo"),
-            //                          Procedimento = row2.Field<string>("Procedimento"),
-            //                          DataAtendimento = row2.Field<string>("DataAtendimento"),
-            //                          DataInicio = row2.Field<string>("DataInicio"),
-            //                          DataRetorno = row2.Field<string>("DataRetorno")
-            //                      };
-
-            ////-- Quantidade Orto = Contar quantidade de DOCUMENTO (do CPF) 
-            //// --Procedimento Observação PEGAR DO MAN101
-
-            //DataTable resultDataTable = new DataTable();
-            //resultDataTable.Columns.Add("Paciente Nome");
-            //resultDataTable.Columns.Add("Paciente CPF");
-            //resultDataTable.Columns.Add("Observação");
-            //resultDataTable.Columns.Add("DataModificado");
-            //resultDataTable.Columns.Add("Diagnostico");
-            //resultDataTable.Columns.Add("DataInicial");
-            //resultDataTable.Columns.Add("DataFinal");
-            //resultDataTable.Columns.Add("PacienteCPF101");
-            //resultDataTable.Columns.Add("PacienteNomeCompleto101");
-            //resultDataTable.Columns.Add("DentistaCPF");
-            //resultDataTable.Columns.Add("DentistaNome");
-            //resultDataTable.Columns.Add("DentistaCodigo");
-            //resultDataTable.Columns.Add("Procedimento");
-            //resultDataTable.Columns.Add("DataAtendimento");
-            //resultDataTable.Columns.Add("DataInicio");
-            //resultDataTable.Columns.Add("DataRetorno");
-
-            ////-- Quantidade Orto = Contar quantidade de DOCUMENTO (do CPF) 
-            //// --Procedimento Observação PEGAR DO MAN101
-
-            //foreach (var item in mergedDataTable)
-            //{
-            //    resultDataTable.Rows.Add(item.PacienteNomeCompleto001, item.PacienteCPF001, item.Observacao, item.Diagnostico,
-            //                             item.DataInicial, item.DataFinal, item.PacienteCPF101, item.PacienteNomeCompleto101,
-            //                             item.DentistaNome, item.DentistaCodigo, item.Procedimento, item.DataAtendimento,
-            //                             item.DataInicio, item.DataRetorno);
-            //}
-
-            //Merge dos Datatables Man001 e Man101 sem linkar os cnpj
-
-            DataTable resultDataTable = new DataTable();
-            foreach (DataColumn col in dt1.Columns)
-            {
-                resultDataTable.Columns.Add(col.ColumnName);
-            }
-            foreach (DataColumn col in dt2.Columns)
-            {
-                resultDataTable.Columns.Add(col.ColumnName);
-            }
-
-            for (int i = 0; i < dt1.Rows.Count; i++)
-            {
-                DataRow item = resultDataTable.NewRow();
-                foreach (DataColumn col in dt1.Columns)
-                {
-                    item[col.ColumnName] = dt1.Rows[i][col.ColumnName];
-                }
-                foreach (DataColumn col in dt2.Columns)
-                {
-                    item[col.ColumnName] = dt2.Rows[i][col.ColumnName];
-                }
-                resultDataTable.Rows.Add(item);
-                resultDataTable.AcceptChanges();
-            }
-            return resultDataTable;
-        }
-
         public DataTable ConvertExcelManutencaoMAM001(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null)
         {
             try
@@ -1438,7 +1270,6 @@ namespace Migracao.Sistems
             }
         }
 
-
         public DataTable ConvertExcelProcedimentosATD222(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null)
         {
             try
@@ -1507,6 +1338,164 @@ namespace Migracao.Sistems
             {
                 throw new Exception($"Erro ao converter Excel Recebíveis: {error.Message}");
             }
+        }
+
+        public DataTable MergeDataTables(DataTable dt1, DataTable dt2)
+        {
+            //Merge dos Datatables Man001 e Man101 linkando ambos pelo cnpj
+
+            var mergedDataTable = from row1 in dt1.AsEnumerable()
+                                  join row2 in dt2.AsEnumerable() on row1.Field<string>("PacienteCPF") equals row2.Field<string>("PacienteCPF")
+                                  select new
+                                  {
+                                      PacienteNomeCompleto001 = row1.Field<string>("PacienteNomeCompleto"),
+                                      PacienteCPF001 = row1.Field<string>("PacienteCPF"),
+                                      Observacao = row1.Field<string>("Observação"),
+                                      DataModificado = row1.Field<string>("DataModificado"),
+                                      Diagnostico = row1.Field<string>("Diagnostico"),
+                                      DataInicial = row1.Field<string>("DataInicial"),
+                                      DataFinal = row1.Field<string>("DataFinal"),
+                                      PacienteCPF101 = row2.Field<string>("PacienteCPF"),
+                                      PacienteNomeCompleto101 = row2.Field<string>("PacienteNomeCompleto"),
+                                      DentistaCPF = row2.Field<string>("DentistaCPF"),
+                                      DentistaNome = row2.Field<string>("DentistaNome"),
+                                      DentistaCodigo = row2.Field<string>("DentistaCodigo"),
+                                      Procedimento = row2.Field<string>("Procedimento"),
+                                      DataAtendimento = row2.Field<string>("DataAtendimento"),
+                                      DataInicio = row2.Field<string>("DataInicio"),
+                                      DataRetorno = row2.Field<string>("DataRetorno")
+                                  };
+
+            DataTable resultDataTable = new DataTable();
+            resultDataTable.Columns.Add("PacienteNomeCompleto001");
+            resultDataTable.Columns.Add("PacienteCPF001");
+            resultDataTable.Columns.Add("Observação");
+            resultDataTable.Columns.Add("DataModificado");
+            resultDataTable.Columns.Add("Diagnostico");
+            resultDataTable.Columns.Add("DataInicial");
+            resultDataTable.Columns.Add("DataFinal");
+            resultDataTable.Columns.Add("PacienteCPF101");
+            resultDataTable.Columns.Add("PacienteNomeCompleto101");
+            resultDataTable.Columns.Add("DentistaCPF");
+            resultDataTable.Columns.Add("DentistaNome");
+            resultDataTable.Columns.Add("DentistaCodigo");
+            resultDataTable.Columns.Add("Procedimento");
+            resultDataTable.Columns.Add("DataAtendimento");
+            resultDataTable.Columns.Add("DataInicio");
+            resultDataTable.Columns.Add("DataRetorno");
+
+            foreach (var item in mergedDataTable)
+            {
+                resultDataTable.Rows.Add(item.PacienteNomeCompleto001, item.PacienteCPF001, item.Observacao, item.Diagnostico,
+                                         item.DataInicial, item.DataFinal, item.PacienteCPF101, item.PacienteNomeCompleto101,
+                                         item.DentistaNome, item.DentistaCodigo, item.Procedimento, item.DataAtendimento,
+                                         item.DataInicio, item.DataRetorno);
+            }
+
+
+            //Merge dos Datatables Man001 e Man101 sem linkar os cnpj
+
+            //DataTable resultDataTable = new DataTable();          
+            //foreach (DataColumn col in dt1.Columns)
+            //{
+            //    resultDataTable.Columns.Add(col.ColumnName);
+            //}
+            //foreach (DataColumn col in dt2.Columns)
+            //{
+            //    resultDataTable.Columns.Add(col.ColumnName);
+            //}
+
+            //for (int i = 0; i < dt1.Rows.Count; i++)
+            //{
+            //    DataRow item = resultDataTable.NewRow();
+            //    foreach (DataColumn col in dt1.Columns)
+            //    {
+            //        item[col.ColumnName] = dt1.Rows[i][col.ColumnName];
+            //    }
+            //    foreach (DataColumn col in dt2.Columns)
+            //    {
+            //        item[col.ColumnName] = dt2.Rows[i][col.ColumnName];
+            //    }
+            //    resultDataTable.Rows.Add(item);
+            //    resultDataTable.AcceptChanges();
+            //}
+            return resultDataTable;
+        }
+
+        public DataTable MergeDataTablesProcedimentosManutencao(DataTable dt1, DataTable dt2)
+        {
+            var mergedDataTable = (from row1 in dt1.AsEnumerable()
+                                  //join row2 in dt2.AsEnumerable() on row1.Field<string>("Paciente CPF") equals row2.Field<string>("Paciente CPF")
+                                  select new
+                                  {
+                                      NumeroControle = row1.Field<string>("Número do Controle"),
+                                      PacienteCPF = row1.Field<string>("Paciente CPF"),
+                                      PacienteNome = row1.Field<string>("Paciente Nome"),
+                                      DentistaCPF = row1.Field<string>("Dentista CPF"),
+                                      DentistaNome = row1.Field<string>("Dentista Nome"),
+                                      Dente = row1.Field<string>("Dente"),
+                                      ProcedimentoNome = row1.Field<string>("Procedimento Nome"),
+                                      ProcedimentoValor = row1.Field<string>("Procedimento Valor"),
+                                      ProcObservacao = row1.Field<string>("Procedimento Observação"),
+                                      DataInicio = row1.Field<string>("Data Início"),
+                                      DataTermino = row1.Field<string>("Data Termino"),
+                                      QtdOrto = string.Empty
+                                      //ValorPagamento = row2.Field<string>("Valor Pagamento"),
+                                      //DataPagamento = row2.Field<string>("Data Pagamento"),
+                                  }).Distinct();            
+
+            DataTable resultDataTable = new DataTable();
+            resultDataTable.Columns.Add("Número do Controle");
+            resultDataTable.Columns.Add("Paciente CPF");
+            resultDataTable.Columns.Add("Paciente Nome");            
+            resultDataTable.Columns.Add("Dentista CPF");
+            resultDataTable.Columns.Add("Dentista Nome");
+            resultDataTable.Columns.Add("Dente");
+            resultDataTable.Columns.Add("Procedimento Nome");
+            resultDataTable.Columns.Add("Procedimento Valor");
+            resultDataTable.Columns.Add("Procedimento Observação");
+            resultDataTable.Columns.Add("Data Início");
+            resultDataTable.Columns.Add("Data Termino");
+            resultDataTable.Columns.Add("Quantidade Orto");
+
+            //resultDataTable.Columns.Add("Valor Pagamento");
+            //resultDataTable.Columns.Add("Data Pagamento");
+            
+
+            foreach (var item in mergedDataTable)
+            {
+                resultDataTable.Rows.Add(item.NumeroControle, item.PacienteCPF, item.PacienteNome, item.DentistaCPF,
+                                         item.DentistaNome, item.Dente, item.ProcedimentoNome, item.ProcedimentoValor,
+                                         item.ProcObservacao, item.DataInicio, item.DataTermino, item.QtdOrto);
+            }
+
+            var mergedDataTable2 = from row2 in dt2.AsEnumerable()
+                                  select new
+                                  {
+                                      NumeroControle = string.Empty,
+                                      PacienteCPF = row2.Field<string>("Paciente CPF"),
+                                      PacienteNome = row2.Field<string>("Paciente Nome"),
+                                      DentistaCPF = string.Empty,
+                                      DentistaNome = row2.Field<string>("Dentista Nome"),
+                                      Dente = row2.Field<string>("Dente"),
+                                      ProcedimentoNome = row2.Field<string>("Procedimento Nome"),
+                                      ProcedimentoValor = row2.Field<string>("Procedimento Valor"),
+                                      ProcObservacao = row2.Field<string>("Procedimento Observação"),
+                                      DataInicio = string.Empty,
+                                      DataTermino = string.Empty,
+                                      QtdOrto = row2.Field<string>("Quantidade Orto")
+                                      //ValorPagamento = row2.Field<string>("Valor Pagamento"),
+                                      //DataPagamento = row2.Field<string>("Data Pagamento"),
+                                  };
+
+            foreach (var item in mergedDataTable2)
+            {
+                resultDataTable.Rows.Add(item.NumeroControle, item.PacienteCPF, item.PacienteNome, item.DentistaCPF,
+                                         item.DentistaNome, item.Dente, item.ProcedimentoNome, item.ProcedimentoValor,
+                                         item.ProcObservacao, item.DataInicio, item.DataTermino, item.QtdOrto);
+            }
+
+            return resultDataTable;
         }
 
         public void RetornaProcedimentosPorTipo(DataTable dt, string estabelecimentoID)
@@ -1767,7 +1756,5 @@ namespace Migracao.Sistems
 
             #endregion
         }
-
-
     }
 }

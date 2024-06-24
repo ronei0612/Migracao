@@ -173,6 +173,8 @@ namespace Migracao.Utils
 		{
 			texto = texto.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
 
+			if (texto == null) return null;
+
 			return string.Join(" ", texto.Split(' ')
 				.Where(parte => parte.Length > 1)
 				.ToArray());

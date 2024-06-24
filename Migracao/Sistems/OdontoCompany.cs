@@ -39,7 +39,7 @@ namespace Migracao.Sistems
         List<string> cabecalhos_CodProcedimentos = ["ID", "Nome", "Usuário"];
         List<string> cabecalhos_ManutencaoMan001 = ["Paciente Nome Completo", "Paciente CPF", "Observação", "Data Modificado", "Diagnostico", "Data Inicial", "Data Final"];
         List<string> cabecalhos_ManutencaoMan101 = ["Paciente CPF", "Paciente Nome", "Dentista CPF", "Dentista Nome", "Dentista Codigo", "Procedimento Nome", "Data Atendimento", "Data Início", "Data Retorno", "Procedimento Observação", "Lancamento"];
-        List<string> cabecalhos_ManutencaoMan111 = ["Paciente CPF", "Paciente Nome", "Dentista Nome", "Procedimento Nome", "Valor Original", "Valor do Pagamento", "Data do Pagamento", "Dente", "Procedimento Observação", "Quantidade Orto", "Tipo do Pagamento", "Vencimento", "Valor Devido"];
+        List<string> cabecalhos_ManutencaoMan111 = ["Paciente CPF", "Paciente Nome", "Dentista Nome", "Procedimento Nome", "Procedimento Valor", "Valor Original", "Valor do Pagamento", "Data do Pagamento", "Dente", "Procedimento Observação", "Quantidade Orto", "Tipo do Pagamento", "Vencimento", "Valor Devido"];
         List<string> cabecalhos_ProcedimentosATD222 = ["Número do Controle", "Paciente CPF", "Paciente Nome", "Dentista CPF", "Dentista Nome", "Dente", "Procedimento Nome", "Procedimento Valor", "Procedimento Observação", "Data Início", "Data Termino"];
         List<string> cabecalhos_ManutencaoManMerge001_101 = ["Paciente Nome Man001", "Paciente CPF Man001", "Observação", "DataModificado", "Diagnostico", "DataInicial", "DataFinal", "Paciente CPF Man101", "Paciente Nome Completo", "Dentista CPF", "DentistaNome", "DentistaCodigo", "Procedimento", "DataAtendimento", "DataInicio", "DataRetorno"];
 
@@ -383,7 +383,7 @@ namespace Migracao.Sistems
                             dataRow["Recebível Exigível(R/E)"] = "R";
                             dataRow["Duplicata"] = duplicata;
                             dataRow["Tipo do Pagamento"] = tipoDoc;
-                            dataRow["Valor Original"] = valorOriginal;
+                            dataRow["Valor Original"] = valorOriginal.ArredondarValorV2();
                             dataRow["Vencimento Recebível"] = venctoOriginal.ToData().ToString("dd/MM/yyyy");
 
                             dataTable.Rows.Add(dataRow);
@@ -441,13 +441,13 @@ namespace Migracao.Sistems
                         {
                             dataRow["CPF"] = cpf;
                             dataRow["Nome"] = nome;
-                            dataRow["ObservaçãoRecebível"] = observacao;
-                            dataRow["DocumentoRef"] = documento;
-                            dataRow["ValorOriginal"] = valor.ArredondarValorV2();
+                            dataRow["Observação Recebível"] = observacao;
+                            dataRow["Documento Ref"] = documento;
+                            dataRow["Valor Original"] = valor.ArredondarValorV2();
                             //dataRow["Prazo"] = prazo;
-                            dataRow["Vencimento(01/12/2010)"] = vencimentoData.ToData().ToString("dd/MM/yyyy");
-                            dataRow["Emissão(01/12/2010)"] = emissaoData.ToData().ToString("dd/MM/yyyy");
-                            dataRow["RecebívelExigível(R/E)"] = "R";
+                            dataRow["Vencimento"] = vencimentoData.ToData().ToString("dd/MM/yyyy");
+                            dataRow["Emissão"] = emissaoData.ToData().ToString("dd/MM/yyyy");
+                            dataRow["Recebível Exigível(R/E)"] = "R";
 
                             dataTable.Rows.Add(dataRow);
                         }
@@ -1130,7 +1130,7 @@ namespace Migracao.Sistems
 
 
                         dataRow["Paciente CPF"] = cpf;
-                        dataRow["Paciente Nome"] = nome;
+                        dataRow["Paciente Nome Completo"] = nome;
                         dataRow["Diagnostico"] = diagnostico;
                         dataRow["Observação"] = observacao + " - " + diagnostico + " - " + obsClasse;
                         dataRow["Data Modificado"] = dataModificado.ToData().ToString();
@@ -1293,9 +1293,9 @@ namespace Migracao.Sistems
                         dataRow["Paciente Nome"] = nome;
                         dataRow["Dentista Nome"] = nomeRespAtendimento;
                         dataRow["Procedimento Nome"] = nomeTipo;
-                        dataRow["Valor Original"] = valorOriginal;
-                        dataRow["Valor do Pagamento"] = valor;
-                        dataRow["Data do Pagamento"] = dataPagamento.ToData().ToShortDateString();
+                        dataRow["Valor Original"] = valorOriginal.ArredondarValorV2();
+                        dataRow["Valor do Pagamento"] = valor.ArredondarValorV2();
+                        dataRow["Data do Pagamento"] = dataPagamento.ToDataNull()?.ToShortDateString();
                         dataRow["Dente"] = string.Empty;
                         dataRow["Procedimento Observação"] = procObservacao;
                         dataRow["Quantidade Orto"] = docsEncontrados;

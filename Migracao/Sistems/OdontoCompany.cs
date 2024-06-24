@@ -7,6 +7,7 @@ using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using System.Data;
 using System.Diagnostics.Metrics;
+using System.Linq;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using static System.Windows.Forms.LinkLabel;
@@ -126,8 +127,6 @@ namespace Migracao.Sistems
                 var salvarArquivoPessoas = Tools.GerarNomeArquivo($"CadastroPessoas_{estabelecimentoID}_OdontoCompany");
                 excelHelper.CriarExcelArquivo(salvarArquivoPessoas + ".xlsx", dataTablePessoas);
             }
-
-
 
             var excel_CRD111 = listView.Items.Cast<ListViewItem>()
                 .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("CRD111")));
@@ -1272,7 +1271,7 @@ namespace Migracao.Sistems
                                 nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
 
                             //`Para analisar porque está vazio
-                            if (!string.IsNullOrEmpty(nome))
+                            if (string.IsNullOrEmpty(nome))
                                 continue;
                         }
 
@@ -1289,6 +1288,7 @@ namespace Migracao.Sistems
 
                         }
 
+                        dataRow["Numero do Controle"] = documento;
                         dataRow["Paciente CPF"] = cpf;
                         dataRow["Paciente Nome"] = nome;
                         dataRow["Dentista Nome"] = nomeRespAtendimento;
@@ -1515,6 +1515,9 @@ namespace Migracao.Sistems
             resultDataTable.Columns.Add("Data Início");
             resultDataTable.Columns.Add("Data Termino");
             resultDataTable.Columns.Add("Quantidade Orto");
+            resultDataTable.Columns.Add("Tipo do Pagamento");
+            resultDataTable.Columns.Add("Vencimento");
+            resultDataTable.Columns.Add("Valor Devido");
 
             //resultDataTable.Columns.Add("Valor Pagamento");
             //resultDataTable.Columns.Add("Data Pagamento");
@@ -1530,7 +1533,7 @@ namespace Migracao.Sistems
             var mergedDataTable2 = from row2 in dt2.AsEnumerable()
                                    select new
                                    {
-                                       NumeroControle = string.Empty,
+                                       NumeroControle = row2.Field<string>("Numero do Controle"),
                                        PacienteCPF = row2.Field<string>("Paciente CPF"),
                                        PacienteNome = row2.Field<string>("Paciente Nome"),
                                        DentistaCPF = string.Empty,
@@ -1545,9 +1548,7 @@ namespace Migracao.Sistems
                                        TipoPagamento = row2.Field<string>("Tipo do Pagamento"),
                                        Vencimento = row2.Field<string>("Vencimento"),
                                        ValorDevido = row2.Field<string>("Valor Devido")
-                                        //ValorPagamento = row2.Field<string>("Valor Pagamento"),
-                                        //DataPagamento = row2.Field<string>("Data Pagamento"),
-        };
+                                   };
 
             foreach (var item in mergedDataTable2)
             {

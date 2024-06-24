@@ -384,7 +384,7 @@ namespace Migracao.Sistems
                             dataRow["Recebível Exigível(R/E)"] = "R";
                             dataRow["Duplicata"] = duplicata;
                             dataRow["Tipo do Pagamento"] = tipoDoc;
-                            dataRow["Valor Original"] = valorOriginal;
+                            dataRow["Valor Original"] = valorOriginal.ArredondarValorV2();
                             dataRow["Vencimento Recebível"] = venctoOriginal.ToData().ToString("dd/MM/yyyy");
 
                             dataTable.Rows.Add(dataRow);
@@ -1293,7 +1293,7 @@ namespace Migracao.Sistems
                         dataRow["Paciente Nome"] = nome;
                         dataRow["Dentista Nome"] = nomeRespAtendimento;
                         dataRow["Procedimento Nome"] = nomeTipo;
-                        dataRow["Valor Original"] = valorOriginal;
+                        dataRow["Valor Original"] = valorOriginal.ArredondarValorV2();
                         dataRow["Valor do Pagamento"] = valor.ArredondarValorV2();
                         dataRow["Data do Pagamento"] = dataPagamento.ToDataNull()?.ToShortDateString();
                         dataRow["Dente"] = string.Empty;

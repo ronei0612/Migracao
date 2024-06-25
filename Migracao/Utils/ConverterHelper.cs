@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Migracao.Utils
 {
-    internal class ConverterHelper
+    public class ConverterHelper
     {
         public void JsonExcel(string json, string caminhoArquivoExcel)
         {
@@ -41,6 +41,18 @@ namespace Migracao.Utils
                 worksheet.Cells["A1"].LoadFromDataTable(dataTable, true);
                 package.SaveAs(new FileInfo(caminhoArquivoExcel));
             }
+        }
+
+        public static List<string> SomaValoresColunaPorReferencia(DataTable dt, string nomeColunaReferencia, string nomeColuna)
+        {
+            var query = (from row in dt.AsEnumerable()
+                         group row by row.Field<string>(nomeColunaReferencia) into g
+                         select new
+                         {
+                             Soma = g.Sum(row => row.Field<double>(nomeColuna)).ToString()
+                         }).ToList();
+
+            return null;
         }
     }
 }

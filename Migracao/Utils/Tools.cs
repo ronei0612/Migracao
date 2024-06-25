@@ -102,22 +102,31 @@ namespace Migracao.Utils
 
 		public static DateTime ToData(this string texto)
 		{
-			if (string.IsNullOrEmpty(texto))
-				return DateTime.Now;
 
-			DateTime dataMinima = new(1900, 01, 01), dataMaxima = new(2079, 06, 06), dataHoje = DateTime.Now, data;
-
-			if (DateTime.TryParse(texto, out data))
+			try
 			{
-			}
-			else if (double.TryParse(texto, out double codigoData))
-				data = DateTime.FromOADate(codigoData);
-			else
-				throw new Exception("Erro na conversão de data");
-			if ((data >= dataMinima && data <= dataMaxima) == false)
-				data = dataHoje;
+                if (string.IsNullOrEmpty(texto))
+                    return DateTime.Now;
 
-			return data;
+                DateTime dataMinima = new(1900, 01, 01), dataMaxima = new(2079, 06, 06), dataHoje = DateTime.Now, data;
+
+                if (DateTime.TryParse(texto, out data))
+                {
+                }
+                else if (double.TryParse(texto, out double codigoData))
+                    data = DateTime.FromOADate(codigoData);
+                else                    
+
+                if ((data >= dataMinima && data <= dataMaxima) == false)
+                    data = dataHoje;
+
+                return data;
+            }
+			catch (Exception)
+			{
+                throw new Exception("Erro na conversão de data");
+            }
+			
 		}
 
 		public static long ToNumV2(this string texto)
@@ -163,6 +172,8 @@ namespace Migracao.Utils
 		public static string? ToNome(this string texto)
 		{
 			texto = texto.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+
+			if (texto == null) return null;
 
 			return string.Join(" ", texto.Split(' ')
 				.Where(parte => parte.Length > 1)

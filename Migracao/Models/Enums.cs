@@ -442,4 +442,38 @@ namespace Migracao.Models
 		[Description("Coordenador de Treinamento")]
 		CoordenadorDeTreinamento = 231
 	}
+
+	public enum AtendimentoTipoID
+    {
+		Atendimento = 0,
+		Avaliação_Clinico = 1,
+        Avaliação_Ortodontia = 2,
+        Procedimento_Clinico = 3,
+        Procedimento_Orto_Montagem_Fixa = 4,
+        Procedimento_Orto_Montagem_Móvel = 5,
+        Procedimento_Orto_Contencao = 6,
+        Procedimento_Orto_Manutencao_Fixa = 7,
+        Procedimento_Orto_Manutenção_Movel = 8,
+        Consulta_Medica = 21,
+		Retorno = 23,
+        Contato_Telefonico = 81,
+        Visita_Prospeccao = 82,
+        Visita_Apresentacao = 83,
+        Visita_Negociacao = 84,
+        Visita_Fechamento = 88,
+        Visita_Depto_Financeiro = 89,
+		Outros = 99,
+        Avaliação_Implante = 103,
+        Procedimento_Implante = 104,
+        Avaliação_Cirurgia = 105,
+        Procedimento_Cirurgico = 106,
+        Avaliação_Protese = 107,
+        Procedimento_Protese = 108,
+        Procedimento_Endodontia = 125,
+        Consulta_Revisão = 126,
+        //Procedimento_Cirurgico = 127,	
+		Fisioterapia = 128,	
+		Psicoterapia = 129,	
+		Negociacao = 1314
+    }
 }

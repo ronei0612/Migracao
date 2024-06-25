@@ -106,7 +106,11 @@ namespace Migracao
 
 						else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
 							importacoes.ImportarAgenda(textBoxExcel1.Text, int.Parse(txtEstabelecimentoID.Text), txtReferencia.Text, int.Parse(txtLoginID.Text), int.Parse(txtPessoaID.Text));
-					}
+
+                        else if (comboBoxImportacao.Text.Equals("Desenv Clinico", StringComparison.CurrentCultureIgnoreCase))
+                            importacoes.ImportarDesenvolvimentoClinico(textBoxExcel1.Text, 
+								int.Parse(txtEstabelecimentoID.Text), int.Parse(txtPessoaID.Text), int.Parse(txtLoginID.Text));
+                    }
 				}
 				catch (Exception ex)
 				{
@@ -257,10 +261,8 @@ namespace Migracao
 						btnExcel.Visible = true;
 
 						if (comboBoxImportacao.Text.Equals("fornecedores", StringComparison.CurrentCultureIgnoreCase)
-							//|| comboBoxImportacao.Text.Equals("pacientes", StringComparison.CurrentCultureIgnoreCase)
-							//|| comboBoxImportacao.Text.Equals("recebíveis", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("recebidos", StringComparison.CurrentCultureIgnoreCase)
-							//|| comboBoxImportacao.Text.Equals("pagos", StringComparison.CurrentCultureIgnoreCase)
+							|| comboBoxImportacao.Text.Equals("Desenv clinico", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("preços procedimentos", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("tabela de preços", StringComparison.CurrentCultureIgnoreCase)
 							|| comboBoxImportacao.Text.Equals("funcionarios", StringComparison.CurrentCultureIgnoreCase)
@@ -285,6 +287,12 @@ namespace Migracao
 								lbPessoaID.Visible = true;
 								txtPessoaID.Visible = true;
 							}
+
+							if(comboBoxImportacao.Text.Equals("Desenv clinico", StringComparison.CurrentCultureIgnoreCase))
+							{
+                                lbPessoaID.Visible = true;
+                                txtPessoaID.Visible = true;
+                            }
 						}
 
 
@@ -321,7 +329,9 @@ namespace Migracao
 					nomeArquivoExcel = "CED001";
 				else if (comboBoxImportacao.Text.Equals("agendamentos", StringComparison.CurrentCultureIgnoreCase))
 					nomeArquivoExcel = "AGENDA";
-			}
+                else if (comboBoxImportacao.Text.Equals("Desenv clinico", StringComparison.CurrentCultureIgnoreCase))
+                    nomeArquivoExcel = "MAN001";
+            }
 		}
 
 		private void comboBoxSistema_SelectedIndexChanged(object sender, EventArgs e)

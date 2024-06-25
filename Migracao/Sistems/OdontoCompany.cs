@@ -6,11 +6,13 @@ using Migracao.Utils;
 using NPOI.POIFS.Crypt.Dsig;
 using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using static NPOI.HSSF.Util.HSSFColor;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using static System.Windows.Forms.LinkLabel;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
@@ -36,7 +38,8 @@ namespace Migracao.Sistems
         string[] ATD222_Procedimentos = ["DOCUMENTO", "CNPJ_CPF", "PRODUTO", "TIPO", "NOME_PRODUTO", "DATA", "VALOR", "OBS", "CAMPOX", "RESPONSAVEL", "DATA_ATEND", "RESP_ATEND", "NOME_RESP_ATEND", "NUMERO", "CONTROLE", "CBARRA", "TERMINAL", "USUARIO", "QTDE_SESSAO", "QTDE_SESSAO_ORIG", "MODIFICADO", "DATA_CANCELADO", "USUARIO_CANCELADO", "DATA_INCLUIDO", "USUARIO_INCLUIDO", "FORMA_MEDIDA", "QTDE_MEDIDA", "DT_AXON", "AXON_ID"];
 
         List<string> cabecalhos_Pacientes = ["Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
-        List<string> cabecalhos_Recebiveis = ["CPF", "Nome", "Numero do Controle", "Recebível Exigível(R/E)", "Valor Devido", "Valor Pago", "Prazo", "Data Vencimento", "Data do Pagamento", "Emissão", "Observação Recebível", "Observação Recebido", "Tipo Pagamento", "Valor Original", "Vencimento Recebível", "Duplicata", "Parcela", "Espécie Pagamento"];
+        List<string> cabecalhos_Recebiveis = ["CPF", "Nome", "Numero do Controle", "Recebível Exigível(R/E)", "Valor Devido", "Valor Pago", "Prazo", "Data Vencimento", "Data do Pagamento", "Emissão", "Observação Recebível", "Observação Recebido", "Tipo Pagamento", "Valor Original", "Vencimento Recebível", "Duplicata", "Parcela", "Situação", "Nome grupo", "Ordem"];
+        List<string> cabecalhos_Recebidos = ["CPF", "Nome", "Numero do Controle", "Recebível Exigível(R/E)", "Valor Devido", "Valor Pago", "Prazo", "Data Vencimento", "Data do Pagamento", "Emissão", "Observação Recebido", "Tipo Pagamento", "Valor Original", "Vencimento Recebível", "Duplicata", "Parcela", "Tipo Espécie Pagamento", "Espécie Pagamento"];
         List<string> cabecalhos_Especies = ["Tipo Espécie", "Espécie Pagamento"];
         List<string> cabecalhos_Agendamentos = ["ID", "CPF", "Nome Completo", "Telefone", "Data Início (01/12/2024 00:00)", "Data Término (01/12/2024 00:00)", "Data Inclusão (01/12/2024)", "NomeCompletoDentista", "Observacao"];
         List<string> cabecalhos_Procedimentos = ["Nome Tabela", "Especialidade", "Ativo (Sim/Não)", "Nome do Procedimento", "Abreviação", "Preço", "TUSS", "Especialidade Código"];
@@ -64,6 +67,7 @@ namespace Migracao.Sistems
             ExcelHelper excelHelper = new();
             DataTable dataTablePessoas = new();
             DataTable dataTableRecebiveis = new();
+            DataTable dataTableRecebidos = new();
             DataTable dataTableEspecies = new();
             DataTable dataTableAgendamentos = new();
             DataTable dataTableProcedimentos = new();
@@ -84,6 +88,9 @@ namespace Migracao.Sistems
 
             foreach (string coluna in cabecalhos_Recebiveis)
                 dataTableRecebiveis.Columns.Add(coluna, typeof(string));
+
+            foreach (string coluna in cabecalhos_Recebidos)
+                dataTableRecebidos.Columns.Add(coluna, typeof(string));
 
             foreach (string coluna in cabecalhos_Especies)
                 dataTableEspecies.Columns.Add(coluna, typeof(string));
@@ -163,7 +170,14 @@ namespace Migracao.Sistems
                 var resultado = LerArquivosExcelCsv(excel_BXD111.Text, Encoding.UTF8);
                 var linhasCSV = resultado.Item1;
                 var cabecalhosCSV = resultado.Item2;
-                dataTableRecebiveis = ConvertExcelRecebidos(dataTableRecebiveis, cabecalhosCSV, linhasCSV, dataTablePessoas, dataTableEspecies);
+                dataTableRecebidos = ConvertExcelRecebidos(dataTableRecebidos, cabecalhosCSV, linhasCSV, dataTablePessoas, dataTableEspecies, dataTableRecebiveis);
+               
+                if (excel_BXD111 != null)
+                {
+                    var salvarArquivoRecebidos = Tools.GerarNomeArquivo($"CadastroRecebiveis_Baixas_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarArquivoRecebidos + ".xlsx", dataTableRecebidos);
+                }
+
             }
 
             var excel_CXD555 = listView.Items.Cast<ListViewItem>()
@@ -338,7 +352,7 @@ namespace Migracao.Sistems
                 excelHelper.CriarExcelArquivo(salvarArquivoAgenda + ".xlsx", dataTableProcedimentos);
             }
 
-            if (excel_BXD111 != null || excel_CRD111 != null)
+            if (excel_CRD111 != null)
             {
                 var salvarArquivoRecebiveis = Tools.GerarNomeArquivo($"CadastroRecebiveis_{estabelecimentoID}_OdontoCompany");
                 excelHelper.CriarExcelArquivo(salvarArquivoRecebiveis + ".xlsx", dataTableRecebiveis);
@@ -377,6 +391,9 @@ namespace Migracao.Sistems
                         var venctoOriginal = valoresLinha.GetValueOrDefault("VENCTO_ORIG").Trim();
                         var duplicata = valoresLinha.GetValueOrDefault("DUPLICATA").Trim();
                         var parcela = valoresLinha.GetValueOrDefault("PARCELA").Trim();
+                        var situacao = valoresLinha.GetValueOrDefault("SITUACAO").Trim();
+                        var nomeGrupo = valoresLinha.GetValueOrDefault("NOME_GRUPO").Trim();
+                        var ordem = valoresLinha.GetValueOrDefault("ORDEM").Trim();
 
                         cpf = cpf.ToCPF();
                         string nome = "";
@@ -400,6 +417,9 @@ namespace Migracao.Sistems
                             dataRow["Tipo Pagamento"] = tipoDoc;
                             dataRow["Valor Original"] = valorOriginal.ArredondarValorV2();
                             dataRow["Vencimento Recebível"] = venctoOriginal.ToData().ToString("dd/MM/yyyy");
+                            dataRow["Situação"] = situacao;
+                            dataRow["Nome Grupo"] = nomeGrupo;
+                            dataRow["Ordem"] = ordem;
 
                             dataTable.Rows.Add(dataRow);
                         }
@@ -419,7 +439,7 @@ namespace Migracao.Sistems
                 throw new Exception($"Erro ao converter Excel Recebíveis: {error.Message}");
             }
         }
-        public DataTable ConvertExcelRecebidos(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePacientes, DataTable dataTableEspecies)
+        public DataTable ConvertExcelRecebidos(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePacientes, DataTable dataTableEspecies, DataTable dataTableRecebiveis)
         {
             try
             {
@@ -458,25 +478,42 @@ namespace Migracao.Sistems
                         var baixaData = valoresLinha.GetValueOrDefault(cabecalhoDataBaixa).Trim();
                         var vencimentoData = valoresLinha.GetValueOrDefault(cabecalhoDataVencimento).Trim();
                         var tipoDocumento = valoresLinha.GetValueOrDefault("TIPO_DOC").Trim();
+                        var parcela = valoresLinha.GetValueOrDefault("PARCELA").Trim();
 
                         if (!string.IsNullOrEmpty(valor) && !string.IsNullOrEmpty(valorOriginal) && valor.ArredondarValorV2() > 1 && valorOriginal.ArredondarValorV2() > 1)
                         {
                             cpf = cpf.ToCPF();
                             string nome = string.Empty;
                             string? formaPagamento = string.Empty;
-
+                            string? situacao = string.Empty;
+                            string? nomeGrupo = string.Empty;
+                            string? ordem = string.Empty;
+                            int indiceEspecies = 0;
 
                             DataRow[] dataRowPessoasEncontrados = dataTablePacientes.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
                             if (dataRowPessoasEncontrados.Length > 0)
                                 nome = dataRowPessoasEncontrados[0]["NomeCompleto"].ToString();
 
 
-                            DataRow[] dataRowEncontrados = dataTable.AsEnumerable()
+                            DataRow[] dataRowEncontrados = dataTableRecebiveis.AsEnumerable()
                             .Where(row =>
                                 row.Field<string>("Numero do Controle") == documento &&
                                 row.Field<string>("CPF") == cpf)
                             //row.Field<string>("Valor Devido") == valorOriginal.ArredondarValorV2().ToString())
                             .ToArray();
+
+
+                            if (dataRowEncontrados.Length > 0) {
+
+                                situacao = dataRowEncontrados[0]["Situação"].ToString();
+                                nomeGrupo = dataRowEncontrados[0]["Nome Grupo"].ToString();
+                                ordem = dataRowEncontrados[0]["Ordem"].ToString();
+                            }
+
+                            var concatObs = (observacao + " | " + tipoDocumento + " | " + situacao + " | " +
+                                nomeGrupo + " | " + ordem);
+
+                            concatObs = concatObs.PadRight(512);
 
                             DataRow[] dataRowEspecies = dataTableEspecies.AsEnumerable()
                             .Where(row =>
@@ -486,23 +523,22 @@ namespace Migracao.Sistems
                             if(dataRowEspecies.Length > 0)
                             {
                                 var tipoPagamento = dataRowEspecies[0]["Espécie Pagamento"].ToString();
-                                formaPagamento = ExcelHelper.GetEspecieIDFromFormaPagamento(tipoPagamento).ToString();
-                            }                           
-
+                                formaPagamento = ExcelHelper.GetEspecieIDFromFormaPagamento(tipoPagamento, out int indice).ToString();
+                                indiceEspecies = indice;
+                            }
 
                             dataRow["Numero do Controle"] = documento;
                             dataRow["CPF"] = cpf;
                             dataRow["Nome"] = nome;
-                            dataRow["Numero do Controle"] = documento;
                             dataRow["Valor Pago"] = valor.ArredondarValorV2();
-                            dataRow["Data do Pagamento"] = baixaData;
+                            dataRow["Data do Pagamento"] = baixaData.ToData();
                             dataRow["Data Vencimento"] = vencimentoData.ToData();
-                            dataRow["Observação Recebido"] = observacao;
-                            dataRow["Recebível Exigível(R/E)"] = "R";
+                            dataRow["Observação Recebido"] = concatObs;
+                            dataRow["Tipo Espécie Pagamento"] = indiceEspecies;
                             dataRow["Espécie Pagamento"] = formaPagamento;
+                            dataRow["Recebível Exigível(R/E)"] = "R";
+                            dataRow["Parcela"] = parcela;
 
-                            //dataRow["Sacado Nome Completo"] = nome;
-                            //dataRow["DentistaFuncionarioID"] = nome;
 
                             if (dataRowEncontrados.Length > 0)
                             {

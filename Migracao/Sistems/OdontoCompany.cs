@@ -7,6 +7,7 @@ using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using System.Data;
 using System.Diagnostics.Metrics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -39,8 +40,8 @@ namespace Migracao.Sistems
         List<string> cabecalhos_CodProcedimentos = ["ID", "Nome", "Usuário"];
         List<string> cabecalhos_ManutencaoMan001 = ["Paciente Nome Completo", "Paciente CPF", "Observação", "Data Modificado", "Diagnostico", "Data Inicial", "Data Final"];
         List<string> cabecalhos_ManutencaoMan101 = ["Paciente CPF", "Paciente Nome", "Dentista CPF", "Dentista Nome", "Dentista Codigo", "Procedimento Nome", "Data Atendimento", "Data Início", "Data Retorno", "Procedimento Observação", "Lancamento"];
-        List<string> cabecalhos_ManutencaoMan111 = ["Paciente CPF", "Paciente Nome", "Dentista Nome", "Procedimento Nome", "Procedimento Valor", "Valor Original", "Valor do Pagamento", "Data do Pagamento", "Dente", "Procedimento Observação", "Quantidade Orto", "Tipo do Pagamento", "Vencimento", "Valor Devido"];
-        List<string> cabecalhos_ProcedimentosATD222 = ["Número do Controle", "Paciente CPF", "Paciente Nome", "Dentista CPF", "Dentista Nome", "Dente", "Procedimento Nome", "Procedimento Valor", "Procedimento Observação", "Data Início", "Data Termino"];
+        List<string> cabecalhos_ManutencaoMan111 = ["Numero do Controle", "Paciente CPF", "Paciente Nome", "Dentista Nome", "Procedimento Nome", "Procedimento Valor", "Valor Original", "Valor do Pagamento", "Data do Pagamento", "Dente", "Procedimento Observação", "Quantidade Orto", "Tipo do Pagamento", "Vencimento", "Valor Devido", "Valor Total", "Data Atendimento"];
+        List<string> cabecalhos_ProcedimentosATD222 = ["Numero do Controle", "Paciente CPF", "Paciente Nome", "Dentista CPF", "Dentista Nome", "Dente", "Procedimento Nome", "Procedimento Valor", "Procedimento Observação", "Data Início", "Data Termino", "Data Atendimento"];
         List<string> cabecalhos_ManutencaoManMerge001_101 = ["Paciente Nome Man001", "Paciente CPF Man001", "Observação", "DataModificado", "Diagnostico", "DataInicial", "DataFinal", "Paciente CPF Man101", "Paciente Nome Completo", "Dentista CPF", "DentistaNome", "DentistaCodigo", "Procedimento", "DataAtendimento", "DataInicio", "DataRetorno"];
 
         //public static Dictionary<string, string> pessoaCSVDict;
@@ -363,12 +364,9 @@ namespace Migracao.Sistems
                         cpf = cpf.ToCPF();
                         string nome = "";
 
-                        if (dataTablePacientes.Rows.Count > 0)
-                        {
-                            DataRow[] dataRowEncontrados = dataTablePacientes.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
-                            if (dataRowEncontrados.Length > 0)
-                                nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
-                        }
+                        DataRow[] dataRowEncontrados = dataTablePacientes.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
+                        if (dataRowEncontrados.Length > 0)
+                            nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
 
                         if (!string.IsNullOrEmpty(valor) && valor.ArredondarValorV2() > 1)
                         {
@@ -385,69 +383,6 @@ namespace Migracao.Sistems
                             dataRow["Tipo do Pagamento"] = tipoDoc;
                             dataRow["Valor Original"] = valorOriginal.ArredondarValorV2();
                             dataRow["Vencimento Recebível"] = venctoOriginal.ToData().ToString("dd/MM/yyyy");
-
-                            dataTable.Rows.Add(dataRow);
-                        }
-                    }
-                    catch (Exception error)
-                    {
-                        throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
-                    }
-
-                    linhaIndex++;
-                }
-
-                return dataTable;
-            }
-            catch (Exception error)
-            {
-                throw new Exception($"Erro ao converter Excel Recebíveis: {error.Message}");
-            }
-        }
-        public DataTable ConvertExcelRecebiveisHistoricoVendas(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePacientes)
-        {
-            try
-            {
-                int linhaIndex = 0;
-                foreach (string[] linha in linhas)
-                {
-                    try
-                    {
-                        DataRow dataRow = dataTable.NewRow();
-                        var valoresLinha = new Dictionary<string, string>();
-
-                        for (int i = 0; i < cabecalhos.Count; i++)
-                            if (i < linha.Length)
-                                valoresLinha.Add(cabecalhos[i], linha[i]);
-
-                        var cpf = valoresLinha.GetValueOrDefault("CNPJ_CPF").Trim();
-                        var observacao = valoresLinha.GetValueOrDefault("HISTORICO").Trim();
-                        var documento = valoresLinha.GetValueOrDefault("DOCUMENTO").Trim();
-                        var valor = valoresLinha.GetValueOrDefault("VALOR").Trim();
-                        var vencimentoData = valoresLinha.GetValueOrDefault("DATA").Trim();
-                        var emissaoData = valoresLinha.GetValueOrDefault("TRANSMISSAO").Trim();
-
-                        cpf = cpf.ToCPF();
-                        var nome = observacao.Replace("VENDA - ", "").Trim();
-
-                        if (dataTablePacientes.Rows.Count > 0)
-                        {
-                            DataRow[] dataRowEncontrados = dataTablePacientes.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
-                            if (dataRowEncontrados.Length > 0)
-                                nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
-                        }
-
-                        if (!string.IsNullOrEmpty(valor) && valor.ArredondarValorV2() > 1)
-                        {
-                            dataRow["CPF"] = cpf;
-                            dataRow["Nome"] = nome;
-                            dataRow["Observação Recebível"] = observacao;
-                            dataRow["Documento Ref"] = documento;
-                            dataRow["Valor Original"] = valor.ArredondarValorV2();
-                            //dataRow["Prazo"] = prazo;
-                            dataRow["Vencimento"] = vencimentoData.ToData().ToString("dd/MM/yyyy");
-                            dataRow["Emissão"] = emissaoData.ToData().ToString("dd/MM/yyyy");
-                            dataRow["Recebível Exigível(R/E)"] = "R";
 
                             dataTable.Rows.Add(dataRow);
                         }
@@ -511,12 +446,10 @@ namespace Migracao.Sistems
                             cpf = cpf.ToCPF();
                             string nome = "";
 
-                            if (dataTablePacientes.Rows.Count > 0)
-                            {
-                                DataRow[] dataRowPessoasEncontrados = dataTablePacientes.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
-                                if (dataRowPessoasEncontrados.Length > 0)
-                                    nome = dataRowPessoasEncontrados[0]["NomeCompleto"].ToString();
-                            }
+                            DataRow[] dataRowPessoasEncontrados = dataTablePacientes.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
+                            if (dataRowPessoasEncontrados.Length > 0)
+                                nome = dataRowPessoasEncontrados[0]["NomeCompleto"].ToString();
+
 
                             DataRow[] dataRowEncontrados = dataTable.AsEnumerable()
                             .Where(row =>
@@ -542,7 +475,7 @@ namespace Migracao.Sistems
                                 dataRow["Valor Original"] = dataRowEncontrados[0]["Valor Original"].ToString();
                                 dataRow["Vencimento Recebível"] = dataRowEncontrados[0]["Vencimento Recebível"].ToString();
                                 dataRow["Duplicata"] = dataRowEncontrados[0]["Duplicata"].ToString();
-                            }                               
+                            }
 
                             dataTable.Rows.Add(dataRow);
 
@@ -584,6 +517,66 @@ namespace Migracao.Sistems
             catch (Exception error)
             {
                 throw new Exception($"Erro ao converter Excel Recebidos: {error.Message}");
+            }
+        }
+        public DataTable ConvertExcelRecebiveisHistoricoVendas(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePacientes)
+        {
+            try
+            {
+                int linhaIndex = 0;
+                foreach (string[] linha in linhas)
+                {
+                    try
+                    {
+                        DataRow dataRow = dataTable.NewRow();
+                        var valoresLinha = new Dictionary<string, string>();
+
+                        for (int i = 0; i < cabecalhos.Count; i++)
+                            if (i < linha.Length)
+                                valoresLinha.Add(cabecalhos[i], linha[i]);
+
+                        var cpf = valoresLinha.GetValueOrDefault("CNPJ_CPF").Trim();
+                        var observacao = valoresLinha.GetValueOrDefault("HISTORICO").Trim();
+                        var documento = valoresLinha.GetValueOrDefault("DOCUMENTO").Trim();
+                        var valor = valoresLinha.GetValueOrDefault("VALOR").Trim();
+                        var vencimentoData = valoresLinha.GetValueOrDefault("DATA").Trim();
+                        var emissaoData = valoresLinha.GetValueOrDefault("TRANSMISSAO").Trim();
+
+                        cpf = cpf.ToCPF();
+                        var nome = observacao.Replace("VENDA - ", "").Trim();
+
+                        DataRow[] dataRowEncontrados = dataTablePacientes.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
+                        if (dataRowEncontrados.Length > 0)
+                            nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
+
+                        if (!string.IsNullOrEmpty(valor) && valor.ArredondarValorV2() > 1)
+                        {
+                            dataRow["CPF"] = cpf;
+                            dataRow["Nome"] = nome;
+                            dataRow["Observação Recebível"] = observacao;
+                            dataRow["Documento Ref"] = documento;
+                            dataRow["Valor Original"] = valor.ArredondarValorV2();
+                            //dataRow["Prazo"] = prazo;
+                            dataRow["Vencimento"] = vencimentoData.ToData().ToString("dd/MM/yyyy");
+                            dataRow["Emissão"] = emissaoData.ToData().ToString("dd/MM/yyyy");
+                            dataRow["Recebível Exigível(R/E)"] = "R";
+
+                            dataTable.Rows.Add(dataRow);
+                        }
+                    }
+                    catch (Exception error)
+                    {
+                        throw new Exception($"Erro na linha {linhaIndex + 1}: {error.Message}");
+                    }
+
+                    linhaIndex++;
+                }
+
+                return dataTable;
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Excel Recebíveis: {error.Message}");
             }
         }
         public DataTable ConvertExcelPessoasDentistas(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas)
@@ -1121,12 +1114,9 @@ namespace Migracao.Sistems
                         cpf = cpf.ToCPF();
                         string? nome = null;
 
-                        if (dataTablePessoas.Rows.Count > 0)
-                        {
-                            DataRow[] dataRowEncontrados = dataTablePessoas.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
-                            if (dataRowEncontrados.Length > 0)
-                                nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
-                        }
+                        DataRow[] dataRowEncontrados = dataTablePessoas.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
+                        if (dataRowEncontrados.Length > 0)
+                            nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
 
 
                         dataRow["Paciente CPF"] = cpf;
@@ -1184,12 +1174,9 @@ namespace Migracao.Sistems
                         cpf = cpf.ToCPF();
                         string? nome = null;
 
-                        if (dataTablePessoas.Rows.Count > 0)
-                        {
-                            DataRow[] dataRowEncontrados = dataTablePessoas.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
-                            if (dataRowEncontrados.Length > 0)
-                                nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
-                        }
+                        DataRow[] dataRowEncontrados = dataTablePessoas.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
+                        if (dataRowEncontrados.Length > 0)
+                            nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
 
                         dataRow["Paciente CPF"] = cpf;
                         dataRow["Paciente Nome"] = nome;
@@ -1248,44 +1235,39 @@ namespace Migracao.Sistems
                         var tipoPagamento = valoresLinha.GetValueOrDefault("TIPO_PAGTO").Trim();
                         var venctoOriginal = valoresLinha.GetValueOrDefault("VENCTO_ORIG").Trim();
                         var valorParcela = valoresLinha.GetValueOrDefault("VALOR_PARCELA").Trim();
-
-                        /*    
-                            TIPO_PAGTO=Tipo do Pagamento 
-                            VALOR=Valor do Pagamento 
-                            VALOR_ORIG = Valor Original
-                            VENCTO_ORIG = Vencimento
-                            VALOR_PARCELA = Valor Devido
-                         */
+                        var dataAtendimento = valoresLinha.GetValueOrDefault("DATA_ATEND").Trim();
 
                         cpf = cpf.ToCPF();
                         string? nome = null;
                         string? procObservacao = null;
-
+                        decimal? valorTotal = 0;
 
                         var docsEncontrados = linhas.Where(linha => linha[34].Equals(documento)).Count();
 
-                        if (dataTablePessoas.Rows.Count > 0)
-                        {
-                            DataRow[] dataRowEncontrados = dataTablePessoas.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
-                            if (dataRowEncontrados.Length > 0)
-                                nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
-
-                            //`Para analisar porque está vazio
-                            if (string.IsNullOrEmpty(nome))
-                                continue;
-                        }
+                        DataRow[] dataRowEncontradosNome = dataTablePessoas.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
+                        if (dataRowEncontradosNome.Length > 0)
+                            nome = dataRowEncontradosNome[0]["NomeCompleto"].ToString();
 
                         if (dataTableMan101.Rows.Count > 0)
                         {
-                            DataRow[] dataRowEncontrados = dataTableMan101.AsEnumerable()
+                            DataRow[] dataRowEncontradosObs = dataTableMan101.AsEnumerable()
                                 .Where(row => row.Field<string>("Paciente CPF") == cpf
                                  && row.Field<string>("Lancamento") == lancamento)
                                 .ToArray();
-                            if (dataRowEncontrados.Length > 0)
+                            if (dataRowEncontradosObs.Length > 0)
                             {
-                                procObservacao = dataRowEncontrados[0]["Procedimento Observação"].ToString();// [9]
+                                procObservacao = dataRowEncontradosObs[0]["Procedimento Observação"].ToString();// [9]
                             }
 
+                        }
+                        var listaValores = linhas.Where(linha => linha[1].Equals(cpf)).ToList();
+
+                        var selecionaLinha = listaValores.Select(linha => linha[18].Replace(",", "."));
+
+                        foreach (var item in selecionaLinha)
+                        {
+                            if (!string.IsNullOrEmpty(item))
+                                valorTotal += Convert.ToDecimal(item, CultureInfo.InvariantCulture);
                         }
 
                         dataRow["Numero do Controle"] = documento;
@@ -1296,12 +1278,15 @@ namespace Migracao.Sistems
                         dataRow["Valor Original"] = valorOriginal.ArredondarValorV2();
                         dataRow["Valor do Pagamento"] = valor.ArredondarValorV2();
                         dataRow["Data do Pagamento"] = dataPagamento.ToDataNull()?.ToShortDateString();
+                        dataRow["Data Atendimento"] = dataAtendimento;
                         dataRow["Dente"] = string.Empty;
                         dataRow["Procedimento Observação"] = procObservacao;
                         dataRow["Quantidade Orto"] = docsEncontrados;
                         dataRow["Tipo do Pagamento"] = tipoPagamento;
                         dataRow["Vencimento"] = venctoOriginal;
                         dataRow["Valor Devido"] = valorParcela;
+                        dataRow["Valor Total"] = valorTotal;
+
 
                         dataTable.Rows.Add(dataRow);
                     }
@@ -1352,37 +1337,31 @@ namespace Migracao.Sistems
                         cpf = cpf.ToCPF();
                         string? nome = null;
 
-                        if (dataTablePessoas.Rows.Count > 0)
-                        {
-                            DataRow[] dataRowEncontrados = dataTablePessoas.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
-                            if (dataRowEncontrados.Length > 0)
-                                nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
+                        DataRow[] dataRowEncontrados = dataTablePessoas.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
+                        if (dataRowEncontrados.Length > 0)
+                            nome = dataRowEncontrados[0]["NomeCompleto"].ToString();
 
-                            //`Para analisar porque está vazio
-                            if (!string.IsNullOrEmpty(nome))
-                                continue;
+                        DataRow[] dataRowRecebiveis = dataTableRecebiveis.AsEnumerable()
+                        .Where(row =>
+                            row.Field<string>("Documento Ref") == documento &&
+                            row.Field<string>("CPF") == cpf)
+                        .ToArray();
 
-                            DataRow[] dataRowRecebiveis = dataTableRecebiveis.AsEnumerable()
-                            .Where(row =>
-                                row.Field<string>("Documento Ref") == documento &&
-                                row.Field<string>("CPF") == cpf)
-                            .ToArray();
+                        dataRow["Numero do Controle"] = documento;
+                        dataRow["Paciente CPF"] = cpf;
+                        dataRow["Paciente Nome"] = nome;
+                        dataRow["Dentista CPF"] = string.Empty;
+                        dataRow["Dentista Nome"] = nomeRespAtendimento;
+                        dataRow["Dente"] = numero;
+                        dataRow["Procedimento Nome"] = nomeProduto;
+                        //dataRow["Dentista Codigo"] = codRespAtendimento;
+                        dataRow["Procedimento Valor"] = valor;
+                        dataRow["Procedimento Observação"] = observacao;
+                        dataRow["Data Início"] = dataInicio.ToData().ToShortDateString();
+                        dataRow["Data Termino"] = dataAtendimento.ToDataNull();
+                        dataRow["Data Atendimento"] = dataAtendimento.ToDataNull();
 
-                            dataRow["Número do Controle"] = documento;
-                            dataRow["Paciente CPF"] = cpf;
-                            dataRow["Paciente Nome"] = nome;
-                            dataRow["Dentista CPF"] = string.Empty;
-                            dataRow["Dentista Nome"] = nomeRespAtendimento;
-                            dataRow["Dente"] = numero;
-                            dataRow["Procedimento Nome"] = nomeProduto;
-                            //dataRow["Dentista Codigo"] = codRespAtendimento;
-                            dataRow["Procedimento Valor"] = valor;
-                            dataRow["Procedimento Observação"] = observacao;
-                            dataRow["Data Início"] = dataInicio.ToData().ToShortDateString();
-                            dataRow["Data Termino"] = dataAtendimento.ToDataNull();
-
-                            dataTable.Rows.Add(dataRow);
-                        }
+                        dataTable.Rows.Add(dataRow);
                     }
                     catch (Exception error)
                     {
@@ -1483,10 +1462,9 @@ namespace Migracao.Sistems
         public DataTable MergeDataTablesProcedimentosManutencao(DataTable dt1, DataTable dt2)
         {
             var mergedDataTable = from row1 in dt1.AsEnumerable()
-                                      //join row2 in dt2.AsEnumerable() on row1.Field<string>("Paciente CPF") equals row2.Field<string>("Paciente CPF")
                                   select new
                                   {
-                                      NumeroControle = row1.Field<string>("Número do Controle"),
+                                      NumeroControle = row1.Field<string>("Numero do Controle"),
                                       PacienteCPF = row1.Field<string>("Paciente CPF"),
                                       PacienteNome = row1.Field<string>("Paciente Nome"),
                                       DentistaCPF = row1.Field<string>("Dentista CPF"),
@@ -1497,13 +1475,16 @@ namespace Migracao.Sistems
                                       ProcObservacao = row1.Field<string>("Procedimento Observação"),
                                       DataInicio = row1.Field<string>("Data Início"),
                                       DataTermino = row1.Field<string>("Data Termino"),
-                                      QtdOrto = string.Empty
-                                      //ValorPagamento = row2.Field<string>("Valor Pagamento"),
-                                      //DataPagamento = row2.Field<string>("Data Pagamento"),
+                                      DataAtendimento = row1.Field<string>("Data Atendimento"),
+                                      QtdOrto = string.Empty,
+                                      TipoPagamento = string.Empty,
+                                      Vencimento = string.Empty,
+                                      ValorDevido = string.Empty,
+                                      ValorTotal = string.Empty
                                   };   //).Distinct();            
 
             DataTable resultDataTable = new DataTable();
-            resultDataTable.Columns.Add("Número do Controle");
+            resultDataTable.Columns.Add("Numero do Controle");
             resultDataTable.Columns.Add("Paciente CPF");
             resultDataTable.Columns.Add("Paciente Nome");
             resultDataTable.Columns.Add("Dentista CPF");
@@ -1514,20 +1495,19 @@ namespace Migracao.Sistems
             resultDataTable.Columns.Add("Procedimento Observação");
             resultDataTable.Columns.Add("Data Início");
             resultDataTable.Columns.Add("Data Termino");
+            resultDataTable.Columns.Add("Data Atendimento");
             resultDataTable.Columns.Add("Quantidade Orto");
             resultDataTable.Columns.Add("Tipo do Pagamento");
             resultDataTable.Columns.Add("Vencimento");
             resultDataTable.Columns.Add("Valor Devido");
-
-            //resultDataTable.Columns.Add("Valor Pagamento");
-            //resultDataTable.Columns.Add("Data Pagamento");
-
+            resultDataTable.Columns.Add("Valor Total");
 
             foreach (var item in mergedDataTable)
             {
                 resultDataTable.Rows.Add(item.NumeroControle, item.PacienteCPF, item.PacienteNome, item.DentistaCPF,
                                          item.DentistaNome, item.Dente, item.ProcedimentoNome, item.ProcedimentoValor,
-                                         item.ProcObservacao, item.DataInicio, item.DataTermino, item.QtdOrto);
+                                         item.ProcObservacao, item.DataInicio, item.DataTermino, item.DataAtendimento, item.QtdOrto,
+                                         item.TipoPagamento, item.Vencimento, item.ValorDevido, item.ValorTotal);
             }
 
             var mergedDataTable2 = from row2 in dt2.AsEnumerable()
@@ -1544,18 +1524,20 @@ namespace Migracao.Sistems
                                        ProcObservacao = row2.Field<string>("Procedimento Observação"),
                                        DataInicio = string.Empty,
                                        DataTermino = string.Empty,
+                                       DataAtendimento = row2.Field<string>("Data Atendimento"),
                                        QtdOrto = row2.Field<string>("Quantidade Orto"),
                                        TipoPagamento = row2.Field<string>("Tipo do Pagamento"),
                                        Vencimento = row2.Field<string>("Vencimento"),
-                                       ValorDevido = row2.Field<string>("Valor Devido")
+                                       ValorDevido = row2.Field<string>("Valor Devido"),
+                                       ValorTotal = row2.Field<string>("Valor Total")
                                    };
 
             foreach (var item in mergedDataTable2)
             {
                 resultDataTable.Rows.Add(item.NumeroControle, item.PacienteCPF, item.PacienteNome, item.DentistaCPF,
                                          item.DentistaNome, item.Dente, item.ProcedimentoNome, item.ProcedimentoValor,
-                                         item.ProcObservacao, item.DataInicio, item.DataTermino, item.QtdOrto,
-                                         item.TipoPagamento, item.Vencimento,item.ValorDevido);
+                                         item.ProcObservacao, item.DataInicio, item.DataTermino, item.DataAtendimento, item.QtdOrto,
+                                         item.TipoPagamento, item.Vencimento, item.ValorDevido, item.ValorTotal);
             }
 
             return resultDataTable;

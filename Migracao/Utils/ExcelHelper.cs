@@ -1112,20 +1112,5 @@ namespace Migracao.Utils
 
 			return sb.ToString();
 		}
-
-        public static double SumColumn(DataTable dt, string columnName)
-        {
-            double sum = 0;
-
-            foreach (DataRow row in dt.Rows)
-            {
-                if (double.TryParse(row[columnName].ToString(), out double value))
-                {
-                    sum += value;
-                }
-            }
-
-            return sum;
-        }
     }
 }

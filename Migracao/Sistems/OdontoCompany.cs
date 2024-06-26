@@ -1,11 +1,14 @@
-﻿using EnumsNET;
+﻿using ClosedXML.Excel;
+using EnumsNET;
 using MathNet.Numerics;
 using MathNet.Numerics.Distributions;
+using Migracao.DTO;
 using Migracao.Models;
 using Migracao.Utils;
 using NPOI.POIFS.Crypt.Dsig;
 using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics.Metrics;
@@ -117,12 +120,17 @@ namespace Migracao.Sistems
                 .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("EMD101")));
             if (excel_EMD101 != null)
             {
-                var resultado = LerArquivosExcelCsv(excel_EMD101.Text, Encoding.UTF8);
-                var linhasCSV = resultado.Item1;
-                var cabecalhosCSV = resultado.Item2;
+                //var resultado = LerArquivosExcelCsv(excel_EMD101.Text, Encoding.UTF8);
+                //var linhasCSV = resultado.Item1;
+                //var cabecalhosCSV = resultado.Item2;
 
-                if (EMD101_Pacientes.All(cabecalhosCSV.Contains))
-                    dataTablePessoas = ConvertExcelPessoasPacientes(dataTablePessoas, cabecalhosCSV, linhasCSV);
+                //if (EMD101_Pacientes.All(cabecalhosCSV.Contains))
+                //    dataTablePessoas = ConvertExcelPessoasPacientes(dataTablePessoas, cabecalhosCSV, linhasCSV);
+
+                var entPacientes = ExcelHelper.ConvertToEntity<List<Pacientes>>(excel_EMD101.Text);
+
+                //var teste = ConvertExcelPessoasPacientesEntity(entPacientes.EntidadeODC);
+
             }
 
             var excel_CED006 = listView.Items.Cast<ListViewItem>()
@@ -171,7 +179,7 @@ namespace Migracao.Sistems
                 var linhasCSV = resultado.Item1;
                 var cabecalhosCSV = resultado.Item2;
                 dataTableRecebidos = ConvertExcelRecebidos(dataTableRecebidos, cabecalhosCSV, linhasCSV, dataTablePessoas, dataTableEspecies, dataTableRecebiveis);
-               
+
                 if (excel_BXD111 != null)
                 {
                     var salvarArquivoRecebidos = Tools.GerarNomeArquivo($"CadastroRecebiveis_Baixas_{estabelecimentoID}_OdontoCompany");
@@ -503,7 +511,8 @@ namespace Migracao.Sistems
                             .ToArray();
 
 
-                            if (dataRowEncontrados.Length > 0) {
+                            if (dataRowEncontrados.Length > 0)
+                            {
 
                                 situacao = dataRowEncontrados[0]["Situação"].ToString();
                                 nomeGrupo = dataRowEncontrados[0]["Nome Grupo"].ToString();
@@ -520,7 +529,7 @@ namespace Migracao.Sistems
                                 row.Field<string>("Tipo Espécie") == tipoDocumento)
                             .ToArray();
 
-                            if(dataRowEspecies.Length > 0)
+                            if (dataRowEspecies.Length > 0)
                             {
                                 var tipoPagamento = dataRowEspecies[0]["Espécie Pagamento"].ToString();
                                 formaPagamento = ExcelHelper.GetEspecieIDFromFormaPagamento(tipoPagamento, out int indice).ToString();
@@ -1890,5 +1899,53 @@ namespace Migracao.Sistems
 
             #endregion
         }
+
+        public List<PacientesDTO> ConvertExcelPessoasPacientesEntity(List<Pacientes> pacientes)
+        {
+            List<PacientesDTO> pacientesDTO = new List<PacientesDTO>();
+
+            try
+            {
+                foreach (var paciente in pacientes)
+                {
+                    var lstPacientes = new PacientesDTO
+                    {
+                        Codigo = paciente.NumFicha,
+                        Ativo = "R",
+                        NomeCompleto = paciente.Nome,
+                        NomeSocial = string.Empty,
+                        Apelido = paciente.Nome.GetPrimeirosCaracteres(20).ToNome(),
+                        Documento = paciente.CgcCpf.ToCPF(),
+                        DataCadastro = DateTime.ParseExact(paciente.DtCadastro, "dd/MM/yyyy", null),
+                        Observacoes = paciente.Obs1,
+                        Email = paciente.Email,
+                        RG = paciente.InscRg.GetPrimeirosCaracteres(20),
+                        Sexo = paciente.SexoMF.ToSexo("m", "f") ? "M" : "F",
+                        NascimentoData = DateTime.ParseExact(paciente.DtNascimento, "dd/MM/yyyy", null),
+                        Paciente = paciente.Cliente,
+                        Funcionario = "N",
+                        Fornecedor = paciente.Fornecedor,
+                        TelefonePrincipal = paciente.Fone1,
+                        Celular = paciente.Celular,
+                        TelefoneAlternativo = paciente.Fone2,
+                        Logradouro = paciente.Endereco.PrimeiraLetraMaiuscula(),
+                        LogradouroNum = paciente.NumEndereco,
+                        Bairro = paciente.Bairro,
+                        Cidade = paciente.Cidade,
+                        Estado = paciente.Estado,
+                        CEP = paciente.Cep,
+                    };
+
+                    pacientesDTO.Add(lstPacientes);
+                }                
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Excel para Pessoas Pacientes: {error.Message}");
+            }
+
+            return pacientesDTO;
+        }
+
     }
 }

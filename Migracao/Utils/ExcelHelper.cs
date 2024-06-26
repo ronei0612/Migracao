@@ -1,4 +1,5 @@
-﻿using Migracao.Models;
+﻿using ClosedXML.Excel;
+using Migracao.Models;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Data;
@@ -1143,9 +1144,48 @@ namespace Migracao.Utils
             }
         }
 
-        public static bool IsStringWithinMaxLength(string input)
+        public static ExcelEntity<T> ConvertToEntity<T>(string filePath) where T : new()
         {
-            return input != null && input.Length <= 512;
+            ExcelEntity<T> excelEntity = new ExcelEntity<T>();
+            excelEntity.EntidadeODC = new List<T>();
+
+            using (var workbook = new XLWorkbook(filePath))
+            {
+                var worksheet = workbook.Worksheet(1);
+                var rows = worksheet.RowsUsed();
+
+                // Pegar as propriedades da classe T
+                var properties = typeof(T).GetProperties();
+
+                // Iterar sobre as linhas do Excel (ignorando cabeçalhos)
+                foreach (var row in rows.Skip(1))
+                {
+                    T obj = new T();
+
+                    // Iterar sobre as colunas do Excel
+                    for (int i = 0; i < properties.Length; i++)
+                    {
+                        var cellValue = row.Cell(i + 1).Value.ToString();
+                        //var propertyType = properties[i].PropertyType;
+
+                        // Converter valor da célula para o tipo apropriado da propriedade
+                        //var convertedValue = Convert.ChangeType(cellValue, propertyType);
+
+                        // Atribuir valor à propriedade do objeto
+                        properties[i].SetValue(obj, cellValue);
+                    }
+
+                    // Adicionar objeto à lista de dados
+                    excelEntity.EntidadeODC.Add(obj);
+                }
+            }
+
+            return excelEntity;
         }
+    }
+
+    public class ExcelEntity<T>
+    {
+        public List<T> EntidadeODC { get; set; }
     }
 }

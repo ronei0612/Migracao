@@ -373,7 +373,7 @@ namespace Migracao
 		{
 			var openFileDialog = new OpenFileDialog();
 			if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "Todos")
-				openFileDialog.Filter = "Arquivo Excel |*.csv";
+				openFileDialog.Filter = "Arquivo Excel |*.csv;*.xlsx";
 			//openFileDialog.Filter = "Arquivo Excel |*.csv;*.xlsx";
 			else if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "JSON")
 				openFileDialog.Filter = "Arquivo Json |*.json";

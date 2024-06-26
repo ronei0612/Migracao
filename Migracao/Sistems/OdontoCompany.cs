@@ -531,8 +531,8 @@ namespace Migracao.Sistems
                             dataRow["CPF"] = cpf;
                             dataRow["Nome"] = nome;
                             dataRow["Valor Pago"] = valor.ArredondarValorV2();
-                            dataRow["Data do Pagamento"] = baixaData.ToData();
-                            dataRow["Data Vencimento"] = vencimentoData.ToData();
+                            dataRow["Data do Pagamento"] = baixaData.ToDataNull();
+                            dataRow["Data Vencimento"] = vencimentoData.ToDataNull();
                             dataRow["Observação Recebido"] = concatObs;
                             dataRow["Tipo Espécie Pagamento"] = indiceEspecies;
                             dataRow["Espécie Pagamento"] = formaPagamento;
@@ -1368,12 +1368,12 @@ namespace Migracao.Sistems
                         dataRow["Valor Original"] = valorOriginal.ArredondarValorV2();
                         dataRow["Valor do Pagamento"] = valor.ArredondarValorV2();
                         dataRow["Data do Pagamento"] = dataPagamento.ToDataNull()?.ToShortDateString();
-                        dataRow["Data Atendimento"] = dataAtendimento;
+                        dataRow["Data Atendimento"] = dataAtendimento.ToDataNull()?.ToShortDateString();
                         dataRow["Dente"] = string.Empty;
                         dataRow["Procedimento Observação"] = procObservacao;
                         dataRow["Quantidade Orto"] = docsEncontrados;
                         dataRow["Tipo Pagamento"] = tipoPagamento;
-                        dataRow["Vencimento"] = venctoOriginal;
+                        dataRow["Vencimento"] = venctoOriginal.ToData().ToShortDateString();
                         dataRow["Valor Devido"] = valorParcela;
                         dataRow["Valor Total"] = valorTotal;
 
@@ -1447,7 +1447,7 @@ namespace Migracao.Sistems
                         //dataRow["Dentista Codigo"] = codRespAtendimento;
                         dataRow["Procedimento Valor"] = valor;
                         dataRow["Procedimento Observação"] = observacao;
-                        dataRow["Data Início"] = dataInicio.ToData().ToShortDateString();
+                        dataRow["Data Início"] = dataInicio.ToDataNull();
                         dataRow["Data Termino"] = dataAtendimento.ToDataNull();
                         dataRow["Data Atendimento"] = dataAtendimento.ToDataNull();
 

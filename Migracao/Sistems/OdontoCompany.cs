@@ -1,4 +1,5 @@
-﻿using ClosedXML.Excel;
+﻿
+using ClosedXML.Excel;
 using EnumsNET;
 using MathNet.Numerics;
 using MathNet.Numerics.Distributions;
@@ -127,9 +128,18 @@ namespace Migracao.Sistems
                 //if (EMD101_Pacientes.All(cabecalhosCSV.Contains))
                 //    dataTablePessoas = ConvertExcelPessoasPacientes(dataTablePessoas, cabecalhosCSV, linhasCSV);
 
-                var entPacientes = ExcelHelper.ConvertToEntity<List<Pacientes>>(excel_EMD101.Text);
+                var entPacientes = ExcelHelper.ConvertToEntity(excel_EMD101.Text);
 
-                //var teste = ConvertExcelPessoasPacientesEntity(entPacientes.EntidadeODC);
+                var lstPacientes = ConvertExcelPessoasPacientesEntity(entPacientes);
+
+                var dataTablePacientes = ExcelHelper.PessoasParaDataTable(lstPacientes);
+
+                if (lstPacientes != null)
+                {
+                    var salvarArquivoPacientes = Tools.GerarNomeArquivo($"CadastroPacientesTestesEntidade_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarArquivoPacientes + ".xlsx", dataTablePacientes);
+                }
+
 
             }
 
@@ -1906,22 +1916,22 @@ namespace Migracao.Sistems
 
             try
             {
-                foreach (var paciente in pacientes)
-                {
-                    var lstPacientes = new PacientesDTO
+                Parallel.ForEach(pacientes, paciente =>
+                {                    
+                    var lstPacientes = new PacientesDTO 
                     {
-                        Codigo = paciente.num,
+                        Codigo = paciente.NumFicha,
                         Ativo = "R",
                         NomeCompleto = paciente.Nome,
                         NomeSocial = string.Empty,
                         Apelido = paciente.Nome.GetPrimeirosCaracteres(20).ToNome(),
                         Documento = paciente.CgcCpf.ToCPF(),
-                        DataCadastro = DateTime.ParseExact(paciente.DtCadastro, "dd/MM/yyyy", null),
+                        DataCadastro = paciente.DtCadastro,
                         Observacoes = paciente.Obs1,
                         Email = paciente.Email,
                         RG = paciente.InscRg.GetPrimeirosCaracteres(20),
                         Sexo = paciente.SexoMF.ToSexo("m", "f") ? "M" : "F",
-                        NascimentoData = DateTime.ParseExact(paciente.DtNascimento, "dd/MM/yyyy", null),
+                        NascimentoData = paciente.DtNascimento,
                         Paciente = paciente.Cliente,
                         Funcionario = "N",
                         Fornecedor = paciente.Fornecedor,
@@ -1937,7 +1947,7 @@ namespace Migracao.Sistems
                     };
 
                     pacientesDTO.Add(lstPacientes);
-                }                
+                });
             }
             catch (Exception error)
             {

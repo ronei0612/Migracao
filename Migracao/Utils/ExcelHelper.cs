@@ -1,4 +1,6 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Office2013.Word;
+using Migracao.DTO;
 using Migracao.Models;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -1144,10 +1146,43 @@ namespace Migracao.Utils
             }
         }
 
-        public static ExcelEntity<T> ConvertToEntity<T>(string filePath) where T : new()
+        public static DataTable PessoasParaDataTable(List<PacientesDTO> pacientesDTO)
         {
-            ExcelEntity<T> excelEntity = new ExcelEntity<T>();
-            excelEntity.EntidadeODC = new List<T>();
+            {
+                DataTable dataTable = new DataTable();
+
+                // Adiciona as colunas ao DataTable baseado nos nomes das propriedades da classe Person
+                foreach (var prop in typeof(PacientesDTO).GetProperties())
+                {
+                    dataTable.Columns.Add(prop.Name, prop.PropertyType);
+                }
+
+                // Usando Parallel.ForEach para processar a lista de pessoas e preencher o DataTable
+                Parallel.ForEach(pacientesDTO, paciente =>
+                {
+                    // Cria uma nova linha para o DataTable
+                    DataRow row = dataTable.NewRow();
+
+                    // Preenche as células da linha com os valores das propriedades da pessoa
+                    foreach (var prop in typeof(PacientesDTO).GetProperties())
+                    {
+                        row[prop.Name] = prop.GetValue(paciente);
+                    }
+
+                    // Adiciona a linha ao DataTable de forma thread-safe
+                    lock (dataTable)
+                    {
+                        dataTable.Rows.Add(row);
+                    }
+                });
+
+                return dataTable;
+            }
+        }
+
+        public static List<Pacientes> ConvertToEntity(string filePath)
+        {
+            List<Pacientes> lstPacientes = new List<Pacientes>();
 
             using (var workbook = new XLWorkbook(filePath))
             {
@@ -1155,33 +1190,72 @@ namespace Migracao.Utils
                 var rows = worksheet.RowsUsed();
 
                 // Pegar as propriedades da classe T
-                var properties = typeof(T).GetProperties();
+                var properties = typeof(Pacientes).GetProperties();
 
                 // Iterar sobre as linhas do Excel (ignorando cabeçalhos)
                 foreach (var row in rows.Skip(1))
                 {
-                    T obj = new T();
+                    Pacientes paciente = new Pacientes();
 
                     // Iterar sobre as colunas do Excel
                     for (int i = 0; i < properties.Length; i++)
                     {
                         var cellValue = row.Cell(i + 1).Value.ToString();
-                        //var propertyType = properties[i].PropertyType;
+                        var propertyType = properties[i].PropertyType;
 
                         // Converter valor da célula para o tipo apropriado da propriedade
-                        //var convertedValue = Convert.ChangeType(cellValue, propertyType);
+                        var convertedValue = Convert.ChangeType(cellValue, propertyType);
 
                         // Atribuir valor à propriedade do objeto
-                        properties[i].SetValue(obj, cellValue);
+                        properties[i].SetValue(paciente, cellValue);
                     }
 
                     // Adicionar objeto à lista de dados
-                    excelEntity.EntidadeODC.Add(obj);
+                    lstPacientes.Add(paciente);
                 }
             }
 
-            return excelEntity;
+            return lstPacientes;
         }
+
+        //public static ExcelEntity<T> ConvertToEntity<T>(string filePath) where T : new()
+        //{
+        //    ExcelEntity<T> excelEntity = new ExcelEntity<T>();
+        //    excelEntity.EntidadeODC = new List<T>();
+
+        //    using (var workbook = new XLWorkbook(filePath))
+        //    {
+        //        var worksheet = workbook.Worksheet(1);
+        //        var rows = worksheet.RowsUsed();
+
+        //        // Pegar as propriedades da classe T
+        //        var properties = typeof(T).GetProperties();
+
+        //        // Iterar sobre as linhas do Excel (ignorando cabeçalhos)
+        //        foreach (var row in rows.Skip(1))
+        //        {
+        //            T obj = new T();
+
+        //            // Iterar sobre as colunas do Excel
+        //            for (int i = 0; i < properties.Length; i++)
+        //            {
+        //                var cellValue = row.Cell(i + 1).Value.ToString();
+        //                //var propertyType = properties[i].PropertyType;
+
+        //                // Converter valor da célula para o tipo apropriado da propriedade
+        //                //var convertedValue = Convert.ChangeType(cellValue, propertyType);
+
+        //                // Atribuir valor à propriedade do objeto
+        //                properties[i].SetValue(obj, cellValue);
+        //            }
+
+        //            // Adicionar objeto à lista de dados
+        //            excelEntity.EntidadeODC.Add(obj);
+        //        }
+        //    }
+
+        //    return excelEntity;
+        //}
     }
 
     public class ExcelEntity<T>

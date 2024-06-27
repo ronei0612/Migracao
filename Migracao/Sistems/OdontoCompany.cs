@@ -1910,7 +1910,7 @@ namespace Migracao.Sistems
                 {
                     var lstPacientes = new PacientesDTO
                     {
-                        Codigo = paciente.NumFicha,
+                        Codigo = paciente.num,
                         Ativo = "R",
                         NomeCompleto = paciente.Nome,
                         NomeSocial = string.Empty,

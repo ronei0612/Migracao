@@ -1594,8 +1594,10 @@ namespace Migracao.Sistems
             resultDataTable.Columns.Add("Valor Devido");
             resultDataTable.Columns.Add("Valor Total");
             resultDataTable.Columns.Add("Valor Pago");
+            resultDataTable.Columns.Add("Valor Original");
             resultDataTable.Columns.Add("Data do Pagamento");
             resultDataTable.Columns.Add("Observação Recebido");
+            
 
             var mergedDataTable = from row1 in dt1.AsEnumerable()
                                   select new
@@ -1618,6 +1620,7 @@ namespace Migracao.Sistems
                                       ValorDevido = string.Empty,
                                       ValorTotal = string.Empty,
                                       ValorPago = string.Empty,
+                                      ValorOriginal = string.Empty,
                                       DataPagamento = string.Empty,
                                       ObservacaoRecebido = string.Empty
                                   };   //).Distinct(); 
@@ -1628,7 +1631,7 @@ namespace Migracao.Sistems
                                          item.DentistaNome, item.Dente, item.ProcedimentoNome, item.ProcedimentoValor,
                                          item.ProcObservacao, item.DataInicio, item.DataTermino, item.DataAtendimento, item.QtdOrto,
                                          item.TipoPagamento, item.Vencimento, item.ValorDevido, item.ValorTotal, item.ValorPago,
-                                         item.DataPagamento, item.ObservacaoRecebido);
+                                         item.ValorOriginal, item.DataPagamento, item.ObservacaoRecebido);
             }
 
             var mergedDataTable2 = from row2 in dt2.AsEnumerable()
@@ -1652,6 +1655,7 @@ namespace Migracao.Sistems
                                        ValorDevido = row2.Field<string>("Valor Devido"),
                                        ValorTotal = row2.Field<string>("Valor Total"),
                                        ValorPago = row2.Field<string>("Valor Pago"),
+                                       ValorOriginal = row2.Field<string>("Valor Original"),
                                        DataPagamento = row2.Field<string>("Data Pagamento"),
                                        ObservacaoRecebido = string.Empty
                                    };
@@ -1662,7 +1666,7 @@ namespace Migracao.Sistems
                                          item.DentistaNome, item.Dente, item.ProcedimentoNome, item.ProcedimentoValor,
                                          item.ProcObservacao, item.DataInicio, item.DataTermino, item.DataAtendimento, item.QtdOrto,
                                          item.TipoPagamento, item.Vencimento, item.ValorDevido, item.ValorTotal, item.ValorPago,
-                                         item.DataPagamento, item.ObservacaoRecebido);
+                                         item.ValorOriginal, item.DataPagamento, item.ObservacaoRecebido);
             }
 
             return resultDataTable;

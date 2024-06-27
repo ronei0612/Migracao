@@ -39,15 +39,15 @@ namespace Migracao.Sistems
 
         List<string> cabecalhos_Pacientes = ["Código", "Ativo(S/N)", "NomeCompleto", "NomeSocial", "Apelido", "Documento(CPF,CNPJ,CGC)", "DataCadastro(01/12/2024)", "Observações", "Email", "RG", "Sexo(M/F)", "NascimentoData", "NascimentoLocal", "EstadoCivil(S/C/V)", "Profissao", "CargoNaClinica", "Dentista(S/N)", "ConselhoCodigo", "Paciente(S/N)", "Funcionario(S/N)", "Fornecedor(S/N)", "TelefonePrincipal", "Celular", "TelefoneAlternativo", "Logradouro", "LogradouroNum", "Complemento", "Bairro", "Cidade", "Estado(SP)", "CEP(00000-000)"];
         List<string> cabecalhos_Recebiveis = ["CPF", "Nome", "Numero do Controle", "Recebível Exigível(R/E)", "Valor Devido", "Valor Pago", "Prazo", "Data Vencimento", "Data do Pagamento", "Emissão", "Observação Recebível", "Observação Recebido", "Tipo Pagamento", "Valor Original", "Vencimento Recebível", "Duplicata", "Parcela", "Situação", "Nome grupo", "Ordem"];
-        List<string> cabecalhos_Recebidos = ["CPF", "Nome", "Numero do Controle", "Recebível Exigível(R/E)", "Valor Devido", "Valor Pago", "Prazo", "Data Vencimento", "Data do Pagamento", "Emissão", "Observação Recebido", "Tipo Pagamento", "Valor Original", "Vencimento Recebível", "Duplicata", "Parcela", "Tipo Espécie Pagamento", "Espécie Pagamento"];
+        List<string> cabecalhos_Recebidos = ["CPF", "Nome","Identificação Dentista", "Recebível Exigível(R/E)", "Valor Devido", "Valor Pago", "Data Vencimento", "Data do Pagamento", "Observação Recebido", "Tipo Pagamento", "Valor Original", "Contrato Controle", "Parcela", "Tipo Espécie Pagamento"];
         List<string> cabecalhos_Especies = ["Tipo Espécie", "Espécie Pagamento"];
         List<string> cabecalhos_Agendamentos = ["ID", "CPF", "Nome Completo", "Telefone", "Data Início (01/12/2024 00:00)", "Data Término (01/12/2024 00:00)", "Data Inclusão (01/12/2024)", "NomeCompletoDentista", "Observacao"];
         List<string> cabecalhos_Procedimentos = ["Nome Tabela", "Especialidade", "Ativo (Sim/Não)", "Nome do Procedimento", "Abreviação", "Preço", "TUSS", "Especialidade Código"];
         List<string> cabecalhos_CodProcedimentos = ["ID", "Nome", "Usuário"];
         List<string> cabecalhos_ManutencaoMan001 = ["Paciente Nome Completo", "Paciente CPF", "Observação", "Data Modificado", "Diagnostico", "Data Inicial", "Data Final"];
         List<string> cabecalhos_ManutencaoMan101 = ["Paciente CPF", "Paciente Nome", "Dentista CPF", "Dentista Nome", "Dentista Codigo", "Procedimento Nome", "Data Atendimento", "Data Início", "Data Retorno", "Procedimento Observação", "Lancamento"];
-        List<string> cabecalhos_ManutencaoMan111 = ["Numero do Controle", "Paciente CPF", "Paciente Nome", "Dentista Nome", "Procedimento Nome", "Procedimento Valor", "Valor Original", "Valor do Pagamento", "Data do Pagamento", "Dente", "Procedimento Observação", "Quantidade Orto", "Tipo Pagamento", "Vencimento", "Valor Devido", "Valor Total", "Data Atendimento"];
-        List<string> cabecalhos_ProcedimentosATD222 = ["Numero do Controle", "Paciente CPF", "Paciente Nome", "Dentista CPF", "Dentista Nome", "Dente", "Procedimento Nome", "Procedimento Valor", "Procedimento Observação", "Data Início", "Data Termino", "Data Atendimento"];
+        List<string> cabecalhos_ManutencaoMan111 = ["Numero do Controle", "Paciente CPF", "Paciente Nome", "Dentista Nome", "Procedimento Nome", "Procedimento Valor", "Valor Original", "Valor Pago", "Data Pagamento", "Dente", "Procedimento Observação", "Quantidade Orto", "Tipo Pagamento", "Vencimento", "Valor Devido", "Valor Total", "Data Atendimento", "Data Início", "Data Termino", "Observação Recebido"];
+        List<string> cabecalhos_ProcedimentosATD222 = ["Numero do Controle", "Paciente CPF", "Paciente Nome", "Dentista CPF", "Dentista Nome", "Dente", "Procedimento Nome", "Procedimento Valor", "Procedimento Observação", "Data Início", "Data Termino", "Data Atendimento", "Codigo Dentista"];
         List<string> cabecalhos_ManutencaoManMerge001_101 = ["Paciente Nome Man001", "Paciente CPF Man001", "Observação", "DataModificado", "Diagnostico", "DataInicial", "DataFinal", "Paciente CPF Man101", "Paciente Nome Completo", "Dentista CPF", "DentistaNome", "DentistaCodigo", "Procedimento", "DataAtendimento", "DataInicio", "DataRetorno"];
 
         //public static Dictionary<string, string> pessoaCSVDict;
@@ -143,6 +143,25 @@ namespace Migracao.Sistems
                 excelHelper.CriarExcelArquivo(salvarArquivoPessoas + ".xlsx", dataTablePessoas);
             }
 
+            var excel_MAN001 = listView.Items.Cast<ListViewItem>()
+                .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("MAN001")));
+
+            if (excel_MAN001 != null)
+            {
+                var resultado = LerArquivosExcelCsv(excel_MAN001.Text, Encoding.UTF8);
+                var linhasCSV1 = resultado.Item1;
+                var cabecalhosCSV = resultado.Item2;
+
+                if (MAN001_Manutencao.All(cabecalhosCSV.Contains))
+                    dataTableManutencaoMan001 = ConvertExcelManutencaoMAM001(dataTableManutencaoMan001, cabecalhosCSV, linhasCSV1, dataTablePessoas);
+
+                if (dataTableManutencaoMan001 != null)
+                {
+                    var salvarManutencaoMan001 = Tools.GerarNomeArquivo($"CadastroManutencaoMan001_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarManutencaoMan001 + ".xlsx", dataTableManutencaoMan001);
+                }
+            }
+
             var excel_CRD013 = listView.Items.Cast<ListViewItem>()
                 .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("CRD013")));
             if (excel_CRD013 != null)
@@ -162,24 +181,7 @@ namespace Migracao.Sistems
                 var cabecalhosCSV = resultado.Item2;
                 dataTableRecebiveis = ConvertExcelRecebiveis(dataTableRecebiveis, cabecalhosCSV, linhasCSV, dataTablePessoas);
             }
-
-            var excel_BXD111 = listView.Items.Cast<ListViewItem>()
-                .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("BXD111")));
-            if (excel_BXD111 != null)
-            {
-                var resultado = LerArquivosExcelCsv(excel_BXD111.Text, Encoding.UTF8);
-                var linhasCSV = resultado.Item1;
-                var cabecalhosCSV = resultado.Item2;
-                dataTableRecebidos = ConvertExcelRecebidos(dataTableRecebidos, cabecalhosCSV, linhasCSV, dataTablePessoas, dataTableEspecies, dataTableRecebiveis);
-               
-                if (excel_BXD111 != null)
-                {
-                    var salvarArquivoRecebidos = Tools.GerarNomeArquivo($"CadastroRecebiveis_Baixas_{estabelecimentoID}_OdontoCompany");
-                    excelHelper.CriarExcelArquivo(salvarArquivoRecebidos + ".xlsx", dataTableRecebidos);
-                }
-
-            }
-
+            
             var excel_CXD555 = listView.Items.Cast<ListViewItem>()
                 .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("CXD555")));
             if (excel_CXD555 != null)
@@ -249,27 +251,8 @@ namespace Migracao.Sistems
                     RetornaProcedimentosPorTipo(dataTableProcedimentos, estabelecimentoID);
             }
 
-            var excel_MAN001 = listView.Items.Cast<ListViewItem>()
-                .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("MAN001")));
-
-            if (excel_MAN001 != null)
-            {
-                var resultado = LerArquivosExcelCsv(excel_MAN001.Text, Encoding.UTF8);
-                var linhasCSV1 = resultado.Item1;
-                var cabecalhosCSV = resultado.Item2;
-
-                if (MAN001_Manutencao.All(cabecalhosCSV.Contains))
-                    dataTableManutencaoMan001 = ConvertExcelManutencaoMAM001(dataTableManutencaoMan001, cabecalhosCSV, linhasCSV1, dataTablePessoas);
-
-                if (dataTableManutencaoMan001 != null)
-                {
-                    var salvarManutencaoMan001 = Tools.GerarNomeArquivo($"CadastroManutencaoMan001_{estabelecimentoID}_OdontoCompany");
-                    excelHelper.CriarExcelArquivo(salvarManutencaoMan001 + ".xlsx", dataTableManutencaoMan001);
-                }
-            }
-
             var excel_MAN101 = listView.Items.Cast<ListViewItem>()
-                .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("MAN101")));
+               .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("MAN101")));
 
             if (excel_MAN101 != null)
             {
@@ -316,6 +299,23 @@ namespace Migracao.Sistems
                 }
 
             }
+            
+            var excel_BXD111 = listView.Items.Cast<ListViewItem>()
+                .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("BXD111")));
+            if (excel_BXD111 != null)
+            {
+                var resultado = LerArquivosExcelCsv(excel_BXD111.Text, Encoding.UTF8);
+                var linhasCSV = resultado.Item1;
+                var cabecalhosCSV = resultado.Item2;
+                dataTableRecebidos = ConvertExcelRecebidos(dataTableRecebidos, cabecalhosCSV, linhasCSV, dataTablePessoas, dataTableEspecies, dataTableRecebiveis, dataTableProcedimentosATD222);
+
+                if (excel_BXD111 != null)
+                {
+                    var salvarArquivoRecebidos = Tools.GerarNomeArquivo($"CadastroRecebiveis_Baixas_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarArquivoRecebidos + ".xlsx", dataTableRecebidos);
+                }
+
+            }
 
             var excel_MAN111 = listView.Items.Cast<ListViewItem>()
                 .FirstOrDefault(item => item.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text.Contains("MAN111")));
@@ -327,7 +327,7 @@ namespace Migracao.Sistems
                 var cabecalhosCSV = resultado.Item2;
 
                 if (MAN111_Manutencao.All(cabecalhosCSV.Contains))
-                    dataTableManutencaoMan111 = ConvertExcelProcedimentosMAN111(dataTableManutencaoMan111, cabecalhosCSV, linhasCSV, dataTablePessoas, dataTableManutencaoMan101);
+                    dataTableManutencaoMan111 = ConvertExcelProcedimentosMAN111(dataTableManutencaoMan111, cabecalhosCSV, linhasCSV, dataTablePessoas, dataTableManutencaoMan101, dataTableManutencaoMan001);
 
                 if (dataTableManutencaoMan111 != null)
                 {
@@ -439,7 +439,7 @@ namespace Migracao.Sistems
                 throw new Exception($"Erro ao converter Excel Recebíveis: {error.Message}");
             }
         }
-        public DataTable ConvertExcelRecebidos(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePacientes, DataTable dataTableEspecies, DataTable dataTableRecebiveis)
+        public DataTable ConvertExcelRecebidos(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePacientes, DataTable dataTableEspecies, DataTable dataTableRecebiveis, DataTable dataTableProcedimentosATD222)
         {
             try
             {
@@ -489,6 +489,8 @@ namespace Migracao.Sistems
                             string? nomeGrupo = string.Empty;
                             string? ordem = string.Empty;
                             int indiceEspecies = 0;
+                            string? codDentista = string.Empty;
+                            
 
                             DataRow[] dataRowPessoasEncontrados = dataTablePacientes.AsEnumerable().Where(row => row.Field<string>("Documento(CPF,CNPJ,CGC)") == cpf).ToArray();
                             if (dataRowPessoasEncontrados.Length > 0)
@@ -510,8 +512,8 @@ namespace Migracao.Sistems
                                 ordem = dataRowEncontrados[0]["Ordem"].ToString();
                             }
 
-                            var concatObs = (observacao + " | " + tipoDocumento + " | " + situacao + " | " +
-                                nomeGrupo + " | " + ordem);
+                            var concatObs = (" Observação: " + observacao + " | Documento: " + tipoDocumento + " | Situação: " + situacao + 
+                                " | Nome do Grupo: " + nomeGrupo + " | Ordem: " + ordem);
 
                             concatObs = concatObs.PadRight(512);
 
@@ -527,15 +529,22 @@ namespace Migracao.Sistems
                                 indiceEspecies = indice;
                             }
 
-                            dataRow["Numero do Controle"] = documento;
+                            DataRow[] dataRowProdATD222 = dataTableProcedimentosATD222.AsEnumerable()
+                            .Where(row =>
+                                row.Field<string>("Paciente CPF") == cpf)
+                            .ToArray();
+
+                            if (dataRowProdATD222.Length > 0)
+                                codDentista = dataRowProdATD222[0]["Codigo Dentista"].ToString();
+
                             dataRow["CPF"] = cpf;
                             dataRow["Nome"] = nome;
+                            dataRow["Identificação Dentista"] = codDentista;
                             dataRow["Valor Pago"] = valor.ArredondarValorV2();
                             dataRow["Data do Pagamento"] = baixaData.ToDataNull();
                             dataRow["Data Vencimento"] = vencimentoData.ToDataNull();
                             dataRow["Observação Recebido"] = concatObs;
                             dataRow["Tipo Espécie Pagamento"] = indiceEspecies;
-                            dataRow["Espécie Pagamento"] = formaPagamento;
                             dataRow["Recebível Exigível(R/E)"] = "R";
                             dataRow["Parcela"] = parcela;
 
@@ -545,8 +554,7 @@ namespace Migracao.Sistems
                                 dataRow["Valor Devido"] = dataRowEncontrados[0]["Valor Devido"].ToString();
                                 dataRow["Tipo Pagamento"] = dataRowEncontrados[0]["Tipo Pagamento"].ToString();
                                 dataRow["Valor Original"] = dataRowEncontrados[0]["Valor Original"].ToString();
-                                dataRow["Vencimento Recebível"] = dataRowEncontrados[0]["Vencimento Recebível"].ToString();
-                                dataRow["Duplicata"] = dataRowEncontrados[0]["Duplicata"].ToString();
+                                dataRow["Contrato Controle"] = dataRowEncontrados[0]["Duplicata"].ToString();
                             }
 
                             dataTable.Rows.Add(dataRow);
@@ -1297,7 +1305,7 @@ namespace Migracao.Sistems
                 throw new Exception($"Erro ao converter Excel AtendimentoATD222: {error.Message}");
             }
         }
-        public DataTable ConvertExcelProcedimentosMAN111(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null, DataTable dataTableMan101 = null)
+        public DataTable ConvertExcelProcedimentosMAN111(DataTable dataTable, List<string> cabecalhos, List<string[]> linhas, DataTable dataTablePessoas = null, DataTable dataTableMan101 = null, DataTable dataTableMan001 = null)
         {
             try
             {
@@ -1331,6 +1339,8 @@ namespace Migracao.Sistems
                         string? nome = null;
                         string? procObservacao = null;
                         decimal? valorTotal = 0;
+                        string? dataInicial = null;
+                        string? dataFinal = null;
 
                         var docsEncontrados = linhas.Where(linha => linha[34].Equals(documento)).Count();
 
@@ -1350,7 +1360,18 @@ namespace Migracao.Sistems
                             }
 
                         }
-                        var listaValores = linhas.Where(linha => linha[1].Equals(cpf)).ToList();
+
+                        DataRow[] dataRowMan001 = dataTableMan001.AsEnumerable()
+                            .Where(row => row.Field<string>("Paciente CPF") == cpf)
+                            .ToArray();
+
+                        if (dataRowMan001.Length > 0)
+                        {
+                            dataInicial = dataRowMan001[0]["Data Inicial"].ToString();
+                            dataFinal = dataRowMan001[0]["Data Final"].ToString();
+                        }                            
+
+                        var listaValores = linhas.Where(linha => linha[1].Equals(cpf) && linha[34].Equals(documento)).ToList();
 
                         var selecionaLinha = listaValores.Select(linha => linha[18].Replace(",", "."));
 
@@ -1358,7 +1379,7 @@ namespace Migracao.Sistems
                         {
                             if (!string.IsNullOrEmpty(item))
                                 valorTotal += Convert.ToDecimal(item, CultureInfo.InvariantCulture);
-                        }
+                        }    
 
                         dataRow["Numero do Controle"] = documento;
                         dataRow["Paciente CPF"] = cpf;
@@ -1366,8 +1387,8 @@ namespace Migracao.Sistems
                         dataRow["Dentista Nome"] = nomeRespAtendimento;
                         dataRow["Procedimento Nome"] = nomeTipo;
                         dataRow["Valor Original"] = valorOriginal.ArredondarValorV2();
-                        dataRow["Valor do Pagamento"] = valor.ArredondarValorV2();
-                        dataRow["Data do Pagamento"] = dataPagamento.ToDataNull()?.ToShortDateString();
+                        dataRow["Valor Pago"] = valor.ArredondarValorV2();
+                        dataRow["Data Pagamento"] = dataPagamento.ToDataNull()?.ToShortDateString();
                         dataRow["Data Atendimento"] = dataAtendimento.ToDataNull()?.ToShortDateString();
                         dataRow["Dente"] = string.Empty;
                         dataRow["Procedimento Observação"] = procObservacao;
@@ -1376,6 +1397,9 @@ namespace Migracao.Sistems
                         dataRow["Vencimento"] = venctoOriginal.ToData().ToShortDateString();
                         dataRow["Valor Devido"] = valorParcela;
                         dataRow["Valor Total"] = valorTotal;
+                        dataRow["Data Início"] = dataInicial.ToData().ToShortDateString();
+                        dataRow["Data Termino"] = dataFinal.ToDataNull()?.ToShortDateString();
+                        dataRow["Observação Recebido"] = valorTotal;
 
 
                         dataTable.Rows.Add(dataRow);
@@ -1433,7 +1457,7 @@ namespace Migracao.Sistems
 
                         DataRow[] dataRowRecebiveis = dataTableRecebiveis.AsEnumerable()
                         .Where(row =>
-                            row.Field<string>("Documento Ref") == documento &&
+                            row.Field<string>("Numero do Controle") == documento &&
                             row.Field<string>("CPF") == cpf)
                         .ToArray();
 
@@ -1444,7 +1468,7 @@ namespace Migracao.Sistems
                         dataRow["Dentista Nome"] = nomeRespAtendimento;
                         dataRow["Dente"] = numero;
                         dataRow["Procedimento Nome"] = nomeProduto;
-                        //dataRow["Dentista Codigo"] = codRespAtendimento;
+                        dataRow["Codigo Dentista"] = codRespAtendimento;
                         dataRow["Procedimento Valor"] = valor;
                         dataRow["Procedimento Observação"] = observacao;
                         dataRow["Data Início"] = dataInicio.ToDataNull();
@@ -1551,6 +1575,28 @@ namespace Migracao.Sistems
         }
         public DataTable MergeDataTablesProcedimentosManutencao(DataTable dt1, DataTable dt2)
         {
+            DataTable resultDataTable = new DataTable();
+            resultDataTable.Columns.Add("Numero do Controle");
+            resultDataTable.Columns.Add("Paciente CPF");
+            resultDataTable.Columns.Add("Paciente Nome");
+            resultDataTable.Columns.Add("Dentista CPF");
+            resultDataTable.Columns.Add("Dentista Nome");
+            resultDataTable.Columns.Add("Dente");
+            resultDataTable.Columns.Add("Procedimento Nome");
+            resultDataTable.Columns.Add("Procedimento Valor");
+            resultDataTable.Columns.Add("Procedimento Observação");
+            resultDataTable.Columns.Add("Data Início");
+            resultDataTable.Columns.Add("Data Termino");
+            resultDataTable.Columns.Add("Data Atendimento");
+            resultDataTable.Columns.Add("Quantidade Orto");
+            resultDataTable.Columns.Add("Tipo Pagamento");
+            resultDataTable.Columns.Add("Vencimento");
+            resultDataTable.Columns.Add("Valor Devido");
+            resultDataTable.Columns.Add("Valor Total");
+            resultDataTable.Columns.Add("Valor Pago");
+            resultDataTable.Columns.Add("Data do Pagamento");
+            resultDataTable.Columns.Add("Observação Recebido");
+
             var mergedDataTable = from row1 in dt1.AsEnumerable()
                                   select new
                                   {
@@ -1570,34 +1616,19 @@ namespace Migracao.Sistems
                                       TipoPagamento = string.Empty,
                                       Vencimento = string.Empty,
                                       ValorDevido = string.Empty,
-                                      ValorTotal = string.Empty
-                                  };   //).Distinct();            
-
-            DataTable resultDataTable = new DataTable();
-            resultDataTable.Columns.Add("Numero do Controle");
-            resultDataTable.Columns.Add("Paciente CPF");
-            resultDataTable.Columns.Add("Paciente Nome");
-            resultDataTable.Columns.Add("Dentista CPF");
-            resultDataTable.Columns.Add("Dentista Nome");
-            resultDataTable.Columns.Add("Dente");
-            resultDataTable.Columns.Add("Procedimento Nome");
-            resultDataTable.Columns.Add("Procedimento Valor");
-            resultDataTable.Columns.Add("Procedimento Observação");
-            resultDataTable.Columns.Add("Data Início");
-            resultDataTable.Columns.Add("Data Termino");
-            resultDataTable.Columns.Add("Data Atendimento");
-            resultDataTable.Columns.Add("Quantidade Orto");
-            resultDataTable.Columns.Add("Tipo Pagamento");
-            resultDataTable.Columns.Add("Vencimento");
-            resultDataTable.Columns.Add("Valor Devido");
-            resultDataTable.Columns.Add("Valor Total");
+                                      ValorTotal = string.Empty,
+                                      ValorPago = string.Empty,
+                                      DataPagamento = string.Empty,
+                                      ObservacaoRecebido = string.Empty
+                                  };   //).Distinct(); 
 
             foreach (var item in mergedDataTable)
             {
                 resultDataTable.Rows.Add(item.NumeroControle, item.PacienteCPF, item.PacienteNome, item.DentistaCPF,
                                          item.DentistaNome, item.Dente, item.ProcedimentoNome, item.ProcedimentoValor,
                                          item.ProcObservacao, item.DataInicio, item.DataTermino, item.DataAtendimento, item.QtdOrto,
-                                         item.TipoPagamento, item.Vencimento, item.ValorDevido, item.ValorTotal);
+                                         item.TipoPagamento, item.Vencimento, item.ValorDevido, item.ValorTotal, item.ValorPago,
+                                         item.DataPagamento, item.ObservacaoRecebido);
             }
 
             var mergedDataTable2 = from row2 in dt2.AsEnumerable()
@@ -1612,14 +1643,17 @@ namespace Migracao.Sistems
                                        ProcedimentoNome = row2.Field<string>("Procedimento Nome"),
                                        ProcedimentoValor = row2.Field<string>("Procedimento Valor"),
                                        ProcObservacao = row2.Field<string>("Procedimento Observação"),
-                                       DataInicio = string.Empty,
-                                       DataTermino = string.Empty,
+                                       DataInicio = row2.Field<string>("Data Início"),
+                                       DataTermino = row2.Field<string>("Data Termino"),
                                        DataAtendimento = row2.Field<string>("Data Atendimento"),
                                        QtdOrto = row2.Field<string>("Quantidade Orto"),
                                        TipoPagamento = row2.Field<string>("Tipo Pagamento"),
                                        Vencimento = row2.Field<string>("Vencimento"),
                                        ValorDevido = row2.Field<string>("Valor Devido"),
-                                       ValorTotal = row2.Field<string>("Valor Total")
+                                       ValorTotal = row2.Field<string>("Valor Total"),
+                                       ValorPago = row2.Field<string>("Valor Pago"),
+                                       DataPagamento = row2.Field<string>("Data Pagamento"),
+                                       ObservacaoRecebido = string.Empty
                                    };
 
             foreach (var item in mergedDataTable2)
@@ -1627,7 +1661,8 @@ namespace Migracao.Sistems
                 resultDataTable.Rows.Add(item.NumeroControle, item.PacienteCPF, item.PacienteNome, item.DentistaCPF,
                                          item.DentistaNome, item.Dente, item.ProcedimentoNome, item.ProcedimentoValor,
                                          item.ProcObservacao, item.DataInicio, item.DataTermino, item.DataAtendimento, item.QtdOrto,
-                                         item.TipoPagamento, item.Vencimento, item.ValorDevido, item.ValorTotal);
+                                         item.TipoPagamento, item.Vencimento, item.ValorDevido, item.ValorTotal, item.ValorPago,
+                                         item.DataPagamento, item.ObservacaoRecebido);
             }
 
             return resultDataTable;

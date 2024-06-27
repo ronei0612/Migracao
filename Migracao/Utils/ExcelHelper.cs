@@ -1143,9 +1143,5 @@ namespace Migracao.Utils
             }
         }
 
-        public static bool IsStringWithinMaxLength(string input)
-        {
-            return input != null && input.Length <= 512;
-        }
     }
 }

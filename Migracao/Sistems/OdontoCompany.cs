@@ -2,6 +2,10 @@
 using MathNet.Numerics;
 using MathNet.Numerics.Distributions;
 using Migracao.Models;
+using Migracao.Models.Context;
+using Migracao.Models.DentalOffice;
+using Migracao.Models.Interfaces;
+using Migracao.Models.OdontoCompany;
 using Migracao.Utils;
 using NPOI.POIFS.Crypt.Dsig;
 using NPOI.SS.Formula.Functions;
@@ -20,8 +24,19 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView;
 
 namespace Migracao.Sistems
 {
-    internal class OdontoCompany
+    internal class OdontoCompany : IDataBaseMigracao
     {
+        FireBirdContext<T> context;
+        string _pathDB;
+        string _pathDBContratos;
+
+        public OdontoCompany(string dataBaseName, string pathDB = null, string pathDBContratos = null)
+        {
+            _pathDB = pathDB;
+            _pathDBContratos = pathDBContratos;
+            var bla = new FireBirdContext<Models.OdontoCompany.Atendimento222>(pathDB).GetAll();
+        }
+
         string arquivoExcelNomesUTF8 = "Files\\NomesUTF8.xlsx";
 
         string[] EMD101_Pacientes = ["BAIRRO", "CEP", "CGC_CPF", "CIDADE", "CLIENTE", "CELULAR", "DT_CADASTRO", "DT_NASCIMENTO", "EMAIL", "ENDERECO", "ESTADO", "FONE1", "FONE2", "FORNECEDOR", "INSC_RG", "NOME", "NUM_CONVENIO", "NUM_ENDERECO", "NUM_FICHA", "OBS1", "SEXO_M_F"];
@@ -51,6 +66,7 @@ namespace Migracao.Sistems
         List<string> cabecalhos_ManutencaoManMerge001_101 = ["Paciente Nome Man001", "Paciente CPF Man001", "Observação", "DataModificado", "Diagnostico", "DataInicial", "DataFinal", "Paciente CPF Man101", "Paciente Nome Completo", "Dentista CPF", "DentistaNome", "DentistaCodigo", "Procedimento", "DataAtendimento", "DataInicio", "DataRetorno"];
 
         //public static Dictionary<string, string> pessoaCSVDict;
+
 
         public Tuple<List<string[]>, List<string>> LerArquivosExcelCsv(string arquivo, Encoding encoding)
         {
@@ -1889,6 +1905,27 @@ namespace Migracao.Sistems
             }
 
             #endregion
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoProcedimentos()
+        {
+
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoDevClinico()
+        {
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoProntuarios()
+        {
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoManutencoes()
+        {
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoFinanceiroReceber()
+        {
         }
     }
 }

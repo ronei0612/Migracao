@@ -1,6 +1,6 @@
 ﻿namespace Migracao.Models
 {
-	internal class Preco
+	public class Preco
 	{
 		public int ID { get; set; }
 		public int TabelaID { get; set; }

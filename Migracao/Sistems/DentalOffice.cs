@@ -1,12 +1,24 @@
 ﻿using Migracao.Models;
+using Migracao.Models.Context;
+using Migracao.Models.Interfaces;
 using Migracao.Utils;
 using NPOI.SS.UserModel;
 
 namespace Migracao.Sistems
 {
-    internal class DentalOffice
+    internal class DentalOffice : IDataBaseMigracao
     {
-		public void ImportarPagos(string arquivoExcel, string arquivoExcelFuncionarios, int estabelecimentoID, int responsavelPessoaID, int loginID)
+        MySqlContext context;
+
+        public DentalOffice(string dataBaseName, string pathDB = null, string pathDBContratos = null)
+        {
+            if (!string.IsNullOrEmpty(dataBaseName))
+                context = new MySqlContext(dataBaseName);
+
+            var orcamentos = context.Orcamento.ToList();
+        }
+
+        public void ImportarPagos(string arquivoExcel, string arquivoExcelFuncionarios, int estabelecimentoID, int responsavelPessoaID, int loginID)
 		{
 			var indiceLinha = 1;
             string tituloColuna = "", colunaLetra = "", celulaValor = "", variaveisValor = "", nome = "";
@@ -458,6 +470,26 @@ namespace Migracao.Sistems
             {
                 throw new Exception(Tools.TratarMensagemErro(arquivoExcel, error.Message, indiceLinha, colunaLetra, tituloColuna, celulaValor, variaveisValor));
             }
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoProcedimentos()
+        {
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoDevClinico()
+        {
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoProntuarios()
+        {
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoManutencoes()
+        {
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoFinanceiroReceber()
+        {
         }
     }
 }

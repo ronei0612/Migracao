@@ -1,6 +1,6 @@
 ﻿namespace Migracao.Models
 {
-    internal class Funcionario
+    public class Funcionario
     {
         public int ID { get; set; }
         public int PessoaID { get; set; }

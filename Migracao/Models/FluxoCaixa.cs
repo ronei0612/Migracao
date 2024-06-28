@@ -1,6 +1,6 @@
 ﻿namespace Migracao.Models
 {
-    internal class FluxoCaixa
+    public class FluxoCaixa
     {
         public string? Nome { get; set; }
         public int ID { get; set; }

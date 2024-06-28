@@ -5,6 +5,7 @@ using MathNet.Numerics;
 using MathNet.Numerics.Distributions;
 using Migracao.DTO;
 using Migracao.Models;
+using Migracao.Models.FirebirdModels;
 using Migracao.Utils;
 using NPOI.POIFS.Crypt.Dsig;
 using NPOI.SS.Formula.Functions;
@@ -1909,8 +1910,7 @@ namespace Migracao.Sistems
 
             #endregion
         }
-
-        public List<PacientesDTO> ConvertExcelPessoasPacientesEntity(List<Pacientes> pacientes)
+        public List<PacientesDTO> ConvertExcelPessoasPacientesEntity(List<EMD101> pacientes)
         {
             List<PacientesDTO> pacientesDTO = new List<PacientesDTO>();
 
@@ -1920,30 +1920,30 @@ namespace Migracao.Sistems
                 {                    
                     var lstPacientes = new PacientesDTO 
                     {
-                        Codigo = paciente.NumFicha,
+                        Codigo = string.Empty,
                         Ativo = "R",
-                        NomeCompleto = paciente.Nome,
+                        NomeCompleto = paciente.NOME,
                         NomeSocial = string.Empty,
-                        Apelido = paciente.Nome.GetPrimeirosCaracteres(20).ToNome(),
-                        Documento = paciente.CgcCpf.ToCPF(),
-                        DataCadastro = paciente.DtCadastro,
-                        Observacoes = paciente.Obs1,
-                        Email = paciente.Email,
-                        RG = paciente.InscRg.GetPrimeirosCaracteres(20),
-                        Sexo = paciente.SexoMF.ToSexo("m", "f") ? "M" : "F",
-                        NascimentoData = paciente.DtNascimento,
-                        Paciente = paciente.Cliente,
+                        Apelido = paciente.NOME.GetPrimeirosCaracteres(20).ToNome(),
+                        Documento = paciente.CGC_CPF.ToCPF(),
+                        DataCadastro = paciente.DT_CADASTRO,
+                        Observacoes = paciente.OBS1,
+                        Email = paciente.EMAIL,
+                        RG = paciente.INSC_RG.GetPrimeirosCaracteres(20),
+                        Sexo = paciente.SEXO_M_F.ToSexo("m", "f") ? "M" : "F",
+                        NascimentoData = paciente.DT_NASCIMENTO,
+                        Paciente = paciente.CLIENTE,
                         Funcionario = "N",
-                        Fornecedor = paciente.Fornecedor,
-                        TelefonePrincipal = paciente.Fone1,
-                        Celular = paciente.Celular,
-                        TelefoneAlternativo = paciente.Fone2,
-                        Logradouro = paciente.Endereco.PrimeiraLetraMaiuscula(),
-                        LogradouroNum = paciente.NumEndereco,
-                        Bairro = paciente.Bairro,
-                        Cidade = paciente.Cidade,
-                        Estado = paciente.Estado,
-                        CEP = paciente.Cep,
+                        Fornecedor = paciente.FORNECEDOR,
+                        TelefonePrincipal = paciente.FONE1,
+                        Celular = paciente.CELULAR,
+                        TelefoneAlternativo = paciente.FONE2,
+                        Logradouro = paciente.ENDERECO.PrimeiraLetraMaiuscula(),
+                        LogradouroNum = paciente.NUM_ENDERECO,
+                        Bairro = paciente.BAIRRO,
+                        Cidade = paciente.CIDADE,
+                        Estado = paciente.ESTADO,
+                        CEP = paciente.CEP,
                     };
 
                     pacientesDTO.Add(lstPacientes);

@@ -20,67 +20,67 @@ namespace Migracao.DTO
         {
             
         }
-        [Description("Codigo")]
+        [DisplayName("Código")]
         public string? Codigo { get; set; }
-        [Description("Ativo")]
+        [DisplayName("Ativo")]
         public string? Ativo { get; set; }
-        [Description("Nome Completo")]
+        [DisplayName("Nome Completo")]
         public string? NomeCompleto { get; set; }
-        [Description("Nome Social")]
+        [DisplayName("Nome Social")]
         public string? NomeSocial { get; set; }
-        [Description("Apelido")]
+        [DisplayName("Apelido")]
         public string? Apelido { get; set; }
-        [Description("Documento")]
+        [DisplayName("Documento")]
         public string? Documento { get; set; }
-        [Description("Data Cadastro")]
+        [DisplayName("Data Cadastro")]
         public string? DataCadastro { get; set; }
-        [Description("Observacões")]
+        [DisplayName("Observacões")]
         public string? Observacoes { get; set; }
-        [Description("Email")]
+        [DisplayName("Email")]
         public string? Email { get; set; }
-        [Description("RG")]
+        [DisplayName("RG")]
         public string? RG { get; set; }
-        [Description("Sexo")]
+        [DisplayName("Sexo")]
         public string? Sexo { get; set; }
-        [Description("Nascimento Data")]
+        [DisplayName("Nascimento Data")]
         public string NascimentoData { get; set; }
-        [Description("Nascimento Local")]
+        [DisplayName("Nascimento Local")]
         public string? NascimentoLocal { get; set; }
-        [Description("Estado Civil")]
+        [DisplayName("Estado Civil")]
         public string? EstadoCivil { get; set; }
-        [Description("Profissão")]
+        [DisplayName("Profissão")]
         public string? Profissao { get; set; }
-        [Description("Cargo na Clinica")]
+        [DisplayName("Cargo na Clinica")]
         public string? CargoNaClinica { get; set; }
-        [Description("Dentista")]
+        [DisplayName("Dentista")]
         public string? Dentista { get; set; }
-        [Description("Conselho Codigo")]
+        [DisplayName("Conselho Codigo")]
         public string? ConselhoCodigo { get; set; }
-        [Description("Paciente")]
+        [DisplayName("Paciente")]
         public string? Paciente { get; set; }
-        [Description("Funcionário")]
+        [DisplayName("Funcionário")]
         public string? Funcionario { get; set; }
-        [Description("Fornecedor")]
+        [DisplayName("Fornecedor")]
         public string? Fornecedor { get; set; }
-        [Description("Telefone Principal")]
+        [DisplayName("Telefone Principal")]
         public string TelefonePrincipal { get; set; }
-        [Description("Celular")]
+        [DisplayName("Celular")]
         public string? Celular { get; set; }
-        [Description("Telefone Alternativo")]
+        [DisplayName("Telefone Alternativo")]
         public string? TelefoneAlternativo { get; set; }
-        [Description("Logradouro")]
+        [DisplayName("Logradouro")]
         public string? Logradouro { get; set; }
-        [Description("LogradouroNum")]
+        [DisplayName("LogradouroNum")]
         public string? LogradouroNum { get; set; }
-        [Description("Complemento")]
+        [DisplayName("Complemento")]
         public string? Complemento { get; set; }
-        [Description("Bairro")]
+        [DisplayName("Bairro")]
         public string? Bairro { get; set; }
-        [Description("Cidade")]
+        [DisplayName("Cidade")]
         public string? Cidade { get; set; }
-        [Description("Estado")]
+        [DisplayName("Estado")]
         public string? Estado { get; set; }
-        [Description("CEP")]
+        [DisplayName("CEP")]
         public string? CEP { get; set; }
     }
 }

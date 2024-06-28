@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Office2013.Word;
 using Migracao.DTO;
 using Migracao.Models;
+using Migracao.Models.FirebirdModels;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Data;
@@ -1158,31 +1159,42 @@ namespace Migracao.Utils
                 }
 
                 // Usando Parallel.ForEach para processar a lista de pessoas e preencher o DataTable
-                Parallel.ForEach(pacientesDTO, paciente =>
+                Parallel.ForEach(pacientesDTO, new ParallelOptions{ MaxDegreeOfParallelism = 4 }, paciente =>
                 {
-                    // Cria uma nova linha para o DataTable
-                    DataRow row = dataTable.NewRow();
-
-                    // Preenche as células da linha com os valores das propriedades da pessoa
-                    foreach (var prop in typeof(PacientesDTO).GetProperties())
+                    try
                     {
-                        row[prop.Name] = prop.GetValue(paciente);
-                    }
+                        DataRow row;
 
-                    // Adiciona a linha ao DataTable de forma thread-safe
-                    lock (dataTable)
-                    {
-                        dataTable.Rows.Add(row);
+                        lock (new object())
+                        { row = dataTable.NewRow(); }
+
+
+                        // Preenche as células da linha com os valores das propriedades da pessoa
+                        foreach (var prop in typeof(PacientesDTO).GetProperties())
+                        {
+                            row[prop.Name] = prop.GetValue(paciente);
+                        }
+
+                        // Adiciona a linha ao DataTable de forma thread-safe
+                        lock (dataTable)
+                        {
+                            dataTable.Rows.Add(row);
+                        }
                     }
+                    catch (Exception ex)
+                    {
+                        throw;
+                    }
+                    
                 });
 
                 return dataTable;
             }
         }
 
-        public static List<Pacientes> ConvertToEntity(string filePath)
+        public static List<EMD101> ConvertToEntity(string filePath)
         {
-            List<Pacientes> lstPacientes = new List<Pacientes>();
+            List<EMD101> lstPacientes = new List<EMD101>();
 
             using (var workbook = new XLWorkbook(filePath))
             {
@@ -1190,12 +1202,12 @@ namespace Migracao.Utils
                 var rows = worksheet.RowsUsed();
 
                 // Pegar as propriedades da classe T
-                var properties = typeof(Pacientes).GetProperties();
+                var properties = typeof(EMD101).GetProperties();
 
                 // Iterar sobre as linhas do Excel (ignorando cabeçalhos)
                 foreach (var row in rows.Skip(1))
                 {
-                    Pacientes paciente = new Pacientes();
+                    EMD101 paciente = new EMD101();
 
                     // Iterar sobre as colunas do Excel
                     for (int i = 0; i < properties.Length; i++)

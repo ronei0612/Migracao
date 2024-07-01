@@ -120,13 +120,15 @@ namespace Migracao
             if (type != null && typeof(IDataBaseMigracao).IsAssignableFrom(type))
             {
                 IDataBaseMigracao instance = (IDataBaseMigracao)Activator.CreateInstance(type, _dataBaseName,  _pathDB, _pathDBContratos);
-
-                if(_tabela == "Procedimentos")
+                
+                if (_tabela == "Procedimentos")
                     instance.DataBaseImportacaoProcedimentos();
                 if (_tabela == "Desenvolvimento Clínico")
                     instance.DataBaseImportacaoDevClinico();
                 if (_tabela == "Manutenções")
                     instance.DataBaseImportacaoManutencoes();
+                if (_tabela == "Pacientes")
+                    instance.DataBaseImportacaoPacientes();
             }
             else
             {

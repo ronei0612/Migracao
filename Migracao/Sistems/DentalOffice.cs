@@ -491,5 +491,9 @@ namespace Migracao.Sistems
         void IDataBaseMigracao.DataBaseImportacaoFinanceiroReceber()
         {
         }
+
+        void IDataBaseMigracao.DataBaseImportacaoPacientes()
+        {
+        }
     }
 }

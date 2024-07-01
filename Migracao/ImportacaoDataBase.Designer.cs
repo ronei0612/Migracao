@@ -55,17 +55,18 @@
             // 
             inputDB.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             inputDB.Enabled = false;
-            inputDB.Location = new Point(212, 10);
+            inputDB.Location = new Point(186, 8);
+            inputDB.Margin = new Padding(3, 2, 3, 2);
             inputDB.Name = "inputDB";
-            inputDB.Size = new Size(608, 27);
+            inputDB.Size = new Size(532, 23);
             inputDB.TabIndex = 102;
             // 
             // labelPathDB
             // 
             labelPathDB.AutoSize = true;
-            labelPathDB.Location = new Point(3, 13);
+            labelPathDB.Location = new Point(3, 10);
             labelPathDB.Name = "labelPathDB";
-            labelPathDB.Size = new Size(183, 20);
+            labelPathDB.Size = new Size(146, 15);
             labelPathDB.TabIndex = 103;
             labelPathDB.Text = "Caminho DataBase Clinica";
             labelPathDB.Click += label2_Click;
@@ -73,9 +74,9 @@
             // labelPathDBContratos
             // 
             labelPathDBContratos.AutoSize = true;
-            labelPathDBContratos.Location = new Point(3, 15);
+            labelPathDBContratos.Location = new Point(3, 11);
             labelPathDBContratos.Name = "labelPathDBContratos";
-            labelPathDBContratos.Size = new Size(203, 20);
+            labelPathDBContratos.Size = new Size(162, 15);
             labelPathDBContratos.TabIndex = 105;
             labelPathDBContratos.Text = "Caminho DataBase Contratos";
             // 
@@ -83,17 +84,19 @@
             // 
             inputDBContratos.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             inputDBContratos.Enabled = false;
-            inputDBContratos.Location = new Point(212, 12);
+            inputDBContratos.Location = new Point(186, 9);
+            inputDBContratos.Margin = new Padding(3, 2, 3, 2);
             inputDBContratos.Name = "inputDBContratos";
-            inputDBContratos.Size = new Size(608, 27);
+            inputDBContratos.Size = new Size(532, 23);
             inputDBContratos.TabIndex = 104;
             // 
             // BtnPathDB
             // 
             BtnPathDB.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            BtnPathDB.Location = new Point(840, 10);
+            BtnPathDB.Location = new Point(735, 8);
+            BtnPathDB.Margin = new Padding(3, 2, 3, 2);
             BtnPathDB.Name = "BtnPathDB";
-            BtnPathDB.Size = new Size(35, 31);
+            BtnPathDB.Size = new Size(31, 23);
             BtnPathDB.TabIndex = 106;
             BtnPathDB.Text = "📂";
             BtnPathDB.UseVisualStyleBackColor = true;
@@ -102,9 +105,10 @@
             // BtnPathDBContratos
             // 
             BtnPathDBContratos.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            BtnPathDBContratos.Location = new Point(840, 10);
+            BtnPathDBContratos.Location = new Point(735, 8);
+            BtnPathDBContratos.Margin = new Padding(3, 2, 3, 2);
             BtnPathDBContratos.Name = "BtnPathDBContratos";
-            BtnPathDBContratos.Size = new Size(35, 31);
+            BtnPathDBContratos.Size = new Size(31, 23);
             BtnPathDBContratos.TabIndex = 107;
             BtnPathDBContratos.Text = "📂";
             BtnPathDBContratos.UseVisualStyleBackColor = true;
@@ -113,9 +117,9 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(9, 8);
+            label3.Location = new Point(8, 6);
             label3.Name = "label3";
-            label3.Size = new Size(111, 20);
+            label3.Size = new Size(89, 15);
             label3.TabIndex = 109;
             label3.Text = "Antigo sistema:";
             // 
@@ -124,9 +128,10 @@
             comboBoxSistema.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxSistema.FormattingEnabled = true;
             comboBoxSistema.Items.AddRange(new object[] { "DentalOffice", "OdontoCompany" });
-            comboBoxSistema.Location = new Point(140, 5);
+            comboBoxSistema.Location = new Point(122, 4);
+            comboBoxSistema.Margin = new Padding(3, 2, 3, 2);
             comboBoxSistema.Name = "comboBoxSistema";
-            comboBoxSistema.Size = new Size(235, 28);
+            comboBoxSistema.Size = new Size(206, 23);
             comboBoxSistema.TabIndex = 108;
             comboBoxSistema.SelectedIndexChanged += AntigoSistemaChanged;
             // 
@@ -135,9 +140,10 @@
             panelDBContratos.Controls.Add(inputDBContratos);
             panelDBContratos.Controls.Add(labelPathDBContratos);
             panelDBContratos.Controls.Add(BtnPathDBContratos);
-            panelDBContratos.Location = new Point(31, 132);
+            panelDBContratos.Location = new Point(27, 99);
+            panelDBContratos.Margin = new Padding(3, 2, 3, 2);
             panelDBContratos.Name = "panelDBContratos";
-            panelDBContratos.Size = new Size(878, 57);
+            panelDBContratos.Size = new Size(768, 43);
             panelDBContratos.TabIndex = 110;
             panelDBContratos.Visible = false;
             // 
@@ -146,9 +152,10 @@
             panelDB.Controls.Add(inputDB);
             panelDB.Controls.Add(BtnPathDB);
             panelDB.Controls.Add(labelPathDB);
-            panelDB.Location = new Point(31, 76);
+            panelDB.Location = new Point(27, 57);
+            panelDB.Margin = new Padding(3, 2, 3, 2);
             panelDB.Name = "panelDB";
-            panelDB.Size = new Size(878, 50);
+            panelDB.Size = new Size(768, 38);
             panelDB.TabIndex = 111;
             panelDB.Visible = false;
             // 
@@ -156,36 +163,39 @@
             // 
             panelAntigoSistema.Controls.Add(label3);
             panelAntigoSistema.Controls.Add(comboBoxSistema);
-            panelAntigoSistema.Location = new Point(285, 12);
+            panelAntigoSistema.Location = new Point(249, 9);
+            panelAntigoSistema.Margin = new Padding(3, 2, 3, 2);
             panelAntigoSistema.Name = "panelAntigoSistema";
-            panelAntigoSistema.Size = new Size(388, 43);
+            panelAntigoSistema.Size = new Size(340, 32);
             panelAntigoSistema.TabIndex = 112;
             // 
             // comboTabelas
             // 
             comboTabelas.DropDownStyle = ComboBoxStyle.DropDownList;
             comboTabelas.FormattingEnabled = true;
-            comboTabelas.Items.AddRange(new object[] { "", "Prontuários", "Agendamentos", "Desenvolvimento Clínico", "Procedimentos", "Manutenções", "Financeiro (Receber)" });
-            comboTabelas.Location = new Point(413, 262);
+            comboTabelas.Items.AddRange(new object[] { "", "Prontuários", "Agendamentos", "Desenvolvimento Clínico", "Procedimentos", "Manutenções", "Financeiro (Receber)", "Pacientes" });
+            comboTabelas.Location = new Point(361, 196);
+            comboTabelas.Margin = new Padding(3, 2, 3, 2);
             comboTabelas.Name = "comboTabelas";
-            comboTabelas.Size = new Size(235, 28);
+            comboTabelas.Size = new Size(206, 23);
             comboTabelas.TabIndex = 113;
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(335, 265);
+            label1.Location = new Point(293, 199);
             label1.Name = "label1";
-            label1.Size = new Size(70, 20);
+            label1.Size = new Size(56, 15);
             label1.TabIndex = 114;
             label1.Text = "Importar:";
             // 
             // btnImportar
             // 
             btnImportar.Anchor = AnchorStyles.Bottom;
-            btnImportar.Location = new Point(425, 478);
+            btnImportar.Location = new Point(372, 358);
+            btnImportar.Margin = new Padding(3, 2, 3, 2);
             btnImportar.Name = "btnImportar";
-            btnImportar.Size = new Size(129, 41);
+            btnImportar.Size = new Size(113, 31);
             btnImportar.TabIndex = 115;
             btnImportar.Text = "⚙ Executar";
             btnImportar.UseVisualStyleBackColor = true;
@@ -195,33 +205,35 @@
             // 
             panelDataBase.Controls.Add(inputDataBaseName);
             panelDataBase.Controls.Add(labelDataBase);
-            panelDataBase.Location = new Point(294, 207);
+            panelDataBase.Location = new Point(257, 155);
+            panelDataBase.Margin = new Padding(3, 2, 3, 2);
             panelDataBase.Name = "panelDataBase";
-            panelDataBase.Size = new Size(379, 49);
+            panelDataBase.Size = new Size(332, 37);
             panelDataBase.TabIndex = 116;
             // 
             // inputDataBaseName
             // 
             inputDataBaseName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            inputDataBaseName.Location = new Point(126, 11);
+            inputDataBaseName.Location = new Point(110, 8);
+            inputDataBaseName.Margin = new Padding(3, 2, 3, 2);
             inputDataBaseName.Name = "inputDataBaseName";
-            inputDataBaseName.Size = new Size(240, 27);
+            inputDataBaseName.Size = new Size(210, 23);
             inputDataBaseName.TabIndex = 105;
             // 
             // labelDataBase
             // 
             labelDataBase.AutoSize = true;
-            labelDataBase.Location = new Point(3, 14);
+            labelDataBase.Location = new Point(3, 10);
             labelDataBase.Name = "labelDataBase";
-            labelDataBase.Size = new Size(117, 20);
+            labelDataBase.Size = new Size(91, 15);
             labelDataBase.TabIndex = 104;
             labelDataBase.Text = "DataBase Nome";
             // 
             // ImportacaoDataBase
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(955, 548);
+            ClientSize = new Size(836, 411);
             Controls.Add(panelDataBase);
             Controls.Add(btnImportar);
             Controls.Add(label1);
@@ -229,6 +241,7 @@
             Controls.Add(panelDBContratos);
             Controls.Add(panelDB);
             Controls.Add(panelAntigoSistema);
+            Margin = new Padding(3, 2, 3, 2);
             Name = "ImportacaoDataBase";
             StartPosition = FormStartPosition.CenterParent;
             Text = "Importação DataBase";

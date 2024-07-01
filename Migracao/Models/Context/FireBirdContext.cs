@@ -1,11 +1,15 @@
 ﻿using Dapper;
 using FirebirdSql.Data.FirebirdClient;
+using MySqlConnector;
+using NPOI.OpenXmlFormats.Shared;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Migracao.Models.Context
 {
@@ -55,6 +59,18 @@ namespace Migracao.Models.Context
 
                 var tipo = typeof(T).CustomAttributes.Where(x => x.AttributeType.Name == "TableAttribute").FirstOrDefault().ConstructorArguments[0].Value;
                 var list = db.Query<T>($"SELECT * FROM  {tipo} ").ToList();
+
+                return list;//ToList();
+            }
+        }
+
+        public List<T> RetornaItensBancoPorQuery(string arquivoSql)
+        {            
+            string sqlScript = File.ReadAllText(arquivoSql);
+
+            using (IDbConnection db = new FbConnection(_connectionString))
+            {
+                var list = db.Query<T>(sqlScript).ToList();
 
                 return list;//ToList();
             }

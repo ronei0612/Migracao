@@ -495,5 +495,10 @@ namespace Migracao.Sistems
         void IDataBaseMigracao.DataBaseImportacaoPacientes()
         {
         }
+
+        public void DataBaseImportacaoFinanceiroRecebiveis()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

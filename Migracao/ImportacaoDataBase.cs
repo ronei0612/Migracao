@@ -123,12 +123,18 @@ namespace Migracao
                 
                 if (_tabela == "Procedimentos")
                     instance.DataBaseImportacaoProcedimentos();
+
                 if (_tabela == "Desenvolvimento Clínico")
                     instance.DataBaseImportacaoDevClinico();
+
                 if (_tabela == "Manutenções")
                     instance.DataBaseImportacaoManutencoes();
+
                 if (_tabela == "Pacientes")
                     instance.DataBaseImportacaoPacientes();
+
+                if(_tabela == "Financeiro")
+                    instance.DataBaseImportacaoFinanceiroReceber();
             }
             else
             {

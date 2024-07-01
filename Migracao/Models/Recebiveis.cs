@@ -1,6 +1,6 @@
 ﻿namespace Migracao.Models
 {
-    internal class Recebivel
+    public class Recebiveis
     {
         public string? Nome { get; set; }
         public int ID { get; set; }

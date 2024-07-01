@@ -18,7 +18,7 @@ namespace Migracao.Models.Context
         public DbSet<Tratamento> Tratamento { get; set; }
         public DbSet<Procedimentos> Procedimentos { get; set; }
         public DbSet<Preco> Precos { get; set; }
-        public DbSet<Recebiveis> Recebiveis { get; set; }
+        public DbSet<DentalOffice.Recebiveis> Recebiveis { get; set; }
         public DbSet<Credits> Credits { get; set; }
         public DbSet<FluxoCaixa> FluxoCaixa { get; set; }
         public DbSet<Exigivel> Exigivel { get; set; }

@@ -14,7 +14,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics.Metrics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using static NPOI.HSSF.Util.HSSFColor;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -1909,7 +1911,23 @@ namespace Migracao.Sistems
 
         void IDataBaseMigracao.DataBaseImportacaoProcedimentos()
         {
+            ExcelHelper excelHelper = new ExcelHelper();
 
+            int estabelecimentoID = 1;
+
+            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectProdedimentos.sql";
+
+            var procedimentos = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+
+            var lstProcedimentos = ConversorEntidadeParaDTO.ConvertProcedimentosParaProcedimentosDTO(procedimentos);
+
+            var dataTableProcedimentos = ExcelHelper.ConversorEntidadeParaDataTable(lstProcedimentos);
+
+            if (dataTableProcedimentos != null)
+            {
+                var salvarProcedimentos = Tools.GerarNomeArquivo($"CadastroProcedimentos_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentos + ".xlsx", dataTableProcedimentos);
+            }
         }
 
         void IDataBaseMigracao.DataBaseImportacaoDevClinico()
@@ -1922,15 +1940,70 @@ namespace Migracao.Sistems
 
         void IDataBaseMigracao.DataBaseImportacaoManutencoes()
         {
+            ExcelHelper excelHelper = new ExcelHelper();
+
+            int estabelecimentoID = 1;
+
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectManutencoes.sql";
+
+            var manutencoes = new FireBirdContext<Models.Manutencoes>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+
+            var lstManutencoes = ConversorEntidadeParaDTO.ConvertManutencoesParaManutencoesDTO(manutencoes);
+
+            var dataTableManutencoes = ExcelHelper.ConversorEntidadeParaDataTable(lstManutencoes);
         }
 
         void IDataBaseMigracao.DataBaseImportacaoFinanceiroReceber()
         {
+            ExcelHelper excelHelper = new ExcelHelper();
+
+            int estabelecimentoID = 1;
+
+            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectFinanceiroReceber.sql";
+
+            var procedimentos = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+
+            var lstProcedimentos = ConversorEntidadeParaDTO.ConvertProcedimentosParaProcedimentosDTO(procedimentos);
+
+            var dataTableProcedimentos = ExcelHelper.ConversorEntidadeParaDataTable(lstProcedimentos);
         }
 
         void IDataBaseMigracao.DataBaseImportacaoPacientes()
         {
-            
+            ExcelHelper excelHelper = new ExcelHelper(); 
+
+            int estabelecimentoID = 1;
+
+            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectPacientes.sql";
+
+            var pacientes = new FireBirdContext<Models.Pacientes>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+
+            var lstPacientes = ConversorEntidadeParaDTO.ConvertPacientesParaPacientesDTO(pacientes);
+
+            var dataTablePacientes = ExcelHelper.ConversorEntidadeParaDataTable(lstPacientes);
+
+            if (lstPacientes != null)
+            {
+                var salvarArquivoPacientes = Tools.GerarNomeArquivo($"CadastroPacientesEntidade_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarArquivoPacientes + ".xlsx", dataTablePacientes);
+            }
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoFinanceiroRecebiveis()
+        {
+            ExcelHelper excelHelper = new ExcelHelper();
+
+            int estabelecimentoID = 1;
+
+            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectFinanceiroRecebiveis.sql";
+
+            var procedimentos = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+
+            var lstProcedimentos = ConversorEntidadeParaDTO.ConvertProcedimentosParaProcedimentosDTO(procedimentos);
+
+            var dataTableProcedimentos = ExcelHelper.ConversorEntidadeParaDataTable(lstProcedimentos);
         }
     }
 }

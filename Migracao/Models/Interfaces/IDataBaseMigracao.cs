@@ -18,6 +18,8 @@ namespace Migracao.Models.Interfaces
 
         void DataBaseImportacaoFinanceiroReceber();
 
+        void DataBaseImportacaoFinanceiroRecebiveis();
+
         void DataBaseImportacaoPacientes();
     }
 }

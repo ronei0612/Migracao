@@ -903,7 +903,7 @@ namespace Migracao.Imports
             linhasSqlSemConsumidor.Add("DECLARE @RecebivelID int;");
 
             List<FluxoCaixa> fluxoCaixas = new();
-            List<Recebivel> recebiveis = new();
+            List<Recebiveis> recebiveis = new();
 
             try
             {
@@ -976,7 +976,7 @@ namespace Migracao.Imports
                     }
 
                     FluxoCaixa fluxoCaixa = null;
-                    Recebivel recebivel = null;
+                    Recebiveis recebivel = null;
 
                     if (isrecebivel)
                     {
@@ -1028,7 +1028,7 @@ namespace Migracao.Imports
                         }
 
                         //if (valorOriginal >= 1)
-                        recebivel = new Recebivel()
+                        recebivel = new Recebiveis()
                         {
                             ConsumidorID = consumidorID,
                             FornecedorID = fornecedorID,

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,16 @@ namespace Migracao.Models.DTO
 {
     public class FinanceiroRecebidosDTO
     {
+        public FinanceiroRecebidosDTO()
+        {
+                
+        }
+
+        public FinanceiroRecebidosDTO(List<Recebidos> recebidos)
+        {
+
+        }
+
         [DisplayName("CPF")]
         public string? CPF { get; set; }
 
@@ -40,6 +51,7 @@ namespace Migracao.Models.DTO
         public string? Emissao { get; set; }
 
         [DisplayName("Observação Recebido")]
+        [MaxLength(512)]
         public string? Observacao_Recebido { get; set; }
 
         [DisplayName("Tipo Pagamento")]

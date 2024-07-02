@@ -15,7 +15,12 @@ crd111.VALOR Valor_Devido,
 crd111.TIPO_DOC Tipo_Pagamento,
 crd111.VALOR_ORIG Valor_Original,
 crd111.DUPLICATA,
-crd111.VENCTO_ORIG Vencimento_Recebivel
+crd111.VENCTO_ORIG Vencimento_Recebivel,
+crd111.SITUACAO,
+crd111.NOME_GRUPO,
+crd111.ORDEM,
+crd013.CODIGO Tipo_Especie,
+crd013.NOME Especie_Pagamento
 FROM BXD111 bxd111
 INNER JOIN EMD101 emd101 ON emd101.CGC_CPF = bxd111.CGC_CPF
 INNER JOIN CRD111 crd111 ON (crd111.CGC_CPF = bxd111.CGC_CPF AND crd111.DOCUMENTO = bxd111.DOCUMENTO)

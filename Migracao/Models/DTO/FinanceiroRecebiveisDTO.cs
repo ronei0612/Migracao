@@ -9,6 +9,16 @@ namespace Migracao.Models.DTO
 {
     public class FinanceiroRecebiveisDTO
     {
+        public FinanceiroRecebiveisDTO()
+        {
+                
+        }
+
+        public FinanceiroRecebiveisDTO(List<Recebiveis> recebiveis)
+        {
+
+        }
+
         [DisplayName("Paciente CPF")]
         public string? Paciente_CPF { get; set; }
 

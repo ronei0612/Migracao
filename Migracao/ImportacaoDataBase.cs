@@ -138,6 +138,9 @@ namespace Migracao
 
                 if (_tabela == "Financeiro (Recebíveis)")
                     instance.DataBaseImportacaoFinanceiroRecebiveis();
+
+                if (_tabela == "Agendamentos")
+                    instance.DataBaseImportacaoAgendamentos();
             }
             else
             {

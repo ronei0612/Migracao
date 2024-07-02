@@ -2,6 +2,7 @@
 using Migracao.Models;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+using System.ComponentModel;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -1115,32 +1116,32 @@ namespace Migracao.Utils
             return sb.ToString();
         }
 
-        public static TitulosEspeciesID GetEspecieIDFromFormaPagamento(string formaPagamento, out int indice)
+        public static int GetEspecieIDFromFormaPagamento(string formaPagamento)
         {
 
             switch (formaPagamento)
             {
                 case string a when a.Contains("CREDIARIO"):
-                    indice = 17;
-                    return TitulosEspeciesID.Carne;
+                    TitulosEspeciesID carne = TitulosEspeciesID.Carne;
+                    return Convert.ToInt32(carne);
                 case string b when b.Contains("CHEQUE"):
-                    indice = 4;
-                    return TitulosEspeciesID.Cheque;
+                    TitulosEspeciesID Cheque = TitulosEspeciesID.Cheque;
+                    return Convert.ToInt32(Cheque);
                 case string b when b.Contains("DINHEIRO"):
-                    indice = 1;
-                    return TitulosEspeciesID.Dinheiro;
+                    TitulosEspeciesID Dinheiro = TitulosEspeciesID.Dinheiro;
+                    return Convert.ToInt32(Dinheiro);
                 case string b when b.Contains("TRANSF"):
-                    indice = 22;
-                    return TitulosEspeciesID.TransferenciaBancaria;
+                    TitulosEspeciesID TransferenciaBancaria = TitulosEspeciesID.TransferenciaBancaria;
+                    return Convert.ToInt32(TransferenciaBancaria);
                 case string b when b.Contains("DEBITO") || b.Contains("PIX"):
-                    indice = 31;
-                    return TitulosEspeciesID.DepositoEmConta;
+                    TitulosEspeciesID DepositoEmConta = TitulosEspeciesID.DepositoEmConta;
+                    return Convert.ToInt32(DepositoEmConta);
                 case string b when b.Contains("CARD") || b.Contains("MASTER") || b.Contains("VISA"):
-                    indice = 8;
-                    return TitulosEspeciesID.CartaoCredito;
+                    TitulosEspeciesID CartaoCredito = TitulosEspeciesID.CartaoCredito;
+                    return Convert.ToInt32(CartaoCredito);
                 default:
-                    indice = 1;
-                    return TitulosEspeciesID.Dinheiro;
+                    TitulosEspeciesID DinheiroDefalut = TitulosEspeciesID.Dinheiro;
+                    return Convert.ToInt32(DinheiroDefalut);
             }
         }
 
@@ -1154,14 +1155,13 @@ namespace Migracao.Utils
             {
                 DataTable dataTable = new DataTable();
 
-                // Adiciona as colunas ao DataTable baseado nos nomes das propriedades da classe Person
-                foreach (var prop in typeof(T).GetProperties())
+                foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(typeof(T)))
                 {
-                    dataTable.Columns.Add(prop.Name, prop.PropertyType);
+                    dataTable.Columns.Add(prop.DisplayName, prop.PropertyType);
                 }
 
                 // Usando Parallel.ForEach para processar a lista de pessoas e preencher o DataTable
-                Parallel.ForEach(entidadeDTO, new ParallelOptions { MaxDegreeOfParallelism = 4 }, paciente =>
+                Parallel.ForEach(entidadeDTO, new ParallelOptions { MaxDegreeOfParallelism = 4 }, entidade =>
                 {
                     try
                     {
@@ -1172,9 +1172,9 @@ namespace Migracao.Utils
 
 
                         // Preenche as células da linha com os valores das propriedades da pessoa
-                        foreach (var prop in typeof(T).GetProperties())
+                        foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(typeof(T)))
                         {
-                            row[prop.Name] = prop.GetValue(paciente);
+                            row[prop.DisplayName] = prop.GetValue(entidade);
                         }
 
                         // Adiciona a linha ao DataTable de forma thread-safe

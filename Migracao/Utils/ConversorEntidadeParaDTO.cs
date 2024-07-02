@@ -4,6 +4,7 @@ using Migracao.Models.DTO;
 using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,30 @@ namespace Migracao.Utils
 {
     public class ConversorEntidadeParaDTO
     {
+        public static List<AgendamentosDTO> ConvertAgendamentosDTOParaAgendamentosDTO(List<Agendamentos> agendamentos)
+        {
+            List<AgendamentosDTO> agendamentosDTO = new List<AgendamentosDTO>();
+
+            try
+            {
+                Parallel.ForEach(agendamentos, agendamento =>
+                {
+                    var lstAgendamentos = new AgendamentosDTO
+                    {
+                       
+                    };
+
+                    agendamentosDTO.Add(lstAgendamentos);
+                });
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Excel para Pessoas Agendamentos: {error.Message}");
+            }
+
+            return agendamentosDTO;
+        }
+
         public static List<PacientesDTO> ConvertPacientesParaPacientesDTO(List<Pacientes> pacientes)
         {
             List<PacientesDTO> pacientesDTO = new List<PacientesDTO>();
@@ -63,6 +88,18 @@ namespace Migracao.Utils
         public static List<ManutencoesDTO> ConvertManutencoesParaManutencoesDTO(List<Manutencoes> manutencoes)
         {
             List<ManutencoesDTO> lstManutencoesDTO = new List<ManutencoesDTO>();
+
+            //var listaValores = linhas.Where(linha => linha[1].Equals(cpf)).ToList();
+
+            //var selecionaLinha = listaValores.Select(linha => linha[18].Replace(",", "."));
+
+            //foreach (var item in selecionaLinha)
+            //{
+            //    if (!string.IsNullOrEmpty(item))
+            //        valorTotal += Convert.ToDecimal(item, CultureInfo.InvariantCulture);
+            //}
+
+            //var docsEncontrados = linhas.Where(linha => linha[34].Equals(documento)).Count();
 
             try
             {
@@ -184,22 +221,23 @@ namespace Migracao.Utils
                 {
                     var lstReceber = new FinanceiroRecebidosDTO
                     {
-                        CPF = receber.CNPJ_CPF,
-                        Nome = receber.Nome_Paciente,
+                        CPF = receber.CNPJ_CPF.ToCPF(),
+                        Nome = receber.Nome_Paciente.ToCPF(),
                         Numero_Controle = receber.Numero_Controle,
                         Recebivel_Exigivel = "R",
                         Valor_Devido = receber.Valor_Devido.ToString(),
                         Valor_Pago = receber.Valor_Pago.ToString(),
                         Data_Vencimento = receber.Data_Vencimento.ToShortDateString(),
                         Data_Pagamento = receber.Data_Baixa.ToShortDateString(),
-                        Observacao_Recebido = receber.Observacao + " | " + receber.Tipo_Documento + " | " + receber.Situacao + " | " + receber.Nome_Grupo + " | " + receber.Ordem,
+                        Observacao_Recebido = ("Observação: " + receber.Observacao + " | Documento: " + receber.Tipo_Documento + " | Situação: " + receber.Situacao + 
+                        " | Nome do Grupo: " + receber.Nome_Grupo + " | Ordem: " + receber.Ordem),
                         Tipo_Pagamento = receber.Tipo_Pagamento,
                         Valor_Original = receber.Valor_Original.ToString(),
                         Vencimento_Recebivel = receber.Vencimento_Recebivel.ToShortDateString(),
                         Duplicata = receber.Duplicata,
                         Parcela = receber.Parcela.ToString(),
                         Tipo_Especie_Pagamento = receber.Tipo_Especie,
-                        Especie_Pagamento = receber.Especie_Pagamento
+                        Especie_Pagamento = ExcelHelper.GetEspecieIDFromFormaPagamento(receber.Tipo_Especie).ToString()
                     };
 
                     lstReceberDTO.Add(lstReceber);
@@ -213,7 +251,7 @@ namespace Migracao.Utils
             return lstReceberDTO;
         }
 
-        public static List<AgendamentosDTO> ConvertAgendamentodsParaAgendamentosDTO(List<Agendamento> agendamentos)
+        public static List<AgendamentosDTO> ConvertAgendamentodsParaAgendamentosDTO(List<Agendamentos> agendamentos)
         {
             List<AgendamentosDTO> lstAgendamentosDTO = new List<AgendamentosDTO>();
 
@@ -221,8 +259,33 @@ namespace Migracao.Utils
             {
                 Parallel.ForEach(agendamentos, agendamento =>
                 {
+                    var minutos = agendamento.Hora.Split(':')[1];
+                    var horas = agendamento.Hora.Split(':')[0];
+                    var dataInicio = agendamento.Data;
+
+                    if (!string.IsNullOrEmpty(horas))
+                        dataInicio = dataInicio.AddHours(double.Parse(horas));
+                    if (!string.IsNullOrEmpty(minutos))
+                        dataInicio = dataInicio.AddMinutes(double.Parse(minutos));
+
+                    var dataTermino = dataInicio;
+                    //var idsEncontrados = agendamentos.Where(agenda => agenda.Equals(agendamento.ID)).Count();
+                    //if (idsEncontrados > 0)
+                    //    dataTermino = dataTermino.AddMinutes(15 * idsEncontrados);
+                    //else
+                    //    dataTermino = dataTermino.AddMinutes(15);
+
                     var lstAgendamento = new AgendamentosDTO
                     {
+                        ID = agendamento.ID,
+                        CPF = agendamento.Paciente_CPF.ToCPF(),
+                        Nome_Completo = agendamento.Nome.ToNome(),
+                        Telefone = agendamento.Telefone,
+                        Data_Inicio = dataInicio,
+                        Data_Termino = dataTermino,
+                        Data_Inclusao = agendamento.Data_Inclusao,
+                        Nome_Completo_Dentista = agendamento.Nome_Dentista,
+                        Observacao = agendamento.Observacao
                     };
 
                     lstAgendamentosDTO.Add(lstAgendamento);

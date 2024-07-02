@@ -542,8 +542,7 @@ namespace Migracao.Sistems
                             if (dataRowEspecies.Length > 0)
                             {
                                 var tipoPagamento = dataRowEspecies[0]["Espécie Pagamento"].ToString();
-                                formaPagamento = ExcelHelper.GetEspecieIDFromFormaPagamento(tipoPagamento, out int indice).ToString();
-                                indiceEspecies = indice;
+                                indiceEspecies = ExcelHelper.GetEspecieIDFromFormaPagamento(tipoPagamento);
                             }
 
                             dataRow["Numero do Controle"] = documento;
@@ -1931,6 +1930,27 @@ namespace Migracao.Sistems
             }
         }
 
+        void IDataBaseMigracao.DataBaseImportacaoAgendamentos()
+        {
+            ExcelHelper excelHelper = new ExcelHelper();
+
+            int estabelecimentoID = 1;
+
+            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectAgendamentos.sql";
+
+            var agendamentos = new FireBirdContext<Agendamentos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+
+            var lstAgendamentos = ConversorEntidadeParaDTO.ConvertAgendamentodsParaAgendamentosDTO(agendamentos);
+
+            var dataTableAgendamentos = ExcelHelper.ConversorEntidadeParaDataTable(lstAgendamentos);
+
+            if (dataTableAgendamentos != null)
+            {
+                var salvarArquivoAgendamentos = Tools.GerarNomeArquivo($"CadastroAgendamentos_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarArquivoAgendamentos + ".xlsx", dataTableAgendamentos);
+            }
+        }
+
         void IDataBaseMigracao.DataBaseImportacaoProcedimentos()
         {
             ExcelHelper excelHelper = new ExcelHelper();
@@ -2017,6 +2037,6 @@ namespace Migracao.Sistems
                 var salvarArquivoRecebiveis = Tools.GerarNomeArquivo($"CadastroRecebiveis_{estabelecimentoID}_OdontoCompany");
                 excelHelper.CriarExcelArquivo(salvarArquivoRecebiveis + ".xlsx", dataTableRecebiveis);
             }
-        }
+        }        
     }
 }

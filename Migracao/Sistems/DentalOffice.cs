@@ -496,7 +496,12 @@ namespace Migracao.Sistems
         {
         }
 
-        public void DataBaseImportacaoFinanceiroRecebiveis()
+        void IDataBaseMigracao.DataBaseImportacaoFinanceiroRecebiveis()
+        {
+            throw new NotImplementedException();
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoAgendamentos()
         {
             throw new NotImplementedException();
         }

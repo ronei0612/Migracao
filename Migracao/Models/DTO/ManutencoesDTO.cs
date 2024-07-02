@@ -18,39 +18,55 @@ namespace Migracao.Models.DTO
 
         }
 
-        [DisplayName("Número do Controle")]
-        public string? NumeroControle { get; set; }
+        [DisplayName("Numero do Controle")]
+        public string Numero_Controle { get; set; }
+
         [DisplayName("Paciente CPF")]
-        public string? PacienteCPF { get; set; }
+        public string Paciente_CPF { get; set; }
+
         [DisplayName("Paciente Nome")]
-        public string? PacienteNome { get; set; }
+        public string Paciente_Nome { get; set; }
+
         [DisplayName("Dentista Nome")]
-        public string? DentistaNome { get; set; }
+        public string Dentista_Nome { get; set; }
+
         [DisplayName("Procedimento Nome")]
-        public string? ProcedimentoNome { get; set; }
+        public string Procedimento_Nome { get; set; }
+
         [DisplayName("Procedimento Valor")]
-        public string? ProcedimentoValor { get; set; }
+        public decimal Procedimento_Valor { get; set; }
+
         [DisplayName("Valor Original")]
-        public string? ValorOriginal { get; set; }
-        [DisplayName("Valor Pagamento")]
-        public string? ValorPagamento { get; set; }
+        public decimal Valor_Original { get; set; }
+
+        [DisplayName("Valor do Pagamento")]
+        public decimal Valor_Pagamento { get; set; }
+
         [DisplayName("Data do Pagamento")]
-        public string? DataPagamento { get; set; }
+        public DateTime? Data_Pagamento { get; set; }
+
         [DisplayName("Dente")]
-        public string? Dente { get; set; }
+        public string Dente { get; set; }
+
         [DisplayName("Procedimento Observação")]
-        public string? ProcedimentoObservacao { get; set; }
+        public string Procedimento_Observacao { get; set; }
+
         [DisplayName("Quantidade Orto")]
-        public string? QuantidadeOrto { get; set; }
+        public int Quantidade_Orto { get; set; }
+
         [DisplayName("Tipo Pagamento")]
-        public string? TipoPagamento { get; set; }
+        public string Tipo_Pagamento { get; set; }
+
         [DisplayName("Vencimento")]
-        public string? Vencimento { get; set; }
+        public DateTime Vencimento { get; set; }
+
         [DisplayName("Valor Devido")]
-        public string? ValorDevido { get; set; }
+        public decimal Valor_Devido { get; set; }
+
         [DisplayName("Valor Total")]
-        public string? ValorTotal { get; set; }
+        public decimal Valor_Total { get; set; }
+
         [DisplayName("Data Atendimento")]
-        public string? DataAtendimento { get; set; }
+        public DateTime Data_Atendimento { get; set; }
     }
 }

@@ -8,22 +8,25 @@ namespace Migracao.Models
 {
     public class Manutencoes
     {
-        public string? NumeroControle { get; set; }
-        public string? PacienteCPF { get; set; }
-        public string? PacienteNome { get; set; }
-        public string? DentistaNome { get; set; }
-        public string? ProcedimentoNome { get; set; }
-        public string? ProcedimentoValor { get; set; }
-        public string? ValorOriginal { get; set; }
-        public string? ValorPagamento { get; set; }
-        public string? DataPagamento { get; set; }
+        public string? Paciente_CPF { get; set; }
+        public string? Nome_Paciente { get; set; }
+        public decimal? Valor_Original { get; set; }
+        public string? Dentista_Nome { get; set; }
+        public DateTime? Data_Pagamento { get; set; }
+        public string? Numero_Controle { get; set; }
+        public string? Procedimento_Nome { get; set; }
+        public decimal? Valor_Pagamento { get; set; }
+        public int? Lancamento { get; set; }
+        public string? Tipo_Pagamento { get; set; }
+        public DateTime? Vencimento { get; set; }
+        public decimal? Valor_Devido { get; set; }
+        public DateTime? Data_Atendimento { get; set; }
+        public string? Procedimentos_Observacao { get; set; }
+        public string? Procedimento_Valor { get; set; }
         public string? Dente { get; set; }
-        public string? ProcedimentoObservacao { get; set; }
-        public string? QuantidadeOrto { get; set; }
-        public string? TipoPagamento { get; set; }
-        public string? Vencimento { get; set; }
-        public string? ValorDevido { get; set; }
-        public string? ValorTotal { get; set; }
-        public string? DataAtendimento { get; set; }
+        public string? Quantidade_Orto { get; set; }
+        public string? Valor_Total { get; set; }
+
+        
     }
 }

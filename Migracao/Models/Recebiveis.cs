@@ -2,9 +2,10 @@
 {
     public class Recebiveis
     {
+        public string CNPJ_CPF { get; set; }
         public string? Nome { get; set; }
         public int ID { get; set; }
-        public long? Documento { get; set; }
+        public string? Documento { get; set; }
         public short? Sequencia { get; set; }
         public short? Parcelas { get; set; }
         public int EspecieID { get; set; }
@@ -12,12 +13,12 @@
         public int? FornecedorID { get; set; }
         public string SacadoNome { get; set; }
         public int? FuncionarioID { get; set; }
-        public DateTime DataEmissao { get; set; }
-        public DateTime DataVencimento { get; set; }
+        public DateTime Data_Emissao { get; set; }
+        public DateTime Data_Vencimento { get; set; }
         public DateTime DataBaseCalculo { get; set; }
-        public DateTime? DataBaixa { get; set; }
-        public decimal ValorOriginal { get; set; }
-        public decimal ValorDevido { get; set; }
+        public DateTime? Data_Baixa { get; set; }
+        public decimal Valor_Original { get; set; }
+        public decimal Valor_Devido { get; set; }
         public short? BancoID { get; set; }
         public int? PlanoContasID { get; set; }
         public int? ContaBancariaID { get; set; }
@@ -72,5 +73,11 @@
         public string IdentificadorPEFIN { get; set; }
         public string IdentificadorRemocaoPEFIN { get; set; }
         public Guid? TokenRecorrencia { get; set; }
+        public string Duplicata { get; set; }
+        public string Tipo_Pagamento { get; set; }
+        public DateTime Vencimento_Original { get; set; }
+        public string? Situacao { get; set; }
+        public string? Nome_Grupo { get; set; }
+        public string? Ordem { get; set; }
     }
 }

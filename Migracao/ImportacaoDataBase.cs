@@ -133,8 +133,11 @@ namespace Migracao
                 if (_tabela == "Pacientes")
                     instance.DataBaseImportacaoPacientes();
 
-                if(_tabela == "Financeiro")
-                    instance.DataBaseImportacaoFinanceiroReceber();
+                if(_tabela == "Financeiro (Recebidos)")
+                    instance.DataBaseImportacaoFinanceiroRecebidos();
+
+                if (_tabela == "Financeiro (Recebíveis)")
+                    instance.DataBaseImportacaoFinanceiroRecebiveis();
             }
             else
             {

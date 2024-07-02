@@ -189,7 +189,7 @@ namespace Migracao.Sistems
                 var linhasCSV = resultado.Item1;
                 var cabecalhosCSV = resultado.Item2;
                 dataTableRecebidos = ConvertExcelRecebidos(dataTableRecebidos, cabecalhosCSV, linhasCSV, dataTablePessoas, dataTableEspecies, dataTableRecebiveis);
-               
+
                 if (excel_BXD111 != null)
                 {
                     var salvarArquivoRecebidos = Tools.GerarNomeArquivo($"CadastroRecebiveis_Baixas_{estabelecimentoID}_OdontoCompany");
@@ -521,7 +521,8 @@ namespace Migracao.Sistems
                             .ToArray();
 
 
-                            if (dataRowEncontrados.Length > 0) {
+                            if (dataRowEncontrados.Length > 0)
+                            {
 
                                 situacao = dataRowEncontrados[0]["Situação"].ToString();
                                 nomeGrupo = dataRowEncontrados[0]["Nome Grupo"].ToString();
@@ -538,7 +539,7 @@ namespace Migracao.Sistems
                                 row.Field<string>("Tipo Espécie") == tipoDocumento)
                             .ToArray();
 
-                            if(dataRowEspecies.Length > 0)
+                            if (dataRowEspecies.Length > 0)
                             {
                                 var tipoPagamento = dataRowEspecies[0]["Espécie Pagamento"].ToString();
                                 formaPagamento = ExcelHelper.GetEspecieIDFromFormaPagamento(tipoPagamento, out int indice).ToString();
@@ -1909,6 +1910,27 @@ namespace Migracao.Sistems
             #endregion
         }
 
+        void IDataBaseMigracao.DataBaseImportacaoPacientes()
+        {
+            ExcelHelper excelHelper = new ExcelHelper();
+
+            int estabelecimentoID = 1;
+
+            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectPacientes.sql";
+
+            var pacientes = new FireBirdContext<Models.Pacientes>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+
+            var lstPacientes = ConversorEntidadeParaDTO.ConvertPacientesParaPacientesDTO(pacientes);
+
+            var dataTablePacientes = ExcelHelper.ConversorEntidadeParaDataTable(lstPacientes);
+
+            if (lstPacientes != null)
+            {
+                var salvarArquivoPacientes = Tools.GerarNomeArquivo($"CadastroPacientesEntidade_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarArquivoPacientes + ".xlsx", dataTablePacientes);
+            }
+        }
+
         void IDataBaseMigracao.DataBaseImportacaoProcedimentos()
         {
             ExcelHelper excelHelper = new ExcelHelper();
@@ -1955,39 +1977,24 @@ namespace Migracao.Sistems
             var dataTableManutencoes = ExcelHelper.ConversorEntidadeParaDataTable(lstManutencoes);
         }
 
-        void IDataBaseMigracao.DataBaseImportacaoFinanceiroReceber()
+        void IDataBaseMigracao.DataBaseImportacaoFinanceiroRecebidos()
         {
             ExcelHelper excelHelper = new ExcelHelper();
 
             int estabelecimentoID = 1;
 
-            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectFinanceiroReceber.sql";
+            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectFinanceiroRecebidos.sql";
 
-            var procedimentos = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+            var recebidos = new FireBirdContext<Models.Recebidos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
-            var lstProcedimentos = ConversorEntidadeParaDTO.ConvertProcedimentosParaProcedimentosDTO(procedimentos);
+            var lstRecebidos = ConversorEntidadeParaDTO.ConvertRecebidosParaRecebidosDTO(recebidos);
 
-            var dataTableProcedimentos = ExcelHelper.ConversorEntidadeParaDataTable(lstProcedimentos);
-        }
+            var dataTableRecebidos = ExcelHelper.ConversorEntidadeParaDataTable(lstRecebidos);
 
-        void IDataBaseMigracao.DataBaseImportacaoPacientes()
-        {
-            ExcelHelper excelHelper = new ExcelHelper(); 
-
-            int estabelecimentoID = 1;
-
-            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectPacientes.sql";
-
-            var pacientes = new FireBirdContext<Models.Pacientes>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
-
-            var lstPacientes = ConversorEntidadeParaDTO.ConvertPacientesParaPacientesDTO(pacientes);
-
-            var dataTablePacientes = ExcelHelper.ConversorEntidadeParaDataTable(lstPacientes);
-
-            if (lstPacientes != null)
+            if (dataTableRecebidos != null)
             {
-                var salvarArquivoPacientes = Tools.GerarNomeArquivo($"CadastroPacientesEntidade_{estabelecimentoID}_OdontoCompany");
-                excelHelper.CriarExcelArquivo(salvarArquivoPacientes + ".xlsx", dataTablePacientes);
+                var salvarArquivoRecebidos = Tools.GerarNomeArquivo($"CadastroRecebidos_Baixas_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarArquivoRecebidos + ".xlsx", dataTableRecebidos);
             }
         }
 
@@ -1999,11 +2006,17 @@ namespace Migracao.Sistems
 
             string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectFinanceiroRecebiveis.sql";
 
-            var procedimentos = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+            var recebiveis = new FireBirdContext<Models.Recebivel>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
-            var lstProcedimentos = ConversorEntidadeParaDTO.ConvertProcedimentosParaProcedimentosDTO(procedimentos);
+            var lstRecebiveis = ConversorEntidadeParaDTO.ConvertRecebiveisParaRecebiveisDTO(recebiveis);
 
-            var dataTableProcedimentos = ExcelHelper.ConversorEntidadeParaDataTable(lstProcedimentos);
+            var dataTableRecebiveis = ExcelHelper.ConversorEntidadeParaDataTable(lstRecebiveis);
+
+            if (dataTableRecebiveis != null)
+            {
+                var salvarArquivoRecebiveis = Tools.GerarNomeArquivo($"CadastroRecebiveis_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarArquivoRecebiveis + ".xlsx", dataTableRecebiveis);
+            }
         }
     }
 }

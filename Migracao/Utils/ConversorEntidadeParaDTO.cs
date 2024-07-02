@@ -1,11 +1,13 @@
 ﻿using Migracao.DTO;
 using Migracao.Models;
 using Migracao.Models.DTO;
+using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static NPOI.HSSF.Util.HSSFColor;
 
 namespace Migracao.Utils
 {
@@ -74,7 +76,7 @@ namespace Migracao.Utils
                         DentistaNome = manutencao.DentistaNome,
                         ProcedimentoNome = manutencao.ProcedimentoNome,
                         ProcedimentoValor = manutencao.ProcedimentoValor,
-                        ValorOriginal = manutencao.ValorOriginal,   
+                        ValorOriginal = manutencao.ValorOriginal,
                         ValorPagamento = manutencao.ValorPagamento,
                         DataPagamento = manutencao.DataPagamento,
                         Dente = manutencao.Dente,
@@ -112,7 +114,7 @@ namespace Migracao.Utils
                         PacienteCPF = procedimento.Paciente_CPF.ToCPF(),
                         PacienteNome = procedimento.Nome_Paciente,
                         DentistaCPF = procedimento.Dentista_CPF,
-                        DentistaNome = procedimento.Dentista_Nome,   
+                        DentistaNome = procedimento.Dentista_Nome,
                         Dente = procedimento.Dente,
                         ProcedimentoNome = procedimento.NOME_PRODUTO,
                         ProcedimentoValor = procedimento.Valor,
@@ -133,7 +135,7 @@ namespace Migracao.Utils
             return lstProcedimentosDTO;
         }
 
-        public static List<FinanceiroRecebiveisDTO> ConvertRecebivelParaRecebivelDTO(List<Recebiveis> recebiveis)
+        public static List<FinanceiroRecebiveisDTO> ConvertRecebiveisParaRecebiveisDTO(List<Recebivel> recebiveis)
         {
             List<FinanceiroRecebiveisDTO> lstRecebiveisDTO = new List<FinanceiroRecebiveisDTO>();
 
@@ -143,7 +145,22 @@ namespace Migracao.Utils
                 {
                     var lstRecebiveis = new FinanceiroRecebiveisDTO
                     {
-                        
+                        Paciente_CPF = recebivel.CNPJ_CPF,
+                        Nome = recebivel.Nome,
+                        Numero_Controle = recebivel.Numero_Controle,
+                        Observacao_Recebivel = recebivel.Observacao,
+                        Recebivel_Exigivel = "R",
+                        Valor_Devido = recebivel.Valor_Devido.ToString().ArredondarValorV2().ToString(),
+                        Data_Vencimento = recebivel.Data_Vencimento.ToString("dd/MM/yyyy"),
+                        Emissao = recebivel.Emissao.ToString("dd/MM/yyyy"),
+                        Duplicata = recebivel.Duplicata.ToString(),
+                        Parcela = recebivel.Parcela.ToString(),
+                        Tipo_Pagamento = recebivel.Tipo_Pagamento.ToString(),
+                        Valor_Original = recebivel.Valor_Original.ToString().ArredondarValorV2().ToString(),
+                        Vencimento_Recebivel = recebivel.Vencimento_Original.ToString("dd/MM/yyyy"),
+                        Situacao = recebivel.Situacao,
+                        Nome_Grupo = recebivel.Nome_Grupo,
+                        Ordem = recebivel.Ordem.ToString()
                     };
 
                     lstRecebiveisDTO.Add(lstRecebiveis);
@@ -157,16 +174,32 @@ namespace Migracao.Utils
             return lstRecebiveisDTO;
         }
 
-        public static List<FinanceiroReceberDTO> ConvertRecebivelsParaRecebivelDTO(List<Receber> receber)
+        public static List<FinanceiroRecebidosDTO> ConvertRecebidosParaRecebidosDTO(List<Recebidos> receber)
         {
-            List<FinanceiroReceberDTO> lstReceberDTO = new List<FinanceiroReceberDTO>();
+            List<FinanceiroRecebidosDTO> lstReceberDTO = new List<FinanceiroRecebidosDTO>();
 
             try
             {
                 Parallel.ForEach(receber, receber =>
                 {
-                    var lstReceber = new FinanceiroReceberDTO
+                    var lstReceber = new FinanceiroRecebidosDTO
                     {
+                        CPF = receber.CNPJ_CPF,
+                        Nome = receber.Nome_Paciente,
+                        Numero_Controle = receber.Numero_Controle,
+                        Recebivel_Exigivel = "R",
+                        Valor_Devido = receber.Valor_Devido.ToString(),
+                        Valor_Pago = receber.Valor_Pago.ToString(),
+                        Data_Vencimento = receber.Data_Vencimento.ToShortDateString(),
+                        Data_Pagamento = receber.Data_Baixa.ToShortDateString(),
+                        Observacao_Recebido = receber.Observacao + " | " + receber.Tipo_Documento + " | " + receber.Situacao + " | " + receber.Nome_Grupo + " | " + receber.Ordem,
+                        Tipo_Pagamento = receber.Tipo_Pagamento,
+                        Valor_Original = receber.Valor_Original.ToString(),
+                        Vencimento_Recebivel = receber.Vencimento_Recebivel.ToShortDateString(),
+                        Duplicata = receber.Duplicata,
+                        Parcela = receber.Parcela.ToString(),
+                        Tipo_Especie_Pagamento = receber.Tipo_Especie,
+                        Especie_Pagamento = receber.Especie_Pagamento
                     };
 
                     lstReceberDTO.Add(lstReceber);
@@ -179,5 +212,32 @@ namespace Migracao.Utils
 
             return lstReceberDTO;
         }
+
+        public static List<AgendamentosDTO> ConvertAgendamentodsParaAgendamentosDTO(List<Agendamento> agendamentos)
+        {
+            List<AgendamentosDTO> lstAgendamentosDTO = new List<AgendamentosDTO>();
+
+            try
+            {
+                Parallel.ForEach(agendamentos, agendamento =>
+                {
+                    var lstAgendamento = new AgendamentosDTO
+                    {
+                    };
+
+                    lstAgendamentosDTO.Add(lstAgendamento);
+                });
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Agendamentos: {error.Message}");
+            }
+
+            return lstAgendamentosDTO;
+        }
+
+
+        // TODO
+        // Prontuários e Desenvolvimento Clinico
     }
 }

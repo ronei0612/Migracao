@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Migracao.Models.DTO
 {
-    public class FinanceiroRecebiveisDTO
+    public class FinanceiroRecebidosDTO
     {
-        [DisplayName("Paciente CPF")]
-        public string? Paciente_CPF { get; set; }
+        [DisplayName("CPF")]
+        public string? CPF { get; set; }
 
         [DisplayName("Nome")]
         public string? Nome { get; set; }
@@ -39,9 +39,6 @@ namespace Migracao.Models.DTO
         [DisplayName("Emissão")]
         public string? Emissao { get; set; }
 
-        [DisplayName("Observação Recebível")]
-        public string Observacao_Recebivel { get; set; }
-
         [DisplayName("Observação Recebido")]
         public string? Observacao_Recebido { get; set; }
 
@@ -60,13 +57,10 @@ namespace Migracao.Models.DTO
         [DisplayName("Parcela")]
         public string? Parcela { get; set; }
 
-        [DisplayName("Situação")]
-        public string? Situacao { get; set; }
+        [DisplayName("Tipo Espécie Pagamento")]
+        public string? Tipo_Especie_Pagamento { get; set; }
 
-        [DisplayName("Nome grupo")]
-        public string? Nome_Grupo { get; set; }
-
-        [DisplayName("Ordem")]
-        public string? Ordem { get; set; }
+        [DisplayName("Espécie Pagamento")]
+        public string? Especie_Pagamento { get; set; }
     }
 }

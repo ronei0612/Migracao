@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Migracao.Models.DTO
 {
-    public class FinanceiroReceberDTO
+    public class AgendamentosDTO
     {
     }
 }

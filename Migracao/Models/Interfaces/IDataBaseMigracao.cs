@@ -16,7 +16,7 @@ namespace Migracao.Models.Interfaces
 
         void DataBaseImportacaoManutencoes();
 
-        void DataBaseImportacaoFinanceiroReceber();
+        void DataBaseImportacaoFinanceiroRecebidos();
 
         void DataBaseImportacaoFinanceiroRecebiveis();
 

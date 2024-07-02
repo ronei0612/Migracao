@@ -1,6 +1,6 @@
 ﻿namespace Migracao.Models
 {
-	internal class Agendamento
+	public class Agendamento
 	{
 		public int ID { get; set; }
 		public short AgendaTipoID { get; set; }

@@ -1,22 +1,21 @@
-﻿using Migracao.Models.DentalOffice;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Migracao.Models.DTO
 {
-    public class ProcedimentosDTO
+    public class ProcedimentosManutencaoDTO
     {
-        public ProcedimentosDTO()
+        public ProcedimentosManutencaoDTO()
         {
-                
+            
         }
 
-        public ProcedimentosDTO(List<Procedimentos> procedimentos)
+        public ProcedimentosManutencaoDTO(List<Procedimentos> procedimentos, List<Manutencoes> manutencoes)
         {
 
         }
@@ -50,17 +49,40 @@ namespace Migracao.Models.DTO
 
         [DisplayName("Data Início")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-
         public string? Data_Inicio { get; set; }
 
         [DisplayName("Data Término")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-
         public string? Data_Termino { get; set; }
 
         [DisplayName("Data Atendimento")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-
         public string? Data_Atendimento { get; set; }
+
+        [DisplayName("Valor Original")]
+        public string? Valor_Original { get; set; }
+
+        [DisplayName("Valor do Pagamento")]
+        public string? Valor_Pagamento { get; set; }
+
+        [DisplayName("Data do Pagamento")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+        public string? Data_Pagamento { get; set; }
+
+        [DisplayName("Quantidade Orto")]
+        public string? Quantidade_Orto { get; set; }
+
+        [DisplayName("Tipo Pagamento")]
+        public string? Tipo_Pagamento { get; set; }
+
+        [DisplayName("Vencimento")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+        public string? Vencimento { get; set; }
+
+        [DisplayName("Valor Devido")]
+        public string? Valor_Devido { get; set; }
+
+        [DisplayName("Valor Total")]
+        public string? Valor_Total { get; set; }
     }
 }

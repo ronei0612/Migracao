@@ -173,7 +173,7 @@
             // 
             comboTabelas.DropDownStyle = ComboBoxStyle.DropDownList;
             comboTabelas.FormattingEnabled = true;
-            comboTabelas.Items.AddRange(new object[] { "", "Prontuários", "Agendamentos", "Desenvolvimento Clínico", "Procedimentos", "Manutenções", "Financeiro (Recebidos)", "Financeiro (Recebíveis)", "Pacientes" });
+            comboTabelas.Items.AddRange(new object[] { "", "Prontuários", "Agendamentos", "Desenvolvimento Clínico", "Procedimentos", "Manutenções", "Financeiro (Recebidos)", "Financeiro (Recebíveis)", "Pacientes", "Dentistas", "Recebíveis Histórico Vendas", "Grupos Procedimentos" });
             comboTabelas.Location = new Point(361, 196);
             comboTabelas.Margin = new Padding(3, 2, 3, 2);
             comboTabelas.Name = "comboTabelas";

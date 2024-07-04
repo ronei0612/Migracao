@@ -505,5 +505,18 @@ namespace Migracao.Sistems
         {
             throw new NotImplementedException();
         }
+
+        void IDataBaseMigracao.DataBaseImportacaoDentistas()
+        {
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoRecebiveisHistVenda()
+        {
+        }
+
+        public void DataBaseImportacaoGruposProcedimentos()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

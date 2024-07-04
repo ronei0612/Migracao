@@ -50,24 +50,24 @@ namespace Migracao.Utils
                     {
                         Codigo = string.Empty,
                         Ativo = "R",
-                        NomeCompleto = paciente.NOME,
-                        NomeSocial = string.Empty,
+                        Nome_Completo = paciente.NOME,
+                        Nome_Social = string.Empty,
                         Apelido = paciente.NOME.GetPrimeirosCaracteres(20).ToNome(),
                         Documento = paciente.CGC_CPF.ToCPF(),
-                        DataCadastro = paciente.DT_CADASTRO,
+                        Data_Cadastro = paciente.DT_CADASTRO,
                         Observacoes = paciente.OBS1,
                         Email = paciente.EMAIL,
                         RG = paciente.INSC_RG.GetPrimeirosCaracteres(20),
                         Sexo = paciente.SEXO_M_F.ToSexo("m", "f") ? "M" : "F",
-                        NascimentoData = paciente.DT_NASCIMENTO,
+                        Nascimento_Data = paciente.DT_NASCIMENTO,
                         Paciente = paciente.CLIENTE,
                         Funcionario = "N",
                         Fornecedor = paciente.FORNECEDOR,
-                        TelefonePrincipal = paciente.FONE1,
+                        Telefone_Principal = paciente.FONE1,
                         Celular = paciente.CELULAR,
-                        TelefoneAlternativo = paciente.FONE2,
+                        Telefone_Alternativo = paciente.FONE2,
                         Logradouro = paciente.ENDERECO.PrimeiraLetraMaiuscula(),
-                        LogradouroNum = paciente.NUM_ENDERECO,
+                        Logradouro_Num = paciente.NUM_ENDERECO,
                         Bairro = paciente.BAIRRO,
                         Cidade = paciente.CIDADE,
                         Estado = paciente.ESTADO,
@@ -107,23 +107,23 @@ namespace Migracao.Utils
                 {
                     var lstManutencao = new ManutencoesDTO
                     {
-                        NumeroControle = manutencao.NumeroControle,
-                        PacienteCPF = manutencao.PacienteCPF,
-                        PacienteNome = manutencao.PacienteNome,
-                        DentistaNome = manutencao.DentistaNome,
-                        ProcedimentoNome = manutencao.ProcedimentoNome,
-                        ProcedimentoValor = manutencao.ProcedimentoValor,
-                        ValorOriginal = manutencao.ValorOriginal,
-                        ValorPagamento = manutencao.ValorPagamento,
-                        DataPagamento = manutencao.DataPagamento,
+                        Numero_Controle = manutencao.Numero_Controle,
+                        Paciente_CPF = manutencao.Paciente_CPF,
+                        Paciente_Nome = manutencao.Nome_Paciente,
+                        Dentista_Nome = manutencao.Dentista_Nome,
+                        Procedimento_Nome = manutencao.Procedimento_Nome,
+                        Procedimento_Valor = manutencao.Procedimento_Valor,
+                        Valor_Original = manutencao.Valor_Original.ToString(),
+                        Valor_Pagamento = manutencao.Valor_Pagamento.ToString(),
+                        Data_Pagamento = manutencao.Data_Pagamento.ToString(),
                         Dente = manutencao.Dente,
-                        ProcedimentoObservacao = manutencao.ProcedimentoObservacao,
-                        QuantidadeOrto = manutencao.QuantidadeOrto,
-                        TipoPagamento = manutencao.TipoPagamento,
-                        Vencimento = manutencao.Vencimento,
-                        ValorDevido = manutencao.ValorDevido,
-                        ValorTotal = manutencao.ValorTotal,
-                        DataAtendimento = manutencao.DataAtendimento
+                        Procedimento_Observacao = manutencao.Procedimentos_Observacao,
+                        Quantidade_Orto = manutencao.Quantidade_Orto,
+                        Tipo_Pagamento = manutencao.Tipo_Pagamento,
+                        Vencimento = manutencao.Vencimento.ToString(),
+                        Valor_Devido = manutencao.Valor_Devido.ToString()   ,
+                        Valor_Total = manutencao.Valor_Total,
+                        Data_Atendimento = manutencao.Data_Atendimento.ToString()
                     };
 
                     lstManutencoesDTO.Add(lstManutencao);
@@ -147,18 +147,18 @@ namespace Migracao.Utils
                 {
                     var lstProcedimento = new ProcedimentosDTO
                     {
-                        NumeroControle = procedimento.Numero_Controle,
-                        PacienteCPF = procedimento.Paciente_CPF.ToCPF(),
-                        PacienteNome = procedimento.Nome_Paciente,
-                        DentistaCPF = procedimento.Dentista_CPF,
-                        DentistaNome = procedimento.Dentista_Nome,
+                        Numero_Controle = procedimento.Numero_Controle,
+                        Paciente_CPF = procedimento.Paciente_CPF.ToCPF(),
+                        Paciente_Nome = procedimento.Nome_Paciente,
+                        Dentista_CPF = procedimento.Dentista_CPF,
+                        Dentista_Nome = procedimento.Dentista_Nome,
                         Dente = procedimento.Dente,
-                        ProcedimentoNome = procedimento.NOME_PRODUTO,
-                        ProcedimentoValor = procedimento.Valor,
-                        ProcedimentoObservacao = procedimento.Observacao,
-                        DataInicio = procedimento.Data_Inicio.ToData().ToShortDateString(),
-                        DataTermino = procedimento.Data_Termino,
-                        DataAtendimento = procedimento.Data_Atendimento
+                        Procedimento_Nome = procedimento.NOME_PRODUTO,
+                        Procedimento_Valor = procedimento.Valor,
+                        Procedimento_Observacao = procedimento.Observacao,
+                        Data_Inicio = procedimento.Data_Inicio.ToData().ToShortDateString(),
+                        Data_Termino = procedimento.Data_Termino,
+                        Data_Atendimento = procedimento.Data_Atendimento
                     };
 
                     lstProcedimentosDTO.Add(lstProcedimento);
@@ -299,8 +299,201 @@ namespace Migracao.Utils
             return lstAgendamentosDTO;
         }
 
+        public static List<DesenvolvimentoClinicoDTO> ConvertDesenvolvimentoClinicoParaDesenvolvimentoClinicoDTO(List<DesenvolvimentoClinico> desenvClicnico)
+        {
+            List<DesenvolvimentoClinicoDTO> lstDesenvolvimentoClinicoDTO = new List<DesenvolvimentoClinicoDTO>();
 
-        // TODO
-        // Prontuários e Desenvolvimento Clinico
+            try
+            {
+                Parallel.ForEach(desenvClicnico, desenvClicnico =>
+                {
+                    var lstDesenvolvimentoClinico = new DesenvolvimentoClinicoDTO
+                    {
+                        Paciente_CPF = desenvClicnico.Paciente_CPF,
+                        Paciente_Nome = desenvClicnico.Paciente_Nome,
+                        Dentista_Nome = desenvClicnico.Dentista_Nome,
+                        Dentista_Codigo = desenvClicnico.Dentista_Codigo,
+                        Procedimento_Nome = desenvClicnico.Procedimento_Nome,
+                        Data_Atendimento = desenvClicnico.Data_Retorno.ToString(),
+                        Data_Inicio = desenvClicnico.Data_Inicio.ToString(),
+                        Data_Retorno = desenvClicnico.Data_Retorno.ToString(),
+                        Procedimento_Observacao = desenvClicnico.Procedimento_Observacao,
+                        Lancamento = desenvClicnico.Lancamento
+                    };
+
+                    lstDesenvolvimentoClinicoDTO.Add(lstDesenvolvimentoClinico);
+                });
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Desenvolvimento Clinico: {error.Message}");
+            }
+
+            return lstDesenvolvimentoClinicoDTO;
+        }
+
+        public static List<ProcedimentosManutencaoDTO> ConvertProcedManutParaProcedManutDTO(List<Procedimentos> procedimentos, List<Manutencoes> manutencoes)
+        {
+            List<ProcedimentosManutencaoDTO> lstProcedManutDTO = new List<ProcedimentosManutencaoDTO>();
+
+            try
+            {
+                Parallel.ForEach(procedimentos, procedimento =>
+                {
+                    var lstProcedManut = new ProcedimentosManutencaoDTO
+                    {
+                        Numero_Controle = procedimento.Numero_Controle,
+                        Paciente_CPF = procedimento.Paciente_CPF.ToCPF(),
+                        Paciente_Nome = procedimento.Nome_Paciente,
+                        Dentista_CPF = procedimento.Dentista_CPF,
+                        Dentista_Nome = procedimento.Dentista_Nome,
+                        Dente = procedimento.Dente,
+                        Procedimento_Nome = procedimento.NOME_PRODUTO,
+                        Procedimento_Valor = procedimento.Valor,
+                        Procedimento_Observacao = procedimento.Observacao,
+                        Data_Inicio = procedimento.Data_Inicio.ToData().ToShortDateString(),
+                        Data_Termino = procedimento.Data_Termino,
+                        Data_Atendimento = procedimento.Data_Atendimento
+                    };
+
+                    lstProcedManutDTO.Add(lstProcedManut);
+                });
+
+                Parallel.ForEach(manutencoes, manutencao =>
+                {
+                    var lstManutencao = new ProcedimentosManutencaoDTO
+                    {
+                        Numero_Controle = manutencao.Numero_Controle,
+                        Paciente_CPF = manutencao.Paciente_CPF,
+                        Paciente_Nome = manutencao.Nome_Paciente,
+                        Dentista_Nome = manutencao.Dentista_Nome,
+                        Procedimento_Nome = manutencao.Procedimento_Nome,
+                        Procedimento_Valor = manutencao.Procedimento_Valor,
+                        Valor_Original = manutencao.Valor_Original.ToString(),
+                        Valor_Pagamento = manutencao.Valor_Pagamento.ToString(),
+                        Data_Pagamento = manutencao.Data_Pagamento.ToString(),
+                        Dente = manutencao.Dente,
+                        Procedimento_Observacao = manutencao.Procedimentos_Observacao,
+                        Quantidade_Orto = manutencao.Quantidade_Orto,
+                        Tipo_Pagamento = manutencao.Tipo_Pagamento,
+                        Vencimento = manutencao.Vencimento.ToString(),
+                        Valor_Devido = manutencao.Valor_Devido.ToString(),
+                        Valor_Total = manutencao.Valor_Total,
+                        Data_Atendimento = manutencao.Data_Atendimento.ToString()
+                    };
+
+                    lstProcedManutDTO.Add(lstManutencao);
+                });
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Procedimentos e Manutenções: {error.Message}");
+            }
+
+            return lstProcedManutDTO;
+        }
+
+        public static List<DentistasDTO> ConvertDentistasParaDentistasDTO(List<Dentistas> dentistas)
+        {
+            List<DentistasDTO> lstDentistasDTO = new List<DentistasDTO>();
+
+            try
+            {
+                Parallel.ForEach(dentistas, dentista =>
+                {
+                    var lstDentistas = new DentistasDTO
+                    {
+                        Codigo = dentista.Codigo?.ToString(),
+                        Ativo = dentista.Ativo.ToString(),
+                        Nome_Completo = dentista.Nome_Completo,
+                        NomeSocial = string.Empty,
+                        Apelido = dentista.NOME?.GetPrimeirosCaracteres(20).ToNome(),
+                        Data_Cadastro = dentista.Data_Cadastro.ToString(),
+                        Observacoes = dentista.Observacoes,
+                        Email = dentista.Email?.ToEmail(),
+                        Nascimento_Local = string.Empty,
+                        Estado_Civil = string.Empty,
+                        Profissao = string.Empty,
+                        Cargo_Clinica = string.Empty,
+                        Dentista = "N",
+                        Conselho_Codigo = string.Empty,
+                        Paciente = "N",
+                        Funcionario = "S",
+                        Fornecedor = "N"
+                    };
+
+                    lstDentistasDTO.Add(lstDentistas);
+                });
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Excel para Pessoas Pacientes: {error.Message}");
+            }
+
+            return lstDentistasDTO;
+        }
+
+        public static List<RecebiveisHistVendaDTO> ConvertRecebiveisHistVendaParaRecebiveisHistVendaDTO(List<RecebiveisHistVenda> recHistVendas)
+        {
+            List<RecebiveisHistVendaDTO> lstRecebiveisHistVendaDTO = new List<RecebiveisHistVendaDTO>();
+
+            try
+            {
+                Parallel.ForEach(recHistVendas, recHistVenda =>
+                {
+                    var lstRecHistVendas = new RecebiveisHistVendaDTO
+                    {
+                        CPF = recHistVenda.Paciente_CPF,
+                        Nome = recHistVenda.Nome_Paciente,
+                        Observacao_Recebivel = recHistVenda.Observacao_Recebivel,
+                        Documento_Ref = recHistVenda.Documento_Ref,
+                        Valor_Original = recHistVenda.Valor_Original.ToString(),
+                        Vencimento = recHistVenda.Vencimento.ToString(),
+                        Emissao = recHistVenda.Emissao,
+                        Recebivel_Exigivel = recHistVenda.Recebivel_Exigivel
+                    };
+
+                    lstRecebiveisHistVendaDTO.Add(lstRecHistVendas);
+                });
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Recebiveis Histórico Venda: {error.Message}");
+            }
+
+            return lstRecebiveisHistVendaDTO;
+        }
+
+        public static List<GruposProcedimentosDTO> ConvertGruposProcedimentosParaGruposProcedimentosDTO(List<GruposProcedimentos> gruposProcedimentos)
+        {
+            List<GruposProcedimentosDTO> lstGruposProcedimentosDTO = new List<GruposProcedimentosDTO>();
+
+            try
+            {
+                Parallel.ForEach(gruposProcedimentos, grupoProcedimento =>
+                {
+                    var lstGruposProcedimentos = new GruposProcedimentosDTO
+                    {
+                        NomeTabela = grupoProcedimento.Procedimento_Nome,
+                        Especialidade = grupoProcedimento.Nome_Grupo,
+                        Ativo = grupoProcedimento.Ativo,
+                        NomeProcedimento = grupoProcedimento.Procedimento_Nome,
+                        Abreviacao = grupoProcedimento.Abreviacao,
+                        Preco = grupoProcedimento.Preco.ToString(),
+                        TUSS = grupoProcedimento.TUSS,
+                        EspecialidadeCodigo = grupoProcedimento.Codigo_Grupo
+                    };
+
+                    lstGruposProcedimentosDTO.Add(lstGruposProcedimentos);
+                });
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Excel para Pessoas Pacientes: {error.Message}");
+            }
+
+            return lstGruposProcedimentosDTO;
+        }
+
     }
 }

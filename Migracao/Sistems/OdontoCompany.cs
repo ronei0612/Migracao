@@ -4,6 +4,7 @@ using MathNet.Numerics.Distributions;
 using Migracao.Models;
 using Migracao.Models.Context;
 using Migracao.Models.DentalOffice;
+using Migracao.Models.DTO;
 using Migracao.Models.Interfaces;
 using Migracao.Models.OdontoCompany;
 using Migracao.Utils;
@@ -1909,6 +1910,333 @@ namespace Migracao.Sistems
             #endregion
         }
 
+        public void RetornaProcedimentosPorTipoEntidade(List<GruposProcedimentosDTO> lstGruposProcedimentos, string estabelecimentoID)
+        {
+            ExcelHelper excelHelper = new();
+
+            try
+            {
+                #region Unimed
+
+                var especialidadeUnimed = lstGruposProcedimentos.FindAll(list =>
+                {
+                    if (list != null && list.Especialidade != null)
+                    {
+                        return list.Especialidade.Contains("UNIMED");
+                    }
+                    return false;
+                });
+
+                var dataTableUnimed = ExcelHelper.ConversorEntidadeParaDataTable(especialidadeUnimed);
+
+                if (dataTableUnimed != null)
+                {
+                    var salvarProcedimentosUnimed = Tools.GerarNomeArquivo($"CadastroProcedimentos_Unimed_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosUnimed + ".xlsx", dataTableUnimed);
+                }
+
+                #endregion
+
+                #region Particular
+
+                var especialidadeParticular = lstGruposProcedimentos.FindAll(list =>
+                {
+                    if (list != null && list.Especialidade != null)
+                    {
+                        return list.Especialidade.Contains("PARTICULAR");
+                    }
+                    return false;
+                });
+
+                var dataTableParticular = ExcelHelper.ConversorEntidadeParaDataTable(especialidadeParticular);
+
+                if (dataTableParticular != null)
+                {
+                    var salvarProcedimentosParticular = Tools.GerarNomeArquivo($"CadastroProcedimentos_Particular_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosParticular + ".xlsx", dataTableParticular);
+                }
+
+                #endregion
+
+                #region Odc
+
+                var especialidadeOdc = lstGruposProcedimentos.FindAll(list =>
+                {
+                    if (list != null && list.Especialidade != null)
+                    {
+                        return list.Especialidade.Contains("ODC");
+                    }
+                    return false;
+                });
+
+                var dataTableOdc = ExcelHelper.ConversorEntidadeParaDataTable(especialidadeOdc);
+
+                if (dataTableOdc != null)
+                {
+                    var salvarProcedimentosOdc = Tools.GerarNomeArquivo($"CadastroProcedimentos_Odc_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosOdc + ".xlsx", dataTableOdc);
+                }
+
+                #endregion
+
+                #region Amil
+
+                var especialidadeAmil = lstGruposProcedimentos.FindAll(list =>
+                {
+                    if (list != null && list.Especialidade != null)
+                    {
+                        return list.Especialidade.Contains("AMIL");
+                    }
+                    return false;
+                });
+
+                var dataTableAmil = ExcelHelper.ConversorEntidadeParaDataTable(especialidadeAmil);
+
+                if (dataTableAmil != null)
+                {
+                    var salvarProcedimentosAmil = Tools.GerarNomeArquivo($"CadastroProcedimentos_Amil_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosAmil + ".xlsx", dataTableAmil);
+                }
+
+                #endregion
+
+                #region Odontomaxi
+
+                var especialidadeOdontomaxi = lstGruposProcedimentos.FindAll(list =>
+                {
+                    if (list != null && list.Especialidade != null)
+                    {
+                        return list.Especialidade.Contains("ODONTOMAXI");
+                    }
+                    return false;
+                });
+
+                var dataTableOdontomaxi = ExcelHelper.ConversorEntidadeParaDataTable(especialidadeOdontomaxi);
+
+                if (dataTableOdontomaxi != null)
+                {
+                    var salvarProcedimentosOdontomaxi = Tools.GerarNomeArquivo($"CadastroProcedimentos_Odontomaxi_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosOdontomaxi + ".xlsx", dataTableOdontomaxi);
+                }
+
+                #endregion
+
+                #region Primavida
+
+                var especialidadePrimavida = lstGruposProcedimentos.FindAll(list =>
+                {
+                    if (list != null && list.Especialidade != null)
+                    {
+                        return list.Especialidade.Contains("PRIMAVIDA");
+                    }
+                    return false;
+                });
+
+                var dataTablePrimavida = ExcelHelper.ConversorEntidadeParaDataTable(especialidadePrimavida);
+
+                if (dataTablePrimavida != null)
+                {
+                    var salvarProcedimentosPrimavida = Tools.GerarNomeArquivo($"CadastroProcedimentos_Primavida_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosPrimavida + ".xlsx", dataTablePrimavida);
+                }
+
+                #endregion
+
+                #region Porto Seguro
+
+                var especialidadePortoSeguro = lstGruposProcedimentos.FindAll(list =>
+                {
+                    if (list != null && list.Especialidade != null)
+                    {
+                        return list.Especialidade.Contains("PORTO SEGURO");
+                    }
+                    return false;
+                });
+
+                var dataTablePortoSeguro = ExcelHelper.ConversorEntidadeParaDataTable(especialidadePortoSeguro);
+
+                if (dataTablePortoSeguro != null)
+                {
+                    var salvarProcedimentosPortoSeguro = Tools.GerarNomeArquivo($"CadastroProcedimentos_PortoSeguro_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosPortoSeguro + ".xlsx", dataTablePortoSeguro);
+                }
+
+                #endregion
+
+                #region Aesp
+
+                var especialidadeAesp = lstGruposProcedimentos.FindAll(list =>
+                {
+                    if (list != null && list.Especialidade != null)
+                    {
+                        return list.Especialidade.Contains("AESP");
+                    }
+                    return false;
+                });
+
+                var dataTableAesp = ExcelHelper.ConversorEntidadeParaDataTable(especialidadeAesp);
+
+                if (dataTableAesp != null)
+                {
+                    var salvarProcedimentosAesp = Tools.GerarNomeArquivo($"CadastroProcedimentos_Aesp_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosAesp + ".xlsx", dataTableAesp);
+                }
+
+                #endregion
+
+                #region Rodrigues Leira
+
+                var especialidadeRodriguesLeira = lstGruposProcedimentos.FindAll(list =>
+                {
+                    if (list != null && list.Especialidade != null)
+                    {
+                        return list.Especialidade.Contains("RODRIGUES LEIRA");
+                    }
+                    return false;
+                });
+
+                var dataTableRodriguesLeira = ExcelHelper.ConversorEntidadeParaDataTable(especialidadeRodriguesLeira);
+
+                if (dataTableRodriguesLeira != null)
+                {
+                    var salvarProcedimentosRodriguesLeira = Tools.GerarNomeArquivo($"CadastroProcedimentos_RodriguesLeira_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosRodriguesLeira + ".xlsx", dataTableRodriguesLeira);
+                }
+
+                #endregion
+
+                #region Inpao
+
+                var especialidadeInpao = lstGruposProcedimentos.FindAll(list =>
+                {
+                    if (list != null && list.Especialidade != null)
+                    {
+                        return list.Especialidade.Contains("INPAO");
+                    }
+                    return false;
+                });
+
+                var dataTableInpao = ExcelHelper.ConversorEntidadeParaDataTable(especialidadeInpao);
+
+                if (dataTableInpao != null)
+                {
+                    var salvarProcedimentosInpao = Tools.GerarNomeArquivo($"CadastroProcedimentos_Inpao_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosInpao + ".xlsx", dataTableInpao);
+                }
+
+                #endregion
+
+                #region Dental Integral
+
+                var especialidadeDentalIntegral = lstGruposProcedimentos.FindAll(list =>
+                {
+                    if (list != null && list.Especialidade != null)
+                    {
+                        return list.Especialidade.Contains("DENTAL INTEGRAL");
+                    }
+                    return false;
+                });
+
+                var dataTableDentalIntegral = ExcelHelper.ConversorEntidadeParaDataTable(especialidadeDentalIntegral);
+
+                if (dataTableDentalIntegral != null)
+                {
+                    var salvarProcedimentosDentalIntegral = Tools.GerarNomeArquivo($"CadastroProcedimentos_DentalIntegral_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosDentalIntegral + ".xlsx", dataTableDentalIntegral);
+                }
+
+                #endregion
+
+                #region Proasa
+
+                var especialidadeProasa = lstGruposProcedimentos.FindAll(list =>
+                {
+                    if (list != null && list.Especialidade != null)
+                    {
+                        return list.Especialidade.Contains("PROASA");
+                    }
+                    return false;
+                });
+
+                var dataTableProasa = ExcelHelper.ConversorEntidadeParaDataTable(especialidadeProasa);
+
+                if (dataTableProasa != null)
+                {
+                    var salvarProcedimentosProasa = Tools.GerarNomeArquivo($"CadastroProcedimentos_Proasa_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosProasa + ".xlsx", dataTableProasa);
+                }
+
+                #endregion
+
+                #region Ideal Odonto
+
+                var especialidadeIdealOdonto = lstGruposProcedimentos.FindAll(list =>
+                {
+                    if (list != null && list.Especialidade != null)
+                    {
+                        return list.Especialidade.Contains("IDEAL ODONTO");
+                    }
+                    return false;
+                });
+
+                var dataTableIdealOdonto = ExcelHelper.ConversorEntidadeParaDataTable(especialidadeIdealOdonto);
+
+                if (dataTableIdealOdonto != null)
+                {
+                    var salvarProcedimentosIdealOdonto = Tools.GerarNomeArquivo($"CadastroProcedimentos_IdealOdonto_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosIdealOdonto + ".xlsx", dataTableIdealOdonto);
+                }
+
+                #endregion
+
+                #region Odontoart
+
+                var especialidadeOdontoart = lstGruposProcedimentos.FindAll(list =>
+                {
+                    if (list != null && list.Especialidade != null)
+                    {
+                        return list.Especialidade.Contains("ODONTOART");
+                    }
+                    return false;
+                });
+
+                var dataTableOdontoart = ExcelHelper.ConversorEntidadeParaDataTable(especialidadeOdontoart);
+
+                if (dataTableOdontoart != null)
+                {
+                    var salvarProcedimentosOdontoart = Tools.GerarNomeArquivo($"CadastroProcedimentosOdontoart_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosOdontoart + ".xlsx", dataTableOdontoart);
+                }
+
+                #endregion
+
+                #region Brazil Dental
+
+                var especialidadeBrazilDental = lstGruposProcedimentos.FindAll(list =>
+                {
+                    if (list != null && list.Especialidade != null)
+                    {
+                        return list.Especialidade.Contains("BRAZIL DENTAL");
+                    }
+                    return false;
+                });
+
+                var dataTableBrazilDental = ExcelHelper.ConversorEntidadeParaDataTable(especialidadeBrazilDental);
+
+                if (dataTableBrazilDental != null)
+                {
+                    var salvarProcedimentosBrazilDental = Tools.GerarNomeArquivo($"CadastroProcedimentos_BrazilDental_{estabelecimentoID}_OdontoCompany");
+                    excelHelper.CriarExcelArquivo(salvarProcedimentosBrazilDental + ".xlsx", dataTableBrazilDental);
+                }
+
+                #endregion
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Grupo Procedimentos: {error.Message}");
+            }
+        }
+
         void IDataBaseMigracao.DataBaseImportacaoPacientes()
         {
             ExcelHelper excelHelper = new ExcelHelper();
@@ -1974,6 +2302,25 @@ namespace Migracao.Sistems
 
         void IDataBaseMigracao.DataBaseImportacaoDevClinico()
         {
+            ExcelHelper excelHelper = new ExcelHelper();
+
+            int estabelecimentoID = 1;
+
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectDesenvolvimentoClinico.sql";
+
+            var desenvClinico = new FireBirdContext<Models.DesenvolvimentoClinico>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+
+            var lstDesenvClinico = ConversorEntidadeParaDTO.ConvertDesenvolvimentoClinicoParaDesenvolvimentoClinicoDTO(desenvClinico);
+
+            var dataTableDesenvClinico = ExcelHelper.ConversorEntidadeParaDataTable(lstDesenvClinico);
+
+            if (dataTableDesenvClinico != null)
+            {
+                var salvarDesenvClinico = Tools.GerarNomeArquivo($"CadastroDesenvClinico_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarDesenvClinico + ".xlsx", dataTableDesenvClinico);
+            }
         }
 
         void IDataBaseMigracao.DataBaseImportacaoProntuarios()
@@ -1983,6 +2330,8 @@ namespace Migracao.Sistems
         void IDataBaseMigracao.DataBaseImportacaoManutencoes()
         {
             ExcelHelper excelHelper = new ExcelHelper();
+
+            DataTable dataTableProcedimentosManutencaoMerge = new();
 
             int estabelecimentoID = 1;
 
@@ -1995,6 +2344,26 @@ namespace Migracao.Sistems
             var lstManutencoes = ConversorEntidadeParaDTO.ConvertManutencoesParaManutencoesDTO(manutencoes);
 
             var dataTableManutencoes = ExcelHelper.ConversorEntidadeParaDataTable(lstManutencoes);
+
+            if (dataTableManutencoes != null)
+            {
+                var salvarManutencoes = Tools.GerarNomeArquivo($"CadastroManutenções_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarManutencoes + ".xlsx", dataTableManutencoes);
+            }
+
+            string arquivoProdedimentosSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectProdedimentos.sql";
+
+            var procedimentos = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoProdedimentosSql);
+
+            var lstProcedManut = ConversorEntidadeParaDTO.ConvertProcedManutParaProcedManutDTO(procedimentos, manutencoes);
+
+            var dataTableProcedManut = ExcelHelper.ConversorEntidadeParaDataTable(lstProcedManut);
+            
+            if (dataTableProcedimentosManutencaoMerge != null)
+            {
+                var salvarProcedimentosManutencaoMerge = Tools.GerarNomeArquivo($"cadastroProcedimentosManutencaoEntidadesMerge_{estabelecimentoID}_odontocompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentosManutencaoMerge + ".xlsx", dataTableProcedManut);
+            }
         }
 
         void IDataBaseMigracao.DataBaseImportacaoFinanceiroRecebidos()
@@ -2037,6 +2406,65 @@ namespace Migracao.Sistems
                 var salvarArquivoRecebiveis = Tools.GerarNomeArquivo($"CadastroRecebiveis_{estabelecimentoID}_OdontoCompany");
                 excelHelper.CriarExcelArquivo(salvarArquivoRecebiveis + ".xlsx", dataTableRecebiveis);
             }
-        }        
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoDentistas()
+        {
+            ExcelHelper excelHelper = new ExcelHelper();
+
+            int estabelecimentoID = 1;
+
+            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectDentistas.sql";
+
+            var dentistas = new FireBirdContext<Models.Dentistas>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+
+            var lstDentistas = ConversorEntidadeParaDTO.ConvertDentistasParaDentistasDTO(dentistas);
+
+            var dataTableDentistas = ExcelHelper.ConversorEntidadeParaDataTable(lstDentistas);
+
+            if (dataTableDentistas != null)
+            {
+                var salvarArquivoDentistas = Tools.GerarNomeArquivo($"CadastroDentistas_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarArquivoDentistas + ".xlsx", dataTableDentistas);
+            }
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoRecebiveisHistVenda()
+        {
+            ExcelHelper excelHelper = new ExcelHelper();
+
+            int estabelecimentoID = 1;
+
+            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectRecebiveisHistVenda.sql";
+
+            var recebiveisHistVenda = new FireBirdContext<Models.RecebiveisHistVenda>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+
+            var lstRecebiveisHistVenda = ConversorEntidadeParaDTO.ConvertRecebiveisHistVendaParaRecebiveisHistVendaDTO(recebiveisHistVenda);
+
+            var dataTableRecebiveisHistVenda = ExcelHelper.ConversorEntidadeParaDataTable(lstRecebiveisHistVenda);
+
+            if (dataTableRecebiveisHistVenda != null)
+            {
+                var salvarArquivoRecebiveisHistVenda = Tools.GerarNomeArquivo($"CadastroRecebiveisHistVenda_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarArquivoRecebiveisHistVenda + ".xlsx", dataTableRecebiveisHistVenda);
+            }
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoGruposProcedimentos()
+        {
+            ExcelHelper excelHelper = new ExcelHelper();
+
+            int estabelecimentoID = 1;
+
+            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelecGrupostProcedimentos.sql";
+
+            var gruposProcedimentos = new FireBirdContext<Models.GruposProcedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+
+            var lstGruposProcedimentos = ConversorEntidadeParaDTO.ConvertGruposProcedimentosParaGruposProcedimentosDTO(gruposProcedimentos);
+
+            RetornaProcedimentosPorTipoEntidade(lstGruposProcedimentos, "1");
+
+
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,12 +39,18 @@ namespace Migracao.Models.DTO
         public string? Valor_Pago { get; set; }
 
         [DisplayName("Prazo")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+
         public string? Prazo { get; set; }
 
         [DisplayName("Data Vencimento")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+
         public string? Data_Vencimento { get; set; }
 
         [DisplayName("Data do Pagamento")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+
         public string? Data_Pagamento { get; set; }
 
         [DisplayName("Emissão")]

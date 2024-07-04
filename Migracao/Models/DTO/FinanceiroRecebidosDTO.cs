@@ -42,12 +42,18 @@ namespace Migracao.Models.DTO
         public string? Prazo { get; set; }
 
         [DisplayName("Data Vencimento")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+
         public string? Data_Vencimento { get; set; }
 
         [DisplayName("Data do Pagamento")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+
         public string? Data_Pagamento { get; set; }
 
         [DisplayName("Emissão")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+
         public string? Emissao { get; set; }
 
         [DisplayName("Observação Recebido")]
@@ -61,6 +67,8 @@ namespace Migracao.Models.DTO
         public string? Valor_Original { get; set; }
 
         [DisplayName("Vencimento Recebível")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+
         public string? Vencimento_Recebivel { get; set; }
 
         [DisplayName("Duplicata")]

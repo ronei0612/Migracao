@@ -23,5 +23,11 @@ namespace Migracao.Models.Interfaces
         void DataBaseImportacaoPacientes();
 
         void DataBaseImportacaoAgendamentos();
+
+        void DataBaseImportacaoDentistas();
+
+        void DataBaseImportacaoRecebiveisHistVenda();
+
+        void DataBaseImportacaoGruposProcedimentos();
     }
 }

@@ -8,6 +8,7 @@ namespace Migracao.Models
 {
     public class Manutencoes
     {
+        public string? Lancamento { get; set; }
         public string? Paciente_CPF { get; set; }
         public string? Nome_Paciente { get; set; }
         public decimal? Valor_Original { get; set; }
@@ -15,8 +16,7 @@ namespace Migracao.Models
         public DateTime? Data_Pagamento { get; set; }
         public string? Numero_Controle { get; set; }
         public string? Procedimento_Nome { get; set; }
-        public decimal? Valor_Pagamento { get; set; }
-        public int? Lancamento { get; set; }
+        public decimal? Valor_Pagamento { get; set; }       
         public string? Tipo_Pagamento { get; set; }
         public DateTime? Vencimento { get; set; }
         public decimal? Valor_Devido { get; set; }

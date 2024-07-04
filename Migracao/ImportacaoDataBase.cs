@@ -141,6 +141,15 @@ namespace Migracao
 
                 if (_tabela == "Agendamentos")
                     instance.DataBaseImportacaoAgendamentos();
+
+                if (_tabela == "Dentistas")
+                    instance.DataBaseImportacaoDentistas();
+
+                if (_tabela == "Recebíveis Histórico Vendas")
+                    instance.DataBaseImportacaoRecebiveisHistVenda();
+
+                if (_tabela == "Grupos Procedimentos")
+                    instance.DataBaseImportacaoGruposProcedimentos();
             }
             else
             {

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Migracao.Models.Context
 {
@@ -67,13 +68,20 @@ namespace Migracao.Models.Context
         public List<T> RetornaItensBancoPorQuery(string arquivoSql)
         {            
             string sqlScript = File.ReadAllText(arquivoSql);
-
-            using (IDbConnection db = new FbConnection(_connectionString))
+            try
             {
-                var list = db.Query<T>(sqlScript).ToList();
+                using (IDbConnection db = new FbConnection(_connectionString))
+                {
+                    var list = db.Query<T>(sqlScript).ToList();
 
-                return list;//ToList();
+                    return list;
+                }
             }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao fazer a consulta no banco Firebird: {error.Message}");
+            }
+            
         }
     }
 }

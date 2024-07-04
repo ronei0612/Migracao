@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Migracao.Utils
 {
@@ -1155,15 +1156,15 @@ namespace Migracao.Utils
             {
                 DataTable dataTable = new DataTable();
 
-                foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(typeof(T)))
+                try
                 {
-                    dataTable.Columns.Add(prop.DisplayName, prop.PropertyType);
-                }
+                    foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(typeof(T)))
+                    {
+                        dataTable.Columns.Add(prop.DisplayName, prop.PropertyType);
+                    }
 
-                // Usando Parallel.ForEach para processar a lista de pessoas e preencher o DataTable
-                Parallel.ForEach(entidadeDTO, new ParallelOptions { MaxDegreeOfParallelism = 4 }, entidade =>
-                {
-                    try
+                    // Usando Parallel.ForEach para processar a lista de pessoas e preencher o DataTable
+                    Parallel.ForEach(entidadeDTO, new ParallelOptions { MaxDegreeOfParallelism = 4 }, entidade =>
                     {
                         DataRow row;
 
@@ -1182,14 +1183,13 @@ namespace Migracao.Utils
                         {
                             dataTable.Rows.Add(row);
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        throw;
-                    }
 
-                });
-
+                    });
+                }
+                catch (Exception error)
+                {
+                    throw new Exception($"Erro na conversão da entidade para datatable: {error.Message}");
+                }
                 return dataTable;
             }
         }

@@ -5,30 +5,31 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Migracao.Models.DentalOffice;
 
 namespace Migracao.Models.DTO
 {
-    public class GruposProcedimentosDTO
+    public class ProcedimentosPrecosDTO
     {
 
-        public GruposProcedimentosDTO()
+        public ProcedimentosPrecosDTO()
         {
                 
         }
 
-        public GruposProcedimentosDTO(List<GruposProcedimentos> gruposProcedimentos)
+        public ProcedimentosPrecosDTO(List<ProcedimentosPrecos> gruposProcedimentos)
         {
 
         }
 
-        [DisplayName("Nome Tabela")]
-        public string? NomeTabela { get; set; }
+        [DisplayName("Nome")]
+        public string? Nome { get; set; }
+
+        [DisplayName("Tabela")]
+        public string? Tabela { get; set; }
 
         [DisplayName("Especialidade")]
         public string? Especialidade { get; set; }
-
-        [DisplayName("Ativo (Sim/Não)")]
-        public string? Ativo { get; set; }
 
         [DisplayName("Nome do Procedimento")]
         public string? NomeProcedimento { get; set; }
@@ -42,8 +43,5 @@ namespace Migracao.Models.DTO
 
         [DisplayName("TUSS")]
         public string? TUSS { get; set; }
-
-        [DisplayName("Especialidade Código")]
-        public string? EspecialidadeCodigo { get; set; }
     }
 }

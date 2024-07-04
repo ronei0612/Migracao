@@ -514,7 +514,7 @@ namespace Migracao.Sistems
         {
         }
 
-        public void DataBaseImportacaoGruposProcedimentos()
+        public void DataBaseImportacaoProcedimentosPrecos()
         {
             throw new NotImplementedException();
         }

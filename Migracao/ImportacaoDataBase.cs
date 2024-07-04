@@ -148,8 +148,8 @@ namespace Migracao
                 if (_tabela == "Recebíveis Histórico Vendas")
                     instance.DataBaseImportacaoRecebiveisHistVenda();
 
-                if (_tabela == "Grupos Procedimentos")
-                    instance.DataBaseImportacaoGruposProcedimentos();
+                if (_tabela == "Procedimentos Preços")
+                    instance.DataBaseImportacaoProcedimentosPrecos();
             }
             else
             {

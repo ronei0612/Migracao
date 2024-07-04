@@ -1910,7 +1910,7 @@ namespace Migracao.Sistems
             #endregion
         }
 
-        public void RetornaProcedimentosPorTipoEntidade(List<GruposProcedimentosDTO> lstGruposProcedimentos, string estabelecimentoID)
+        public void RetornaProcedimentosPorTipoEntidade(List<ProcedimentosPrecosDTO> lstGruposProcedimentos, string estabelecimentoID)
         {
             ExcelHelper excelHelper = new();
 
@@ -2321,11 +2321,7 @@ namespace Migracao.Sistems
                 var salvarDesenvClinico = Tools.GerarNomeArquivo($"CadastroDesenvClinico_{estabelecimentoID}_OdontoCompany");
                 excelHelper.CriarExcelArquivo(salvarDesenvClinico + ".xlsx", dataTableDesenvClinico);
             }
-        }
-
-        void IDataBaseMigracao.DataBaseImportacaoProntuarios()
-        {
-        }
+        }        
 
         void IDataBaseMigracao.DataBaseImportacaoManutencoes()
         {
@@ -2365,6 +2361,8 @@ namespace Migracao.Sistems
                 excelHelper.CriarExcelArquivo(salvarProcedimentosManutencaoMerge + ".xlsx", dataTableProcedManut);
             }
         }
+
+
 
         void IDataBaseMigracao.DataBaseImportacaoFinanceiroRecebidos()
         {
@@ -2450,21 +2448,25 @@ namespace Migracao.Sistems
             }
         }
 
-        void IDataBaseMigracao.DataBaseImportacaoGruposProcedimentos()
+        void IDataBaseMigracao.DataBaseImportacaoProcedimentosPrecos()
         {
             ExcelHelper excelHelper = new ExcelHelper();
 
             int estabelecimentoID = 1;
 
-            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelecGrupostProcedimentos.sql";
+            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectProcedimentosPrecos.sql";
 
-            var gruposProcedimentos = new FireBirdContext<Models.GruposProcedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+            var procedimentosPrecos = new FireBirdContext<Models.ProcedimentosPrecos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
-            var lstGruposProcedimentos = ConversorEntidadeParaDTO.ConvertGruposProcedimentosParaGruposProcedimentosDTO(gruposProcedimentos);
+            var lstProcedimentosPrecos = ConversorEntidadeParaDTO.ConvertProcedimentosPrecosParaProcedimentosPrecosDTO(procedimentosPrecos);
 
-            RetornaProcedimentosPorTipoEntidade(lstGruposProcedimentos, "1");
+            RetornaProcedimentosPorTipoEntidade(lstProcedimentosPrecos, "1");
 
 
+        }
+
+        void IDataBaseMigracao.DataBaseImportacaoProntuarios()
+        {
         }
     }
 }

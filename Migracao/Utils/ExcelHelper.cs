@@ -1161,18 +1161,13 @@ namespace Migracao.Utils
                     foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(typeof(T)))
                     {
                         dataTable.Columns.Add(prop.DisplayName, prop.PropertyType);
-                    }
+                    }                    
 
-                    // Usando Parallel.ForEach para processar a lista de pessoas e preencher o DataTable
-                    Parallel.ForEach(entidadeDTO, new ParallelOptions { MaxDegreeOfParallelism = 4 }, entidade =>
+                    foreach (var entidade in entidadeDTO)
                     {
-                        DataRow row;
+                        DataRow row = dataTable.NewRow();
 
-                        lock (new object())
-                        { row = dataTable.NewRow(); }
-
-
-                        // Preenche as células da linha com os valores das propriedades da pessoa
+                        // Preenche as células da linha com os valores das propriedades da entidade
                         foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(typeof(T)))
                         {
                             row[prop.DisplayName] = prop.GetValue(entidade);
@@ -1183,8 +1178,7 @@ namespace Migracao.Utils
                         {
                             dataTable.Rows.Add(row);
                         }
-
-                    });
+                    }
                 }
                 catch (Exception error)
                 {

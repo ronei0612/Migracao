@@ -67,7 +67,7 @@ namespace Migracao.Models.Context
 
         public List<T> RetornaItensBancoPorQuery(string arquivoSql)
         {            
-            string sqlScript = File.ReadAllText(arquivoSql);
+            string sqlScript = File.ReadAllText(arquivoSql, Encoding.UTF8);
             try
             {
                 using (IDbConnection db = new FbConnection(_connectionString))

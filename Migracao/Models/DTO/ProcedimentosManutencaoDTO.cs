@@ -19,7 +19,6 @@ namespace Migracao.Models.DTO
         {
 
         }
-
         [DisplayName("Número do Controle")]
         public string? Numero_Controle { get; set; }
 
@@ -42,6 +41,7 @@ namespace Migracao.Models.DTO
         public string? Procedimento_Nome { get; set; }
 
         [DisplayName("Procedimento Valor")]
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
         public string? Procedimento_Valor { get; set; }
 
         [DisplayName("Procedimento Observação")]
@@ -59,16 +59,6 @@ namespace Migracao.Models.DTO
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Atendimento { get; set; }
 
-        [DisplayName("Valor Original")]
-        public string? Valor_Original { get; set; }
-
-        [DisplayName("Valor do Pagamento")]
-        public string? Valor_Pagamento { get; set; }
-
-        [DisplayName("Data do Pagamento")]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-        public string? Data_Pagamento { get; set; }
-
         [DisplayName("Quantidade Orto")]
         public string? Quantidade_Orto { get; set; }
 
@@ -80,9 +70,29 @@ namespace Migracao.Models.DTO
         public string? Vencimento { get; set; }
 
         [DisplayName("Valor Devido")]
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
         public string? Valor_Devido { get; set; }
 
         [DisplayName("Valor Total")]
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
         public string? Valor_Total { get; set; }
+
+        [DisplayName("Valor Pago")]
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
+        public string? Valor_Pago { get; set; }
+
+        [DisplayName("Valor Original")]
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
+        public string? Valor_Original { get; set; }
+
+        [DisplayName("Data do Pagamento")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+        public string? Data_Pagamento { get; set; }
+
+        [DisplayName("Observação Recebido")]
+        public string? Observacao_Recebido { get; set; }
+
+        [DisplayName("Valor do Pagamento")]
+        public string? Valor_Pagamento { get; set; }
     }
 }

@@ -20,37 +20,37 @@ namespace Migracao.Models.DTO
 
         }
 
-        [DisplayName("Paciente CPF")]
-        public string? Paciente_CPF { get; set; }
+        [DisplayName("ID")]
+        public string? Id { get; set; }
 
-        [DisplayName("Paciente Nome")]
-        public string? Paciente_Nome { get; set; }
+        [DisplayName("CPF")]
+        public string? CPF { get; set; }
 
-        [DisplayName("Dentista Nome")]
-        public string? Dentista_Nome { get; set; }
+        [DisplayName("Nome Completo")]
+        public string? Nome_Completo { get; set; }
 
-        [DisplayName("Dentista Codigo")]
-        public string? Dentista_Codigo { get; set; }
+        [DisplayName("Telefone")]
+        public string? Telefone { get; set; }
 
-        [DisplayName("Procedimento Nome")]
-        public string? Procedimento_Nome { get; set; }
-
-        [DisplayName("Data Atendimento")]
+        [DisplayName("Data e Hora de Início")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-        public string? Data_Atendimento { get; set; }
+        public string? Data_Hora_Inicio { get; set; }
 
-        [DisplayName("Data Início")]
+        [DisplayName("Data e Hora de Término")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-        public string? Data_Inicio { get; set; }
+        public string? Data_Hora_Termino { get; set; }
 
-        [DisplayName("Data Retorno")]
+        [DisplayName("Data e Hora do Atendimento")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-        public string? Data_Retorno { get; set; }
+        public string? Data_Hora_Atendimento { get; set; }
 
-        [DisplayName("Procedimento Observação")]
-        public string? Procedimento_Observacao { get; set; }
+        [DisplayName("Dentista")]
+        public string? Dentista { get; set; }
 
-        [DisplayName("Lancamento")]
-        public string? Lancamento { get; set; }
+        [DisplayName("Observação")]
+        public string? Observacao { get; set; }
+
+        [DisplayName("Desenvolvimento Clínico")]
+        public string? Desenvolvimento_Clinico { get; set; }
     }
 }

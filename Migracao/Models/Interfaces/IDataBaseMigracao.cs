@@ -28,6 +28,6 @@ namespace Migracao.Models.Interfaces
 
         void DataBaseImportacaoRecebiveisHistVenda();
 
-        void DataBaseImportacaoGruposProcedimentos();
+        void DataBaseImportacaoProcedimentosPrecos();
     }
 }

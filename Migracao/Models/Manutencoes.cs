@@ -19,7 +19,7 @@ namespace Migracao.Models
         public decimal? Valor_Pagamento { get; set; }       
         public string? Tipo_Pagamento { get; set; }
         public DateTime? Vencimento { get; set; }
-        public decimal? Valor_Devido { get; set; }
+        public string? Valor_Devido { get; set; }
         public DateTime? Data_Atendimento { get; set; }
         public string? Procedimentos_Observacao { get; set; }
         public string? Procedimento_Valor { get; set; }

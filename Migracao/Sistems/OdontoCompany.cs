@@ -2243,11 +2243,17 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string arquivoPacientesSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectPacientes.sql";
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            string arquivoPacientesSql = baseDirectory + "SelectPacientes.sql";
+
+            //string arquivoPacientesSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectPacientes.sql";
 
             var pacientes = new FireBirdContext<Models.Pacientes>(_pathDB).RetornaItensBancoPorQuery(arquivoPacientesSql);
 
-            string arquivoDDentistasSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectDentistas.sql";
+            string arquivoDDentistasSql = baseDirectory + "SelectDentistas.sql";
+
+           // string arquivoDDentistasSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectDentistas.sql";
 
             var dentistas = new FireBirdContext<Models.Dentistas>(_pathDB).RetornaItensBancoPorQuery(arquivoDDentistasSql);
 
@@ -2268,7 +2274,11 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectAgendamentos.sql";
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            string arquivoSql = baseDirectory + "SelectAgendamentos.sql";
+
+           // string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectAgendamentos.sql";
 
             var agendamentos = new FireBirdContext<Agendamentos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
@@ -2289,7 +2299,11 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectProdedimentos.sql";
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            string arquivoSql = baseDirectory + "SelectProdedimentos.sql";
+
+            //string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectProdedimentos.sql";
 
             var procedimentos = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
@@ -2312,11 +2326,15 @@ namespace Migracao.Sistems
 
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-            string arquivoDesenvClinicoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectDesenvolvimentoClinico.sql";
+            string arquivoDesenvClinicoSql = baseDirectory + "SelectDesenvolvimentoClinico.sql";
 
-            var desenvClinico = new FireBirdContext<Models.DesenvolvimentoClinico>(_pathDB).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
+           // string arquivoDesenvClinicoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectDesenvolvimentoClinico.sql";
 
-            string arquivoAgendamentosSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectAgendamentos.sql";
+           var desenvClinico = new FireBirdContext<Models.DesenvolvimentoClinico>(_pathDB).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
+
+            string arquivoAgendamentosSql = baseDirectory + "SelectAgendamentos.sql";
+
+            //string arquivoAgendamentosSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectAgendamentos.sql";
 
             var agendamentos = new FireBirdContext<Models.Agendamentos>(_pathDB).RetornaItensBancoPorQuery(arquivoAgendamentosSql);
 
@@ -2341,7 +2359,9 @@ namespace Migracao.Sistems
 
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectManutencoes.sql";
+            string arquivoSql = baseDirectory + "SelectManutencoes.sql";
+
+            //string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectManutencoes.sql";
 
             var manutencoes = new FireBirdContext<Models.Manutencoes>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
@@ -2355,7 +2375,9 @@ namespace Migracao.Sistems
                 excelHelper.CriarExcelArquivo(salvarManutencoes + ".xlsx", dataTableManutencoes);
             }
 
-            string arquivoProdedimentosSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectProdedimentos.sql";
+            string arquivoProdedimentosSql = baseDirectory + "SelectProdedimentos.sql";
+
+            //string arquivoProdedimentosSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectProdedimentos.sql";
 
             var procedimentos = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoProdedimentosSql);
 
@@ -2378,7 +2400,11 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectFinanceiroRecebidos.sql";
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            string arquivoSql = baseDirectory + "SelectFinanceiroRecebidos.sql";
+
+            //string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectFinanceiroRecebidos.sql";
 
             var recebidos = new FireBirdContext<Models.Recebidos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
@@ -2399,7 +2425,11 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectFinanceiroRecebiveis.sql";
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            string arquivoSql = baseDirectory + "SelectFinanceiroRecebiveis.sql";
+
+            //string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectFinanceiroRecebiveis.sql";
 
             var recebiveis = new FireBirdContext<Models.Recebivel>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
@@ -2420,7 +2450,11 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectDentistas.sql";
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            string arquivoSql = baseDirectory + "SelectDentistas.sql";
+
+            //string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectDentistas.sql";
 
             var dentistas = new FireBirdContext<Models.Dentistas>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
@@ -2441,7 +2475,11 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectRecebiveisHistVenda.sql";
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            string arquivoSql = baseDirectory + "SelectRecebiveisHistVenda.sql";
+
+            //string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectRecebiveisHistVenda.sql";
 
             var recebiveisHistVenda = new FireBirdContext<Models.RecebiveisHistVenda>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
@@ -2462,7 +2500,11 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectProcedimentosPrecos.sql";
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            string arquivoSql = baseDirectory + "SelectProcedimentosPrecos.sql";
+
+            // string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectProcedimentosPrecos.sql";
 
             var procedimentosPrecos = new FireBirdContext<Models.ProcedimentosPrecos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 

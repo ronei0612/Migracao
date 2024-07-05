@@ -8,26 +8,23 @@ namespace Migracao.Models
 {
     public class Pacientes
     {
-        public string? BAIRRO { get; set; }
+        public string? Nome_Paciente { get; set; }
+        public string? Numero_Prontuario { get; set; }
+        public string? Observacoes { get; set; }
+        public string? E_mail { get; set; }
+        public string? Telefone_Principal { get; set; }
+        public string? CPF { get; set; }
+        public string? RG { get; set; }
+        public string? Sexo { get; set; }
+        public string? Data_de_Nascimento { get; set; }
+        public string? Celular { get; set; }
+        public string? Telefone_Alternativo { get; set; }
+        public string? Logradouro { get; set; }
+        public string? Numero { get; set; }
+        public string? Complemento { get; set; }
+        public string? Bairro { get; set; }
+        public string? Cidade { get; set; }
+        public string? UF { get; set; }
         public string? CEP { get; set; }
-        public string? CGC_CPF { get; set; }
-        public string? CIDADE { get; set; }
-        public string? CLIENTE { get; set; }
-        public string? CELULAR { get; set; }
-        public string? DT_CADASTRO { get; set; }
-        public string? DT_NASCIMENTO { get; set; }
-        public string? EMAIL { get; set; }
-        public string? ENDERECO { get; set; }
-        public string? ESTADO { get; set; }
-        public string? FONE1 { get; set; }
-        public string? FONE2 { get; set; }
-        public string? FORNECEDOR { get; set; }
-        public string? INSC_RG { get; set; }
-        public string? NOME { get; set; }
-        public string? NUM_CONVENIO { get; set; }
-        public string? NUM_ENDERECO { get; set; }
-        public string? NUM_FICHA { get; set; }
-        public string? OBS1 { get; set; }
-        public string? SEXO_M_F { get; set; }
     }
 }

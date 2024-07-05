@@ -488,11 +488,8 @@ namespace Migracao.Sistems
         {
         }
 
-        void IDataBaseMigracao.DataBaseImportacaoFinanceiroRecebidos()
-        {
-        }
 
-        void IDataBaseMigracao.DataBaseImportacaoPacientes()
+        void IDataBaseMigracao.DataBaseImportacaoPacientesDentistas()
         {
         }
 
@@ -515,6 +512,11 @@ namespace Migracao.Sistems
         }
 
         public void DataBaseImportacaoProcedimentosPrecos()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DataBaseImportacaoPagosExigiveis()
         {
             throw new NotImplementedException();
         }

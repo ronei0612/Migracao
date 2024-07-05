@@ -2237,24 +2237,28 @@ namespace Migracao.Sistems
             }
         }
 
-        void IDataBaseMigracao.DataBaseImportacaoPacientes()
+        void IDataBaseMigracao.DataBaseImportacaoPacientesDentistas()
         {
             ExcelHelper excelHelper = new ExcelHelper();
 
             int estabelecimentoID = 1;
 
-            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectPacientes.sql";
+            string arquivoPacientesSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectPacientes.sql";
 
-            var pacientes = new FireBirdContext<Models.Pacientes>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+            var pacientes = new FireBirdContext<Models.Pacientes>(_pathDB).RetornaItensBancoPorQuery(arquivoPacientesSql);
 
-            var lstPacientes = ConversorEntidadeParaDTO.ConvertPacientesParaPacientesDTO(pacientes);
+            string arquivoDDentistasSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectDentistas.sql";
 
-            var dataTablePacientes = ExcelHelper.ConversorEntidadeParaDataTable(lstPacientes);
+            var dentistas = new FireBirdContext<Models.Dentistas>(_pathDB).RetornaItensBancoPorQuery(arquivoDDentistasSql);
 
-            if (lstPacientes != null)
+            var lstPacientesDentistas = ConversorEntidadeParaDTO.ConvertPacientesDentistasParaPacientesDentistasDTO(pacientes, dentistas);
+
+            var dataTablePacientesDentistas = ExcelHelper.ConversorEntidadeParaDataTable(lstPacientesDentistas);
+
+            if (dataTablePacientesDentistas != null)
             {
-                var salvarArquivoPacientes = Tools.GerarNomeArquivo($"CadastroPacientesEntidade_{estabelecimentoID}_OdontoCompany");
-                excelHelper.CriarExcelArquivo(salvarArquivoPacientes + ".xlsx", dataTablePacientes);
+                var salvarArquivoPacientesDentistas = Tools.GerarNomeArquivo($"CadastroPacienteDentistasEntidade_{estabelecimentoID}_OdontoCompany");
+                excelHelper.CriarExcelArquivo(salvarArquivoPacientesDentistas + ".xlsx", dataTablePacientesDentistas);
             }
         }
 
@@ -2308,11 +2312,15 @@ namespace Migracao.Sistems
 
             string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-            string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectDesenvolvimentoClinico.sql";
+            string arquivoDesenvClinicoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectDesenvolvimentoClinico.sql";
 
-            var desenvClinico = new FireBirdContext<Models.DesenvolvimentoClinico>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+            var desenvClinico = new FireBirdContext<Models.DesenvolvimentoClinico>(_pathDB).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
 
-            var lstDesenvClinico = ConversorEntidadeParaDTO.ConvertDesenvolvimentoClinicoParaDesenvolvimentoClinicoDTO(desenvClinico);
+            string arquivoAgendamentosSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectAgendamentos.sql";
+
+            var agendamentos = new FireBirdContext<Models.Agendamentos>(_pathDB).RetornaItensBancoPorQuery(arquivoAgendamentosSql);
+
+            var lstDesenvClinico = ConversorEntidadeParaDTO.ConvertDesenvolvimentoClinicoParaDesenvolvimentoClinicoDTO(desenvClinico, agendamentos);
 
             var dataTableDesenvClinico = ExcelHelper.ConversorEntidadeParaDataTable(lstDesenvClinico);
 
@@ -2364,7 +2372,7 @@ namespace Migracao.Sistems
 
 
 
-        void IDataBaseMigracao.DataBaseImportacaoFinanceiroRecebidos()
+        void IDataBaseMigracao.DataBaseImportacaoPagosExigiveis()
         {
             ExcelHelper excelHelper = new ExcelHelper();
 

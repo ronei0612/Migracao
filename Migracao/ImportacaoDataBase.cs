@@ -1,4 +1,5 @@
-﻿using Migracao.Models.Interfaces;
+﻿using Migracao.Models;
+using Migracao.Models.Interfaces;
 using Migracao.Sistems;
 using Migracao.Utils;
 using System;
@@ -130,11 +131,11 @@ namespace Migracao
                 if (_tabela == "Manutenções")
                     instance.DataBaseImportacaoManutencoes();
 
-                if (_tabela == "Pacientes")
-                    instance.DataBaseImportacaoPacientes();
+                if (_tabela == "Pacientes/Dentistas")
+                    instance.DataBaseImportacaoPacientesDentistas();
 
-                if(_tabela == "Financeiro (Recebidos)")
-                    instance.DataBaseImportacaoFinanceiroRecebidos();
+                //if(_tabela == "Financeiro (Recebidos)")
+                //    instance.DataBaseImportacaoFinanceiroRecebidos();
 
                 if (_tabela == "Financeiro (Recebíveis)")
                     instance.DataBaseImportacaoFinanceiroRecebiveis();
@@ -150,6 +151,9 @@ namespace Migracao
 
                 if (_tabela == "Procedimentos Preços")
                     instance.DataBaseImportacaoProcedimentosPrecos();
+
+                if (_tabela == "Recebíveis Pagos e Exigíveis")
+                    instance.DataBaseImportacaoPagosExigiveis();
             }
             else
             {

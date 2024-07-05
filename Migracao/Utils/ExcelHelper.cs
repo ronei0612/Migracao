@@ -1146,6 +1146,34 @@ namespace Migracao.Utils
             }
         }
 
+        public static string GetEspecieIDFromFormaPagamentoEntidades(string formaPagamento)
+        {
+
+            switch (formaPagamento)
+            {
+                case string a when a.Equals("17"):
+                    return TitulosEspeciesID.Carne.ToString();
+
+                case string b when b.Contains("4"):
+                    return TitulosEspeciesID.Cheque.ToString();
+
+                case string b when b.Contains("1"):
+                    return TitulosEspeciesID.Dinheiro.ToString();
+
+                case string b when b.Contains("22"):
+                    return TitulosEspeciesID.TransferenciaBancaria.ToString();
+
+                case string b when b.Contains("31") || b.Contains("PIX"):
+                    return TitulosEspeciesID.DepositoEmConta.ToString();
+
+                case string b when b.Contains("8") || b.Contains("MASTER") || b.Contains("VISA"):
+                    return TitulosEspeciesID.CartaoCredito.ToString();
+
+                default:
+                    return TitulosEspeciesID.Dinheiro.ToString();
+            }
+        }
+
         public static bool IsStringWithinMaxLength(string input)
         {
             return input != null && input.Length <= 512;

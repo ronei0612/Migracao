@@ -8,15 +8,13 @@ namespace Migracao.Models
 {
     public class Dentistas
     {
-        public string? Codigo { get; set; }
-        public string? NOME { get; set; }
+        public string? Numero_Prontuario { get; set; }
+        public string? Apelido { get; set; }
         public string? Departamento { get; set; }
         public string? Observacoes { get; set; }
-        public string? Ativo { get; set; }
         public string? Nome_Completo { get; set; }
         public string? Email { get; set; }
         public string? Telefone { get; set; }
-        public string? CRO { get; set; }
-        public DateTime? Data_Cadastro { get; set; }
+        public string? Codigo_do_Conselho_e_Estado { get; set; }
     }
 }

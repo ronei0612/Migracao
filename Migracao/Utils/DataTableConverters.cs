@@ -11,13 +11,13 @@ namespace Migracao.Utils
 {
     public class DataTableConverters
     {
-        public static DataTable ConversorEntidadeParaDataTable(List<PacientesDTO> pacientesDTO)
+        public static DataTable ConversorEntidadeParaDataTable(List<PacientesDentistasDTO> pacientesDTO)
         {
             {
                 DataTable dataTable = new DataTable();
 
                 // Adiciona as colunas ao DataTable baseado nos nomes das propriedades da classe Person
-                foreach (var prop in typeof(PacientesDTO).GetProperties())
+                foreach (var prop in typeof(PacientesDentistasDTO).GetProperties())
                 {
                     dataTable.Columns.Add(prop.Name, prop.PropertyType);
                 }
@@ -34,7 +34,7 @@ namespace Migracao.Utils
 
 
                         // Preenche as células da linha com os valores das propriedades da pessoa
-                        foreach (var prop in typeof(PacientesDTO).GetProperties())
+                        foreach (var prop in typeof(PacientesDentistasDTO).GetProperties())
                         {
                             row[prop.Name] = prop.GetValue(paciente);
                         }

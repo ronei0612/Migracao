@@ -21,7 +21,7 @@ namespace Migracao.Models.DTO
         }
 
         [DisplayName("ID")]
-        public string? Id { get; set; }
+        public string? ID { get; set; }
 
         [DisplayName("CPF")]
         public string? CPF { get; set; }
@@ -40,9 +40,13 @@ namespace Migracao.Models.DTO
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Hora_Termino { get; set; }
 
-        [DisplayName("Data e Hora do Atendimento")]
+        [DisplayName("Data e Hora Atendimento Início")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-        public string? Data_Hora_Atendimento { get; set; }
+        public string? Data_Hora_Atendimento_Inicio { get; set; }
+
+        [DisplayName("Data e Hora Atendimento Término")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+        public string? Data_Hora_Atendimento_Termino { get; set; }
 
         [DisplayName("Dentista")]
         public string? Dentista { get; set; }

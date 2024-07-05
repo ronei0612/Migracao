@@ -19,6 +19,7 @@ crd111.VENCTO_ORIG Vencimento_Recebivel,
 crd111.SITUACAO,
 crd111.NOME_GRUPO,
 crd111.ORDEM,
+crd111.OBS Pagamento_Observacoes,
 crd013.CODIGO Tipo_Especie,
 crd013.NOME Especie_Pagamento
 FROM BXD111 bxd111

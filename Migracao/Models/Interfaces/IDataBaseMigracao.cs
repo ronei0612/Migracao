@@ -16,11 +16,11 @@ namespace Migracao.Models.Interfaces
 
         void DataBaseImportacaoManutencoes();
 
-        void DataBaseImportacaoFinanceiroRecebidos();
+        void DataBaseImportacaoPagosExigiveis();
 
         void DataBaseImportacaoFinanceiroRecebiveis();
 
-        void DataBaseImportacaoPacientes();
+        void DataBaseImportacaoPacientesDentistas();
 
         void DataBaseImportacaoAgendamentos();
 

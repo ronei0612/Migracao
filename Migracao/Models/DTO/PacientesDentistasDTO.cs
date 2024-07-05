@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace Migracao.DTO
 {
-    public class PacientesDTO
+    public class PacientesDentistasDTO
     {
 
-        public PacientesDTO() { }
+        public PacientesDentistasDTO() { }
 
-        public PacientesDTO(List<Pacientes> pacientes)
+        public PacientesDentistasDTO(List<Pacientes> pacientes)
         {
 
         }
@@ -26,6 +26,9 @@ namespace Migracao.DTO
 
         [DisplayName("Número Prontuário")]
         public string? Numero_Prontuario { get; set; }
+
+        [DisplayName("Nome")]
+        public string? Nome { get; set; }
 
         [DisplayName("Nome Completo")]
         public string? Nome_Completo { get; set; }

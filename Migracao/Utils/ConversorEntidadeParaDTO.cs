@@ -67,7 +67,7 @@ namespace Migracao.Utils
             return lstAgendamentosDTO;
         }
 
-        public static List<DesenvolvimentoClinicoDTO> ConvertDesenvolvimentoClinicoParaDesenvolvimentoClinicoDTO(List<DesenvolvimentoClinico> desenvClicnicos)
+        public static List<DesenvolvimentoClinicoDTO> ConvertDesenvolvimentoClinicoParaDesenvolvimentoClinicoDTO(List<DesenvolvimentoClinico> desenvClicnicos, List<Agendamentos> agendamentos)
         {
             List<DesenvolvimentoClinicoDTO> lstDesenvolvimentoClinicoDTO = new List<DesenvolvimentoClinicoDTO>();
 
@@ -80,12 +80,32 @@ namespace Migracao.Utils
                         CPF = desenvClicnico.Paciente_CPF,
                         Nome_Completo = desenvClicnico.Paciente_Nome,
                         Dentista = desenvClicnico.Dentista_Nome,
-                        Id = desenvClicnico.Dentista_Codigo,
+                        ID = desenvClicnico.Dentista_Codigo,
                         Desenvolvimento_Clinico = desenvClicnico.Procedimento_Nome,
-                        Data_Hora_Atendimento = desenvClicnico.Data_Retorno.ToString(),
                         Data_Hora_Inicio = desenvClicnico.Data_Inicio.ToString(),
-                        Data_Hora_Termino = desenvClicnico.Data_Retorno.ToString(),
+                        Data_Hora_Termino = string.Empty,
+                        Data_Hora_Atendimento_Inicio = desenvClicnico.Data_Retorno.ToString(),
+                        Data_Hora_Atendimento_Termino = string.Empty,
                         Observacao = desenvClicnico.Procedimento_Observacao
+                    };
+
+                    lstDesenvolvimentoClinicoDTO.Add(lstDesenvolvimentoClinico);
+                };
+
+                foreach (var agendamento in agendamentos)
+                {
+                    var lstDesenvolvimentoClinico = new DesenvolvimentoClinicoDTO
+                    {
+                        CPF = agendamento.Paciente_CPF,
+                        Nome_Completo = agendamento.Nome,
+                        Dentista = agendamento.Nome_Dentista,
+                        ID = agendamento.Codigo_Responsavel,
+                        Desenvolvimento_Clinico = string.Empty,
+                        Data_Hora_Inicio = agendamento.Data_Inclusao.ToString(),
+                        Data_Hora_Termino = string.Empty,
+                        Data_Hora_Atendimento_Inicio = agendamento.Data.ToString(),
+                        Data_Hora_Atendimento_Termino = string.Empty,
+                        Observacao = agendamento.Observacao
                     };
 
                     lstDesenvolvimentoClinicoDTO.Add(lstDesenvolvimentoClinico);
@@ -99,35 +119,60 @@ namespace Migracao.Utils
             return lstDesenvolvimentoClinicoDTO;
         }
 
-        public static List<PacientesDTO> ConvertPacientesParaPacientesDTO(List<Models.Pacientes> pacientes)
+        public static List<PacientesDentistasDTO> ConvertPacientesDentistasParaPacientesDentistasDTO(List<Models.Pacientes> pacientes, List<Models.Dentistas> dentistas)
         {
-            List<PacientesDTO> pacientesDTO = new List<PacientesDTO>();
+            List<PacientesDentistasDTO> pacientesDentistasDTO = new List<PacientesDentistasDTO>();
 
             try
             {
                 foreach (var paciente in pacientes)
                 {
-                    var lstPacientes = new PacientesDTO
+                    var lstPacientes = new PacientesDentistasDTO
                     {
-                        Nome_Completo = paciente.NOME,
-                        Apelido = paciente.NOME,
-                        CPF = paciente.CGC_CPF,
-                        Observacoes = paciente.OBS1,
-                        Email = paciente.EMAIL,
-                        RG = paciente.INSC_RG.GetPrimeirosCaracteres(20),
-                        Sexo = paciente.SEXO_M_F.ToSexo("m", "f") ? "M" : "F",
-                        Data_Nascimento = paciente.DT_NASCIMENTO,
-                        Telefone_Principal = paciente.FONE1,
-                        Celular = paciente.CELULAR,
-                        Telefone_Alternativo = paciente.FONE2,
-                        Logradouro = paciente.ENDERECO,
-                        Numero = paciente.NUM_ENDERECO,
-                        Bairro = paciente.BAIRRO,
-                        Cidade = paciente.CIDADE,
+                        Cargo_Clinica = string.Empty,
+                        Nome = paciente.Nome_Paciente,
+                        Nome_Social = string.Empty,
+                        Nome_Completo = string.Empty,
+                        Apelido = string.Empty,
+                        CPF = paciente.CPF,
+                        Observacoes = paciente.Observacoes,
+                        Email = paciente.E_mail,
+                        RG = paciente.RG.GetPrimeirosCaracteres(20),
+                        Sexo = paciente.Sexo.ToSexo("m", "f") ? "M" : "F",
+                        Data_Nascimento = paciente.Data_de_Nascimento,
+                        Telefone_Principal = paciente.Telefone_Principal,
+                        Celular = paciente.Celular,
+                        Telefone_Alternativo = paciente.Telefone_Alternativo,
+                        Logradouro = paciente.Logradouro,
+                        Numero = paciente.Numero,
+                        Bairro = paciente.Bairro,
+                        Cidade = paciente.Cidade,
                         CEP = paciente.CEP,
+                        Codigo_Conselho_Estado = string.Empty,
+                        Estado_Civil = string.Empty,
+                        Cidade_Nascimento = string.Empty,
+                        Profissao = string.Empty
                     };
 
-                    pacientesDTO.Add(lstPacientes);
+                    pacientesDentistasDTO.Add(lstPacientes);
+                };
+
+                foreach (var dentista in dentistas)
+                {
+                    var lstPacientes = new PacientesDentistasDTO
+                    {
+                        Cargo_Clinica = "Dentista",
+                        Nome = dentista.Nome_Completo,
+                        Nome_Social = string.Empty,
+                        Nome_Completo = dentista.Nome_Completo,
+                        Apelido = dentista.Nome_Completo.GetPrimeirosCaracteres(20),
+                        Observacoes = dentista.Observacoes,
+                        Email = dentista.Email,
+                        Telefone_Principal = dentista.Telefone,
+                        Codigo_Conselho_Estado = dentista.Codigo_do_Conselho_e_Estado
+                    };
+
+                    pacientesDentistasDTO.Add(lstPacientes);
                 };
             }
             catch (Exception error)
@@ -135,7 +180,7 @@ namespace Migracao.Utils
                 throw new Exception($"Erro ao converter Excel para Pessoas Pacientes: {error.Message}");
             }
 
-            return pacientesDTO;
+            return pacientesDentistasDTO;
         }
 
         public static List<ManutencoesDTO> ConvertManutencoesParaManutencoesDTO(List<Manutencoes> manutencoes)
@@ -388,15 +433,19 @@ namespace Migracao.Utils
             return lstRecebiveisDTO;
         }
 
-        public static List<FinanceiroRecebidosDTO> ConvertRecebidosParaRecebidosDTO(List<Recebidos> recebidos)
+        public static List<PagosExigiveisDTO> ConvertRecebidosParaRecebidosDTO(List<Recebidos> recebidos)
         {
-            List<FinanceiroRecebidosDTO> lstReceberDTO = new List<FinanceiroRecebidosDTO>();
+            List<PagosExigiveisDTO> lstReceberDTO = new List<PagosExigiveisDTO>();
 
             try
             {
                 foreach (var receber in recebidos)
                 {
-                    var lstReceber = new FinanceiroRecebidosDTO
+
+                    var tipoPagamento = receber.Tipo_Pagamento;
+                    string formaPagamento = ExcelHelper.GetEspecieIDFromFormaPagamentoEntidades(tipoPagamento);
+
+                    var lstReceber = new PagosExigiveisDTO
                     {
                         CPF = receber.CNPJ_CPF.ToCPF(),
                         Nome = receber.Nome_Paciente.ToCPF(),
@@ -408,13 +457,14 @@ namespace Migracao.Utils
                         Data_Pagamento = receber.Data_Baixa.ToShortDateString(),
                         Observacao_Recebido = ("Observação: " + receber.Observacao + " | Documento: " + receber.Tipo_Documento + " | Situação: " + receber.Situacao +
                         " | Nome do Grupo: " + receber.Nome_Grupo + " | Ordem: " + receber.Ordem),
-                        Tipo_Pagamento = receber.Tipo_Pagamento,
+                        Tipo_Pagamento = formaPagamento,
                         Valor_Original = receber.Valor_Original.ToString(),
-                        Vencimento_Recebivel = receber.Vencimento_Recebivel.ToShortDateString(),
-                        Duplicata = receber.Duplicata,
+                        //Vencimento_Recebivel = receber.Vencimento_Recebivel.ToShortDateString(),
+                        //Duplicata = receber.Duplicata,
                         Parcela = receber.Parcela.ToString(),
-                        Tipo_Especie_Pagamento = receber.Tipo_Especie,
-                        Especie_Pagamento = ExcelHelper.GetEspecieIDFromFormaPagamento(receber.Tipo_Especie).ToString()
+                        //Tipo_Especie_Pagamento = receber.Tipo_Especie,
+                        //Especie_Pagamento = ExcelHelper.GetEspecieIDFromFormaPagamento(receber.Tipo_Especie).ToString(),
+                        Pagamento_Observacoes = receber.Pagamento_Observacoes
                     };
 
                     lstReceberDTO.Add(lstReceber);
@@ -442,23 +492,15 @@ namespace Migracao.Utils
                 {
                     var lstDentistas = new DentistasDTO
                     {
-                        Codigo = dentista.Codigo?.ToString(),
-                        Ativo = dentista.Ativo.ToString(),
-                        Nome_Completo = dentista.Nome_Completo,
-                        NomeSocial = string.Empty,
-                        Apelido = dentista.NOME?.GetPrimeirosCaracteres(20).ToNome(),
-                        Data_Cadastro = dentista.Data_Cadastro.ToString(),
-                        Observacoes = dentista.Observacoes,
-                        Email = dentista.Email?.ToEmail(),
-                        Nascimento_Local = string.Empty,
-                        Estado_Civil = string.Empty,
-                        Profissao = string.Empty,
-                        Cargo_Clinica = string.Empty,
-                        Dentista = "N",
-                        Conselho_Codigo = string.Empty,
-                        Paciente = "N",
-                        Funcionario = "S",
-                        Fornecedor = "N"
+                        //Cargo_Clinica = "Dentista",
+                        //Nome = dentista.Nome_Completo,
+                        //Nome_Social = string.Empty,
+                        //Nome_Completo = dentista.Nome_Completo,
+                        //Apelido = dentista.Nome_Completo.GetPrimeirosCaracteres(20),
+                        //Observacoes = dentista.Observacoes,
+                        //Email = dentista.Email,
+                        //Telefone_Principal = dentista.Telefone,
+                        //Codigo_Conselho_Estado = dentista.Codigo_do_Conselho_e_Estado
                     };
 
                     lstDentistasDTO.Add(lstDentistas);

@@ -30,5 +30,6 @@ namespace Migracao.Models
         public string? Situacao { get; set; }
         public string? Nome_Grupo { get; set; }
         public string? Ordem { get; set; }
+        public string? Pagamento_Observacoes { get; set; }
     }
 }

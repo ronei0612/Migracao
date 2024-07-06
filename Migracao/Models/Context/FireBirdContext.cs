@@ -16,7 +16,7 @@ namespace Migracao.Models.Context
 {
     public class FireBirdContext<T>
     {
-        string _connectionString = @"Server=localhost;Database={0};User=SYSDBA;Password=masterkey;";
+        string _connectionString = @"Server=localhost;Database={0};User=SYSDBA;Password=masterkey;Charset=ISO8859_1";
 
         public FireBirdContext(string dataBase)
         {

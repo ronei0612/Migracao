@@ -1,4 +1,5 @@
 ﻿using Migracao.Models;
+using Migracao.Models.DentalOffice;
 using Migracao.Models.Interfaces;
 using Migracao.Sistems;
 using Migracao.Utils;
@@ -42,23 +43,23 @@ namespace Migracao
         {
             if (comboBoxSistema.Items[comboBoxSistema.SelectedIndex] == "DentalOffice")
             {
-                panelDB.Visible          = false;
+                panelDB.Visible = false;
                 panelDBContratos.Visible = false;
 
-                inputDBContratos.Text    = string.Empty;
+                inputDBContratos.Text = string.Empty;
 
-                panelDataBase.Visible    = true;  
+                panelDataBase.Visible = true;
             }
 
             if (comboBoxSistema.Items[comboBoxSistema.SelectedIndex] == "OdontoCompany")
             {
-                panelDB.Visible          = true;
-                panelDB.Visible          = true;
+                panelDB.Visible = true;
+                panelDB.Visible = true;
                 panelDBContratos.Visible = true;
 
-                inputDataBaseName.Text   = string.Empty;
+                inputDataBaseName.Text = string.Empty;
 
-                panelDataBase.Visible    = false;
+                panelDataBase.Visible = false;
             }
         }
 
@@ -76,7 +77,7 @@ namespace Migracao
         {
             _sistemaOrigem = comboBoxSistema.SelectedItem.ToString();
 
-            _pathDB          = inputDB.Text;
+            _pathDB = inputDB.Text;
             _pathDBContratos = inputDBContratos.Text;
 
             _dataBaseName = inputDataBaseName.Text.ToString();
@@ -85,7 +86,7 @@ namespace Migracao
             if (string.IsNullOrEmpty(_tabela))
                 MessageBox.Show("Para continuar, selecione uma das opções de tabela para importação!", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-            if(string.IsNullOrEmpty(_pathDB) || (_sistemaOrigem == "OdontoCompany" && string.IsNullOrEmpty(_pathDBContratos)))
+            if (string.IsNullOrEmpty(_pathDB) || (_sistemaOrigem == "OdontoCompany" && string.IsNullOrEmpty(_pathDBContratos)))
                 MessageBox.Show("Por favor, valide o caminho das DBs desejadas", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             //Identifica a classe, baseado na escolha de sistema, cria a instancia e chama o método através dela
@@ -99,42 +100,46 @@ namespace Migracao
             if (type != null && typeof(IDataBaseMigracao).IsAssignableFrom(type))
             {
                 IDataBaseMigracao instance = (IDataBaseMigracao)Activator.CreateInstance(type, _dataBaseName, _pathDB, _pathDBContratos);
+
                 
                 switch (_tabela)
                 {
-                    case "Procedimentos":
-                    instance.DataBaseImportacaoProcedimentos();
+                   // Principais
+                    case "AgendamentosDesenvClínico":
+                        instance.DataBaseImportacaoDevClinico();
                         break;
-                    case "Desenvolvimento Clínico":
-                    instance.DataBaseImportacaoDevClinico();
+                    case "ProcedimentosManutenções":
+                        instance.DataBaseImportacaoManutencoes();
                         break;
-                    case "Manutenções":
-                    instance.DataBaseImportacaoManutencoes();
+                    case "PacientesDentistas":
+                        instance.DataBaseImportacaoPacientesDentistas();
                         break;
-                    case "Pacientes/Dentistas":
-                    instance.DataBaseImportacaoPacientesDentistas();
-                        break;
-                    case "Financeiro (Recebíveis)":
-                //    instance.DataBaseImportacaoFinanceiroRecebidos();
 
-                if (_tabela == "Financeiro (Recebíveis)")
+                    case "ProcedimentosTabela Preços":
+                        instance.DataBaseImportacaoProcedimentosPrecos();
+                        break;
+                    case "Recebíveis Pagos e Exigíveis":
+                        instance.DataBaseImportacaoPagosExigiveis();
+                        break;
+
+                    // Complementares
+                    case "Procedimentos":
+                        instance.DataBaseImportacaoProcedimentos();
+                        break;
+
+                    case "Financeiro (Recebíveis)":
                     instance.DataBaseImportacaoFinanceiroRecebiveis();
                         break;
                     case "Agendamentos":
-                    instance.DataBaseImportacaoAgendamentos();
+                        instance.DataBaseImportacaoAgendamentos();
                         break;
                     case "Dentistas":
-                    instance.DataBaseImportacaoDentistas();
+                        instance.DataBaseImportacaoDentistas();
                         break;
                     case "Recebíveis Histórico Vendas":
-                    instance.DataBaseImportacaoRecebiveisHistVenda();
+                        instance.DataBaseImportacaoRecebiveisHistVenda();
                         break;
-                    case "Procedimentos Preços":
-                    instance.DataBaseImportacaoProcedimentosPrecos();
-                        break;
-                    case "Recebíveis Pagos e Exigíveis":
-                    instance.DataBaseImportacaoPagosExigiveis();
-                        break;
+                    
                 }
             }
             else

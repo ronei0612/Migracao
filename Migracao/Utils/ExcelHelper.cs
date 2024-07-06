@@ -1,6 +1,8 @@
-﻿using Migracao.DTO;
+﻿using ClosedXML.Excel;
+using Migracao.DTO;
 using Migracao.Models;
 using NPOI.SS.UserModel;
+using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
 using System.ComponentModel;
 using System.Data;
@@ -303,7 +305,7 @@ namespace Migracao.Utils
                 ICell cell = row.GetCell(columnIndex);
                 ICell cellRetorno = row.GetCell(columnRetorno);
 
-                if (cell != null && cell.CellType != CellType.Blank && cell.StringCellValue.Equals(texto, StringComparison.OrdinalIgnoreCase))
+                if (cell != null && cell.CellType != NPOI.SS.UserModel.CellType.Blank && cell.StringCellValue.Equals(texto, StringComparison.OrdinalIgnoreCase))
                     return cellRetorno.ToString();
             }
 
@@ -960,6 +962,10 @@ namespace Migracao.Utils
             IWorkbook workbook = new XSSFWorkbook();
             ISheet sheet = workbook.CreateSheet("Planilha1");
 
+            int numberOfColumns = dataTable.Columns.Count;
+
+            sheet.SetAutoFilter(new CellRangeAddress(0, 0, 0, numberOfColumns - 1));
+
             // Adiciona os nomes das colunas ao arquivo Excel
             IRow headerRow = sheet.CreateRow(0);
             for (int j = 0; j < dataTable.Columns.Count; j++)
@@ -979,6 +985,12 @@ namespace Migracao.Utils
                 }
             }
 
+            ICellStyle headerStyle = workbook.CreateCellStyle();
+            headerStyle.FillForegroundColor = NPOI.SS.UserModel.IndexedColors.LightCornflowerBlue.Index;
+            headerStyle.FillPattern = FillPattern.SolidForeground;
+
+            // Aplicar o estilo de fundo ao cabeçalho
+            headerRow.RowStyle = headerStyle;
             FileStream sw = File.Create(nomeArquivo);
             workbook.Write(sw);
             sw.Close();
@@ -1215,10 +1227,5 @@ namespace Migracao.Utils
                 return dataTable;
             }
         }
-    }
-
-    public class ExcelEntity<T>
-    {
-        public List<T> EntidadeODC { get; set; }
     }
 }

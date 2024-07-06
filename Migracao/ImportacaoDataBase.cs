@@ -64,34 +64,12 @@ namespace Migracao
 
         private void BtnPathDB_Click(object sender, EventArgs e)
         {
-            var openFileDialog = new OpenFileDialog()
-            {
-                Title = "Selecione um arquivo",
-                InitialDirectory = Tools.ultimaPasta
-            };
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                inputDB.Text = openFileDialog.FileName;
-                //Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-                //File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
-            }
+            SelecionarArquivo(inputDB);
         }
 
         private void BtnPathDBContratos_Click(object sender, EventArgs e)
         {
-            var openFileDialog = new OpenFileDialog()
-            {
-                Title = "Selecione um arquivo",
-                InitialDirectory = Tools.ultimaPasta
-            };
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                inputDBContratos.Text = openFileDialog.FileName;
-                //Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-                //File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
-            }
+            SelecionarArquivo(inputDBContratos);
         }
 
         private void ExecutarImportacao(object sender, EventArgs e)
@@ -120,44 +98,64 @@ namespace Migracao
 
             if (type != null && typeof(IDataBaseMigracao).IsAssignableFrom(type))
             {
-                IDataBaseMigracao instance = (IDataBaseMigracao)Activator.CreateInstance(type, _dataBaseName,  _pathDB, _pathDBContratos);
+                IDataBaseMigracao instance = (IDataBaseMigracao)Activator.CreateInstance(type, _dataBaseName, _pathDB, _pathDBContratos);
                 
-                if (_tabela == "Procedimentos")
+                switch (_tabela)
+                {
+                    case "Procedimentos":
                     instance.DataBaseImportacaoProcedimentos();
-
-                if (_tabela == "Desenvolvimento Clínico")
+                        break;
+                    case "Desenvolvimento Clínico":
                     instance.DataBaseImportacaoDevClinico();
-
-                if (_tabela == "Manutenções")
+                        break;
+                    case "Manutenções":
                     instance.DataBaseImportacaoManutencoes();
-
-                if (_tabela == "Pacientes/Dentistas")
+                        break;
+                    case "Pacientes/Dentistas":
                     instance.DataBaseImportacaoPacientesDentistas();
-
-                //if(_tabela == "Financeiro (Recebidos)")
+                        break;
+                    case "Financeiro (Recebíveis)":
                 //    instance.DataBaseImportacaoFinanceiroRecebidos();
 
                 if (_tabela == "Financeiro (Recebíveis)")
                     instance.DataBaseImportacaoFinanceiroRecebiveis();
-
-                if (_tabela == "Agendamentos")
+                        break;
+                    case "Agendamentos":
                     instance.DataBaseImportacaoAgendamentos();
-
-                if (_tabela == "Dentistas")
+                        break;
+                    case "Dentistas":
                     instance.DataBaseImportacaoDentistas();
-
-                if (_tabela == "Recebíveis Histórico Vendas")
+                        break;
+                    case "Recebíveis Histórico Vendas":
                     instance.DataBaseImportacaoRecebiveisHistVenda();
-
-                if (_tabela == "Procedimentos Preços")
+                        break;
+                    case "Procedimentos Preços":
                     instance.DataBaseImportacaoProcedimentosPrecos();
-
-                if (_tabela == "Recebíveis Pagos e Exigíveis")
+                        break;
+                    case "Recebíveis Pagos e Exigíveis":
                     instance.DataBaseImportacaoPagosExigiveis();
+                        break;
+                }
             }
             else
             {
                 MessageBox.Show("Classe não encontrada ou não implementa a Interface!", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void SelecionarArquivo(TextBox textBox)
+        {
+            var openFileDialog = new OpenFileDialog
+            {
+                Title = "Selecione um arquivo",
+                InitialDirectory = Tools.ultimaPasta
+            };
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                textBox.Text = openFileDialog.FileName;
+                Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
+                File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
             }
         }
     }

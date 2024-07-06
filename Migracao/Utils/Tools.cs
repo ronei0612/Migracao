@@ -2,6 +2,7 @@
 using NPOI.SS.UserModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -13,8 +14,14 @@ namespace Migracao.Utils
 		public static string salvarNaPasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Documents");
 		public static string ultimaPasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Documents");
 		public static string ultimoEstabelecimentoID = "";
+        public static string ultimoEstabelecimento = "";
+        public static string ultimoAntigoSistema = "0";
+        public static string ultimoinputDB = "";
+        public static string ultimoinputDBContratos = "";
+        
+        private static string arquivoConfig = "config.config";
 
-		public static string? ToCPF(this string possivelCpf)
+        public static string? ToCPF(this string possivelCpf)
 		{
 			if (string.IsNullOrEmpty(possivelCpf))
 				return null;
@@ -189,7 +196,7 @@ namespace Migracao.Utils
 
 		public static string GerarNomeArquivo(string nomeArquivo, string extensao = ".xlsx")
 		{
-			var caminhoDoArquivo = Path.Combine(Tools.salvarNaPasta, nomeArquivo);
+			var caminhoDoArquivo = Path.Combine(salvarNaPasta, nomeArquivo);
 
 			if (File.Exists(caminhoDoArquivo + extensao))
 			{
@@ -473,5 +480,25 @@ namespace Migracao.Utils
 
 			return string.Join(" ", nameParts.Skip(1));
 		}
-	}
+
+        public static void SalvarConfig()
+        {
+            File.WriteAllText(arquivoConfig,
+                    salvarNaPasta + Environment.NewLine +
+                    ultimaPasta + Environment.NewLine +
+                    ultimoEstabelecimentoID + Environment.NewLine +
+                    ultimoEstabelecimento + Environment.NewLine +
+                    ultimoAntigoSistema + Environment.NewLine +
+                    ultimoinputDB + Environment.NewLine +
+                    ultimoinputDBContratos);
+        }
+
+        public static string[] LerConfig()
+        {
+			if (!File.Exists(arquivoConfig))
+				SalvarConfig();
+
+            return File.ReadAllLines(arquivoConfig);
+        }
+    }
 }

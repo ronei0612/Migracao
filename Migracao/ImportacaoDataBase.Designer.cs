@@ -69,7 +69,6 @@
             labelPathDB.Size = new Size(146, 15);
             labelPathDB.TabIndex = 103;
             labelPathDB.Text = "Caminho DataBase Clinica";
-            labelPathDB.Click += label2_Click;
             // 
             // labelPathDBContratos
             // 
@@ -101,6 +100,7 @@
             BtnPathDB.Text = "📂";
             BtnPathDB.UseVisualStyleBackColor = true;
             BtnPathDB.Click += BtnPathDB_Click;
+            BtnPathDB.KeyDown += BtnPathDB_KeyDown;
             // 
             // BtnPathDBContratos
             // 
@@ -113,6 +113,7 @@
             BtnPathDBContratos.Text = "📂";
             BtnPathDBContratos.UseVisualStyleBackColor = true;
             BtnPathDBContratos.Click += BtnPathDBContratos_Click;
+            BtnPathDBContratos.KeyDown += BtnPathDB_KeyDown;
             // 
             // label3
             // 
@@ -134,6 +135,7 @@
             comboBoxSistema.Size = new Size(206, 23);
             comboBoxSistema.TabIndex = 108;
             comboBoxSistema.SelectedIndexChanged += AntigoSistemaChanged;
+            comboBoxSistema.KeyDown += BtnPathDB_KeyDown;
             // 
             // panelDBContratos
             // 
@@ -173,12 +175,13 @@
             // 
             comboTabelas.DropDownStyle = ComboBoxStyle.DropDownList;
             comboTabelas.FormattingEnabled = true;
-            comboTabelas.Items.AddRange(new object[] { "", "Pacientes/Dentistas", "Agendamentos", "Desenvolvimento Clínico", "Procedimentos Preços", "Recebíveis Pagos e Exigíveis", "Manutenções", "Procedimentos", "Financeiro (Recebíveis)", "Recebíveis Histórico Vendas" });
+            comboTabelas.Items.AddRange(new object[] { "TUDO", "PacientesDentistas", "AgendamentosDesenvClínico", "ProcedimentosTabela Preços", "Recebíveis Pagos e Exigíveis", "ProcedimentosManutenções" });
             comboTabelas.Location = new Point(361, 196);
             comboTabelas.Margin = new Padding(3, 2, 3, 2);
             comboTabelas.Name = "comboTabelas";
             comboTabelas.Size = new Size(206, 23);
             comboTabelas.TabIndex = 113;
+            comboTabelas.KeyDown += BtnPathDB_KeyDown;
             // 
             // label1
             // 
@@ -197,9 +200,10 @@
             btnImportar.Name = "btnImportar";
             btnImportar.Size = new Size(113, 31);
             btnImportar.TabIndex = 115;
-            btnImportar.Text = "⚙ Executar";
+            btnImportar.Text = "✅ Executar";
             btnImportar.UseVisualStyleBackColor = true;
-            btnImportar.Click += ExecutarImportacao;
+            btnImportar.Click += btnImportar_Click;
+            btnImportar.KeyDown += BtnPathDB_KeyDown;
             // 
             // panelDataBase
             // 
@@ -245,6 +249,8 @@
             Name = "ImportacaoDataBase";
             StartPosition = FormStartPosition.CenterParent;
             Text = "Importação DataBase";
+            Load += ImportacaoDataBase_Load;
+            KeyDown += ImportacaoDataBase_KeyDown;
             panelDBContratos.ResumeLayout(false);
             panelDBContratos.PerformLayout();
             panelDB.ResumeLayout(false);

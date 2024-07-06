@@ -1,16 +1,5 @@
-﻿using Migracao.Models;
-using Migracao.Models.Interfaces;
-using Migracao.Sistems;
+﻿using Migracao.Models.Interfaces;
 using Migracao.Utils;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace Migracao
 {
@@ -25,6 +14,8 @@ namespace Migracao
         private string _dataBaseName;
         private string _tabela;
         private string _sistemaOrigem;
+        ThreadStart backgroundThreadStart;
+        Thread backgroundThread;
 
 
         public ImportacaoDataBase()
@@ -32,33 +23,27 @@ namespace Migracao
             InitializeComponent();
         }
 
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-
         private void AntigoSistemaChanged(object sender, EventArgs e)
         {
             if (comboBoxSistema.Items[comboBoxSistema.SelectedIndex] == "DentalOffice")
             {
-                panelDB.Visible          = false;
+                panelDB.Visible = false;
                 panelDBContratos.Visible = false;
 
-                inputDBContratos.Text    = string.Empty;
+                inputDBContratos.Text = string.Empty;
 
-                panelDataBase.Visible    = true;  
+                panelDataBase.Visible = true;
             }
 
             if (comboBoxSistema.Items[comboBoxSistema.SelectedIndex] == "OdontoCompany")
             {
-                panelDB.Visible          = true;
-                panelDB.Visible          = true;
+                panelDB.Visible = true;
+                panelDB.Visible = true;
                 panelDBContratos.Visible = true;
 
-                inputDataBaseName.Text   = string.Empty;
+                inputDataBaseName.Text = string.Empty;
 
-                panelDataBase.Visible    = false;
+                panelDataBase.Visible = false;
             }
         }
 
@@ -72,12 +57,27 @@ namespace Migracao
             SelecionarArquivo(inputDBContratos);
         }
 
-        private void ExecutarImportacao(object sender, EventArgs e)
+        private void btnImportar_Click(object sender, EventArgs e)
+        {
+            if (btnImportar.Text.Contains("Executar")) {
+                btnImportar.Enabled = false;
+
+                backgroundThread = new Thread(backgroundThreadStart);
+                backgroundThread.Start();
+            }
+        }
+
+        private void ExecutarImportacao()
         {
             _sistemaOrigem = comboBoxSistema.SelectedItem.ToString();
 
-            _pathDB          = inputDB.Text;
+            _pathDB = inputDB.Text;
             _pathDBContratos = inputDBContratos.Text;
+
+            Tools.ultimoAntigoSistema = comboBoxSistema.SelectedIndex.ToString();
+            Tools.ultimoinputDB = _pathDB;
+            Tools.ultimoinputDBContratos = _pathDBContratos;
+            Tools.SalvarConfig();
 
             _dataBaseName = inputDataBaseName.Text.ToString();
 
@@ -85,11 +85,21 @@ namespace Migracao
             if (string.IsNullOrEmpty(_tabela))
                 MessageBox.Show("Para continuar, selecione uma das opções de tabela para importação!", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-            if(string.IsNullOrEmpty(_pathDB) || (_sistemaOrigem == "OdontoCompany" && string.IsNullOrEmpty(_pathDBContratos)))
+            if (string.IsNullOrEmpty(_pathDB) || (_sistemaOrigem == "OdontoCompany" && string.IsNullOrEmpty(_pathDBContratos)))
                 MessageBox.Show("Por favor, valide o caminho das DBs desejadas", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-            //Identifica a classe, baseado na escolha de sistema, cria a instancia e chama o método através dela
-            GetImportacaoMetodo();
+            try
+            {
+                //Identifica a classe, baseado na escolha de sistema, cria a instancia e chama o método através dela
+                GetImportacaoMetodo();
+
+                btnImportar.Enabled = true;
+                MessageBox.Show("Sucesso!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void GetImportacaoMetodo()
@@ -99,41 +109,53 @@ namespace Migracao
             if (type != null && typeof(IDataBaseMigracao).IsAssignableFrom(type))
             {
                 IDataBaseMigracao instance = (IDataBaseMigracao)Activator.CreateInstance(type, _dataBaseName, _pathDB, _pathDBContratos);
-                
+
                 switch (_tabela)
                 {
+                    case "TUDO":
+                        instance.DataBaseImportacaoProcedimentos();
+                        instance.DataBaseImportacaoDevClinico();
+                        instance.DataBaseImportacaoManutencoes();
+                        instance.DataBaseImportacaoPacientesDentistas();
+                        instance.DataBaseImportacaoFinanceiroRecebiveis();
+                        instance.DataBaseImportacaoAgendamentos();
+                        instance.DataBaseImportacaoDentistas();
+                        instance.DataBaseImportacaoRecebiveisHistVenda();
+                        instance.DataBaseImportacaoProcedimentosPrecos();
+                        instance.DataBaseImportacaoPagosExigiveis();
+                        break;
                     case "Procedimentos":
-                    instance.DataBaseImportacaoProcedimentos();
+                        instance.DataBaseImportacaoProcedimentos();
                         break;
                     case "Desenvolvimento Clínico":
-                    instance.DataBaseImportacaoDevClinico();
+                        instance.DataBaseImportacaoDevClinico();
                         break;
                     case "Manutenções":
-                    instance.DataBaseImportacaoManutencoes();
+                        instance.DataBaseImportacaoManutencoes();
                         break;
                     case "Pacientes/Dentistas":
-                    instance.DataBaseImportacaoPacientesDentistas();
+                        instance.DataBaseImportacaoPacientesDentistas();
                         break;
                     case "Financeiro (Recebíveis)":
-                //    instance.DataBaseImportacaoFinanceiroRecebidos();
+                        //    instance.DataBaseImportacaoFinanceiroRecebidos();
 
-                if (_tabela == "Financeiro (Recebíveis)")
-                    instance.DataBaseImportacaoFinanceiroRecebiveis();
+                        if (_tabela == "Financeiro (Recebíveis)")
+                            instance.DataBaseImportacaoFinanceiroRecebiveis();
                         break;
                     case "Agendamentos":
-                    instance.DataBaseImportacaoAgendamentos();
+                        instance.DataBaseImportacaoAgendamentos();
                         break;
                     case "Dentistas":
-                    instance.DataBaseImportacaoDentistas();
+                        instance.DataBaseImportacaoDentistas();
                         break;
                     case "Recebíveis Histórico Vendas":
-                    instance.DataBaseImportacaoRecebiveisHistVenda();
+                        instance.DataBaseImportacaoRecebiveisHistVenda();
                         break;
                     case "Procedimentos Preços":
-                    instance.DataBaseImportacaoProcedimentosPrecos();
+                        instance.DataBaseImportacaoProcedimentosPrecos();
                         break;
                     case "Recebíveis Pagos e Exigíveis":
-                    instance.DataBaseImportacaoPagosExigiveis();
+                        instance.DataBaseImportacaoPagosExigiveis();
                         break;
                 }
             }
@@ -155,8 +177,30 @@ namespace Migracao
             {
                 textBox.Text = openFileDialog.FileName;
                 Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-                File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+                Tools.SalvarConfig();
             }
+        }
+
+        private void ImportacaoDataBase_Load(object sender, EventArgs e)
+        {
+            comboBoxSistema.SelectedIndex = int.Parse(Tools.ultimoAntigoSistema);
+            inputDB.Text = Tools.ultimoinputDB;
+            inputDBContratos.Text = Tools.ultimoinputDBContratos;
+            comboTabelas.SelectedIndex = 0;
+
+            backgroundThreadStart = new ThreadStart(ExecutarImportacao);
+        }
+
+        private void ImportacaoDataBase_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+                this.Hide();
+        }
+
+        private void BtnPathDB_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+                this.Hide();
         }
     }
 }

@@ -8,7 +8,6 @@ namespace Migracao
 {
     public partial class Form1 : Form
     {
-        string arquivoConfig = "config.config";
         string nomeArquivoExcel = "";
         string janelaArquivoExcel = "Selecione um arquivo";
 
@@ -31,14 +30,15 @@ namespace Migracao
             {
                 textBoxExcel1.Text = openFileDialog.FileName;
                 Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-                File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+                Tools.SalvarConfig();
             }
         }
 
         private void btnImportar_Click(object sender, EventArgs e)
         {
             Tools.ultimoEstabelecimentoID = txtEstabelecimentoID.Text;
-            File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+            Tools.ultimoAntigoSistema = comboBoxSistema.SelectedIndex.ToString();
+            Tools.SalvarConfig();
 
             if (ValidarCampos())
             {
@@ -388,25 +388,29 @@ namespace Migracao
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            if (!File.Exists(arquivoConfig))
-                File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
-
-            var textoLinhas = File.ReadAllLines(arquivoConfig);
+            var textoLinhas = Tools.LerConfig();
 
             try
             {
                 Tools.salvarNaPasta = textoLinhas[0];
                 Tools.ultimaPasta = textoLinhas[1];
                 Tools.ultimoEstabelecimentoID = textoLinhas[2];
+                Tools.ultimoEstabelecimento = textoLinhas[3];
+                Tools.ultimoAntigoSistema = textoLinhas[4];
+                Tools.ultimoinputDB = textoLinhas[5];
+                Tools.ultimoinputDBContratos = textoLinhas[6];
+
+                comboBoxSistema.SelectedIndex = int.Parse(Tools.ultimoAntigoSistema);
+                txtEstabelecimentoID.Text = Tools.ultimoEstabelecimentoID;
             }
             catch
             {
-                File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+                Tools.SalvarConfig();
             }
 
             if (!Directory.Exists(Tools.salvarNaPasta))
             {
-                File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+                Tools.SalvarConfig();
                 MessageBox.Show("Configure a pasta de saída clicando em \"Configurações\"", "Atenção!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
@@ -418,7 +422,7 @@ namespace Migracao
             if (!string.IsNullOrEmpty(pasta))
             {
                 Tools.salvarNaPasta = pasta;
-                File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+                Tools.SalvarConfig();
             }
         }
 
@@ -451,7 +455,7 @@ namespace Migracao
             {
                 txtExcel2.Text = openFileDialog.FileName;
                 Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-                File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+                Tools.SalvarConfig();
             }
         }
 
@@ -468,7 +472,7 @@ namespace Migracao
             {
                 txtReferencia.Text = openFileDialog.FileName;
                 Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-                File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+                Tools.SalvarConfig();
             }
         }
 
@@ -534,7 +538,7 @@ namespace Migracao
             {
                 retorno = openFileDialog.FileName;
                 Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-                File.WriteAllText(arquivoConfig, Tools.salvarNaPasta + Environment.NewLine + Tools.ultimaPasta + Environment.NewLine + Tools.ultimoEstabelecimentoID);
+                Tools.SalvarConfig();
             }
 
             return retorno;
@@ -544,6 +548,12 @@ namespace Migracao
         {
             ImportacaoDataBase importacaoDataBase = new ImportacaoDataBase();
             importacaoDataBase.ShowDialog();
+        }
+
+        private void txtEstabelecimentoID_Leave(object sender, EventArgs e)
+        {
+            Tools.ultimoEstabelecimentoID = txtEstabelecimentoID.Text;
+            Tools.SalvarConfig();
         }
     }
 }

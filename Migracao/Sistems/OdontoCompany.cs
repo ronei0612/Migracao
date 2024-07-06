@@ -2243,7 +2243,7 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string baseDirectory = "Scripts\\";
 
             string arquivoPacientesSql = baseDirectory + "SelectPacientes.sql";
 
@@ -2274,11 +2274,7 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-
-            string arquivoSql = baseDirectory + "SelectAgendamentos.sql";
-
-           // string arquivoSql = @"C:\Users\Jorge\source\repos\Migracao\Migracao\Scripts\SelectAgendamentos.sql";
+            string arquivoSql = "Scripts\\SelectAgendamentos.sql";
 
             var agendamentos = new FireBirdContext<Agendamentos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
@@ -2299,7 +2295,7 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string baseDirectory = "Scripts\\";
 
             string arquivoSql = baseDirectory + "SelectProdedimentos.sql";
 
@@ -2324,7 +2320,7 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string baseDirectory = "Scripts\\";
 
             string arquivoDesenvClinicoSql = baseDirectory + "SelectDesenvolvimentoClinico.sql";
 
@@ -2357,7 +2353,7 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string baseDirectory = "Scripts\\";
 
             string arquivoSql = baseDirectory + "SelectManutencoes.sql";
 
@@ -2400,7 +2396,7 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string baseDirectory = "Scripts\\";
 
             string arquivoSql = baseDirectory + "SelectFinanceiroRecebidos.sql";
 
@@ -2425,7 +2421,7 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string baseDirectory = "Scripts\\";
 
             string arquivoSql = baseDirectory + "SelectFinanceiroRecebiveis.sql";
 
@@ -2450,7 +2446,7 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string baseDirectory = "Scripts\\";
 
             string arquivoSql = baseDirectory + "SelectDentistas.sql";
 
@@ -2475,7 +2471,7 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string baseDirectory = "Scripts\\";
 
             string arquivoSql = baseDirectory + "SelectRecebiveisHistVenda.sql";
 
@@ -2500,7 +2496,7 @@ namespace Migracao.Sistems
 
             int estabelecimentoID = 1;
 
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string baseDirectory = "Scripts\\";
 
             string arquivoSql = baseDirectory + "SelectProcedimentosPrecos.sql";
 

@@ -346,7 +346,7 @@ namespace Migracao.Utils
             }
             catch (Exception error)
             {
-                throw new Exception($"Erro ao converter Excel para Pessoas Pacientes: {error.Message}");
+                throw new Exception($"Erro ao converter Procedimentos Tabela Preços: {error.Message}");
             }
 
             return lstGruposProcedimentosDTO;

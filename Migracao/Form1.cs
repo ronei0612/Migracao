@@ -1,42 +1,16 @@
-using Migracao.Imports;
-using Migracao.Sistems;
 using Migracao.Utils;
 
 namespace Migracao
 {
     public partial class Form1 : Form
     {
-        string nomeArquivoExcel = "";
-        string janelaArquivoExcel = "Selecione um arquivo";
-
         public Form1()
         {
             InitializeComponent();
         }
 
-        private void btnExcel_Click(object sender, EventArgs e)
-        {
-            var openFileDialog = new OpenFileDialog()
-            {
-                Filter = "Arquivo Excel |*.xlsx",
-                Title = janelaArquivoExcel,
-                FileName = nomeArquivoExcel,
-                InitialDirectory = Tools.ultimaPasta
-            };
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-                Tools.SalvarConfig();
-            }
-        }
-
         private void btnImportar_Click(object sender, EventArgs e)
         {
-            Tools.ultimoEstabelecimentoID = txtEstabelecimentoID.Text;
-            Tools.ultimoAntigoSistema = comboBoxSistema.SelectedIndex.ToString();
-            Tools.SalvarConfig();
-
             if (ValidarCampos())
             {
                 try
@@ -80,11 +54,8 @@ namespace Migracao
                     }
             }
 
-            else
-            {
-                if (comboBoxSistema.SelectedIndex == -1 || comboBoxSistema.SelectedIndex == -1 || string.IsNullOrWhiteSpace(txtEstabelecimentoID.Text))
-                    return false;
-            }
+            else if (string.IsNullOrWhiteSpace(txtEstabelecimentoID.Text))
+                return false;
 
             return true;
         }
@@ -101,10 +72,6 @@ namespace Migracao
 
             txtEstabelecimentoID.Visible = true;
             lbEstabelecimento.Visible = true;
-        }
-
-        void AlterarNomesCampos()
-        {
         }
 
         void MostrarCampos()
@@ -131,48 +98,20 @@ namespace Migracao
 
                 else
                 {
-                    comboBoxSistema.Visible = true;
-                    label3.Visible = true;
-
-                    if (comboBoxSistema.SelectedIndex > -1 && comboBoxImportacao.SelectedIndex > -1)
+                    if (comboBoxImportacao.SelectedIndex > -1)
                     {
-                        AlterarNomesCampos();
                         btnImportar.Visible = true;
                     }
                 }
             }
         }
 
-        void NomeArquivoOpenFile()
-        {
-            nomeArquivoExcel = "";
-        }
-
-        private void comboBoxSistema_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            MostrarCampos();
-            NomeArquivoOpenFile();
-        }
-
         private void comboBoxImportacao_SelectedIndexChanged(object sender, EventArgs e)
         {
-            janelaArquivoExcel = comboBoxImportacao.Text;
-
             MostrarCampos();
-            NomeArquivoOpenFile();
-        }
-
-        private void txtPessoaID_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            e.Handled = !(char.IsNumber(e.KeyChar) || e.KeyChar == (char)Keys.Back);
         }
 
         private void txtEstabelecimentoID_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            e.Handled = !(char.IsNumber(e.KeyChar) || e.KeyChar == (char)Keys.Back);
-        }
-
-        private void txtLoginID_KeyPress(object sender, KeyPressEventArgs e)
         {
             e.Handled = !(char.IsNumber(e.KeyChar) || e.KeyChar == (char)Keys.Back);
         }
@@ -214,7 +153,6 @@ namespace Migracao
                 Tools.ultimoinputDB = textoLinhas[5];
                 Tools.ultimoinputDBContratos = textoLinhas[6];
 
-                comboBoxSistema.SelectedIndex = int.Parse(Tools.ultimoAntigoSistema);
                 txtEstabelecimentoID.Text = Tools.ultimoEstabelecimentoID;
             }
             catch
@@ -251,84 +189,16 @@ namespace Migracao
             folderBrowser.Filter = "|Pasta";
             folderBrowser.FileName = "Abrir Pasta";
             folderBrowser.Title = titulo;
+
             if (folderBrowser.ShowDialog() == DialogResult.OK)
                 retorno = Path.GetDirectoryName(folderBrowser.FileName);
+
             return retorno;
-        }
-
-        private void btnExcel2_Click_1(object sender, EventArgs e)
-        {
-            var openFileDialog = new OpenFileDialog()
-            {
-                Filter = "Arquivo Excel |*.xlsx",
-                Title = "Selecione um arquivo",
-                InitialDirectory = Tools.ultimaPasta
-            };
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-                Tools.SalvarConfig();
-            }
-        }
-
-        private void btnReferencia_Click(object sender, EventArgs e)
-        {
-            var openFileDialog = new OpenFileDialog()
-            {
-                Filter = "Arquivo Excel |*.xlsx",
-                Title = "Selecione um arquivo",
-                InitialDirectory = Tools.ultimaPasta
-            };
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-                Tools.SalvarConfig();
-            }
         }
 
         private void abrirPastaToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Tools.AbrirPastaExplorer(Tools.salvarNaPasta);
-        }
-
-        private void btnPessoas_Click(object sender, EventArgs e)
-        {
-            var arquivoPessoas = EscolherArquivoExcel("Arquivo Pessoas.xlsx");
-
-            if (string.IsNullOrEmpty(arquivoPessoas) == false)
-                try
-                {
-                    var excelHelper = new ExcelHelper();
-                    var workbook = excelHelper.LerExcel(arquivoPessoas);
-                    var sheet = workbook.GetSheetAt(0);
-                    excelHelper.InitializeDictionaryPessoas(sheet);
-
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-        }
-
-        private void btnRecebiveis_Click(object sender, EventArgs e)
-        {
-            var arquivoRecebiveis = EscolherArquivoExcel("Recebiveis");
-
-            if (string.IsNullOrEmpty(arquivoRecebiveis) == false)
-                try
-                {
-                    var excelHelper = new ExcelHelper();
-                    var workbook = excelHelper.LerExcel(arquivoRecebiveis);
-                    var sheet = workbook.GetSheetAt(0);
-                    excelHelper.InitializeDictionaryRecebiveis(sheet);
-
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Erro!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
         }
 
         string EscolherArquivoExcel(string titulo = "Selecione um arquivo")

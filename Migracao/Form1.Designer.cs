@@ -34,8 +34,6 @@
             openFileDialog1 = new OpenFileDialog();
             comboBoxImportacao = new ComboBox();
             label4 = new Label();
-            label3 = new Label();
-            comboBoxSistema = new ComboBox();
             txtEstabelecimentoID = new TextBox();
             listView1 = new ListView();
             columnHeader1 = new ColumnHeader();
@@ -63,7 +61,7 @@
             // btnImportar
             // 
             btnImportar.Anchor = AnchorStyles.Bottom;
-            btnImportar.Location = new Point(365, 302);
+            btnImportar.Location = new Point(365, 251);
             btnImportar.Margin = new Padding(3, 2, 3, 2);
             btnImportar.Name = "btnImportar";
             btnImportar.Size = new Size(88, 22);
@@ -98,29 +96,6 @@
             label4.TabIndex = 10;
             label4.Text = "Importação de:";
             // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(355, 44);
-            label3.Name = "label3";
-            label3.Size = new Size(89, 15);
-            label3.TabIndex = 15;
-            label3.Text = "Antigo sistema:";
-            label3.Visible = false;
-            // 
-            // comboBoxSistema
-            // 
-            comboBoxSistema.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboBoxSistema.FormattingEnabled = true;
-            comboBoxSistema.Items.AddRange(new object[] { "DentalOffice", "OdontoCompany" });
-            comboBoxSistema.Location = new Point(465, 40);
-            comboBoxSistema.Margin = new Padding(3, 2, 3, 2);
-            comboBoxSistema.Name = "comboBoxSistema";
-            comboBoxSistema.Size = new Size(206, 23);
-            comboBoxSistema.TabIndex = 1;
-            comboBoxSistema.Visible = false;
-            comboBoxSistema.SelectedIndexChanged += comboBoxSistema_SelectedIndexChanged;
-            // 
             // txtEstabelecimentoID
             // 
             txtEstabelecimentoID.Location = new Point(133, 70);
@@ -137,7 +112,7 @@
             listView1.Columns.AddRange(new ColumnHeader[] { columnHeader1 });
             listView1.Location = new Point(12, 98);
             listView1.Name = "listView1";
-            listView1.Size = new Size(759, 199);
+            listView1.Size = new Size(759, 148);
             listView1.TabIndex = 18;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
@@ -222,13 +197,11 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(818, 335);
+            ClientSize = new Size(818, 284);
             Controls.Add(btnDelFromList);
             Controls.Add(btnAddToList);
             Controls.Add(listView1);
             Controls.Add(txtEstabelecimentoID);
-            Controls.Add(label3);
-            Controls.Add(comboBoxSistema);
             Controls.Add(label4);
             Controls.Add(comboBoxImportacao);
             Controls.Add(btnImportar);
@@ -254,8 +227,6 @@
 		private OpenFileDialog openFileDialog1;
 		private ComboBox comboBoxImportacao;
 		private Label label4;
-		private Label label3;
-		private ComboBox comboBoxSistema;
 		private TextBox txtEstabelecimentoID;
 		private ListView listView1;
 		private Button btnAddToList;

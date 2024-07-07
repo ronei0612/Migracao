@@ -88,21 +88,8 @@ namespace Migracao
                     btnImportar.Visible = true;
                 }
 
-                else if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "Todos")
-                {
-                    listView1.Visible = true;
-                    btnAddToList.Visible = true;
-                    btnDelFromList.Visible = true;
+                else if (comboBoxImportacao.SelectedIndex > -1)
                     btnImportar.Visible = true;
-                }
-
-                else
-                {
-                    if (comboBoxImportacao.SelectedIndex > -1)
-                    {
-                        btnImportar.Visible = true;
-                    }
-                }
             }
         }
 
@@ -125,10 +112,8 @@ namespace Migracao
         private void btnAddToList_Click(object sender, EventArgs e)
         {
             var openFileDialog = new OpenFileDialog();
-            if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "Todos")
-                openFileDialog.Filter = "Arquivo Excel |*.csv";
-            //openFileDialog.Filter = "Arquivo Excel |*.csv;*.xlsx";
-            else if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "JSON")
+
+            if (comboBoxImportacao.Items[comboBoxImportacao.SelectedIndex] == "JSON")
                 openFileDialog.Filter = "Arquivo Json |*.json";
 
             openFileDialog.Title = "Selecione os arquivos";
@@ -199,27 +184,6 @@ namespace Migracao
         private void abrirPastaToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Tools.AbrirPastaExplorer(Tools.salvarNaPasta);
-        }
-
-        string EscolherArquivoExcel(string titulo = "Selecione um arquivo")
-        {
-            string retorno = "";
-
-            var openFileDialog = new OpenFileDialog()
-            {
-                Filter = "Arquivo Excel |*.xlsx;*.csv",
-                Title = titulo,
-                InitialDirectory = Tools.ultimaPasta
-            };
-
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                retorno = openFileDialog.FileName;
-                Tools.ultimaPasta = Path.GetDirectoryName(openFileDialog.FileName);
-                Tools.SalvarConfig();
-            }
-
-            return retorno;
         }
 
         private void OpenFormImportarDataBase(object sender, EventArgs e)

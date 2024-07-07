@@ -1,8 +1,6 @@
 ﻿using Migracao.Models;
-using NPOI.SS.UserModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -18,6 +16,7 @@ namespace Migracao.Utils
         public static string ultimoAntigoSistema = "0";
         public static string ultimoinputDB = "";
         public static string ultimoinputDBContratos = "";
+		public static ExcelHelper excelHelper;
         
         private static string arquivoConfig = "config.config";
 
@@ -284,81 +283,48 @@ namespace Migracao.Utils
 			return false;
 		}
 
-
-		// Função auxiliar para obter valores inteiros de uma célula, tratando células vazias
-		public static int? GetIntValueFromCell(ICell cell)
-		{
-			if (cell == null || cell.CellType == CellType.Blank)
-				return null;
-			return (int)cell.NumericCellValue;
-		}
-
-		// Função auxiliar para obter valores decimais de uma célula, tratando células vazias
-		public static decimal? GetDecimalValueFromCell(ICell cell)
-		{
-			if (cell == null || cell.CellType == CellType.Blank)
-				return null;
-			if (cell is decimal)
-				return (decimal)cell.NumericCellValue;
-			else
-				return decimal.Parse(cell.StringCellValue);
-		}
-
-		// Função auxiliar para obter valores de data/hora de uma célula, tratando células vazias
-		public static DateTime? GetDateTimeValueFromCell(ICell cell)
-		{
-			if (cell == null || cell.CellType == CellType.Blank)
-				return DateTime.Now;
-			if (cell is DateTime)
-				return cell.DateCellValue;
-			else
-				return DateTime.Parse(cell.ToString());
-
-			//.ToString("yyyy-MM-dd HH:mm:ss.f");
-		}
-
-		// Função auxiliar para obter valores de TimeSpan de uma célula, tratando células vazias
-		public static TimeSpan? GetTimeSpanValueFromCell(ICell cell)
-		{
-			if (cell == null || cell.CellType == CellType.Blank)
-				return null;
-
-			// Converte o valor da célula (que pode ser um DateTime ou um double) para TimeSpan
-			if (cell.CellType == CellType.Numeric)
+        public static string ToCidade(this string textoCidade, string uf)
+        {
+			if (excelHelper == null)
 			{
-				// Se for um número, assume que é um valor de tempo em dias (como o Excel armazena)
-				return TimeSpan.FromDays(cell.NumericCellValue);
-			}
-			else
-			{
-				// Se for um DateTime, converte para TimeSpan
-				return TimeSpan.Parse(cell.DateCellValue.ToString());//.TimeOfDay;
-			}
-		}
+                var arquivoExcelCidades = "Files\\EnderecosCidades.xlsx";
+                excelHelper = new ExcelHelper();
+                if (File.Exists(arquivoExcelCidades))
+                    try
+                    {
+                        var workbookCidades = excelHelper.LerExcel(arquivoExcelCidades);
+                        var sheetCidades = workbookCidades.GetSheetAt(0);
+                        excelHelper.InitializeDictionaryCidade(sheetCidades);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
+                    }
+            }
 
-		//public static string EncontrarCidadeSemelhante(string textoCidade, string[] cidades)
-		//{
-		//	textoCidade = RemoverAcentos(textoCidade).ToLower();
+            if (string.IsNullOrEmpty(textoCidade))
+                return "";
 
-		//	string cidadeEncontrada = null;
-		//	int maiorSemelhanca = 0;
+            textoCidade = RemoverAcentos(textoCidade).ToLower();
+            uf = uf.ToLower();
 
-		//	foreach (string cidade in cidades)
-		//	{
-		//		string cidadeNormalizada = RemoverAcentos(cidade).ToLower();
-		//		int semelhanca = CalcularSemelhanca(textoCidade, cidadeNormalizada);
+            if (!string.IsNullOrWhiteSpace(textoCidade))
+            {
+				if (excelHelper.CidadeExists(textoCidade, uf))
+                    return textoCidade;
+				else
+				{
+                    var procurarCidade = EncontrarCidadeSemelhante(textoCidade);
 
-		//		if (semelhanca > maiorSemelhanca)
-		//		{
-		//			maiorSemelhanca = semelhanca;
-		//			cidadeEncontrada = cidade;
-		//		}
-		//	}
+                    if (excelHelper.CidadeExists(procurarCidade, uf))
+                        return textoCidade;
+                }
+            }
+			
+            return textoCidade;
+        }
 
-		//	return cidadeEncontrada;
-		//}
-
-		public static string EncontrarCidadeSemelhante(this string textoCidade)
+        public static string EncontrarCidadeSemelhante(this string textoCidade)
 		{
 			textoCidade = RemoverAcentos(textoCidade).ToLower();
 

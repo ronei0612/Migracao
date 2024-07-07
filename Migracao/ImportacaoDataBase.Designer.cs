@@ -175,7 +175,7 @@
             // 
             comboTabelas.DropDownStyle = ComboBoxStyle.DropDownList;
             comboTabelas.FormattingEnabled = true;
-            comboTabelas.Items.AddRange(new object[] { "TUDO", "PacientesDentistas", "AgendamentosDesenvClínico", "ProcedimentosTabela Preços", "Recebíveis Pagos e Exigíveis", "ProcedimentosManutenções" });
+            comboTabelas.Items.AddRange(new object[] { "TUDO", "Pacientes/Dentistas", "Agendamentos/DesenvClínico", "Procedimentos Tabela Preços", "Recebíveis/Pagos/Exigíveis", "Procedimentos/Manutenções" });
             comboTabelas.Location = new Point(361, 196);
             comboTabelas.Margin = new Padding(3, 2, 3, 2);
             comboTabelas.Name = "comboTabelas";
@@ -250,7 +250,6 @@
             StartPosition = FormStartPosition.CenterParent;
             Text = "Importação DataBase";
             Load += ImportacaoDataBase_Load;
-            KeyDown += ImportacaoDataBase_KeyDown;
             panelDBContratos.ResumeLayout(false);
             panelDBContratos.PerformLayout();
             panelDB.ResumeLayout(false);

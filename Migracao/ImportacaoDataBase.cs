@@ -14,6 +14,7 @@ namespace Migracao
         private string _dataBaseName;
         private string _tabela;
         private string _sistemaOrigem;
+        private string _sistemaOrigemIndex;
         ThreadStart backgroundThreadStart;
         Thread backgroundThread;
 
@@ -59,9 +60,11 @@ namespace Migracao
 
         private void btnImportar_Click(object sender, EventArgs e)
         {
-            if (btnImportar.Text.Contains("Executar")) {
+            if (btnImportar.Text.Contains("Executar"))
+            {
                 btnImportar.Enabled = false;
 
+                backgroundThreadStart = new ThreadStart(ExecutarImportacao);
                 backgroundThread = new Thread(backgroundThreadStart);
                 backgroundThread.Start();
             }
@@ -69,19 +72,20 @@ namespace Migracao
 
         private void ExecutarImportacao()
         {
-            _sistemaOrigem = comboBoxSistema.SelectedItem.ToString();
+            this.Invoke((MethodInvoker)delegate {
+                _sistemaOrigem = comboBoxSistema.SelectedItem.ToString();
+                _sistemaOrigemIndex = comboBoxSistema.SelectedIndex.ToString();
+                _tabela = comboTabelas.SelectedItem?.ToString();
+                _pathDB = inputDB.Text;
+                _pathDBContratos = inputDBContratos.Text;
+                _dataBaseName = inputDataBaseName.Text.ToString();
+            });
 
-            _pathDB = inputDB.Text;
-            _pathDBContratos = inputDBContratos.Text;
-
-            Tools.ultimoAntigoSistema = comboBoxSistema.SelectedIndex.ToString();
+            Tools.ultimoAntigoSistema = _sistemaOrigemIndex;
             Tools.ultimoinputDB = _pathDB;
             Tools.ultimoinputDBContratos = _pathDBContratos;
             Tools.SalvarConfig();
 
-            _dataBaseName = inputDataBaseName.Text.ToString();
-
-            _tabela = comboTabelas.SelectedItem?.ToString();
             if (string.IsNullOrEmpty(_tabela))
                 MessageBox.Show("Para continuar, selecione uma das opções de tabela para importação!", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
@@ -93,7 +97,11 @@ namespace Migracao
                 //Identifica a classe, baseado na escolha de sistema, cria a instancia e chama o método através dela
                 GetImportacaoMetodo();
 
-                btnImportar.Enabled = true;
+                this.Invoke((MethodInvoker)delegate
+                {
+                    btnImportar.Enabled = true;
+                });
+
                 MessageBox.Show("Sucesso!");
             }
             catch (Exception ex)
@@ -112,51 +120,52 @@ namespace Migracao
 
                 switch (_tabela)
                 {
+                    // Principais
                     case "TUDO":
-                        instance.DataBaseImportacaoProcedimentos();
                         instance.DataBaseImportacaoDevClinico();
                         instance.DataBaseImportacaoManutencoes();
                         instance.DataBaseImportacaoPacientesDentistas();
+                        instance.DataBaseImportacaoProcedimentosPrecos();
+                        instance.DataBaseImportacaoPagosExigiveis();
+                        instance.DataBaseImportacaoProcedimentos();
                         instance.DataBaseImportacaoFinanceiroRecebiveis();
                         instance.DataBaseImportacaoAgendamentos();
                         instance.DataBaseImportacaoDentistas();
                         instance.DataBaseImportacaoRecebiveisHistVenda();
-                        instance.DataBaseImportacaoProcedimentosPrecos();
-                        instance.DataBaseImportacaoPagosExigiveis();
                         break;
-                    case "Procedimentos":
-                        instance.DataBaseImportacaoProcedimentos();
-                        break;
-                    case "Desenvolvimento Clínico":
+                    case "Agendamentos/DesenvClínico":
                         instance.DataBaseImportacaoDevClinico();
                         break;
-                    case "Manutenções":
+                    case "Procedimentos/Manutenções":
                         instance.DataBaseImportacaoManutencoes();
                         break;
                     case "Pacientes/Dentistas":
                         instance.DataBaseImportacaoPacientesDentistas();
                         break;
-                    case "Financeiro (Recebíveis)":
-                        //    instance.DataBaseImportacaoFinanceiroRecebidos();
-
-                        if (_tabela == "Financeiro (Recebíveis)")
-                            instance.DataBaseImportacaoFinanceiroRecebiveis();
-                        break;
-                    case "Agendamentos":
-                        instance.DataBaseImportacaoAgendamentos();
-                        break;
-                    case "Dentistas":
-                        instance.DataBaseImportacaoDentistas();
-                        break;
-                    case "Recebíveis Histórico Vendas":
-                        instance.DataBaseImportacaoRecebiveisHistVenda();
-                        break;
-                    case "Procedimentos Preços":
+                    case "Procedimentos Tabela Preços":
                         instance.DataBaseImportacaoProcedimentosPrecos();
                         break;
-                    case "Recebíveis Pagos e Exigíveis":
+                    case "Recebíveis/Pagos/Exigíveis":
                         instance.DataBaseImportacaoPagosExigiveis();
                         break;
+
+                        // Complementares
+                        //case "Procedimentos":
+                        //    instance.DataBaseImportacaoProcedimentos();
+                        //    break;
+
+                        //case "Financeiro (Recebíveis)":
+                        //instance.DataBaseImportacaoFinanceiroRecebiveis();
+                        //    break;
+                        //case "Agendamentos":
+                        //    instance.DataBaseImportacaoAgendamentos();
+                        //    break;
+                        //case "Dentistas":
+                        //    instance.DataBaseImportacaoDentistas();
+                        //    break;
+                        //case "Recebíveis Histórico Vendas":
+                        //    instance.DataBaseImportacaoRecebiveisHistVenda();
+                        //    break;                    
                 }
             }
             else
@@ -187,8 +196,6 @@ namespace Migracao
             inputDB.Text = Tools.ultimoinputDB;
             inputDBContratos.Text = Tools.ultimoinputDBContratos;
             comboTabelas.SelectedIndex = 0;
-
-            backgroundThreadStart = new ThreadStart(ExecutarImportacao);
         }
 
         private void ImportacaoDataBase_KeyDown(object sender, KeyEventArgs e)

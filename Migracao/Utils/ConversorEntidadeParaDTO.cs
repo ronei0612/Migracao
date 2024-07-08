@@ -45,7 +45,7 @@ namespace Migracao.Utils
 
                     var lstAgendamento = new AgendamentosDTO
                     {
-                        ID = agendamento.ID,
+                        Lancamento = agendamento.Lancamento,
                         CPF = agendamento.Paciente_CPF.ToCPF(),
                         Nome_Completo = agendamento.Nome.ToNome(),
                         Telefone = agendamento.Telefone,
@@ -74,31 +74,29 @@ namespace Migracao.Utils
 
             try
             {
-                //foreach (var desenvClicnico in desenvClicnicos)
-                //{
-                //    nome = desenvClicnico.Paciente_Nome;
 
-                //    var lstDesenvolvimentoClinico = new DesenvolvimentoClinicoDTO
-                //    {
-                //        CPF = desenvClicnico.Paciente_CPF.ToCPF(),
-                //        Nome_Completo = desenvClicnico.Paciente_Nome.ToNome(),
-                //        Telefone = string.Empty,
-                //        Dentista = desenvClicnico.Dentista_Nome,
-                //        //ID = desenvClicnico.Dentista_Codigo,
-                //        Desenvolvimento_Clinico = desenvClicnico.Procedimento_Observacao,
-                //        Data_Hora_Inicio = desenvClicnico.Data_Inicio.ToString(),
-                //        Data_Hora_Termino = string.Empty,
-                //        Data_Hora_Atendimento_Inicio = desenvClicnico.Data_Retorno.ToString(),
-                //        Data_Hora_Atendimento_Termino = string.Empty,
-                //        //Observacao = desenvClicnico.Procedimento_Observacao
-                //    };
-
-                //    lstDesenvolvimentoClinicoDTO.Add(lstDesenvolvimentoClinico);
-                //};
-
-                foreach (var agendamento in agendamentos)
+                Parallel.ForEach(agendamentos, agendamento =>
                 {
-                    var lstDesenvolvimentoClinico = new DesenvolvimentoClinicoDTO
+                    var minutos = agendamento.Hora.Split(':')[1];
+                    var horas = agendamento.Hora.Split(':')[0];
+                    var dataInicio = agendamento.Data;
+
+                    if (!string.IsNullOrEmpty(horas))
+                        dataInicio = dataInicio.AddHours(double.Parse(horas));
+
+                    if (!string.IsNullOrEmpty(minutos))
+                        dataInicio = dataInicio.AddMinutes(double.Parse(minutos));
+
+                    var dataTermino = dataInicio;
+
+                    var numLancamentos = agendamentos
+                                        .Where(m => m.Lancamento == agendamento.Lancamento)
+                                        .Count();
+
+                    var minutosParaAdicionar = numLancamentos > 0 ? 15 * numLancamentos : 15;
+                    dataTermino = dataTermino.AddMinutes(minutosParaAdicionar);
+
+                    var desenvolvimentoClinico = new DesenvolvimentoClinicoDTO
                     {
                         CPF = agendamento.Paciente_CPF.ToCPF(),
                         Nome_Completo = agendamento.Nome.ToNome(),
@@ -107,15 +105,17 @@ namespace Migracao.Utils
                         //ID = agendamento.Codigo_Responsavel,
                         Desenvolvimento_Clinico = agendamento.Observacao,
                         Data_Hora_Inicio = agendamento.Data_Inclusao.ToString(),
-                        Data_Hora_Termino = string.Empty,
+                        Data_Hora_Termino = dataTermino.ToString(),
                         Data_Hora_Atendimento_Inicio = agendamento.Data.ToString(),
-                        Data_Hora_Atendimento_Termino = string.Empty,
+                        Data_Hora_Atendimento_Termino = dataTermino.ToString(),
                         //Observacao = agendamento.Observacao
                     };
 
-                    lstDesenvolvimentoClinicoDTO.Add(lstDesenvolvimentoClinico);
-                    linha++;
-                };
+                    lock (lstDesenvolvimentoClinicoDTO)
+                    {
+                        lstDesenvolvimentoClinicoDTO.Add(desenvolvimentoClinico);
+                    }
+                });
             }
             catch (Exception error)
             {
@@ -305,7 +305,7 @@ namespace Migracao.Utils
                         Procedimento_Nome = manutencao.Procedimento_Nome,
                         Procedimento_Valor = manutencao.Procedimento_Valor.ToMoeda().ToString(),
                         Valor_Original = manutencao.Valor_Original.ToString(),
-                        Valor_Pagamento = manutencao.Valor_Pagamento.ToString(),
+                        Valor_Pago = manutencao.Valor_Pagamento.ToString(),
                         Data_Pagamento = manutencao.Data_Pagamento.ToString(),
                         Dente = manutencao.Dente,
                         Procedimento_Observacao = manutencao.Procedimentos_Observacao,

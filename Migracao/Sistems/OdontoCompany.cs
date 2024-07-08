@@ -88,7 +88,7 @@ namespace Migracao.Sistems
 
             string arquivoDesenvClinicoSql = "Scripts\\SelectDesenvolvimentoClinico.sql";
 
-           var desenvClinico = new FireBirdContext<Models.DesenvolvimentoClinico>(_pathDB).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
+            var desenvClinico = new FireBirdContext<Models.DesenvolvimentoClinico>(_pathDB).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
 
             string arquivoAgendamentosSql = "Scripts\\SelectAgendamentos.sql";
 

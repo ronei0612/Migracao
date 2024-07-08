@@ -54,7 +54,7 @@ namespace Migracao.Models.DTO
         [DisplayName("Observação")]
         public string? Observacao { get; set; }
 
-        [DisplayName("Desenvolvimento Clínico")]
+        [DisplayName("Observação Desenvolvimento Clínico")]
         public string? Desenvolvimento_Clinico { get; set; }
     }
 }

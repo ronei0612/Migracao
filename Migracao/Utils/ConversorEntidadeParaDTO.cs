@@ -70,42 +70,49 @@ namespace Migracao.Utils
         public static List<DesenvolvimentoClinicoDTO> ConvertDesenvolvimentoClinicoParaDesenvolvimentoClinicoDTO(List<DesenvolvimentoClinico> desenvClicnicos, List<Agendamentos> agendamentos)
         {
             List<DesenvolvimentoClinicoDTO> lstDesenvolvimentoClinicoDTO = new List<DesenvolvimentoClinicoDTO>();
+            var nome = "";
 
             try
             {
-                foreach (var desenvClicnico in desenvClicnicos)
-                {
-                    var lstDesenvolvimentoClinico = new DesenvolvimentoClinicoDTO
-                    {
-                        CPF = desenvClicnico.Paciente_CPF,
-                        Nome_Completo = desenvClicnico.Paciente_Nome,
-                        Dentista = desenvClicnico.Dentista_Nome,
-                        ID = desenvClicnico.Dentista_Codigo,
-                        Desenvolvimento_Clinico = desenvClicnico.Procedimento_Nome,
-                        Data_Hora_Inicio = desenvClicnico.Data_Inicio.ToString(),
-                        Data_Hora_Termino = string.Empty,
-                        Data_Hora_Atendimento_Inicio = desenvClicnico.Data_Retorno.ToString(),
-                        Data_Hora_Atendimento_Termino = string.Empty,
-                        Observacao = desenvClicnico.Procedimento_Observacao
-                    };
+                //foreach (var desenvClicnico in desenvClicnicos)
+                //{
+                //    nome = desenvClicnico.Paciente_Nome;
 
-                    lstDesenvolvimentoClinicoDTO.Add(lstDesenvolvimentoClinico);
-                };
+                //    var lstDesenvolvimentoClinico = new DesenvolvimentoClinicoDTO
+                //    {
+                //        CPF = desenvClicnico.Paciente_CPF.ToCPF(),
+                //        Nome_Completo = desenvClicnico.Paciente_Nome.ToNome(),
+                //        Telefone = string.Empty,
+                //        Dentista = desenvClicnico.Dentista_Nome,
+                //        //ID = desenvClicnico.Dentista_Codigo,
+                //        Desenvolvimento_Clinico = desenvClicnico.Procedimento_Observacao,
+                //        Data_Hora_Inicio = desenvClicnico.Data_Inicio.ToString(),
+                //        Data_Hora_Termino = string.Empty,
+                //        Data_Hora_Atendimento_Inicio = desenvClicnico.Data_Retorno.ToString(),
+                //        Data_Hora_Atendimento_Termino = string.Empty,
+                //        //Observacao = desenvClicnico.Procedimento_Observacao
+                //    };
+
+                //    lstDesenvolvimentoClinicoDTO.Add(lstDesenvolvimentoClinico);
+                //};
 
                 foreach (var agendamento in agendamentos)
                 {
+                    nome = agendamento.Nome;
+
                     var lstDesenvolvimentoClinico = new DesenvolvimentoClinicoDTO
                     {
-                        CPF = agendamento.Paciente_CPF,
-                        Nome_Completo = agendamento.Nome,
-                        Dentista = agendamento.Nome_Dentista,
-                        ID = agendamento.Codigo_Responsavel,
-                        Desenvolvimento_Clinico = string.Empty,
+                        CPF = agendamento.Paciente_CPF.ToCPF(),
+                        Nome_Completo = agendamento.Nome.ToNome(),
+                        Telefone = agendamento.Telefone.ToFone().ToString(),
+                        Dentista = agendamento.Nome_Dentista.ToNome(),
+                        //ID = agendamento.Codigo_Responsavel,
+                        Desenvolvimento_Clinico = agendamento.Observacao,
                         Data_Hora_Inicio = agendamento.Data_Inclusao.ToString(),
                         Data_Hora_Termino = string.Empty,
                         Data_Hora_Atendimento_Inicio = agendamento.Data.ToString(),
                         Data_Hora_Atendimento_Termino = string.Empty,
-                        Observacao = agendamento.Observacao
+                        //Observacao = agendamento.Observacao
                     };
 
                     lstDesenvolvimentoClinicoDTO.Add(lstDesenvolvimentoClinico);
@@ -113,7 +120,7 @@ namespace Migracao.Utils
             }
             catch (Exception error)
             {
-                throw new Exception($"Erro ao converter Desenvolvimento Clinico: {error.Message}");
+                throw new Exception($"Erro ao converter Desenvolvimento Clinico \"{nome}\": {error.Message}");
             }
 
             return lstDesenvolvimentoClinicoDTO;
@@ -133,9 +140,8 @@ namespace Migracao.Utils
                     var lstPacientes = new PacientesDentistasDTO
                     {
                         Cargo_Clinica = "Paciente",
-                        Nome = paciente.Nome_Paciente.ToNome(),
+                        Nome_Completo = paciente.Nome_Paciente.ToNome(),
                         Nome_Social = string.Empty,
-                        Nome_Completo = string.Empty,
                         Apelido = string.Empty,
                         CPF = paciente.CPF.ToCPF(),
                         Observacoes = paciente.Observacoes,
@@ -168,10 +174,9 @@ namespace Migracao.Utils
                     var lstPacientes = new PacientesDentistasDTO
                     {
                         Cargo_Clinica = "Dentista",
-                        Nome = dentista.Nome_Completo.ToNome(),
+                        Nome_Completo = dentista.Nome_Completo.ToNome() ?? dentista.Apelido.ToNome(),
                         Nome_Social = string.Empty,
-                        Nome_Completo = dentista.Nome_Completo.ToNome(),
-                        Apelido = dentista.Nome_Completo,
+                        Apelido = dentista.Apelido.ToNome(),
                         Observacoes = dentista.Observacoes,
                         Email = dentista.Email,
                         Telefone_Principal = dentista.Telefone.ToFone().ToString(),

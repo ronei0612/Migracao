@@ -70,7 +70,7 @@ namespace Migracao.Utils
         public static List<DesenvolvimentoClinicoDTO> ConvertDesenvolvimentoClinicoParaDesenvolvimentoClinicoDTO(List<DesenvolvimentoClinico> desenvClicnicos, List<Agendamentos> agendamentos)
         {
             List<DesenvolvimentoClinicoDTO> lstDesenvolvimentoClinicoDTO = new List<DesenvolvimentoClinicoDTO>();
-            var nome = "";
+            var linha = 1;
 
             try
             {
@@ -98,8 +98,6 @@ namespace Migracao.Utils
 
                 foreach (var agendamento in agendamentos)
                 {
-                    nome = agendamento.Nome;
-
                     var lstDesenvolvimentoClinico = new DesenvolvimentoClinicoDTO
                     {
                         CPF = agendamento.Paciente_CPF.ToCPF(),
@@ -116,11 +114,12 @@ namespace Migracao.Utils
                     };
 
                     lstDesenvolvimentoClinicoDTO.Add(lstDesenvolvimentoClinico);
+                    linha++;
                 };
             }
             catch (Exception error)
             {
-                throw new Exception($"Erro ao converter Desenvolvimento Clinico \"{nome}\": {error.Message}");
+                throw new Exception($"Erro ao converter Desenvolvimento Clinico (Linha {linha}): {error.Message}");
             }
 
             return lstDesenvolvimentoClinicoDTO;
@@ -129,14 +128,12 @@ namespace Migracao.Utils
         public static List<PacientesDentistasDTO> ConvertPacientesDentistasParaPacientesDentistasDTO(List<Models.Pacientes> pacientes, List<Models.Dentistas> dentistas)
         {
             List<PacientesDentistasDTO> pacientesDentistasDTO = new List<PacientesDentistasDTO>();
-            var nome = "";
+            var linha = 1;
 
             try
             {
                 foreach (var paciente in pacientes)
                 {
-                    nome = paciente.Nome_Paciente;
-
                     var lstPacientes = new PacientesDentistasDTO
                     {
                         Cargo_Clinica = "Paciente",
@@ -165,12 +162,11 @@ namespace Migracao.Utils
                     };
 
                     pacientesDentistasDTO.Add(lstPacientes);
+                    linha++;
                 };
 
                 foreach (var dentista in dentistas)
                 {
-                    nome = dentista.Nome_Completo;
-
                     var lstPacientes = new PacientesDentistasDTO
                     {
                         Cargo_Clinica = "Dentista",
@@ -184,11 +180,12 @@ namespace Migracao.Utils
                     };
 
                     pacientesDentistasDTO.Add(lstPacientes);
+                    linha++;
                 };
             }
             catch (Exception error)
             {
-                throw new Exception($"Erro ao converter Excel para Pessoas Pacientes \"{nome}\": {error.Message}");
+                throw new Exception($"Erro ao converter Excel para Pessoas Pacientes (Linha {linha}): {error.Message}");
             }
 
             return pacientesDentistasDTO;
@@ -258,9 +255,11 @@ namespace Migracao.Utils
             List<ProcedimentosManutencaoDTO> lstProcedManutDTO = new List<ProcedimentosManutencaoDTO>();
             decimal? valorTotal = 0;
             int docsEncontrados = 0;
+            var linha = 1;
 
             try
             {
+
                 foreach (var procedimento in procedimentos)
                 {
                     var lstProcedManut = new ProcedimentosManutencaoDTO
@@ -283,7 +282,10 @@ namespace Migracao.Utils
                     };
 
                     lstProcedManutDTO.Add(lstProcedManut);
+                    linha++;
                 };
+
+                linha = 1;
 
                 foreach (var manutencao in manutencoes)
                 {
@@ -317,12 +319,13 @@ namespace Migracao.Utils
 
                     lstProcedManutDTO.Add(lstManutencao);
 
+                    linha++;
                     valorTotal = 0;
                 };
             }
             catch (Exception error)
             {
-                throw new Exception($"Erro ao converter Procedimentos e Manutenções: {error.Message}");
+                throw new Exception($"Erro ao converter Procedimentos e Manutenções (Linha {linha}): {error.Message}");
             }
 
             return lstProcedManutDTO;

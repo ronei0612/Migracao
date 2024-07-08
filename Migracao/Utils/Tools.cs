@@ -180,7 +180,9 @@ namespace Migracao.Utils
 
 		public static string? ToNome(this string texto)
 		{
-			texto = texto.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
+            if (texto == null) return null;
+
+            texto = texto.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
 
 			if (texto == null) return null;
 
@@ -252,9 +254,11 @@ namespace Migracao.Utils
 						: TitulosEspeciesID.DepositoEmConta);
 		}
 
-		public static decimal ToMoeda(this string texto)
+		public static decimal? ToMoeda(this string texto)
 		{
-			if (texto.Contains(',') && texto.Contains('.'))
+			if (texto == null) return null;
+
+            if (texto.Contains(',') && texto.Contains('.'))
 				return decimal.Parse(texto.Replace(".", "").Replace(",", "."), CultureInfo.InvariantCulture);
 			else
 				return decimal.Parse(texto.Replace(",", "."), CultureInfo.InvariantCulture);

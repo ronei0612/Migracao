@@ -1,6 +1,5 @@
 ﻿using Migracao.DTO;
 using Migracao.Models;
-using Migracao.Models.Context;
 using Migracao.Models.DentalOffice;
 using Migracao.Models.DTO;
 using Migracao.Models.OdontoCompany;
@@ -18,14 +17,6 @@ namespace Migracao.Utils
 {
     public class ConversorEntidadeParaDTO
     {
-        static string? _pathDB;
-
-        public ConversorEntidadeParaDTO(string pathDB)
-        {
-            _pathDB = pathDB;
-            var bla = new FireBirdContext<Models.Agendamentos>(pathDB).GetAll();
-        }
-
         #region Conversores no modelo de importação
 
         public static List<AgendamentosDTO> ConvertAgendamentodsParaAgendamentosDTO(List<Agendamentos> agendamentos)
@@ -46,15 +37,15 @@ namespace Migracao.Utils
                         dataInicio = dataInicio.AddMinutes(double.Parse(minutos));
 
                     var dataTermino = dataInicio;
-                    var idsEncontrados = agendamentos.Where(agenda => agenda.Equals(agendamento.Lancamento)).Count();
-                    if (idsEncontrados > 0)
-                        dataTermino = dataTermino.AddMinutes(15 * idsEncontrados);
-                    else
-                        dataTermino = dataTermino.AddMinutes(15);
+                    //var idsEncontrados = agendamentos.Where(agenda => agenda.Equals(agendamento.ID)).Count();
+                    //if (idsEncontrados > 0)
+                    //    dataTermino = dataTermino.AddMinutes(15 * idsEncontrados);
+                    //else
+                    //    dataTermino = dataTermino.AddMinutes(15);
 
                     var lstAgendamento = new AgendamentosDTO
                     {
-                        Lancamento = agendamento.Lancamento,
+                        ID = agendamento.ID,
                         CPF = agendamento.Paciente_CPF.ToCPF(),
                         Nome_Completo = agendamento.Nome.ToNome(),
                         Telefone = agendamento.Telefone,
@@ -79,55 +70,56 @@ namespace Migracao.Utils
         public static List<DesenvolvimentoClinicoDTO> ConvertDesenvolvimentoClinicoParaDesenvolvimentoClinicoDTO(List<DesenvolvimentoClinico> desenvClicnicos, List<Agendamentos> agendamentos)
         {
             List<DesenvolvimentoClinicoDTO> lstDesenvolvimentoClinicoDTO = new List<DesenvolvimentoClinicoDTO>();
-            var nome = "";
-            string arquivoAgendamentosSql = "Scripts\\SelectNumeroLancamentosAgendamentos.sql";
+            var linha = 1;
 
             try
-            {               
+            {
+                //foreach (var desenvClicnico in desenvClicnicos)
+                //{
+                //    nome = desenvClicnico.Paciente_Nome;
 
-                Parallel.ForEach(agendamentos, agendamento =>
+                //    var lstDesenvolvimentoClinico = new DesenvolvimentoClinicoDTO
+                //    {
+                //        CPF = desenvClicnico.Paciente_CPF.ToCPF(),
+                //        Nome_Completo = desenvClicnico.Paciente_Nome.ToNome(),
+                //        Telefone = string.Empty,
+                //        Dentista = desenvClicnico.Dentista_Nome,
+                //        //ID = desenvClicnico.Dentista_Codigo,
+                //        Desenvolvimento_Clinico = desenvClicnico.Procedimento_Observacao,
+                //        Data_Hora_Inicio = desenvClicnico.Data_Inicio.ToString(),
+                //        Data_Hora_Termino = string.Empty,
+                //        Data_Hora_Atendimento_Inicio = desenvClicnico.Data_Retorno.ToString(),
+                //        Data_Hora_Atendimento_Termino = string.Empty,
+                //        //Observacao = desenvClicnico.Procedimento_Observacao
+                //    };
+
+                //    lstDesenvolvimentoClinicoDTO.Add(lstDesenvolvimentoClinico);
+                //};
+
+                foreach (var agendamento in agendamentos)
                 {
-                    var minutos = agendamento.Hora.Split(':')[1];
-                    var horas = agendamento.Hora.Split(':')[0];
-                    var dataInicio = agendamento.Data;
-
-                    if (!string.IsNullOrEmpty(horas))
-                        dataInicio = dataInicio.AddHours(double.Parse(horas));
-                    if (!string.IsNullOrEmpty(minutos))
-                        dataInicio = dataInicio.AddMinutes(double.Parse(minutos));
-
-                    var dataTermino = dataInicio;
-
-                    var numLancamentos = agendamentos
-                                        .Where(m => m.Lancamento == agendamento.Lancamento)
-                                        .Count();
-
-                    var minutosParaAdicionar = numLancamentos > 0 ? 15 * numLancamentos : 15;
-                    dataTermino = dataTermino.AddMinutes(minutosParaAdicionar);
-
-                    var desenvolvimentoClinico = new DesenvolvimentoClinicoDTO
+                    var lstDesenvolvimentoClinico = new DesenvolvimentoClinicoDTO
                     {
                         CPF = agendamento.Paciente_CPF.ToCPF(),
                         Nome_Completo = agendamento.Nome.ToNome(),
                         Telefone = agendamento.Telefone.ToFone().ToString(),
                         Dentista = agendamento.Nome_Dentista.ToNome(),
+                        //ID = agendamento.Codigo_Responsavel,
                         Desenvolvimento_Clinico = agendamento.Observacao,
                         Data_Hora_Inicio = agendamento.Data_Inclusao.ToString(),
-                        Data_Hora_Termino = dataTermino.ToString(),
+                        Data_Hora_Termino = string.Empty,
                         Data_Hora_Atendimento_Inicio = agendamento.Data.ToString(),
                         Data_Hora_Atendimento_Termino = string.Empty,
+                        //Observacao = agendamento.Observacao
                     };
 
-                    // Adicionar o desenvolvimentoClinico à lista compartilhada de forma segura
-                    lock (lstDesenvolvimentoClinicoDTO)
-                    {
-                        lstDesenvolvimentoClinicoDTO.Add(desenvolvimentoClinico);
-                    }
-                });
+                    lstDesenvolvimentoClinicoDTO.Add(lstDesenvolvimentoClinico);
+                    linha++;
+                };
             }
             catch (Exception error)
             {
-                throw new Exception($"Erro ao converter Desenvolvimento Clinico \"{nome}\": {error.Message}");
+                throw new Exception($"Erro ao converter Desenvolvimento Clinico (Linha {linha}): {error.Message}");
             }
 
             return lstDesenvolvimentoClinicoDTO;
@@ -136,14 +128,12 @@ namespace Migracao.Utils
         public static List<PacientesDentistasDTO> ConvertPacientesDentistasParaPacientesDentistasDTO(List<Models.Pacientes> pacientes, List<Models.Dentistas> dentistas)
         {
             List<PacientesDentistasDTO> pacientesDentistasDTO = new List<PacientesDentistasDTO>();
-            var nome = "";
+            var linha = 1;
 
             try
             {
                 foreach (var paciente in pacientes)
                 {
-                    nome = paciente.Nome_Paciente;
-
                     var lstPacientes = new PacientesDentistasDTO
                     {
                         Cargo_Clinica = "Paciente",
@@ -172,12 +162,11 @@ namespace Migracao.Utils
                     };
 
                     pacientesDentistasDTO.Add(lstPacientes);
+                    linha++;
                 };
 
                 foreach (var dentista in dentistas)
                 {
-                    nome = dentista.Nome_Completo;
-
                     var lstPacientes = new PacientesDentistasDTO
                     {
                         Cargo_Clinica = "Dentista",
@@ -191,11 +180,12 @@ namespace Migracao.Utils
                     };
 
                     pacientesDentistasDTO.Add(lstPacientes);
+                    linha++;
                 };
             }
             catch (Exception error)
             {
-                throw new Exception($"Erro ao converter Excel para Pessoas Pacientes \"{nome}\": {error.Message}");
+                throw new Exception($"Erro ao converter Excel para Pessoas Pacientes (Linha {linha}): {error.Message}");
             }
 
             return pacientesDentistasDTO;
@@ -265,9 +255,11 @@ namespace Migracao.Utils
             List<ProcedimentosManutencaoDTO> lstProcedManutDTO = new List<ProcedimentosManutencaoDTO>();
             decimal? valorTotal = 0;
             int docsEncontrados = 0;
+            var linha = 1;
 
             try
             {
+
                 foreach (var procedimento in procedimentos)
                 {
                     var lstProcedManut = new ProcedimentosManutencaoDTO
@@ -283,14 +275,17 @@ namespace Migracao.Utils
                         Procedimento_Observacao = procedimento.Observacao,
                         Data_Inicio = procedimento.Data_Inicio.ToDataNull().ToString(),
                         Data_Termino = procedimento.Data_Termino.ToDataNull().ToString(),
-                        Data_Atendimento = procedimento.Data_Atendimento.ToDataNull().ToString()
+                        Data_Atendimento = procedimento.Data_Atendimento.ToDataNull().ToString(),
                         //Valor_Original = procedimento.Valor_Original.ToString(),
                         //Valor_Pagamento = procedimento.Valor_Pagamento.ToString(),
                         //Data_Pagamento = procedimento.Data_Pagamento.ToString(),
                     };
 
                     lstProcedManutDTO.Add(lstProcedManut);
+                    linha++;
                 };
+
+                linha = 1;
 
                 foreach (var manutencao in manutencoes)
                 {
@@ -310,7 +305,7 @@ namespace Migracao.Utils
                         Procedimento_Nome = manutencao.Procedimento_Nome,
                         Procedimento_Valor = manutencao.Procedimento_Valor.ToMoeda().ToString(),
                         Valor_Original = manutencao.Valor_Original.ToString(),
-                        Valor_Pago = manutencao.Valor_Pagamento.ToString(),
+                        Valor_Pagamento = manutencao.Valor_Pagamento.ToString(),
                         Data_Pagamento = manutencao.Data_Pagamento.ToString(),
                         Dente = manutencao.Dente,
                         Procedimento_Observacao = manutencao.Procedimentos_Observacao,
@@ -324,12 +319,13 @@ namespace Migracao.Utils
 
                     lstProcedManutDTO.Add(lstManutencao);
 
+                    linha++;
                     valorTotal = 0;
                 };
             }
             catch (Exception error)
             {
-                throw new Exception($"Erro ao converter Procedimentos e Manutenções: {error.Message}");
+                throw new Exception($"Erro ao converter Procedimentos e Manutenções (Linha {linha}): {error.Message}");
             }
 
             return lstProcedManutDTO;

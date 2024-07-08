@@ -283,9 +283,9 @@ namespace Migracao.Utils
 			return false;
 		}
 
-        public static string ToCidade(this string textoCidade, string uf)
+        public static string ToCidade(this string textoCidade, string uf, string cep = "")
         {
-			if (excelHelper == null)
+            if (excelHelper == null)
 			{
                 var arquivoExcelCidades = "Files\\EnderecosCidades.xlsx";
                 excelHelper = new ExcelHelper();
@@ -302,49 +302,18 @@ namespace Migracao.Utils
                     }
             }
 
-            if (string.IsNullOrEmpty(textoCidade))
-                return "";
+            if (excelHelper.CidadeExists(cep, textoCidade.ToLower(), uf.ToLower()))
+                return textoCidade;
+			else
+			{
+                var procurarCidade = excelHelper.EncontrarCidadeSemelhante(textoCidade.ToLower());
 
-            textoCidade = RemoverAcentos(textoCidade).ToLower();
-            uf = uf.ToLower();
-
-            if (!string.IsNullOrWhiteSpace(textoCidade))
-            {
-				if (excelHelper.CidadeExists(textoCidade, uf))
+                if (excelHelper.CidadeExists(cep, procurarCidade, uf))
                     return textoCidade;
-				else
-				{
-                    var procurarCidade = EncontrarCidadeSemelhante(textoCidade);
-
-                    if (excelHelper.CidadeExists(procurarCidade, uf))
-                        return textoCidade;
-                }
             }
 			
             return textoCidade;
         }
-
-        public static string EncontrarCidadeSemelhante(this string textoCidade)
-		{
-			textoCidade = RemoverAcentos(textoCidade).ToLower();
-
-			string cidadeEncontrada = null;
-			int menorDistancia = int.MaxValue;
-
-			foreach (string cidade in Cidade.cidades)
-			{
-				string cidadeNormalizada = RemoverAcentos(cidade).ToLower();
-				int distancia = DistanciaLevenshtein(textoCidade, cidadeNormalizada);
-
-				if (distancia < menorDistancia)
-				{
-					menorDistancia = distancia;
-					cidadeEncontrada = cidade;
-				}
-			}
-
-			return cidadeEncontrada;
-		}
 
 		public static string RemoverAcentos(string texto)
 		{
@@ -372,34 +341,6 @@ namespace Migracao.Utils
 			}
 
 			return contador;
-		}
-
-		// Implementação da Distância de Levenshtein
-		private static int DistanciaLevenshtein(string s, string t)
-		{
-			int[,] d = new int[s.Length + 1, t.Length + 1];
-
-			for (int i = 0; i <= s.Length; i++)
-			{
-				d[i, 0] = i;
-			}
-
-			for (int j = 0; j <= t.Length; j++)
-			{
-				d[0, j] = j;
-			}
-
-			for (int j = 1; j <= t.Length; j++)
-			{
-				for (int i = 1; i <= s.Length; i++)
-				{
-					int custo = (s[i - 1] == t[j - 1]) ? 0 : 1;
-
-					d[i, j] = Math.Min(Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1), d[i - 1, j - 1] + custo);
-				}
-			}
-
-			return d[s.Length, t.Length];
 		}
 
 		public static decimal ArredondarValorV2(this string input)

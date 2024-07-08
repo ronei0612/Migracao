@@ -180,9 +180,13 @@ namespace Migracao.Utils
                     if (!cidadeEstadoDict.ContainsKey(key))
                         cidadeEstadoDict.Add(key, cidadeIdCellValue);
 
+                    key = cidadeCellValue.ToLower();
+                    if (!cidadeDict.ContainsKey(key))
+                        cidadeDict.Add(key, cidadeIdCellValue);
+
                     if (cepCellValue != "0" && !string.IsNullOrEmpty(cepCellValue))
                     {
-                        key = cepCellValue + "|" + estadoCellValue.ToLower();
+                        key = cepCellValue.Substring(0, 5) + "|" + estadoCellValue.ToLower();
                         if (!cepEstadoDict.ContainsKey(key))
                             cepEstadoDict.Add(key, cidadeIdCellValue);
                     }
@@ -201,8 +205,17 @@ namespace Migracao.Utils
             throw new Exception($"Coluna {columnName} não encontrada");
         }
 
-        public bool CidadeExists(string cidade, string estado)
+        public bool CidadeExists(string cep = "", string cidade = "", string estado = "")
         {
+            string key = "";
+
+            if (cep.Length >= 5 && !string.IsNullOrEmpty(estado))
+            {
+                key = cep.Substring(0, 5) + "|" + estado.ToLower();
+                if (cepEstadoDict.ContainsKey(key))
+                    return true;
+            }
+
             if (string.IsNullOrEmpty(cidade))
                 return true;
 
@@ -210,13 +223,62 @@ namespace Migracao.Utils
 
             if (!string.IsNullOrWhiteSpace(cidade))
             {
-                string key = cidade + "|" + estado.ToLower();
+                key = cidade + "|" + estado.ToLower();
                 if (cidadeEstadoDict.ContainsKey(key))
                     return true;
             }
 
             return false;
         }
+
+        public string EncontrarCidadeSemelhante(string textoCidade)
+        {
+            textoCidade = textoCidade.ToLower();
+
+            string cidadeEncontrada = null;
+            int menorDistancia = int.MaxValue;
+
+            foreach (string cidade in cidadeDict.Keys)
+            {
+                string cidadeNormalizada = Tools.RemoverAcentos(cidade).ToLower();
+                int distancia = DistanciaLevenshtein(textoCidade, cidadeNormalizada);
+
+                if (distancia < menorDistancia)
+                {
+                    menorDistancia = distancia;
+                    cidadeEncontrada = cidade;
+                }
+            }
+
+            return cidadeEncontrada;
+        }
+        private int DistanciaLevenshtein(string s, string t)
+        {
+            int[,] d = new int[s.Length + 1, t.Length + 1];
+
+            for (int i = 0; i <= s.Length; i++)
+            {
+                d[i, 0] = i;
+            }
+
+            for (int j = 0; j <= t.Length; j++)
+            {
+                d[0, j] = j;
+            }
+
+            for (int j = 1; j <= t.Length; j++)
+            {
+                for (int i = 1; i <= s.Length; i++)
+                {
+                    int custo = (s[i - 1] == t[j - 1]) ? 0 : 1;
+
+                    d[i, j] = Math.Min(Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1), d[i - 1, j - 1] + custo);
+                }
+            }
+
+            return d[s.Length, t.Length];
+        }
+
         public string GetConsumidorID(string cpf = "", string nomeCompleto = "", string codigo = "")
         {
             if (string.IsNullOrWhiteSpace(cpf) && string.IsNullOrWhiteSpace(nomeCompleto))

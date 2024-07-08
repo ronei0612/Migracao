@@ -101,7 +101,8 @@ namespace Migracao.Utils
 			else if (double.TryParse(texto, out double codigoData))
 				data = DateTime.FromOADate(codigoData);
 			else
-				throw new Exception("Erro na conversão de data");
+				return null;
+				//throw new Exception("Erro na conversão de data: " + texto);
 			if ((data >= dataMinima && data <= dataMaxima) == false)
 				data = dataHoje;
 

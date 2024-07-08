@@ -106,6 +106,10 @@ namespace Migracao
             }
             catch (Exception ex)
             {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    btnImportar.Enabled = true;
+                });
                 MessageBox.Show(ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

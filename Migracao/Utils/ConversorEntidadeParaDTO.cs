@@ -122,25 +122,28 @@ namespace Migracao.Utils
         public static List<PacientesDentistasDTO> ConvertPacientesDentistasParaPacientesDentistasDTO(List<Models.Pacientes> pacientes, List<Models.Dentistas> dentistas)
         {
             List<PacientesDentistasDTO> pacientesDentistasDTO = new List<PacientesDentistasDTO>();
+            var nome = "";
 
             try
             {
                 foreach (var paciente in pacientes)
                 {
+                    nome = paciente.Nome_Paciente;
+
                     var lstPacientes = new PacientesDentistasDTO
                     {
-                        Cargo_Clinica = string.Empty,
+                        Cargo_Clinica = "Paciente",
                         Nome = paciente.Nome_Paciente.ToNome(),
                         Nome_Social = string.Empty,
                         Nome_Completo = string.Empty,
                         Apelido = string.Empty,
-                        CPF = paciente.CPF,
+                        CPF = paciente.CPF.ToCPF(),
                         Observacoes = paciente.Observacoes,
                         Email = paciente.E_mail.ToEmail(),
                         RG = paciente.RG.GetPrimeirosCaracteres(20),
-                        Sexo = paciente.Sexo.ToSexo("m", "f") ? "M" : "F",
-                        Data_Nascimento = paciente.Data_de_Nascimento,
-                        Telefone_Principal = paciente.Telefone_Principal,
+                        Sexo = paciente.Sexo.ToSexo("m", "f") ? "Masculino" : "Feminino",
+                        Data_Nascimento = paciente.Data_de_Nascimento.ToDataNull().ToString(),
+                        Telefone_Principal = paciente.Telefone_Principal.ToFone().ToString(),
                         Celular = paciente.Celular.ToFone().ToString(),
                         Telefone_Alternativo = paciente.Telefone_Alternativo.ToFone().ToString(),
                         Logradouro = paciente.Logradouro,
@@ -159,16 +162,19 @@ namespace Migracao.Utils
 
                 foreach (var dentista in dentistas)
                 {
+                    nome = dentista.Nome_Completo;
+                    if (nome.Contains("AMELIA ZA"))
+                        nome = nome;
                     var lstPacientes = new PacientesDentistasDTO
                     {
                         Cargo_Clinica = "Dentista",
-                        Nome = dentista.Nome_Completo,
+                        Nome = dentista.Nome_Completo.ToNome(),
                         Nome_Social = string.Empty,
-                        Nome_Completo = dentista.Nome_Completo,
-                        Apelido = dentista.Nome_Completo.GetPrimeirosCaracteres(20),
+                        Nome_Completo = dentista.Nome_Completo.ToNome(),
+                        Apelido = dentista.Nome_Completo,
                         Observacoes = dentista.Observacoes,
                         Email = dentista.Email,
-                        Telefone_Principal = dentista.Telefone,
+                        Telefone_Principal = dentista.Telefone.ToFone().ToString(),
                         Codigo_Conselho_Estado = dentista.Codigo_do_Conselho_e_Estado
                     };
 
@@ -177,7 +183,7 @@ namespace Migracao.Utils
             }
             catch (Exception error)
             {
-                throw new Exception($"Erro ao converter Excel para Pessoas Pacientes: {error.Message}");
+                throw new Exception($"Erro ao converter Excel para Pessoas Pacientes \"{nome}\": {error.Message}");
             }
 
             return pacientesDentistasDTO;

@@ -71,6 +71,8 @@ namespace Migracao.Utils
 
 		public static long? ToFone(this string telefone)
 		{
+			if (string.IsNullOrEmpty(telefone))
+				return null;
 			var possivelTel = Regex.Replace(telefone, "[^0-9]", "");
 
 			if (string.IsNullOrEmpty(possivelTel))

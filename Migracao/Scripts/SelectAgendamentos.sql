@@ -1,5 +1,5 @@
 SELECT 
-LANCTO ID,
+LANCTO Lancamento,
 CNPJ_CPF Paciente_CPF,
 NOME Nome,
 DATA DATA,

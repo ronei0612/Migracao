@@ -8,7 +8,7 @@ namespace Migracao.Models
 {
     public class Agendamentos
     {
-        public int ID { get; set; }
+        public string? Lancamento { get; set; }
         public string? Paciente_CPF { get; set; }
         public string? Nome { get; set; }
         public DateTime Data { get; set; }

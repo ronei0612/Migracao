@@ -27,9 +27,6 @@ namespace Migracao.DTO
         [DisplayName("Número Prontuário")]
         public string? Numero_Prontuario { get; set; }
 
-        [DisplayName("Nome")]
-        public string? Nome { get; set; }
-
         [DisplayName("Nome Completo")]
         public string? Nome_Completo { get; set; }
 

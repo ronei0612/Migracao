@@ -11,7 +11,7 @@ namespace Migracao.Models.DTO
     public class AgendamentosDTO
     {
         [DisplayName("ID")]
-        public int ID { get; set; }
+        public string? Lancamento { get; set; }
 
         [DisplayName("CPF")]
         public string? CPF { get; set; }

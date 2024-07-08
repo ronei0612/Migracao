@@ -77,7 +77,7 @@ namespace Migracao.Sistems
 
             if (dataTablePacientesDentistas != null)
             {
-                var salvarArquivoPacientesDentistas = Tools.GerarNomeArquivo($"CadastroPacienteDentistasEntidade_{Tools.ultimoEstabelecimentoID}_OdontoCompany");
+                var salvarArquivoPacientesDentistas = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_CadastroPacientesDentistas");
                 excelHelper.CriarExcelArquivo(salvarArquivoPacientesDentistas + ".xlsx", dataTablePacientesDentistas);
             }
         }              

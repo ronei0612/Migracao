@@ -254,8 +254,10 @@ namespace Migracao.Utils
 						: TitulosEspeciesID.DepositoEmConta);
 		}
 
-		public static decimal ToMoeda(this string texto)
+		public static decimal? ToMoeda(this string texto)
 		{
+			if (texto == null) return null;
+
             if (texto.Contains(',') && texto.Contains('.'))
 				return decimal.Parse(texto.Replace(".", "").Replace(",", "."), CultureInfo.InvariantCulture);
 			else

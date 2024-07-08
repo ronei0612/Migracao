@@ -267,16 +267,19 @@ namespace Migracao.Utils
                     {
                         Numero_Controle = procedimento.Numero_Controle,
                         Paciente_CPF = procedimento.Paciente_CPF.ToCPF(),
-                        Paciente_Nome = procedimento.Nome_Paciente,
-                        Dentista_CPF = procedimento.Dentista_CPF,
-                        Dentista_Nome = procedimento.Dentista_Nome,
+                        Paciente_Nome = procedimento.Nome_Paciente.ToNome(),
+                        Dentista_CPF = procedimento.Dentista_CPF.ToCPF(),
+                        Dentista_Nome = procedimento.Dentista_Nome.ToNome(),
                         Dente = procedimento.Dente,
                         Procedimento_Nome = procedimento.NOME_PRODUTO,
-                        Procedimento_Valor = procedimento.Valor,
+                        Procedimento_Valor = procedimento.Valor.ToMoeda().ToString(),
                         Procedimento_Observacao = procedimento.Observacao,
-                        Data_Inicio = procedimento.Data_Inicio.ToData().ToShortDateString(),
-                        Data_Termino = procedimento.Data_Termino,
-                        Data_Atendimento = procedimento.Data_Atendimento
+                        Data_Inicio = procedimento.Data_Inicio.ToDataNull().ToString(),
+                        Data_Termino = procedimento.Data_Termino.ToDataNull().ToString(),
+                        Data_Atendimento = procedimento.Data_Atendimento.ToDataNull().ToString(),
+                        //Valor_Original = procedimento.Valor_Original.ToString(),
+                        //Valor_Pagamento = procedimento.Valor_Pagamento.ToString(),
+                        //Data_Pagamento = procedimento.Data_Pagamento.ToString(),
                     };
 
                     lstProcedManutDTO.Add(lstProcedManut);
@@ -291,22 +294,14 @@ namespace Migracao.Utils
 
                     var listaValores = manutencoes.Where(linha => linha.Paciente_CPF.Equals(manutencao.Paciente_CPF)).ToList();
 
-                    var selecionaLinha = listaValores.Select(linha => linha.Valor_Devido?.Replace(",", "."));
-
-                    foreach (var item in selecionaLinha)
-                    {
-                        if (!string.IsNullOrEmpty(item))
-                            valorTotal += Convert.ToDecimal(item, CultureInfo.InvariantCulture);
-                    }
-
                     var lstManutencao = new ProcedimentosManutencaoDTO
                     {
                         Numero_Controle = manutencao.Numero_Controle,
-                        Paciente_CPF = manutencao.Paciente_CPF,
-                        Paciente_Nome = manutencao.Nome_Paciente,
-                        Dentista_Nome = manutencao.Dentista_Nome,
+                        Paciente_CPF = manutencao.Paciente_CPF.ToCPF(),
+                        Paciente_Nome = manutencao.Nome_Paciente.ToNome(),
+                        Dentista_Nome = manutencao.Dentista_Nome.ToNome(),
                         Procedimento_Nome = manutencao.Procedimento_Nome,
-                        Procedimento_Valor = manutencao.Procedimento_Valor,
+                        Procedimento_Valor = manutencao.Procedimento_Valor.ToMoeda().ToString(),
                         Valor_Original = manutencao.Valor_Original.ToString(),
                         Valor_Pagamento = manutencao.Valor_Pagamento.ToString(),
                         Data_Pagamento = manutencao.Data_Pagamento.ToString(),

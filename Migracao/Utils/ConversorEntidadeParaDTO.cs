@@ -164,8 +164,7 @@ namespace Migracao.Utils
                 foreach (var dentista in dentistas)
                 {
                     nome = dentista.Nome_Completo;
-                    if (nome.Contains("AMELIA ZA"))
-                        nome = nome;
+
                     var lstPacientes = new PacientesDentistasDTO
                     {
                         Cargo_Clinica = "Dentista",

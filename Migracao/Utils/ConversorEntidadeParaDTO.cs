@@ -153,7 +153,7 @@ namespace Migracao.Utils
                         Numero = paciente.Numero,
                         Bairro = paciente.Bairro,
                         Cidade = paciente.Cidade.ToCidade(paciente.UF),
-                        UF = paciente.UF.ToUpper(),
+                        UF = paciente.UF?.ToUpper() ?? "",
                         CEP = paciente.CEP,
                         Codigo_Conselho_Estado = string.Empty,
                         Estado_Civil = string.Empty,

@@ -309,9 +309,9 @@ namespace Migracao.Utils
                     }
             }
 
-			textoCidade = textoCidade.ToLower() ?? "";
-			uf = uf.ToLower() ?? "";
-            cep = cep ?? "";
+			textoCidade = !string.IsNullOrEmpty(textoCidade) ? textoCidade.ToLower() : string.Empty;
+			uf = !string.IsNullOrEmpty(uf) ? uf.ToLower() : string.Empty;
+            cep = !string.IsNullOrEmpty(cep) ? cep.ToLower() : string.Empty;
 
             if (excelHelper.CidadeExists(cep, textoCidade, uf.ToLower()))
                 return textoCidade;

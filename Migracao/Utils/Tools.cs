@@ -309,7 +309,11 @@ namespace Migracao.Utils
                     }
             }
 
-            if (excelHelper.CidadeExists(cep, textoCidade.ToLower(), uf.ToLower()))
+			textoCidade = textoCidade.ToLower() ?? "";
+			uf = uf.ToLower() ?? "";
+            cep = cep ?? "";
+
+            if (excelHelper.CidadeExists(cep, textoCidade, uf.ToLower()))
                 return textoCidade;
 			else
 			{

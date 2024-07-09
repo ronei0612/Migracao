@@ -70,6 +70,7 @@ namespace Migracao.Utils
         public static List<DesenvolvimentoClinicoDTO> ConvertDesenvolvimentoClinicoParaDesenvolvimentoClinicoDTO(List<DesenvolvimentoClinico> desenvClicnicos, List<Agendamentos> agendamentos)
         {
             List<DesenvolvimentoClinicoDTO> lstDesenvolvimentoClinicoDTO = new List<DesenvolvimentoClinicoDTO>();
+            List<DesenvolvimentoClinicoComErrosDTO> lstDesenvolvimentoClinicoComErrosDTO = new List<DesenvolvimentoClinicoComErrosDTO>();
             var linha = 1;
 
             try
@@ -111,9 +112,20 @@ namespace Migracao.Utils
                         //Observacao = agendamento.Observacao
                     };
 
+                    if ((string.IsNullOrEmpty(desenvolvimentoClinico.CPF)) || (string.IsNullOrEmpty(desenvolvimentoClinico.Nome_Completo)) ||
+                            (string.IsNullOrEmpty(desenvolvimentoClinico.Dentista)) || (string.IsNullOrEmpty(desenvolvimentoClinico.Desenvolvimento_Clinico)) ||
+                            (string.IsNullOrEmpty(desenvolvimentoClinico.Data_Hora_Inicio)) || (string.IsNullOrEmpty(desenvolvimentoClinico.Data_Hora_Termino)))
+                    {
+                        var desenvolvimentoClinicoComErrosDTO = new DesenvolvimentoClinicoComErrosDTO { Mensagem_Erro = $"Paciente : {desenvolvimentoClinico.Nome_Completo}, com CPF {desenvolvimentoClinico.CPF} contém erros ou está faltando informações, confira os campos obrigatórios." };
+                        lstDesenvolvimentoClinicoComErrosDTO.Add(desenvolvimentoClinico);
+                        lstDesenvolvimentoClinicoComErrosDTO.Add(desenvolvimentoClinicoComErrosDTO);
+                    }
+                    else
+                        lstDesenvolvimentoClinicoDTO.Add(desenvolvimentoClinico);
+
                     lock (lstDesenvolvimentoClinicoDTO)
                     {
-                        lstDesenvolvimentoClinicoDTO.Add(desenvolvimentoClinico);
+                        
                     }
                 });
             }
@@ -128,13 +140,14 @@ namespace Migracao.Utils
         public static List<PacientesDentistasDTO> ConvertPacientesDentistasParaPacientesDentistasDTO(List<Models.Pacientes> pacientes, List<Models.Dentistas> dentistas)
         {
             List<PacientesDentistasDTO> pacientesDentistasDTO = new List<PacientesDentistasDTO>();
+            List<PacientesDentistasComErroDTO> pacientesDentistasComErroDTO = new List<PacientesDentistasComErroDTO>();
             var linha = 1;
 
             try
             {
                 foreach (var paciente in pacientes)
                 {
-                    var lstPacientes = new PacientesDentistasDTO
+                    var lstCadastro = new PacientesDentistasDTO
                     {
                         Cargo_Clinica = "Paciente",
                         Nome_Completo = paciente.Nome_Paciente.ToNome(),
@@ -153,7 +166,7 @@ namespace Migracao.Utils
                         Numero = paciente.Numero,
                         Bairro = paciente.Bairro,
                         Cidade = paciente.Cidade.ToCidade(paciente.UF),
-                        UF = paciente.UF.ToUpper(),
+                        UF = !string.IsNullOrEmpty(paciente.UF) ? paciente.UF.ToUpper() : string.Empty,
                         CEP = paciente.CEP,
                         Codigo_Conselho_Estado = string.Empty,
                         Estado_Civil = string.Empty,
@@ -161,13 +174,23 @@ namespace Migracao.Utils
                         Profissao = string.Empty
                     };
 
-                    pacientesDentistasDTO.Add(lstPacientes);
+                    if ((string.IsNullOrEmpty(lstCadastro.Nome_Completo)) || (string.IsNullOrEmpty(lstCadastro.CPF)) ||
+                        (string.IsNullOrEmpty(lstCadastro.RG)) || (string.IsNullOrEmpty(lstCadastro.Data_Nascimento)) ||
+                        (string.IsNullOrEmpty(lstCadastro.CPF)) || (string.IsNullOrEmpty(lstCadastro.CEP)) ||
+                        (string.IsNullOrEmpty(lstCadastro.Cidade)) || (string.IsNullOrEmpty(lstCadastro.UF)))
+                    {
+                        var lstPacientesDentistasComErros = new PacientesDentistasComErroDTO {  Mensagem_Erro = $"Paciente : {lstCadastro.Nome_Completo}, com CPF {lstCadastro.CPF} contém erros ou está faltando informações, confira os campos obrigatórios."};
+                        pacientesDentistasComErroDTO.Add(lstPacientesDentistasComErros);
+                    }
+                    else
+                        pacientesDentistasDTO.Add(lstCadastro);
+
                     linha++;
                 };
 
                 foreach (var dentista in dentistas)
                 {
-                    var lstPacientes = new PacientesDentistasDTO
+                    var lstCadastro = new PacientesDentistasDTO
                     {
                         Cargo_Clinica = "Dentista",
                         Nome_Completo = dentista.Nome_Completo.ToNome() ?? dentista.Apelido.ToNome(),
@@ -179,8 +202,16 @@ namespace Migracao.Utils
                         Codigo_Conselho_Estado = dentista.Codigo_do_Conselho_e_Estado
                     };
 
-                    pacientesDentistasDTO.Add(lstPacientes);
-                    linha++;
+                    if ((string.IsNullOrEmpty(lstCadastro.Nome_Completo)) || (string.IsNullOrEmpty(lstCadastro.CPF)) ||
+                        (string.IsNullOrEmpty(lstCadastro.RG)) || (string.IsNullOrEmpty(lstCadastro.Data_Nascimento)) ||
+                        (string.IsNullOrEmpty(lstCadastro.CPF)) || (string.IsNullOrEmpty(lstCadastro.CEP)) ||
+                        (string.IsNullOrEmpty(lstCadastro.Cidade)) || (string.IsNullOrEmpty(lstCadastro.UF)))
+                    {
+                        var lstPacientesDentistasComErros = new PacientesDentistasComErroDTO { Mensagem_Erro = $"Paciente : {lstCadastro.Nome_Completo}, com CPF {lstCadastro.CPF} contém erros ou está faltando informações, confira os campos obrigatórios." };
+                        pacientesDentistasComErroDTO.Add(lstPacientesDentistasComErros);
+                    }
+                    else
+                        pacientesDentistasDTO.Add(lstCadastro);
                 };
             }
             catch (Exception error)

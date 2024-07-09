@@ -36,8 +36,6 @@ namespace Migracao.Models.Context
                 }
                 catch (Exception ex)
                 {
-
-                    var aa = 1;
                     return 0;
                 }
             }

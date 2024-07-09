@@ -5,6 +5,7 @@ using Migracao.Models.Interfaces;
 using Migracao.Utils;
 using NPOI.SS.Formula.Functions;
 using System.Data;
+using System.Linq;
 using System.Text;
 
 namespace Migracao.Sistems
@@ -65,11 +66,15 @@ namespace Migracao.Sistems
 
             string arquivoPacientesSql = "Scripts\\SelectPacientes.sql";
 
-            var pacientes = new FireBirdContext<Pacientes>(_pathDB).RetornaItensBancoPorQuery(arquivoPacientesSql);
+            var pacientesClinico = new FireBirdContext<Pacientes>(_pathDB).RetornaItensBancoPorQuery(arquivoPacientesSql);
+            var pacientesContrato = new FireBirdContext<Pacientes>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoPacientesSql);
+            var pacientes = pacientesClinico.Union(pacientesContrato).ToList();
 
             string arquivoDDentistasSql = "Scripts\\SelectDentistas.sql";
 
-            var dentistas = new FireBirdContext<Dentistas>(_pathDB).RetornaItensBancoPorQuery(arquivoDDentistasSql);
+            var dentistasClinico = new FireBirdContext<Dentistas>(_pathDB).RetornaItensBancoPorQuery(arquivoDDentistasSql);
+            var dentistasContrato = new FireBirdContext<Dentistas>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoDDentistasSql);
+            var dentistas = dentistasClinico.Union(dentistasContrato).ToList();
 
             var lstPacientesDentistas = ConversorEntidadeParaDTO.ConvertPacientesDentistasParaPacientesDentistasDTO(pacientes, dentistas);
 
@@ -88,11 +93,11 @@ namespace Migracao.Sistems
 
             string arquivoDesenvClinicoSql = "Scripts\\SelectDesenvolvimentoClinico.sql";
 
-            var desenvClinico = new FireBirdContext<Models.DesenvolvimentoClinico>(_pathDB).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
+            var desenvClinico = new FireBirdContext<DesenvolvimentoClinico>(_pathDB).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
 
             string arquivoAgendamentosSql = "Scripts\\SelectAgendamentos.sql";
 
-            var agendamentos = new FireBirdContext<Models.Agendamentos>(_pathDB).RetornaItensBancoPorQuery(arquivoAgendamentosSql);
+            var agendamentos = new FireBirdContext<Agendamentos>(_pathDB).RetornaItensBancoPorQuery(arquivoAgendamentosSql);
 
             var lstDesenvClinico = ConversorEntidadeParaDTO.ConvertDesenvolvimentoClinicoParaDesenvolvimentoClinicoDTO(desenvClinico, agendamentos);
 
@@ -113,7 +118,7 @@ namespace Migracao.Sistems
 
             string arquivoSql = "Scripts\\SelectManutencoes.sql";
 
-            var manutencoes = new FireBirdContext<Models.Manutencoes>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+            var manutencoes = new FireBirdContext<Manutencoes>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
             var lstManutencoes = ConversorEntidadeParaDTO.ConvertManutencoesParaManutencoesDTO(manutencoes);
 

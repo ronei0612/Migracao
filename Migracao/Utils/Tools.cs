@@ -198,6 +198,7 @@ namespace Migracao.Utils
 
 			if (texto == null) return null;
 
+			// Remove última letra sozinha para não dar problema no fotetizar
 			return string.Join(" ", texto.Split(' ')
 				.Where(parte => parte.Length > 1)
 				.ToArray());

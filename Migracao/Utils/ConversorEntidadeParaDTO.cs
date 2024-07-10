@@ -139,7 +139,7 @@ namespace Migracao.Utils
                         Cargo_Clinica = "Paciente",
                         Nome_Completo = paciente.Nome_Paciente.ToNome(),
                         Nome_Social = string.Empty,
-                        Apelido = string.Empty,
+                        Apelido = paciente.Nome_Paciente.ToApelido(),
                         CPF = paciente.CPF.ToCPF(),
                         Observacoes = paciente.Observacoes,
                         Email = paciente.E_mail.ToEmail(),
@@ -170,9 +170,9 @@ namespace Migracao.Utils
                     var lstPacientes = new PacientesDentistasDTO
                     {
                         Cargo_Clinica = "Dentista",
-                        Nome_Completo = dentista.Nome_Completo.ToNome() ?? dentista.Apelido.ToNome(),
+                        Nome_Completo = dentista.Nome_Completo.ToNome() ?? dentista.Apelido.ToApelido(),
                         Nome_Social = string.Empty,
-                        Apelido = dentista.Apelido.ToNome(),
+                        Apelido = dentista.Apelido.ToApelido(),
                         Observacoes = dentista.Observacoes,
                         Email = dentista.Email,
                         Telefone_Principal = dentista.Telefone.ToFone().ToString(),

@@ -48,7 +48,19 @@ namespace Migracao.Utils
 			return texto.Contains(' ') ? texto.Split(' ')[0] : texto;
 		}
 
-		public static string ToSN(this bool texto)
+        public static string ToApelido(this string texto, string nome = "")
+        {
+			if (string.IsNullOrEmpty(texto)) {
+				if (string.IsNullOrEmpty(nome))
+					return "";
+				else
+                    return nome.ToNome().GetPrimeirosCaracteres(20);
+            }
+            else
+                return texto.ToNome().GetPrimeirosCaracteres(20);
+        }
+
+        public static string ToSN(this bool texto)
 		{
 			if (texto)
 				return "S";

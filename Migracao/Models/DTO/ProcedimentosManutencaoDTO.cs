@@ -85,14 +85,11 @@ namespace Migracao.Models.DTO
         [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
         public string? Valor_Original { get; set; }
 
-        [DisplayName("Data do Pagamento")]
+        [DisplayName("Data Pagamento")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Pagamento { get; set; }
 
         [DisplayName("Observação Recebido")]
         public string? Observacao_Recebido { get; set; }
-
-        [DisplayName("Valor do Pagamento")]
-        public string? Valor_Pagamento { get; set; }
     }
 }

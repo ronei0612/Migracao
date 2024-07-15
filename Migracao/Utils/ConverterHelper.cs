@@ -1,6 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using Migracao.Models;
+using Newtonsoft.Json;
+using NPOI.SS.Formula.Functions;
 using OfficeOpenXml;
 using System.Data;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Migracao.Utils
@@ -51,8 +54,27 @@ namespace Migracao.Utils
                          {
                              Soma = g.Sum(row => row.Field<double>(nomeColuna)).ToString()
                          }).ToList();
-
             return null;
+        }
+
+        public static decimal SomarValores<T>(List<T> lista, Func<T, string> selector)
+        {
+            decimal valorTotal = 0;
+
+            foreach (var item in lista)
+            {
+                string valorString = selector(item);
+
+                if (!string.IsNullOrEmpty(valorString))
+                {
+                    if (decimal.TryParse(valorString.Replace(",", "."), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal valorDecimal))
+                    {
+                        valorTotal += valorDecimal;
+                    }
+                }
+            }
+
+            return valorTotal;
         }
     }
 }

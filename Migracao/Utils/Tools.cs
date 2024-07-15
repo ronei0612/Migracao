@@ -1,59 +1,61 @@
 ﻿using Migracao.Models;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Migracao.Utils
 {
-	internal static class Tools
-	{
-		public static string mascaraCPF = "000.000.000-00";
-		public static string salvarNaPasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Documents");
-		public static string ultimaPasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Documents");
-		public static string ultimoEstabelecimentoID = "";
+    internal static class Tools
+    {
+        public static string mascaraCPF = "000.000.000-00";
+        public static string salvarNaPasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Documents");
+        public static string ultimaPasta = Environment.ExpandEnvironmentVariables("%userprofile%\\Documents");
+        public static string ultimoEstabelecimentoID = "";
         public static string ultimoEstabelecimento = "";
         public static string ultimoAntigoSistema = "0";
         public static string ultimoinputDB = "";
         public static string ultimoinputDBContratos = "";
-		public static ExcelHelper excelHelper;
-        
+        public static ExcelHelper excelHelper;
+
         private static string arquivoConfig = "config.config";
 
         public static string? ToCPF(this string possivelCpf)
-		{
-			if (string.IsNullOrEmpty(possivelCpf))
-				return null;
+        {
+            if (string.IsNullOrEmpty(possivelCpf))
+                return null;
 
-			if (possivelCpf.Contains('.') && possivelCpf.Contains('-') && possivelCpf.Length <= 14)
-				return possivelCpf;
+            if (possivelCpf.Contains('.') && possivelCpf.Contains('-') && possivelCpf.Length <= 14)
+                return possivelCpf;
 
-			else
-			{
-				var mascaraCPFformat = mascaraCPF.Split('.')[0].Replace(".", @"\.").Replace("-", @"\-");
-				var mascaraCPFLenth = Regex.Replace(mascaraCPFformat, "[^0-9]", "").Length.ToString();
+            else
+            {
+                var mascaraCPFformat = mascaraCPF.Split('.')[0].Replace(".", @"\.").Replace("-", @"\-");
+                var mascaraCPFLenth = Regex.Replace(mascaraCPFformat, "[^0-9]", "").Length.ToString();
 
-				if (possivelCpf.Length == int.Parse(mascaraCPFLenth))
-					return Convert.ToUInt64(possivelCpf).ToString(mascaraCPFformat).GetPrimeirosCaracteres(14);
-			}
+                if (possivelCpf.Length == int.Parse(mascaraCPFLenth))
+                    return Convert.ToUInt64(possivelCpf).ToString(mascaraCPFformat).GetPrimeirosCaracteres(14);
+            }
 
-			return "";
-		}
+            return "";
+        }
 
-		public static string GetPrimeiroNome(this string texto)
-		{
-			if (string.IsNullOrEmpty(texto))
-				return "";
+        public static string GetPrimeiroNome(this string texto)
+        {
+            if (string.IsNullOrEmpty(texto))
+                return "";
 
-			return texto.Contains(' ') ? texto.Split(' ')[0] : texto;
-		}
+            return texto.Contains(' ') ? texto.Split(' ')[0] : texto;
+        }
 
         public static string ToApelido(this string texto, string nome = "")
         {
-			if (string.IsNullOrEmpty(texto)) {
-				if (string.IsNullOrEmpty(nome))
-					return "";
-				else
+            if (string.IsNullOrEmpty(texto))
+            {
+                if (string.IsNullOrEmpty(nome))
+                    return "";
+                else
                     return nome.ToNome().GetPrimeirosCaracteres(20);
             }
             else
@@ -61,71 +63,71 @@ namespace Migracao.Utils
         }
 
         public static string ToSN(this bool texto)
-		{
-			if (texto)
-				return "S";
+        {
+            if (texto)
+                return "S";
 
-			return "N";
-		}
+            return "N";
+        }
 
-		public static string? ToEmail(this string email)
-		{
-			if (string.IsNullOrEmpty(email))
-				return null;
+        public static string? ToEmail(this string email)
+        {
+            if (string.IsNullOrEmpty(email))
+                return null;
 
-			//return texto.Contains('@') && texto.Contains('.') ? texto : "";
-			var emailRegex = new Regex(@"^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$");
-			if (emailRegex.IsMatch(email))
-				return email.ToLower();
+            //return texto.Contains('@') && texto.Contains('.') ? texto : "";
+            var emailRegex = new Regex(@"^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$");
+            if (emailRegex.IsMatch(email))
+                return email.ToLower();
 
-			return null;
-		}
+            return null;
+        }
 
-		public static long? ToFone(this string telefone)
-		{
-			if (string.IsNullOrEmpty(telefone))
-				return null;
-			var possivelTel = Regex.Replace(telefone, "[^0-9]", "");
+        public static long? ToFone(this string telefone)
+        {
+            if (string.IsNullOrEmpty(telefone))
+                return null;
+            var possivelTel = Regex.Replace(telefone, "[^0-9]", "");
 
-			if (string.IsNullOrEmpty(possivelTel))
-				return null;
-			else if (possivelTel.Length >= 8 && possivelTel.Length <= 16)
-				return long.Parse(possivelTel);
-			else
-				return long.Parse(possivelTel.GetPrimeirosCaracteres(16));
-		}
+            if (string.IsNullOrEmpty(possivelTel))
+                return null;
+            else if (possivelTel.Length >= 8 && possivelTel.Length <= 16)
+                return long.Parse(possivelTel);
+            else
+                return long.Parse(possivelTel.GetPrimeirosCaracteres(16));
+        }
 
-		public static string GetPrimeirosCaracteres(this string texto, int max)
-		{
-			return texto.Substring(0, Math.Min(max, texto.Length));
-		}
+        public static string GetPrimeirosCaracteres(this string texto, int max)
+        {
+            return texto.Substring(0, Math.Min(max, texto.Length));
+        }
 
-		public static DateTime? ToDataNull(this string texto)
-		{
-			if (string.IsNullOrEmpty(texto))
-				return null;
+        public static DateTime? ToDataNull(this string texto)
+        {
+            if (string.IsNullOrEmpty(texto))
+                return null;
 
-			DateTime dataMinima = new(1900, 01, 01), dataMaxima = new(2079, 06, 06), dataHoje = DateTime.Now, data;
+            DateTime dataMinima = new(1900, 01, 01), dataMaxima = new(2079, 06, 06), dataHoje = DateTime.Now, data;
 
-			if (DateTime.TryParse(texto, out data))
-			{
-			}
-			else if (double.TryParse(texto, out double codigoData))
-				data = DateTime.FromOADate(codigoData);
-			else
-				return null;
-				//throw new Exception("Erro na conversão de data: " + texto);
-			if ((data >= dataMinima && data <= dataMaxima) == false)
-				data = dataHoje;
+            if (DateTime.TryParse(texto, out data))
+            {
+            }
+            else if (double.TryParse(texto, out double codigoData))
+                data = DateTime.FromOADate(codigoData);
+            else
+                return null;
+            //throw new Exception("Erro na conversão de data: " + texto);
+            if ((data >= dataMinima && data <= dataMaxima) == false)
+                data = dataHoje;
 
-			return data;
-		}
+            return data;
+        }
 
-		public static DateTime ToData(this string texto)
-		{
+        public static DateTime ToData(this string texto)
+        {
 
-			try
-			{
+            try
+            {
                 if (string.IsNullOrEmpty(texto))
                     return DateTime.Now;
 
@@ -136,177 +138,177 @@ namespace Migracao.Utils
                 }
                 else if (double.TryParse(texto, out double codigoData))
                     data = DateTime.FromOADate(codigoData);
-                else                    
+                else
 
                 if ((data >= dataMinima && data <= dataMaxima) == false)
                     data = dataHoje;
 
                 return data;
             }
-			catch (Exception)
-			{
+            catch (Exception)
+            {
                 throw new Exception("Erro na conversão de data");
             }
-			
-		}
 
-		public static long ToNumV2(this string texto)
-		{
-			if (string.IsNullOrEmpty(texto))
-				return 0;
+        }
 
-			return long.Parse(Regex.Replace(texto, "[^0-9]", ""));
-		}
+        public static long ToNumV2(this string texto)
+        {
+            if (string.IsNullOrEmpty(texto))
+                return 0;
 
-		public static int ToNum(this string texto)
-		{
-			if (string.IsNullOrEmpty(texto))
-				return 0;
+            return long.Parse(Regex.Replace(texto, "[^0-9]", ""));
+        }
 
-			return int.Parse(Regex.Replace(texto, "[^0-9]", ""));
-		}
+        public static int ToNum(this string texto)
+        {
+            if (string.IsNullOrEmpty(texto))
+                return 0;
 
-		public static bool ToSexo(this string texto, string masculino, string feminino)
-		{
-			if (string.IsNullOrEmpty(texto))
-				return true;
+            return int.Parse(Regex.Replace(texto, "[^0-9]", ""));
+        }
 
-			var sexoLetra = texto.ToLower();
+        public static bool ToSexo(this string texto, string masculino, string feminino)
+        {
+            if (string.IsNullOrEmpty(texto))
+                return true;
 
-			if (sexoLetra == masculino)
-				return true;
+            var sexoLetra = texto.ToLower();
 
-			else if (sexoLetra == feminino)
-				return false;
+            if (sexoLetra == masculino)
+                return true;
 
-			return true;
-		}
+            else if (sexoLetra == feminino)
+                return false;
 
-		public static string? PrimeiraLetraMaiuscula(this string texto)
-		{
-			if (string.IsNullOrEmpty(texto))
-				return null;
+            return true;
+        }
 
-			return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(texto.ToLower());
-		}
+        public static string? PrimeiraLetraMaiuscula(this string texto)
+        {
+            if (string.IsNullOrEmpty(texto))
+                return null;
 
-		public static string? ToNome(this string texto)
-		{
+            return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(texto.ToLower());
+        }
+
+        public static string? ToNome(this string texto)
+        {
             if (texto == null) return null;
 
             texto = texto.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
 
-			if (texto == null) return null;
+            if (texto == null) return null;
 
-			// Remove última letra sozinha para não dar problema no fotetizar
-			return string.Join(" ", texto.Split(' ')
-				.Where(parte => parte.Length > 1)
-				.ToArray());
-		}
+            // Remove última letra sozinha para não dar problema no fotetizar
+            return string.Join(" ", texto.Split(' ')
+                .Where(parte => parte.Length > 1)
+                .ToArray());
+        }
 
 
-		public static string GetLetras(this string texto)
-		{
-			return Regex.Replace(texto, @"[^a-zA-Z\?\s]", "").Trim();
-			//return Regex.Replace(texto, @"[^\p{L}\s]", "").Trim();
-		}
+        public static string GetLetras(this string texto)
+        {
+            return Regex.Replace(texto, @"[^a-zA-Z\?\s]", "").Trim();
+            //return Regex.Replace(texto, @"[^\p{L}\s]", "").Trim();
+        }
 
-		public static string GerarNomeArquivo(string nomeArquivo, string extensao = ".xlsx")
-		{
-			var caminhoDoArquivo = Path.Combine(salvarNaPasta, nomeArquivo);
+        public static string GerarNomeArquivo(string nomeArquivo, string extensao = ".xlsx")
+        {
+            var caminhoDoArquivo = Path.Combine(salvarNaPasta, nomeArquivo);
 
-			if (File.Exists(caminhoDoArquivo + extensao))
-			{
-				int count = 1;
-				while (File.Exists($"{caminhoDoArquivo} ({count}){extensao}"))
-					count++;
+            if (File.Exists(caminhoDoArquivo + extensao))
+            {
+                int count = 1;
+                while (File.Exists($"{caminhoDoArquivo} ({count}){extensao}"))
+                    count++;
 
-				caminhoDoArquivo = $"{caminhoDoArquivo} ({count++})";
-			}
+                caminhoDoArquivo = $"{caminhoDoArquivo} ({count++})";
+            }
 
-			return caminhoDoArquivo;
-		}
+            return caminhoDoArquivo;
+        }
 
-		public static void AbrirPastaSelecionandoArquivo(string nomeArquivo)
-		{
-			string argumento = "/select, \"" + nomeArquivo + "\"";
+        public static void AbrirPastaSelecionandoArquivo(string nomeArquivo)
+        {
+            string argumento = "/select, \"" + nomeArquivo + "\"";
 
-			Process.Start("explorer.exe", argumento);
-		}
+            Process.Start("explorer.exe", argumento);
+        }
 
-		public static void AbrirPastaExplorer(string pasta)
-		{
-			string argumento = "\"" + pasta + "\"";
+        public static void AbrirPastaExplorer(string pasta)
+        {
+            string argumento = "\"" + pasta + "\"";
 
-			Process.Start("explorer.exe", argumento);
-		}
+            Process.Start("explorer.exe", argumento);
+        }
 
-		public static string TratarMensagemErro(string arquivo, string erroMensagem, int indiceLinha, string colunaLetra, string tituloColuna, string celulaValor, string variaveisValor = "")
-		{
-			var mensagemErro = $"\"{arquivo}\" Falha na linha {indiceLinha}, coluna {colunaLetra}: {tituloColuna}, valor esperado: , valor da célula: \"{celulaValor}\": {erroMensagem}";
+        public static string TratarMensagemErro(string arquivo, string erroMensagem, int indiceLinha, string colunaLetra, string tituloColuna, string celulaValor, string variaveisValor = "")
+        {
+            var mensagemErro = $"\"{arquivo}\" Falha na linha {indiceLinha}, coluna {colunaLetra}: {tituloColuna}, valor esperado: , valor da célula: \"{celulaValor}\": {erroMensagem}";
 
-			if (!string.IsNullOrWhiteSpace(variaveisValor))
-				mensagemErro += Environment.NewLine + "Variáveis" + Environment.NewLine + variaveisValor;
+            if (!string.IsNullOrWhiteSpace(variaveisValor))
+                mensagemErro += Environment.NewLine + "Variáveis" + Environment.NewLine + variaveisValor;
 
-			if (indiceLinha <= 0)
-				mensagemErro = erroMensagem;
+            if (indiceLinha <= 0)
+                mensagemErro = erroMensagem;
 
-			return mensagemErro;
-		}
+            return mensagemErro;
+        }
 
-		public static byte ToTipoPagamento(this string texto)
-		{
-			return (byte)(texto.Equals("dinheiro", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.Dinheiro
-						: texto.Equals("cheque", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.Cheque
-						: texto.Equals("boleto bancário", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.BoletoBancario
-						: texto.Equals("cartão de crédito", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.CartaoCredito
-						: texto.Equals("debito", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.CartaoDebito
-						: texto.Equals("cartão de débito", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.CartaoDebito
-						: texto.Equals("pix", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.CreditoEmConta
-						: texto.Equals("débito automático", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.CartaoCreditoRecorrente
-						: TitulosEspeciesID.DepositoEmConta);
-		}
+        public static byte ToTipoPagamento(this string texto)
+        {
+            return (byte)(texto.Equals("dinheiro", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.Dinheiro
+                        : texto.Equals("cheque", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.Cheque
+                        : texto.Equals("boleto bancário", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.BoletoBancario
+                        : texto.Equals("cartão de crédito", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.CartaoCredito
+                        : texto.Equals("debito", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.CartaoDebito
+                        : texto.Equals("cartão de débito", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.CartaoDebito
+                        : texto.Equals("pix", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.CreditoEmConta
+                        : texto.Equals("débito automático", StringComparison.CurrentCultureIgnoreCase) ? TitulosEspeciesID.CartaoCreditoRecorrente
+                        : TitulosEspeciesID.DepositoEmConta);
+        }
 
-		public static decimal? ToMoeda(this string texto)
-		{
-			if (texto == null) return null;
+        public static decimal? ToMoeda(this string texto)
+        {
+            if (texto == null) return null;
 
             if (texto.Contains(',') && texto.Contains('.'))
-				return decimal.Parse(texto.Replace(".", "").Replace(",", "."), CultureInfo.InvariantCulture);
-			else
-				return decimal.Parse(texto.Replace(",", "."), CultureInfo.InvariantCulture);
-		}
+                return decimal.Parse(texto.Replace(".", "").Replace(",", "."), CultureInfo.InvariantCulture);
+            else
+                return decimal.Parse(texto.Replace(",", "."), CultureInfo.InvariantCulture);
+        }
 
 
-		public static string TratarCaracteres(string texto)
-		{
-			var regex = new Regex("[^a-zA-Z0-9 -_]");
-			texto = regex.Replace(texto, "");
-			return texto;
-		}
+        public static string TratarCaracteres(string texto)
+        {
+            var regex = new Regex("[^a-zA-Z0-9 -_]");
+            texto = regex.Replace(texto, "");
+            return texto;
+        }
 
-		public static bool IsCPF(this string texto)
-		{
-			texto = Regex.Replace(texto, "[^0-9]", "");
-			if (texto.Length == 11)
-				return true;
+        public static bool IsCPF(this string texto)
+        {
+            texto = Regex.Replace(texto, "[^0-9]", "");
+            if (texto.Length == 11)
+                return true;
 
-			return false;
-		}
+            return false;
+        }
 
-		public static bool IsCNPJ_CGC(this string texto)
-		{
-			texto = Regex.Replace(texto, "[^0-9]", "");
-			if (texto.Length == 14)
-				return true;
+        public static bool IsCNPJ_CGC(this string texto)
+        {
+            texto = Regex.Replace(texto, "[^0-9]", "");
+            if (texto.Length == 14)
+                return true;
 
-			return false;
-		}
+            return false;
+        }
 
         public static string ToCidade(this string textoCidade, string uf, string cep = "")
         {
             if (excelHelper == null)
-			{
+            {
                 var arquivoExcelCidades = "Files\\EnderecosCidades.xlsx";
                 excelHelper = new ExcelHelper();
                 if (File.Exists(arquivoExcelCidades))
@@ -322,95 +324,95 @@ namespace Migracao.Utils
                     }
             }
 
-			textoCidade = !string.IsNullOrEmpty(textoCidade) ? textoCidade.ToLower() : string.Empty;
-			uf = !string.IsNullOrEmpty(uf) ? uf.ToLower() : string.Empty;
+            textoCidade = !string.IsNullOrEmpty(textoCidade) ? textoCidade.ToLower() : string.Empty;
+            uf = !string.IsNullOrEmpty(uf) ? uf.ToLower() : string.Empty;
             cep = !string.IsNullOrEmpty(cep) ? cep.ToLower() : string.Empty;
 
             if (excelHelper.CidadeExists(cep, textoCidade, uf.ToLower()))
                 return textoCidade;
-			else
-			{
+            else
+            {
                 var procurarCidade = excelHelper.EncontrarCidadeSemelhante(textoCidade.ToLower());
 
                 if (excelHelper.CidadeExists(cep, procurarCidade, uf))
                     return textoCidade;
             }
-			
+
             return textoCidade;
         }
 
-		public static string RemoverAcentos(string texto)
-		{
-			if (string.IsNullOrEmpty(texto))
-				return texto;
+        public static string RemoverAcentos(string texto)
+        {
+            if (string.IsNullOrEmpty(texto))
+                return texto;
 
-			return new string(texto
-				.Normalize(NormalizationForm.FormD)
-				.Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
-				.ToArray());
-		}
+            return new string(texto
+                .Normalize(NormalizationForm.FormD)
+                .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                .ToArray());
+        }
 
-		// Função simples para calcular a semelhança entre duas strings
-		private static int CalcularSemelhanca(string str1, string str2)
-		{
-			int contador = 0;
-			int tamanhoMenor = Math.Min(str1.Length, str2.Length);
+        // Função simples para calcular a semelhança entre duas strings
+        private static int CalcularSemelhanca(string str1, string str2)
+        {
+            int contador = 0;
+            int tamanhoMenor = Math.Min(str1.Length, str2.Length);
 
-			for (int i = 0; i < tamanhoMenor; i++)
-			{
-				if (str1[i] == str2[i])
-				{
-					contador++;
-				}
-			}
+            for (int i = 0; i < tamanhoMenor; i++)
+            {
+                if (str1[i] == str2[i])
+                {
+                    contador++;
+                }
+            }
 
-			return contador;
-		}
+            return contador;
+        }
 
-		public static decimal ArredondarValorV2(this string input)
-		{
-			if (input.Contains('.'))
-				input = input.Replace(".", ",");
+        public static decimal ArredondarValorV2(this string input)
+        {
+            if (input.Contains('.'))
+                input = input.Replace(".", ",");
 
-			if (decimal.TryParse(input, out decimal valorDecimal))
-				return decimal.Parse(Math.Round(valorDecimal, 2).ToString("F2"));
+            if (decimal.TryParse(input, out decimal valorDecimal))
+                return decimal.Parse(Math.Round(valorDecimal, 2).ToString("F2"));
 
-			return 0.00m;
-		}
+            return 0.00m;
+        }
 
-		public static decimal ArredondarValor(this string input)
-		{
-			if (input.Contains('.') && input.Contains(',') == false)
-			{
-				input = input.Replace(".", "");
-				int posicao = input.Length - 4;
-				input = input.Insert(posicao, ",");
-			}
+        public static decimal ArredondarValor(this string input)
+        {
+            if (input.Contains('.') && input.Contains(',') == false)
+            {
+                input = input.Replace(".", "");
+                int posicao = input.Length - 4;
+                input = input.Insert(posicao, ",");
+            }
 
-			if (decimal.TryParse(input, out decimal valorDecimal))
-				return Math.Round(valorDecimal, 2);
+            if (decimal.TryParse(input, out decimal valorDecimal))
+                return Math.Round(valorDecimal, 2);
 
-			return 0;
-		}
+            return 0;
+        }
 
-		public static LogradouroTipos GetLogradouroTipo(this string texto)
-		{
-			texto = texto.GetPrimeiroNome();
+        public static LogradouroTipos GetLogradouroTipo(this string texto)
+        {
+            texto = texto.GetPrimeiroNome();
 
-			if (Enum.TryParse<LogradouroTipos>(texto, true, out LogradouroTipos tipo))
-				return tipo;
+            if (Enum.TryParse<LogradouroTipos>(texto, true, out LogradouroTipos tipo))
+                return tipo;
 
-			return LogradouroTipos.Outros;
-		}
+            return LogradouroTipos.Outros;
+        }
 
-		public static string RemoverPrimeiroNome(this string texto)
-		{
-			texto = texto.Trim();
+        public static string RemoverPrimeiroNome(this string texto)
+        {
+            texto = texto.Trim();
 
-			string[] nameParts = texto.Split(' ');
+            string[] nameParts = texto.Split(' ');
 
-			return string.Join(" ", nameParts.Skip(1));
-		}
+            return string.Join(" ", nameParts.Skip(1));
+        }
 
         public static void SalvarConfig()
         {
@@ -426,10 +428,38 @@ namespace Migracao.Utils
 
         public static string[] LerConfig()
         {
-			if (!File.Exists(arquivoConfig))
-				SalvarConfig();
+            if (!File.Exists(arquivoConfig))
+                SalvarConfig();
 
             return File.ReadAllLines(arquivoConfig);
+        }
+
+        public static string ToDentista(this string nomeDentista, string? nomeCompleto)
+        {
+
+            string[] palavrasRemover = new string[] {
+                "CIRURGIA", "CLINICA", "CLINICO", "ENDO", "EXO", "ORCAMENTISTA",
+                "ORTO", "ORTODONTISTA", "PEDRIATRA", "PROTESE", "PROTESISTA",
+                "PROTOCOLO", "URGENCIA", "CANAL", "EMERGENCIA", "ENDODONTIA" };
+
+            nomeDentista = nomeDentista.Replace("(", "").Replace(")", "");
+
+            string[] nomeDentistaSplitado = nomeDentista.Split(' ');
+
+            // Converter arrays em HashSet para facilitar a comparação
+            var palavrasRemoverHash = new HashSet<string>(palavrasRemover);
+
+            // Filtrar palavras comuns
+            var palavrasComuns = nomeDentistaSplitado.Where(palavra => !palavrasRemoverHash.Contains(palavra)).ToArray();
+
+            // Construir novo texto apenas com palavras comuns
+            string apelidoAjustado = string.Join(" ", palavrasComuns);
+
+
+            if (string.IsNullOrEmpty(apelidoAjustado))
+                apelidoAjustado = nomeCompleto;
+
+            return apelidoAjustado;
         }
     }
 }

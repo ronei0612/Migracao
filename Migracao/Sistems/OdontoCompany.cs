@@ -70,13 +70,13 @@ namespace Migracao.Sistems
             var pacientesContrato = new FireBirdContext<Pacientes>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoPacientesSql);
             var pacientes = pacientesClinico.Union(pacientesContrato).ToList();
 
-            string arquivoDDentistasSql = "Scripts\\SelectDentistas.sql";
+            //string arquivoDDentistasSql = "Scripts\\SelectDentistas.sql";
 
-            var dentistasClinico = new FireBirdContext<Dentistas>(_pathDB).RetornaItensBancoPorQuery(arquivoDDentistasSql);
-            var dentistasContrato = new FireBirdContext<Dentistas>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoDDentistasSql);
-            var dentistas = dentistasClinico.Union(dentistasContrato).ToList();
+            //var dentistasClinico = new FireBirdContext<Dentistas>(_pathDB).RetornaItensBancoPorQuery(arquivoDDentistasSql);
+            //var dentistasContrato = new FireBirdContext<Dentistas>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoDDentistasSql);
+            //var dentistas = dentistasClinico.Union(dentistasContrato).ToList();
 
-            var lstPacientesDentistas = ConversorEntidadeParaDTO.ConvertPacientesDentistasParaPacientesDentistasDTO(pacientes, dentistas);
+            var lstPacientesDentistas = ConversorEntidadeParaDTO.ConvertPacientesDentistasParaPacientesDentistasDTO(pacientes);
 
             var dataTablePacientesDentistas = ExcelHelper.ConversorEntidadeParaDataTable(lstPacientesDentistas);
 
@@ -136,16 +136,16 @@ namespace Migracao.Sistems
             string arquivoProdedimentosSql = "Scripts\\SelectProdedimentos.sql";
             var procedimentosClicico = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoProdedimentosSql);
             var procedimentosContratos = new FireBirdContext<Procedimentos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoProdedimentosSql);
-            var procedimentosMerge = procedimentosClicico.Union(procedimentosContratos).ToList();
+            var procedimentos = procedimentosClicico.Union(procedimentosContratos).ToList();
 
-            var lstProcedManut = ConversorEntidadeParaDTO.ConvertProcedManutParaProcedManutDTO(procedimentosMerge, manutencoesMerge);
+            var lstProcedimentos = ConversorEntidadeParaDTO.ConvertProcedimentosParaProcedimentosDTO(procedimentos);
 
-            var dataTableProcedManut = ExcelHelper.ConversorEntidadeParaDataTable(lstProcedManut);
+            var dataTableProcedimentos = ExcelHelper.ConversorEntidadeParaDataTable(lstProcedimentos);
             
             if (dataTableProcedimentosManutencaoMerge != null)
             {
-                var salvarProcedimentosManutencaoMerge = Tools.GerarNomeArquivo($"cadastroProcedimentosManutencaoEntidadesMerge_{Tools.ultimoEstabelecimentoID}_odontocompany");
-                excelHelper.CriarExcelArquivo(salvarProcedimentosManutencaoMerge + ".xlsx", dataTableProcedManut);
+                var salvarProcedimentos = Tools.GerarNomeArquivo($"cadastroProcedimentos_{Tools.ultimoEstabelecimentoID}_odontocompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentos + ".xlsx", dataTableProcedimentos);
             }
         }
 

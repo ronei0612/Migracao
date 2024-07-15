@@ -34,9 +34,6 @@ namespace Migracao.Models.DTO
         [DisplayName("Dentista Nome")]
         public string? Dentista_Nome { get; set; }
 
-        [DisplayName("Dente")]
-        public string? Dente { get; set; }
-
         [DisplayName("Procedimento Nome")]
         public string? Procedimento_Nome { get; set; }
 

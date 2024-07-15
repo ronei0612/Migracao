@@ -19,7 +19,7 @@ namespace Migracao.Utils
     {
         #region Conversores no modelo de importação
 
-        public static List<PacientesDentistasDTO> ConvertPacientesDentistasParaPacientesDentistasDTO(List<Models.Pacientes> pacientes, List<Models.Dentistas> dentistas)
+        public static List<PacientesDentistasDTO> ConvertPacientesDentistasParaPacientesDentistasDTO(List<Models.Pacientes> pacientes, List<Models.Dentistas>? dentistas = null)
         {
             List<PacientesDentistasDTO> pacientesDentistasDTO = new List<PacientesDentistasDTO>();
             var linha = 1;
@@ -59,23 +59,23 @@ namespace Migracao.Utils
                     linha++;
                 };
 
-                foreach (var dentista in dentistas)
-                {
-                    var lstPacientes = new PacientesDentistasDTO
-                    {
-                        Cargo_Clinica = "Dentista",
-                        Nome_Completo = dentista.Nome_Completo.ToNome() ?? dentista.Apelido.ToApelido(),
-                        Nome_Social = string.Empty,
-                        Apelido = dentista.Apelido.ToDentista(dentista.Nome_Completo),
-                        Observacoes = dentista.Observacoes,
-                        Email = dentista.Email,
-                        Telefone_Principal = dentista.Telefone.ToFone().ToString(),
-                        Codigo_Conselho_Estado = dentista.Codigo_do_Conselho_e_Estado
-                    };
+                //foreach (var dentista in dentistas)
+                //{
+                //    var lstPacientes = new PacientesDentistasDTO
+                //    {
+                //        Cargo_Clinica = "Dentista",
+                //        Nome_Completo = dentista.Nome_Completo.ToNome() ?? dentista.Apelido.ToApelido(),
+                //        Nome_Social = string.Empty,
+                //        Apelido = dentista.Apelido.ToDentista(dentista.Nome_Completo),
+                //        Observacoes = dentista.Observacoes,
+                //        Email = dentista.Email,
+                //        Telefone_Principal = dentista.Telefone.ToFone().ToString(),
+                //        Codigo_Conselho_Estado = dentista.Codigo_do_Conselho_e_Estado
+                //    };
 
-                    pacientesDentistasDTO.Add(lstPacientes);
-                    linha++;
-                };
+                //    pacientesDentistasDTO.Add(lstPacientes);
+                //    linha++;
+                //};
             }
             catch (Exception error)
             {
@@ -191,7 +191,7 @@ namespace Migracao.Utils
             return lstDesenvolvimentoClinicoDTO;
         }
 
-        public static List<ProcedimentosManutencaoDTO> ConvertProcedManutParaProcedManutDTO(List<Models.Procedimentos> procedimentos, List<Manutencoes> manutencoes)
+        public static List<ProcedimentosManutencaoDTO> ConvertProcedimentosParaProcedimentosDTO(List<Models.Procedimentos> procedimentos, List<Manutencoes> manutencoes)
         {
             List<ProcedimentosManutencaoDTO> lstProcedManutDTO = new List<ProcedimentosManutencaoDTO>();
             decimal? valorTotal = 0;
@@ -249,7 +249,6 @@ namespace Migracao.Utils
                         Valor_Original = manutencao.Valor_Original.ToString(),
                         Valor_Pago = manutencao.Valor_Pagamento.ToString(),
                         Data_Pagamento = manutencao.Data_Pagamento.ToString(),
-                        Dente = manutencao.Dente,
                         Procedimento_Observacao = manutencao.Procedimentos_Observacao,
                         Quantidade_Orto = contaQtdOrto.ToString(),
                         Tipo_Pagamento = manutencao.Tipo_Pagamento,

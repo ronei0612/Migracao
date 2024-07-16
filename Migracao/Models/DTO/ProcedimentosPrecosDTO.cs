@@ -22,12 +22,6 @@ namespace Migracao.Models.DTO
 
         }
 
-        [DisplayName("Nome")]
-        public string? Nome { get; set; }
-
-        [DisplayName("Tabela")]
-        public string? Tabela { get; set; }
-
         [DisplayName("Especialidade")]
         public string? Especialidade { get; set; }
 

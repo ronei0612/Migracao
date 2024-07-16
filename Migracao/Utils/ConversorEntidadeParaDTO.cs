@@ -210,16 +210,12 @@ namespace Migracao.Utils
                         Paciente_Nome = procedimento.Nome_Paciente.ToNome(),
                         Dentista_CPF = procedimento.Dentista_CPF.ToCPF(),
                         Dentista_Nome = procedimento.Dentista_Nome.ToNome(),
-                        Dente = procedimento.Dente,
                         Procedimento_Nome = procedimento.NOME_PRODUTO,
                         Procedimento_Valor = procedimento.Valor.ToMoeda().ToString(),
                         Procedimento_Observacao = procedimento.Observacao,
                         Data_Inicio = procedimento.Data_Inicio.ToDataNull().ToString(),
                         Data_Termino = procedimento.Data_Termino.ToDataNull().ToString(),
-                        Data_Atendimento = procedimento.Data_Atendimento.ToDataNull().ToString(),
-                        //Valor_Original = procedimento.Valor_Original.ToString(),
-                        //Valor_Pagamento = procedimento.Valor_Pagamento.ToString(),
-                        //Data_Pagamento = procedimento.Data_Pagamento.ToString(),
+                        Data_Atendimento = procedimento.Data_Atendimento.ToDataNull().ToString()
                     };
 
                     lstProcedManutDTO.Add(lstProcedManut);
@@ -282,8 +278,6 @@ namespace Migracao.Utils
                 {
                     var lstGruposProcedimentos = new ProcedimentosPrecosDTO
                     {
-                        Nome = grupoProcedimento.Procedimento_Nome,
-                        Tabela = grupoProcedimento.Tabela,
                         Especialidade = grupoProcedimento.Nome_Grupo,
                         NomeProcedimento = grupoProcedimento.Procedimento_Nome,
                         Abreviacao = grupoProcedimento.Abreviacao,

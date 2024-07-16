@@ -30,7 +30,7 @@ namespace Migracao.Utils
                 {
                     var lstPacientes = new PacientesDentistasDTO
                     {
-                        Cargo_Clinica = "Paciente",
+                        //Cargo_Clinica = "Paciente",
                         Nome_Completo = paciente.Nome_Paciente.ToNome(),
                         Nome_Social = string.Empty,
                         Apelido = paciente.Nome_Paciente.ToApelido(),
@@ -49,7 +49,7 @@ namespace Migracao.Utils
                         Cidade = paciente.Cidade.ToCidade(paciente.UF),
                         UF = paciente.UF?.ToUpper() ?? "",
                         CEP = paciente.CEP,
-                        Codigo_Conselho_Estado = string.Empty,
+                        //Codigo_Conselho_Estado = string.Empty,
                         Estado_Civil = string.Empty,
                         Cidade_Nascimento = string.Empty,
                         Profissao = string.Empty
@@ -216,8 +216,7 @@ namespace Migracao.Utils
                         Procedimento_Observacao = procedimento.Observacao,
                         Data_Inicio = procedimento.Data_Inicio.ToDataNull().ToString(),
                         Data_Termino = procedimento.Data_Termino.ToDataNull().ToString(),
-                        Data_Atendimento = procedimento.Data_Atendimento.ToDataNull().ToString(),
-                        //Valor_Original = procedimento.Valor_Original.ToString(),
+                        Data_Atendimento = procedimento.Data_Atendimento.ToDataNull().ToString()
                         //Valor_Pagamento = procedimento.Valor_Pagamento.ToString(),
                         //Data_Pagamento = procedimento.Data_Pagamento.ToString(),
                     };
@@ -255,7 +254,9 @@ namespace Migracao.Utils
                         Vencimento = manutencao.Vencimento.ToString(),
                         Valor_Devido = manutencao.Valor_Devido?.ToString(),
                         Valor_Total = valorTotal.ToString(),
-                        Data_Atendimento = manutencao.Data_Atendimento.ToString()
+                        Data_Atendimento = manutencao.Data_Atendimento.ToString(),
+                        Data_Inicio = manutencao.Data_Hora_Inicio.ToString(),
+                        Data_Termino = manutencao.Data_Hora_Termino.ToString()
                     };
 
                     lstProcedManutDTO.Add(lstManutencao);
@@ -312,40 +313,34 @@ namespace Migracao.Utils
             {
                 foreach (var manutencao in manutencoes)
                 {
-                    var somaValores = manutencoes
+                    var contaQtdOrto = manutencoes
                                      .Where(m => m.Numero_Controle == manutencao.Numero_Controle)
                                      .Count();
 
-
                     var listaValores = manutencoes.Where(linha => linha.Paciente_CPF.Equals(manutencao.Paciente_CPF)).ToList();
 
-                    var selecionaLinha = listaValores.Select(linha => linha.Valor_Devido?.Replace(",", "."));
-
-                    foreach (var item in selecionaLinha)
-                    {
-                        if (!string.IsNullOrEmpty(item))
-                            valorTotal += Convert.ToDecimal(item, CultureInfo.InvariantCulture);
-                    }
+                    valorTotal = ConverterHelper.SomarValores(listaValores, m => m.Valor_Devido);
 
                     var lstManutencao = new ManutencoesDTO
                     {
                         Numero_Controle = manutencao.Numero_Controle,
-                        Paciente_CPF = manutencao.Paciente_CPF,
-                        Paciente_Nome = manutencao.Nome_Paciente,
-                        Dentista_Nome = manutencao.Dentista_Nome,
+                        Paciente_CPF = manutencao.Paciente_CPF.ToCPF(),
+                        Paciente_Nome = manutencao.Nome_Paciente.ToNome(),
+                        Dentista_Nome = manutencao.Dentista_Nome.ToNome(),
                         Procedimento_Nome = manutencao.Procedimento_Nome,
-                        Procedimento_Valor = manutencao.Procedimento_Valor,
-                        Valor_Original = manutencao.Valor_Original.ToString(),
-                        Valor_Pagamento = manutencao.Valor_Pagamento.ToString(),
-                        Data_Pagamento = manutencao.Data_Pagamento.ToString(),
-                        Dente = manutencao.Dente,
+                        Procedimento_Valor = manutencao.Procedimento_Valor.ToMoeda().ToString(),
+                        //Valor_Original = manutencao.Valor_Original.ToString(),
+                        //Valor_Pago = manutencao.Valor_Pagamento.ToString(),
+                        //Data_Pagamento = manutencao.Data_Pagamento.ToString(),
                         Procedimento_Observacao = manutencao.Procedimentos_Observacao,
-                        Quantidade_Orto = somaValores.ToString(),
-                        Tipo_Pagamento = manutencao.Tipo_Pagamento,
-                        Vencimento = manutencao.Vencimento.ToString(),
-                        Valor_Devido = manutencao.Valor_Devido?.ToString(),
+                        Quantidade_Orto = contaQtdOrto.ToString(),
+                        //Tipo_Pagamento = manutencao.Tipo_Pagamento,
+                        //Vencimento = manutencao.Vencimento.ToString(),
+                        //Valor_Devido = manutencao.Valor_Devido?.ToString(),
                         Valor_Total = valorTotal.ToString(),
-                        Data_Atendimento = manutencao.Data_Atendimento.ToString()
+                        Data_Atendimento = manutencao.Data_Atendimento.ToString(),
+                        Data_Inicio = manutencao.Data_Hora_Inicio.ToString(),
+                        Data_Termino = manutencao.Data_Hora_Termino.ToString()
                     };
 
                     lstManutencoesDTO.Add(lstManutencao);

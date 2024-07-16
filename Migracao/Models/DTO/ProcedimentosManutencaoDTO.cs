@@ -34,6 +34,9 @@ namespace Migracao.Models.DTO
         [DisplayName("Dentista Nome")]
         public string? Dentista_Nome { get; set; }
 
+        [DisplayName("Dente")]
+        public string? Dente { get; set; }
+
         [DisplayName("Procedimento Nome")]
         public string? Procedimento_Nome { get; set; }
 
@@ -44,11 +47,11 @@ namespace Migracao.Models.DTO
         [DisplayName("Procedimento Observação")]
         public string? Procedimento_Observacao { get; set; }
 
-        [DisplayName("Data Início")]
+        [DisplayName("Data Hora Início")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Inicio { get; set; }
 
-        [DisplayName("Data Término")]
+        [DisplayName("Data Hora Término")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Termino { get; set; }
 

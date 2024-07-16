@@ -26,7 +26,7 @@ namespace Migracao.Models
         public string? Dente { get; set; }
         public string? Quantidade_Orto { get; set; }
         public string? Valor_Total { get; set; }
-
-        
+        public DateTime? Data_Hora_Inicio { get; set; }
+        public DateTime? Data_Hora_Termino { get; set; }
     }
 }

@@ -21,8 +21,8 @@ namespace Migracao.DTO
 
         }
 
-        [DisplayName("Cargo na Clínica")]
-        public string? Cargo_Clinica { get; set; }
+        //[DisplayName("Cargo na Clínica")]
+        //public string? Cargo_Clinica { get; set; }
 
         [DisplayName("Número Prontuário")]
         public string? Numero_Prontuario { get; set; }
@@ -64,8 +64,8 @@ namespace Migracao.DTO
         [DisplayName("Profissão")]
         public string? Profissao { get; set; }
 
-        [DisplayName("Código do Conselho e Estado")]
-        public string? Codigo_Conselho_Estado { get; set; }
+        //[DisplayName("Código do Conselho e Estado")]
+        //public string? Codigo_Conselho_Estado { get; set; }
 
         [DisplayName("Telefone Principal")]
         public string? Telefone_Principal { get; set; }

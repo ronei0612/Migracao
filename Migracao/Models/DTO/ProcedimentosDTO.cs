@@ -37,6 +37,7 @@ namespace Migracao.Models.DTO
         public string? Procedimento_Nome { get; set; }
 
         [DisplayName("Procedimento Valor")]
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
         public string? Procedimento_Valor { get; set; }
 
         [DisplayName("Procedimento Observação")]

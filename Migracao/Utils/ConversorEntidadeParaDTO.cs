@@ -201,28 +201,28 @@ namespace Migracao.Utils
             try
             {
 
-                foreach (var procedimento in procedimentos)
-                {
-                    var lstProcedManut = new ProcedimentosManutencaoDTO
-                    {
-                        Numero_Controle = procedimento.Numero_Controle,
-                        Paciente_CPF = procedimento.Paciente_CPF.ToCPF(),
-                        Paciente_Nome = procedimento.Nome_Paciente.ToNome(),
-                        Dentista_CPF = procedimento.Dentista_CPF.ToCPF(),
-                        Dentista_Nome = procedimento.Dentista_Nome.ToNome(),
-                        Procedimento_Nome = procedimento.NOME_PRODUTO,
-                        Procedimento_Valor = procedimento.Valor.ToMoeda().ToString(),
-                        Procedimento_Observacao = procedimento.Observacao,
-                        Data_Inicio = procedimento.Data_Inicio.ToDataNull().ToString(),
-                        Data_Termino = procedimento.Data_Termino.ToDataNull().ToString(),
-                        Data_Atendimento = procedimento.Data_Atendimento.ToDataNull().ToString()
-                    };
+                //foreach (var procedimento in procedimentos)
+                //{
+                //    var lstProcedManut = new ProcedimentosManutencaoDTO
+                //    {
+                //        Numero_Controle = procedimento.Numero_Controle,
+                //        Paciente_CPF = procedimento.Paciente_CPF.ToCPF(),
+                //        Paciente_Nome = procedimento.Nome_Paciente.ToNome(),
+                //        Dentista_CPF = procedimento.Dentista_CPF.ToCPF(),
+                //        Dentista_Nome = procedimento.Dentista_Nome.ToNome(),
+                //        Procedimento_Nome = procedimento.NOME_PRODUTO,
+                //        Procedimento_Valor = procedimento.Valor.ToMoeda().ToString(),
+                //        Procedimento_Observacao = procedimento.Observacao,
+                //        Data_Inicio = procedimento.Data_Inicio.ToDataNull().ToString(),
+                //        Data_Termino = procedimento.Data_Termino.ToDataNull().ToString(),
+                //        Data_Atendimento = procedimento.Data_Atendimento.ToDataNull().ToString()
+                //    };
 
-                    lstProcedManutDTO.Add(lstProcedManut);
-                    linha++;
-                };
+                //    lstProcedManutDTO.Add(lstProcedManut);
+                //    linha++;
+                //};
 
-                linha = 1;
+                //linha = 1;
 
                 //foreach (var manutencao in manutencoes)
                 //{
@@ -435,7 +435,7 @@ namespace Migracao.Utils
 
         public static List<ProcedimentosDTO> ConvertProcedimentosParaProcedimentosDTO(List<Models.Procedimentos> procedimentos)
         {
-            List<ProcedimentosDTO> lstProcedimentosDTO = new List<ProcedimentosDTO>();
+            var lstProcedimentosDTO = new List<ProcedimentosDTO>();
 
             try
             {
@@ -450,12 +450,12 @@ namespace Migracao.Utils
                         Dentista_CPF = procedimento.Dentista_CPF,
                         Dentista_Nome = procedimento.Dentista_Nome,
                         Dente = procedimento.Dente,
-                        Procedimento_Nome = procedimento.NOME_PRODUTO,
-                        Procedimento_Valor = procedimento.Valor,
+                        Procedimento_Nome = procedimento.Nome_Procedimento,
+                        Procedimento_Valor = procedimento.Valor.ToString(),
                         Procedimento_Observacao = procedimento.Observacao,
-                        Data_Inicio = procedimento.Data_Inicio.ToData().ToShortDateString(),
-                        Data_Termino = procedimento.Data_Termino,
-                        Data_Atendimento = procedimento.Data_Atendimento
+                        Data_Inicio = procedimento.Data_Inicio.ToString(),
+                        //Data_Termino = procedimento.Data_Termino,
+                        Data_Atendimento = procedimento.Data_Atendimento.ToString()
                     };
 
                     lstProcedimentosDTO.Add(lstProcedimento);

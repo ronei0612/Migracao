@@ -133,20 +133,20 @@ namespace Migracao.Sistems
                 excelHelper.CriarExcelArquivoV2(salvarManutencoes + ".xlsx", dataTableManutencoes);
             }
 
-            //string arquivoProdedimentosSql = "Scripts\\SelectProdedimentos.sql";
-            //var procedimentosClicico = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoProdedimentosSql);
-            //var procedimentosContratos = new FireBirdContext<Procedimentos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoProdedimentosSql);
-            //var procedimentos = procedimentosClicico.Union(procedimentosContratos).ToList();
+            string arquivoProdedimentosSql = "Scripts\\SelectProdedimentos.sql";
+            var procedimentosClicico = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoProdedimentosSql);
+            var procedimentosContratos = new FireBirdContext<Procedimentos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoProdedimentosSql);
+            var procedimentos = procedimentosClicico.Union(procedimentosContratos).ToList();
 
-            //var lstProcedimentos = ConversorEntidadeParaDTO.ConvertProcedimentosParaProcedimentosDTO(procedimentos);
+            var lstProcedimentos = ConversorEntidadeParaDTO.ConvertProcedimentosParaProcedimentosDTO(procedimentos);
 
-            //var dataTableProcedimentos = ExcelHelper.ConversorEntidadeParaDataTable(lstProcedimentos);
-            
-            //if (dataTableProcedimentosManutencaoMerge != null)
-            //{
-            //    var salvarProcedimentos = Tools.GerarNomeArquivo($"cadastroProcedimentos_{Tools.ultimoEstabelecimentoID}_odontocompany");
-            //    excelHelper.CriarExcelArquivo(salvarProcedimentos + ".xlsx", dataTableProcedimentos);
-            //}
+            var dataTableProcedimentos = ExcelHelper.ConversorEntidadeParaDataTable(lstProcedimentos);
+
+            if (dataTableProcedimentosManutencaoMerge != null)
+            {
+                var salvarProcedimentos = Tools.GerarNomeArquivo($"cadastroProcedimentos_{Tools.ultimoEstabelecimentoID}_odontocompany");
+                excelHelper.CriarExcelArquivo(salvarProcedimentos + ".xlsx", dataTableProcedimentos);
+            }
         }
 
         void IDataBaseMigracao.DataBaseImportacaoPagosExigiveis()

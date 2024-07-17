@@ -1,11 +1,5 @@
-﻿using Migracao.Models.DentalOffice;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Migracao.Models.DTO
 {
@@ -50,17 +44,14 @@ namespace Migracao.Models.DTO
 
         [DisplayName("Data Início")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-
         public string? Data_Inicio { get; set; }
 
-        [DisplayName("Data Término")]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-
-        public string? Data_Termino { get; set; }
+        //[DisplayName("Data Término")]
+        //[DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+        //public string? Data_Termino { get; set; }
 
         [DisplayName("Data Atendimento")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-
         public string? Data_Atendimento { get; set; }
     }
 }

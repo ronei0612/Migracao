@@ -47,5 +47,8 @@ namespace Migracao.Models.DTO
 
         [DisplayName("Data Término")]
         public string? Data_Termino { get; set; }
+
+        [DisplayName("Data Atendimento")]
+        public string? Data_Atendimento { get; set; }
     }
 }

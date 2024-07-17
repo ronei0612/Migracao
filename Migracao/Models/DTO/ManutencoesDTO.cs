@@ -82,8 +82,8 @@ namespace Migracao.Models.DTO
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Inicio { get; set; }
 
-        [DisplayName("Data Término")]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-        public string? Data_Termino { get; set; }
+        //[DisplayName("Data Término")]
+        //[DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+        //public string? Data_Termino { get; set; }
     }
 }

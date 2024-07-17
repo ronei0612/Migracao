@@ -224,43 +224,43 @@ namespace Migracao.Utils
 
                 linha = 1;
 
-                foreach (var manutencao in manutencoes)
-                {
-                    var contaQtdOrto = manutencoes
-                                     .Where(m => m.Numero_Controle == manutencao.Numero_Controle)
-                                     .Count();
+                //foreach (var manutencao in manutencoes)
+                //{
+                //    var contaQtdOrto = manutencoes
+                //                     .Where(m => m.Numero_Controle == manutencao.Numero_Controle)
+                //                     .Count();
 
-                    var listaValores = manutencoes.Where(linha => linha.Paciente_CPF.Equals(manutencao.Paciente_CPF)).ToList();
+                //    var listaValores = manutencoes.Where(linha => linha.Paciente_CPF.Equals(manutencao.Paciente_CPF)).ToList();
 
-                    valorTotal = ConverterHelper.SomarValores(listaValores, m => m.Valor_Devido);
+                //    valorTotal = ConverterHelper.SomarValores(listaValores, m => m.Valor_Devido);
 
-                    var lstManutencao = new ProcedimentosManutencaoDTO
-                    {
-                        Numero_Controle = manutencao.Numero_Controle,
-                        Paciente_CPF = manutencao.Paciente_CPF.ToCPF(),
-                        Paciente_Nome = manutencao.Nome_Paciente.ToNome(),
-                        Dentista_Nome = manutencao.Dentista_Nome.ToNome(),
-                        Procedimento_Nome = manutencao.Procedimento_Nome,
-                        Procedimento_Valor = manutencao.Procedimento_Valor.ToMoeda().ToString(),
-                        Valor_Original = manutencao.Valor_Original.ToString(),
-                        Valor_Pago = manutencao.Valor_Pagamento.ToString(),
-                        Data_Pagamento = manutencao.Data_Pagamento.ToString(),
-                        Procedimento_Observacao = manutencao.Procedimentos_Observacao,
-                        Quantidade_Orto = contaQtdOrto.ToString(),
-                        Tipo_Pagamento = manutencao.Tipo_Pagamento,
-                        Vencimento = manutencao.Vencimento.ToString(),
-                        Valor_Devido = manutencao.Valor_Devido?.ToString(),
-                        Valor_Total = valorTotal.ToString(),
-                        Data_Atendimento = manutencao.Data_Atendimento.ToString(),
-                        Data_Inicio = manutencao.Data_Hora_Inicio.ToString(),
-                        Data_Termino = manutencao.Data_Hora_Termino.ToString()
-                    };
+                //    var lstManutencao = new ProcedimentosManutencaoDTO
+                //    {
+                //        Numero_Controle = manutencao.Numero_Controle,
+                //        Paciente_CPF = manutencao.Paciente_CPF.ToCPF(),
+                //        Paciente_Nome = manutencao.Nome_Paciente.ToNome(),
+                //        Dentista_Nome = manutencao.Dentista_Nome.ToNome(),
+                //        Procedimento_Nome = manutencao.Procedimento_Nome,
+                //        Procedimento_Valor = manutencao.Procedimento_Valor.ToMoeda().ToString(),
+                //        Valor_Original = manutencao.Valor_Original.ToString(),
+                //        Valor_Pago = manutencao.Valor_Pagamento.ToString(),
+                //        Data_Pagamento = manutencao.Data_Pagamento.ToString(),
+                //        Procedimento_Observacao = manutencao.Procedimentos_Observacao,
+                //        Quantidade_Orto = contaQtdOrto.ToString(),
+                //        Tipo_Pagamento = manutencao.Tipo_Pagamento,
+                //        Vencimento = manutencao.Vencimento.ToString(),
+                //        Valor_Devido = manutencao.Valor_Devido?.ToString(),
+                //        Valor_Total = valorTotal.ToString(),
+                //        Data_Atendimento = manutencao.Data_Atendimento.ToString(),
+                //        Data_Inicio = manutencao.Data_Hora_Inicio.ToString(),
+                //        Data_Termino = manutencao.Data_Hora_Termino.ToString()
+                //    };
 
-                    lstProcedManutDTO.Add(lstManutencao);
+                //    lstProcedManutDTO.Add(lstManutencao);
 
-                    linha++;
-                    valorTotal = 0;
-                };
+                //    linha++;
+                //    valorTotal = 0;
+                //};
             }
             catch (Exception error)
             {
@@ -300,52 +300,39 @@ namespace Migracao.Utils
 
         public static List<ManutencoesDTO> ConvertManutencoesParaManutencoesDTO(List<Manutencoes> manutencoes)
         {
-            List<ManutencoesDTO> lstManutencoesDTO = new List<ManutencoesDTO>();
-            decimal? valorTotal = 0;
-            int docsEncontrados = 0;
+            var lstManutencoesDTO = new List<ManutencoesDTO>();
 
             try
             {
                 foreach (var manutencao in manutencoes)
                 {
-                    var contaQtdOrto = manutencoes
-                                     .Where(m => m.Numero_Controle == manutencao.Numero_Controle)
-                                     .Count();
-
-                    var listaValores = manutencoes.Where(linha => linha.Paciente_CPF.Equals(manutencao.Paciente_CPF)).ToList();
-
-                    valorTotal = ConverterHelper.SomarValores(listaValores, m => m.Valor_Devido);
-
-                    var lstManutencao = new ManutencoesDTO
+                    if (!string.IsNullOrEmpty(manutencao.Procedimento_Nome) && !string.IsNullOrEmpty(manutencao.Numero_Controle))
                     {
-                        Numero_Controle = manutencao.Numero_Controle,
-                        Paciente_CPF = manutencao.Paciente_CPF.ToCPF(),
-                        Paciente_Nome = manutencao.Nome_Paciente.ToNome(),
-                        Dentista_Nome = manutencao.Dentista_Nome.ToNome(),
-                        Procedimento_Nome = manutencao.Procedimento_Nome,
-                        Procedimento_Valor = manutencao.Procedimento_Valor.ToMoeda().ToString(),
-                        //Valor_Original = manutencao.Valor_Original.ToString(),
-                        //Valor_Pago = manutencao.Valor_Pagamento.ToString(),
-                        //Data_Pagamento = manutencao.Data_Pagamento.ToString(),
-                        Procedimento_Observacao = manutencao.Procedimentos_Observacao,
-                        Quantidade_Orto = contaQtdOrto.ToString(),
-                        //Tipo_Pagamento = manutencao.Tipo_Pagamento,
-                        //Vencimento = manutencao.Vencimento.ToString(),
-                        //Valor_Devido = manutencao.Valor_Devido?.ToString(),
-                        Valor_Total = valorTotal.ToString(),
-                        Data_Atendimento = manutencao.Data_Atendimento.ToString(),
-                        Data_Inicio = manutencao.Data_Hora_Inicio.ToString(),
-                        Data_Termino = manutencao.Data_Hora_Termino.ToString()
-                    };
+                        var itensOrto = manutencoes.Where(m => m.Numero_Controle == manutencao.Numero_Controle && m.Paciente_CPF.Equals(manutencao.Paciente_CPF));
+                        var valorTotal = itensOrto.Where(m => m.Valor.HasValue).Sum(m => m.Valor.Value);
 
-                    lstManutencoesDTO.Add(lstManutencao);
+                        var lstManutencao = new ManutencoesDTO
+                        {
+                            Numero_Controle = manutencao.Numero_Controle,
+                            Paciente_CPF = manutencao.Paciente_CPF.ToCPF(),
+                            Paciente_Nome = manutencao.Nome_Paciente.ToNome(),
+                            Dentista_Nome = manutencao.Dentista_Nome.ToNome(),
+                            Procedimento_Nome = manutencao.Procedimento_Nome,
+                            Procedimento_Valor = manutencao.Valor.ToString(),
+                            Procedimento_Observacao = manutencao.Procedimentos_Observacao,
+                            Quantidade_Orto = itensOrto.Count().ToString(),
+                            Valor_Total = valorTotal.ToString(),
+                            Data_Atendimento = manutencao.Data_Atendimento.ToString(),
+                            Data_Inicio = manutencao.Data_Hora_Inicio.ToString()
+                        };
 
-                    valorTotal = 0;
+                        lstManutencoesDTO.Add(lstManutencao);
+                    }
                 };
             }
             catch (Exception error)
             {
-                throw new Exception($"Erro ao converter Manutencao: {error.Message}");
+                throw new Exception($"Erro ao converter Manutenção: {error.Message}");
             }
 
             return lstManutencoesDTO;

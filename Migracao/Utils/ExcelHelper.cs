@@ -6,6 +6,7 @@ using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
 using System.ComponentModel;
 using System.Data;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -506,20 +507,60 @@ namespace Migracao.Utils
             sw.Close();
         }
 
-        public static List<string[]> LerCSV(string filePath, char separador, Encoding encoding)
+        public void CriarExcelArquivoV2(string nomeArquivo, DataTable dataTable)
         {
-            var linhas = new List<string[]>();
-            using (var reader = new StreamReader(filePath, encoding))
+            var culture = new CultureInfo("pt-BR");
+
+            var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Planilha1");
+
+            // Adicionar os nomes das colunas ao arquivo Excel
+            var headerRow = worksheet.Row(1); // Começa na primeira linha
+            for (int j = 0; j < dataTable.Columns.Count; j++)
             {
-                string linha;
-                while ((linha = reader.ReadLine()) != null)
+                headerRow.Cell(j + 1).Value = dataTable.Columns[j].ColumnName;
+            }
+
+            // Adicionar o DataTable ao arquivo Excel
+            for (int i = 0; i < dataTable.Rows.Count; i++)
+            {
+                var row = worksheet.Row(i + 2); // Começa na segunda linha, pois a primeira linha é para os nomes das colunas
+                for (int j = 0; j < dataTable.Columns.Count; j++)
                 {
-                    string[] valores = linha.Split(separador); // Assumindo que o separador é ';'
-                    linhas.Add(valores);
+                    var cellValue = dataTable.Rows[i][j].ToString();
+
+                    if (DateTime.TryParseExact(cellValue, "dd/MM/yyyy HH:mm:ss", culture, DateTimeStyles.None, out DateTime data) ||
+                        DateTime.TryParseExact(cellValue, "dd/MM/yyyy", culture, DateTimeStyles.None, out data))
+                        row.Cell(j + 1).Value = data;
+                    else
+                        row.Cell(j + 1).Value = cellValue;
                 }
             }
-            return linhas;
+
+            // Aplicar o estilo de fundo ao cabeçalho
+            headerRow.Style.Fill.BackgroundColor = XLColor.LightCornflowerBlue;
+
+            // Aplicar o filtro automático
+            worksheet.Range(1, 1, 1, dataTable.Columns.Count).SetAutoFilter();
+
+            // Salvar o arquivo
+            workbook.SaveAs(nomeArquivo);
         }
+
+        public static List<string[]> LerCSV(string filePath, char separador, Encoding encoding)
+            {
+                var linhas = new List<string[]>();
+                using (var reader = new StreamReader(filePath, encoding))
+                {
+                    string linha;
+                    while ((linha = reader.ReadLine()) != null)
+                    {
+                        string[] valores = linha.Split(separador); // Assumindo que o separador é ';'
+                        linhas.Add(valores);
+                    }
+                }
+                return linhas;
+            }
 
         public static List<string[]> GetLinhasCSV(string filePath, char separador, int cabecalhos, Encoding encoding)
         {

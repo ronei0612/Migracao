@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Migracao.Models
+﻿namespace Migracao.Models
 {
     public class Procedimentos
     {
@@ -14,11 +8,10 @@ namespace Migracao.Models
         public string? Dentista_CPF { get; set; }
         public string? Dentista_Nome { get; set; }
         public string? Dente { get; set; }
-        public string? NOME_PRODUTO { get; set; }
-        public string? Valor { get; set; }
+        public string? Nome_Procedimento { get; set; }
+        public decimal? Valor { get; set; }
         public string? Observacao { get; set; }
-        public string? Data_Inicio { get; set; }
-        public string? Data_Termino { get; set; }
-        public string? Data_Atendimento { get; set; }
+        public DateTime? Data_Inicio { get; set; }
+        public DateTime? Data_Atendimento { get; set; }
     }
 }

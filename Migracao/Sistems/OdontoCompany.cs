@@ -114,9 +114,9 @@ namespace Migracao.Sistems
 
         void IDataBaseMigracao.DataBaseImportacaoManutencoes()
         {
-            ExcelHelper excelHelper = new ExcelHelper();
+            var excelHelper = new ExcelHelper();
 
-            DataTable dataTableProcedimentosManutencaoMerge = new();
+            var dataTableProcedimentosManutencaoMerge = new DataTable();
 
             string arquivoSql = "Scripts\\SelectManutencoes.sql";
             var manutencoesClinico = new FireBirdContext<Manutencoes>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
@@ -130,7 +130,7 @@ namespace Migracao.Sistems
             if (dataTableManutencoes != null)
             {
                 var salvarManutencoes = Tools.GerarNomeArquivo($"CadastroManutenções_{Tools.ultimoEstabelecimentoID}_OdontoCompany");
-                excelHelper.CriarExcelArquivo(salvarManutencoes + ".xlsx", dataTableManutencoes);
+                excelHelper.CriarExcelArquivoV2(salvarManutencoes + ".xlsx", dataTableManutencoes);
             }
 
             string arquivoProdedimentosSql = "Scripts\\SelectProdedimentos.sql";
@@ -141,7 +141,7 @@ namespace Migracao.Sistems
             var lstProcedimentos = ConversorEntidadeParaDTO.ConvertProcedimentosParaProcedimentosDTO(procedimentos);
 
             var dataTableProcedimentos = ExcelHelper.ConversorEntidadeParaDataTable(lstProcedimentos);
-            
+
             if (dataTableProcedimentosManutencaoMerge != null)
             {
                 var salvarProcedimentos = Tools.GerarNomeArquivo($"cadastroProcedimentos_{Tools.ultimoEstabelecimentoID}_odontocompany");

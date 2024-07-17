@@ -75,15 +75,12 @@ namespace Migracao.Models.DTO
         //public string? Valor_Pago { get; set; }
 
         [DisplayName("Data Atendimento")]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Atendimento { get; set; }
 
         [DisplayName("Data Início")]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Inicio { get; set; }
 
         [DisplayName("Data Término")]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Termino { get; set; }
     }
 }

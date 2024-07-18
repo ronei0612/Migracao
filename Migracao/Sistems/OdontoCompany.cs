@@ -88,12 +88,12 @@ namespace Migracao.Sistems
             string arquivoDesenvClinicoSql = "Scripts\\SelectDesenvolvimentoClinico.sql";
             var desenvClinico = new FireBirdContext<DesenvolvimentoClinico>(_pathDB).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
             var desenvClinicoContratos = new FireBirdContext<DesenvolvimentoClinico>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
-            var desenvClinicoMerge = desenvClinico.Union(desenvClinicoContratos).ToList();
+            var desenvClinicoMerge = desenvClinico.Union(desenvClinicoContratos).DistinctBy(x => x.Paciente_CPF).ToList();
 
             string arquivoAgendamentosSql = "Scripts\\SelectAgendamentos.sql";
             var agendamentosClinico = new FireBirdContext<Agendamentos>(_pathDB).RetornaItensBancoPorQuery(arquivoAgendamentosSql);
             var agendamentosContratos = new FireBirdContext<Agendamentos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
-            var agendamentosMerge = agendamentosClinico.Union(agendamentosContratos).ToList();
+            var agendamentosMerge = agendamentosClinico.Union(agendamentosContratos).DistinctBy(x => x.Paciente_CPF).ToList();
 
             var lstDesenvClinico = ConversorEntidadeParaDTO.ConvertDesenvolvimentoClinicoParaDesenvolvimentoClinicoDTO(desenvClinicoMerge, agendamentosMerge);
 
@@ -115,7 +115,7 @@ namespace Migracao.Sistems
             string arquivoSql = "Scripts\\SelectManutencoes.sql";
             var manutencoesClinico = new FireBirdContext<Manutencoes>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
             var manutencoesContratos = new FireBirdContext<Manutencoes>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoSql);
-            var manutencoesMerge = manutencoesClinico.Union(manutencoesContratos).ToList();
+            var manutencoesMerge = manutencoesClinico.Union(manutencoesContratos).DistinctBy(x => x.Paciente_CPF).ToList();
 
             var lstManutencoes = ConversorEntidadeParaDTO.ConvertManutencoesParaManutencoesDTO(manutencoesMerge);
 
@@ -150,7 +150,7 @@ namespace Migracao.Sistems
             string arquivoSql = "Scripts\\SelectFinanceiroRecebidos.sql";
             var recebidosClinico = new FireBirdContext<Models.Recebidos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
             var recebidosContratos = new FireBirdContext<Models.Recebidos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoSql);
-            var recebidosMerge = recebidosClinico.Union(recebidosContratos).ToList();
+            var recebidosMerge = recebidosClinico.Union(recebidosContratos).DistinctBy(x => x.CNPJ_CPF).ToList();
 
             var lstRecebidos = ConversorEntidadeParaDTO.ConvertRecebidosParaRecebidosDTO(recebidosMerge);
 

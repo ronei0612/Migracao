@@ -56,7 +56,7 @@ namespace Migracao.Utils
                 if (string.IsNullOrEmpty(nome))
                     return "";
                 else
-                    return nome.ToNome().GetPrimeirosCaracteres(20);
+                    return nome.ToNome().Split(' ')[0].GetPrimeirosCaracteres(20);
             }
             else
                 return texto.ToNome().GetPrimeirosCaracteres(20);

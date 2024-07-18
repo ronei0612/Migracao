@@ -20,8 +20,8 @@ namespace Migracao.Models.DTO
 
         }
 
-        [DisplayName("ID")]
-        public string? ID { get; set; }
+        //[DisplayName("ID")]
+        //public string? ID { get; set; }
 
         [DisplayName("CPF")]
         public string? CPF { get; set; }
@@ -32,27 +32,27 @@ namespace Migracao.Models.DTO
         [DisplayName("Telefone")]
         public string? Telefone { get; set; }
 
-        [DisplayName("Data e Hora de Início")]
+        [DisplayName("Data Hora Início")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Hora_Inicio { get; set; }
 
-        [DisplayName("Data e Hora de Término")]
+        [DisplayName("Data Hora Término")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Hora_Termino { get; set; }
 
-        [DisplayName("Data e Hora Atendimento Início")]
+        [DisplayName("Data Hora Atendimento Início")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Hora_Atendimento_Inicio { get; set; }
 
-        [DisplayName("Data e Hora Atendimento Término")]
+        [DisplayName("Data Hora Atendimento Término")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Hora_Atendimento_Termino { get; set; }
 
         [DisplayName("Dentista")]
         public string? Dentista { get; set; }
 
-        [DisplayName("Observação")]
-        public string? Observacao { get; set; }
+        //[DisplayName("Observação")]
+        //public string? Observacao { get; set; }
 
         [DisplayName("Observação Desenvolvimento Clínico")]
         public string? Desenvolvimento_Clinico { get; set; }

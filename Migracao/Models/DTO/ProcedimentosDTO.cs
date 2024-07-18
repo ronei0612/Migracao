@@ -36,20 +36,16 @@ namespace Migracao.Models.DTO
         [DisplayName("Procedimento Nome")]
         public string? Procedimento_Nome { get; set; }
 
-        [DisplayName("Procedimento Valor")]
+        [DisplayName("Valor")]
         [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
         public string? Procedimento_Valor { get; set; }
 
-        [DisplayName("Procedimento Observação")]
+        [DisplayName("Observação")]
         public string? Procedimento_Observacao { get; set; }
 
         [DisplayName("Data Início")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Inicio { get; set; }
-
-        //[DisplayName("Data Término")]
-        //[DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-        //public string? Data_Termino { get; set; }
 
         [DisplayName("Data Atendimento")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]

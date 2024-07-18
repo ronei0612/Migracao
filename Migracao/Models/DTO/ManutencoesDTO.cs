@@ -29,10 +29,10 @@ namespace Migracao.Models.DTO
         [DisplayName("Manutenção Nome")]
         public string? Procedimento_Nome { get; set; }
 
-        [DisplayName("Procedimento Valor")]
+        [DisplayName("Valor")]
         public string? Procedimento_Valor { get; set; }
 
-        [DisplayName("Procedimento Observação")]
+        [DisplayName("Observação")]
         public string? Procedimento_Observacao { get; set; }
 
         [DisplayName("Quantidade Orto")]
@@ -44,9 +44,6 @@ namespace Migracao.Models.DTO
 
         [DisplayName("Data Início")]
         public string? Data_Inicio { get; set; }
-
-        [DisplayName("Data Término")]
-        public string? Data_Termino { get; set; }
 
         [DisplayName("Data Atendimento")]
         public string? Data_Atendimento { get; set; }

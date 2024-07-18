@@ -165,7 +165,7 @@ namespace Migracao.Sistems
 
         void IDataBaseMigracao.DataBaseImportacaoProcedimentosPrecos()
         {
-            var excelHelper = new ExcelHelper();
+            //var excelHelper = new ExcelHelper();
 
             var arquivoSql = "Scripts\\SelectProcedimentosPrecos.sql";
             var procedimentosPrecosClinico = new FireBirdContext<ProcedimentosPrecos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
@@ -185,7 +185,7 @@ namespace Migracao.Sistems
 
             var arquivoSql = "Scripts\\SelectFinanceiroRecebiveis.sql";
 
-            var recebiveis = new FireBirdContext<Models.Recebivel>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+            var recebiveis = new FireBirdContext<Recebivel>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
             var lstRecebiveis = ConversorEntidadeParaDTO.ConvertRecebiveisParaRecebiveisDTO(recebiveis);
 

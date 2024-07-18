@@ -656,7 +656,7 @@ namespace Migracao.Utils
         public static DataTable ConversorEntidadeParaDataTable<T>(List<T> entidadeDTO) where T : class
         {
             {
-                DataTable dataTable = new DataTable();
+                var dataTable = new DataTable();
 
                 try
                 {

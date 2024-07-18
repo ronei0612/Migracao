@@ -62,9 +62,9 @@ namespace Migracao.Sistems
         //Pricipais
         void IDataBaseMigracao.DataBaseImportacaoPacientesDentistas()
         {
-            ExcelHelper excelHelper = new ExcelHelper();
+            var excelHelper = new ExcelHelper();
 
-            string arquivoPacientesSql = "Scripts\\SelectPacientes.sql";
+            var arquivoPacientesSql = "Scripts\\SelectPacientes.sql";
 
             var pacientesClinico = new FireBirdContext<Pacientes>(_pathDB).RetornaItensBancoPorQuery(arquivoPacientesSql);
             var pacientesContrato = new FireBirdContext<Pacientes>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoPacientesSql);
@@ -76,21 +76,21 @@ namespace Migracao.Sistems
 
             if (dataTablePacientesDentistas != null)
             {
-                var salvarArquivoPacientesDentistas = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_CadastroPacientesDentistas");
+                var salvarArquivoPacientesDentistas = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_Pacientes");
                 excelHelper.CriarExcelArquivo(salvarArquivoPacientesDentistas + ".xlsx", dataTablePacientesDentistas);
             }
         }              
 
         void IDataBaseMigracao.DataBaseImportacaoDevClinico()
         {
-            ExcelHelper excelHelper = new ExcelHelper();
+            var excelHelper = new ExcelHelper();
 
-            string arquivoDesenvClinicoSql = "Scripts\\SelectDesenvolvimentoClinico.sql";
+            var arquivoDesenvClinicoSql = "Scripts\\SelectDesenvolvimentoClinico.sql";
             var desenvClinico = new FireBirdContext<DesenvolvimentoClinico>(_pathDB).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
             var desenvClinicoContratos = new FireBirdContext<DesenvolvimentoClinico>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
             var desenvClinicoMerge = desenvClinico.Union(desenvClinicoContratos).DistinctBy(x => x.Paciente_CPF).ToList();
 
-            string arquivoAgendamentosSql = "Scripts\\SelectAgendamentos.sql";
+            var arquivoAgendamentosSql = "Scripts\\SelectAgendamentos.sql";
             var agendamentosClinico = new FireBirdContext<Agendamentos>(_pathDB).RetornaItensBancoPorQuery(arquivoAgendamentosSql);
             var agendamentosContratos = new FireBirdContext<Agendamentos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
             var agendamentosMerge = agendamentosClinico.Union(agendamentosContratos).DistinctBy(x => x.Paciente_CPF).ToList();
@@ -101,7 +101,7 @@ namespace Migracao.Sistems
 
             if (dataTableDesenvClinico != null)
             {
-                var salvarDesenvClinico = Tools.GerarNomeArquivo($"CadastroDesenvClinico_{Tools.ultimoEstabelecimentoID}_OdontoCompany");
+                var salvarDesenvClinico = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_DesenvClinico");
                 excelHelper.CriarExcelArquivo(salvarDesenvClinico + ".xlsx", dataTableDesenvClinico);
             }
         }        
@@ -112,7 +112,7 @@ namespace Migracao.Sistems
 
             var dataTableProcedimentosManutencaoMerge = new DataTable();
 
-            string arquivoSql = "Scripts\\SelectManutencoes.sql";
+            var arquivoSql = "Scripts\\SelectManutencoes.sql";
             var manutencoesClinico = new FireBirdContext<Manutencoes>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
             var manutencoesContratos = new FireBirdContext<Manutencoes>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoSql);
             var manutencoesMerge = manutencoesClinico.Union(manutencoesContratos).DistinctBy(x => x.Paciente_CPF).ToList();
@@ -123,11 +123,11 @@ namespace Migracao.Sistems
 
             if (dataTableManutencoes != null)
             {
-                var salvarManutencoes = Tools.GerarNomeArquivo($"CadastroManutenções_{Tools.ultimoEstabelecimentoID}_OdontoCompany");
+                var salvarManutencoes = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_Manutenções");
                 excelHelper.CriarExcelArquivoV2(salvarManutencoes + ".xlsx", dataTableManutencoes);
             }
 
-            string arquivoProdedimentosSql = "Scripts\\SelectProdedimentos.sql";
+            var arquivoProdedimentosSql = "Scripts\\SelectProdedimentos.sql";
             var procedimentosClicico = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoProdedimentosSql);
             var procedimentosContratos = new FireBirdContext<Procedimentos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoProdedimentosSql);
             var procedimentos = procedimentosClicico.Union(procedimentosContratos).ToList();
@@ -138,16 +138,16 @@ namespace Migracao.Sistems
 
             if (dataTableProcedimentosManutencaoMerge != null)
             {
-                var salvarProcedimentos = Tools.GerarNomeArquivo($"cadastroProcedimentos_{Tools.ultimoEstabelecimentoID}_odontocompany");
+                var salvarProcedimentos = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_Procedimentos");
                 excelHelper.CriarExcelArquivo(salvarProcedimentos + ".xlsx", dataTableProcedimentos);
             }
         }
 
         void IDataBaseMigracao.DataBaseImportacaoPagosExigiveis()
         {
-            ExcelHelper excelHelper = new ExcelHelper();
+            var excelHelper = new ExcelHelper();
 
-            string arquivoSql = "Scripts\\SelectFinanceiroRecebidos.sql";
+            var arquivoSql = "Scripts\\SelectFinanceiroRecebidos.sql";
             var recebidosClinico = new FireBirdContext<Models.Recebidos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
             var recebidosContratos = new FireBirdContext<Models.Recebidos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoSql);
             var recebidosMerge = recebidosClinico.Union(recebidosContratos).DistinctBy(x => x.CNPJ_CPF).ToList();
@@ -165,13 +165,11 @@ namespace Migracao.Sistems
 
         void IDataBaseMigracao.DataBaseImportacaoProcedimentosPrecos()
         {
-            ExcelHelper excelHelper = new ExcelHelper();
+            var excelHelper = new ExcelHelper();
 
-            int estabelecimentoID = 1;
-
-            string arquivoSql = "Scripts\\SelectProcedimentosPrecos.sql";
-            var procedimentosPrecosClinico = new FireBirdContext<Models.ProcedimentosPrecos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
-            var procedimentosPrecosContratos = new FireBirdContext<Models.ProcedimentosPrecos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoSql);
+            var arquivoSql = "Scripts\\SelectProcedimentosPrecos.sql";
+            var procedimentosPrecosClinico = new FireBirdContext<ProcedimentosPrecos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+            var procedimentosPrecosContratos = new FireBirdContext<ProcedimentosPrecos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoSql);
             var procedimentosPrecosMerge = procedimentosPrecosClinico.Union(procedimentosPrecosContratos).ToList();
 
             var lstProcedimentosPrecos = ConversorEntidadeParaDTO.ConvertProcedimentosPrecosParaProcedimentosPrecosDTO(procedimentosPrecosMerge);
@@ -183,9 +181,9 @@ namespace Migracao.Sistems
         // Complementares
         void IDataBaseMigracao.DataBaseImportacaoFinanceiroRecebiveis()
         {
-            ExcelHelper excelHelper = new ExcelHelper();
+            var excelHelper = new ExcelHelper();
 
-            string arquivoSql = "Scripts\\SelectFinanceiroRecebiveis.sql";
+            var arquivoSql = "Scripts\\SelectFinanceiroRecebiveis.sql";
 
             var recebiveis = new FireBirdContext<Models.Recebivel>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
@@ -202,9 +200,9 @@ namespace Migracao.Sistems
 
         void IDataBaseMigracao.DataBaseImportacaoDentistas()
         {
-            ExcelHelper excelHelper = new ExcelHelper();
+            var excelHelper = new ExcelHelper();
 
-            string arquivoSql = "Scripts\\SelectDentistas.sql";
+            var arquivoSql = "Scripts\\SelectDentistas.sql";
 
             var dentistas = new FireBirdContext<Models.Dentistas>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
@@ -221,9 +219,9 @@ namespace Migracao.Sistems
 
         void IDataBaseMigracao.DataBaseImportacaoRecebiveisHistVenda()
         {
-            ExcelHelper excelHelper = new ExcelHelper();
+            var excelHelper = new ExcelHelper();
 
-            string arquivoSql = "Scripts\\SelectRecebiveisHistVenda.sql";
+            var arquivoSql = "Scripts\\SelectRecebiveisHistVenda.sql";
 
             var recebiveisHistVenda = new FireBirdContext<Models.RecebiveisHistVenda>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
@@ -244,9 +242,9 @@ namespace Migracao.Sistems
 
         void IDataBaseMigracao.DataBaseImportacaoAgendamentos()
         {
-            ExcelHelper excelHelper = new ExcelHelper();
+            var excelHelper = new ExcelHelper();
 
-            string arquivoSql = "Scripts\\SelectAgendamentos.sql";
+            var arquivoSql = "Scripts\\SelectAgendamentos.sql";
 
             var agendamentos = new FireBirdContext<Agendamentos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
@@ -263,9 +261,9 @@ namespace Migracao.Sistems
 
         void IDataBaseMigracao.DataBaseImportacaoProcedimentos()
         {
-            ExcelHelper excelHelper = new ExcelHelper();
+            var excelHelper = new ExcelHelper();
 
-            string arquivoSql = "Scripts\\SelectProdedimentos.sql";
+            var arquivoSql = "Scripts\\SelectProdedimentos.sql";
 
             var procedimentos = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
@@ -275,7 +273,7 @@ namespace Migracao.Sistems
 
             if (dataTableProcedimentos != null)
             {
-                var salvarProcedimentos = Tools.GerarNomeArquivo($"CadastroProcedimentos_{Tools.ultimoEstabelecimentoID}_OdontoCompany");
+                var salvarProcedimentos = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_Procedimentos");
                 excelHelper.CriarExcelArquivo(salvarProcedimentos + ".xlsx", dataTableProcedimentos);
             }
         }

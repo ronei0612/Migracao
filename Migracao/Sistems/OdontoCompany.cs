@@ -68,13 +68,7 @@ namespace Migracao.Sistems
 
             var pacientesClinico = new FireBirdContext<Pacientes>(_pathDB).RetornaItensBancoPorQuery(arquivoPacientesSql);
             var pacientesContrato = new FireBirdContext<Pacientes>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoPacientesSql);
-            var pacientes = pacientesClinico.Union(pacientesContrato).ToList();
-
-            //string arquivoDDentistasSql = "Scripts\\SelectDentistas.sql";
-
-            //var dentistasClinico = new FireBirdContext<Dentistas>(_pathDB).RetornaItensBancoPorQuery(arquivoDDentistasSql);
-            //var dentistasContrato = new FireBirdContext<Dentistas>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoDDentistasSql);
-            //var dentistas = dentistasClinico.Union(dentistasContrato).ToList();
+            var pacientes = pacientesClinico.Union(pacientesContrato).DistinctBy(p => p.CPF).ToList();
 
             var lstPacientesDentistas = ConversorEntidadeParaDTO.ConvertPacientesDentistasParaPacientesDentistasDTO(pacientes);
 

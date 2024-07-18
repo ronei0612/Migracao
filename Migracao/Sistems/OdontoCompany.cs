@@ -127,9 +127,9 @@ namespace Migracao.Sistems
                 excelHelper.CriarExcelArquivoV2(salvarManutencoes + ".xlsx", dataTableManutencoes);
             }
 
-            var arquivoProdedimentosSql = "Scripts\\SelectProdedimentos.sql";
-            var procedimentosClicico = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoProdedimentosSql);
-            var procedimentosContratos = new FireBirdContext<Procedimentos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoProdedimentosSql);
+            var arquivoProcedimentosSql = "Scripts\\SelectProcedimentos.sql";
+            var procedimentosClicico = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoProcedimentosSql);
+            var procedimentosContratos = new FireBirdContext<Procedimentos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoProcedimentosSql);
             var procedimentos = procedimentosClicico.Union(procedimentosContratos).ToList();
 
             var lstProcedimentos = ConversorEntidadeParaDTO.ConvertProcedimentosParaProcedimentosDTO(procedimentos);

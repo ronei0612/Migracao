@@ -64,7 +64,7 @@
     <None Update="Scripts\SelectProcedimentosPrecos.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Scripts\SelectProdedimentos.sql">
+    <None Update="Scripts\SelectProcedimentos.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Scripts\SelectRecebiveisHistVenda.sql">

@@ -35,7 +35,7 @@ namespace Migracao.Sistems
 
         public void RetornaProcedimentosPorTipoEntidade(List<ProcedimentosPrecosDTO> lstGruposProcedimentos)
         {
-            ExcelHelper excelHelper = new();
+            var excelHelper = new ExcelHelper();
 
             try
             {
@@ -46,7 +46,7 @@ namespace Migracao.Sistems
 
                 foreach (var grupo in procedimentosAgrupados)
                 {
-                    var fileName = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_CadastroProcedimentos_{grupo.Especialidade}");
+                    var fileName = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_TabelaDePreços_{grupo.Especialidade}");
                     var dataTable = ExcelHelper.ConversorEntidadeParaDataTable(grupo.Procedimentos);
 
                     if (dataTable != null)
@@ -55,7 +55,7 @@ namespace Migracao.Sistems
             }
             catch (Exception error)
             {
-                throw new Exception($"Erro ao converter Grupo Procedimentos: {error.Message}");
+                throw new Exception($"Erro ao converter Tabela de Preços: {error.Message}");
             }
         }
 

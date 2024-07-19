@@ -5,7 +5,6 @@
         public string? Numero_Controle { get; set; }
         public string? Paciente_CPF { get; set; }
         public string? Nome_Paciente { get; set; }
-        public string? Dentista_CPF { get; set; }
         public string? Dentista_Nome { get; set; }
         public string? Dente { get; set; }
         public string? Nome_Procedimento { get; set; }

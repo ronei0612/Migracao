@@ -447,7 +447,6 @@ namespace Migracao.Utils
                         Numero_Controle = procedimento.Numero_Controle,
                         Paciente_CPF = procedimento.Paciente_CPF.ToCPF(),
                         Paciente_Nome = procedimento.Nome_Paciente,
-                        Dentista_CPF = procedimento.Dentista_CPF,
                         Dentista_Nome = procedimento.Dentista_Nome,
                         Dente = procedimento.Dente,
                         Procedimento_Nome = procedimento.Nome_Procedimento,

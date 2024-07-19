@@ -8,7 +8,6 @@ atd222.NOME_PRODUTO Nome_Procedimento,
 atd222.Valor,
 atd222.OBS Observacao,
 atd222.DATA Data_Inicio,
-atd222.DATA_ATEND Data_Termino,
 atd222.DATA_ATEND Data_Atendimento
 FROM ATD222 atd222
-INNER JOIN EMD101 emd101 ON EMD101.CGC_CPF = atd222.CNPJ_CPF 
+INNER JOIN EMD101 emd101 ON EMD101.CGC_CPF = atd222.CNPJ_CPF

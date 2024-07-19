@@ -24,9 +24,6 @@ namespace Migracao.Models.DTO
         [DisplayName("Paciente Nome")]
         public string? Paciente_Nome { get; set; }
 
-        [DisplayName("Dentista CPF")]
-        public string? Dentista_CPF { get; set; }
-
         [DisplayName("Dentista Nome")]
         public string? Dentista_Nome { get; set; }
 

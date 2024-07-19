@@ -2,16 +2,6 @@
 using Migracao.Models;
 using Migracao.Models.DentalOffice;
 using Migracao.Models.DTO;
-using Migracao.Models.OdontoCompany;
-using NPOI.SS.Formula.Functions;
-using Org.BouncyCastle.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static NPOI.HSSF.Util.HSSFColor;
 
 namespace Migracao.Utils
 {
@@ -21,7 +11,7 @@ namespace Migracao.Utils
 
         public static List<PacientesDentistasDTO> ConvertPacientesDentistasParaPacientesDentistasDTO(List<Models.Pacientes> pacientes, List<Models.Dentistas>? dentistas = null)
         {
-            List<PacientesDentistasDTO> pacientesDentistasDTO = new List<PacientesDentistasDTO>();
+            var pacientesDentistasDTO = new List<PacientesDentistasDTO>();
             var linha = 1;
 
             try
@@ -30,7 +20,6 @@ namespace Migracao.Utils
                 {
                     var lstPacientes = new PacientesDentistasDTO
                     {
-                        //Cargo_Clinica = "Paciente",
                         Nome_Completo = paciente.Nome_Paciente.ToNome(),
                         Nome_Social = string.Empty,
                         Apelido = paciente.Nome_Paciente.ToApelido(),
@@ -46,7 +35,7 @@ namespace Migracao.Utils
                         Logradouro = paciente.Logradouro,
                         Numero = paciente.Numero,
                         Bairro = paciente.Bairro,
-                        Cidade = paciente.Cidade.ToCidade(paciente.UF),
+                        Cidade = paciente.Cidade.ToCidade(),
                         UF = paciente.UF?.ToUpper() ?? "",
                         CEP = paciente.CEP,
                         //Codigo_Conselho_Estado = string.Empty,
@@ -58,24 +47,6 @@ namespace Migracao.Utils
                     pacientesDentistasDTO.Add(lstPacientes);
                     linha++;
                 };
-
-                //foreach (var dentista in dentistas)
-                //{
-                //    var lstPacientes = new PacientesDentistasDTO
-                //    {
-                //        Cargo_Clinica = "Dentista",
-                //        Nome_Completo = dentista.Nome_Completo.ToNome() ?? dentista.Apelido.ToApelido(),
-                //        Nome_Social = string.Empty,
-                //        Apelido = dentista.Apelido.ToDentista(dentista.Nome_Completo),
-                //        Observacoes = dentista.Observacoes,
-                //        Email = dentista.Email,
-                //        Telefone_Principal = dentista.Telefone.ToFone().ToString(),
-                //        Codigo_Conselho_Estado = dentista.Codigo_do_Conselho_e_Estado
-                //    };
-
-                //    pacientesDentistasDTO.Add(lstPacientes);
-                //    linha++;
-                //};
             }
             catch (Exception error)
             {
@@ -87,7 +58,7 @@ namespace Migracao.Utils
 
         public static List<AgendamentosDTO> ConvertAgendamentodsParaAgendamentosDTO(List<Agendamentos> agendamentos)
         {
-            List<AgendamentosDTO> lstAgendamentosDTO = new List<AgendamentosDTO>();
+            var lstAgendamentosDTO = new List<AgendamentosDTO>();
 
             try
             {
@@ -135,7 +106,7 @@ namespace Migracao.Utils
 
         public static List<DesenvolvimentoClinicoDTO> ConvertDesenvolvimentoClinicoParaDesenvolvimentoClinicoDTO(List<DesenvolvimentoClinico> desenvClicnicos, List<Agendamentos> agendamentos)
         {
-            List<DesenvolvimentoClinicoDTO> lstDesenvolvimentoClinicoDTO = new List<DesenvolvimentoClinicoDTO>();
+            var lstDesenvolvimentoClinicoDTO = new List<DesenvolvimentoClinicoDTO>();
             var linha = 1;
 
             try
@@ -386,7 +357,7 @@ namespace Migracao.Utils
 
         public static List<PagosExigiveisDTO> ConvertRecebidosParaRecebidosDTO(List<Recebidos> recebidos)
         {
-            List<PagosExigiveisDTO> lstReceberDTO = new List<PagosExigiveisDTO>();
+            var lstReceberDTO = new List<PagosExigiveisDTO>();
 
             try
             {

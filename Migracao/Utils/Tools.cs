@@ -209,8 +209,8 @@ namespace Migracao.Utils
 
         public static string GetLetras(this string texto)
         {
-            return Regex.Replace(texto, @"[^a-zA-Z\?\s]", "").Trim();
-            //return Regex.Replace(texto, @"[^\p{L}\s]", "").Trim();
+            return new string(texto.Where(c => char.IsLetter(c) || char.IsWhiteSpace(c) || c == '?').ToArray()).Trim();
+            //return Regex.Replace(texto, @"[^a-zA-Z\?\s]", "").Trim();
         }
 
         public static string GerarNomeArquivo(string nomeArquivo, string extensao = ".xlsx")
@@ -303,6 +303,31 @@ namespace Migracao.Utils
                 return true;
 
             return false;
+        }
+
+        public static string ToCidade(this string textoCidade)
+        {
+            if (excelHelper == null)
+            {
+                var arquivoExcelCidades = "Files\\EnderecosCidades.xlsx";
+                excelHelper = new ExcelHelper();
+                if (File.Exists(arquivoExcelCidades))
+                    try
+                    {
+                        var workbookCidades = excelHelper.LerExcel(arquivoExcelCidades);
+                        var sheetCidades = workbookCidades.GetSheetAt(0);
+                        excelHelper.InitializeDictionaryCidade(sheetCidades);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception($"Erro ao ler o arquivo Excel \"{arquivoExcelCidades}\": {ex.Message}");
+                    }
+            }
+
+            textoCidade = !string.IsNullOrEmpty(textoCidade) ? textoCidade.ToLower() : string.Empty;
+            textoCidade = excelHelper.BuscarCidade(textoCidade).ToNome();
+
+            return textoCidade;
         }
 
         public static string ToCidade(this string textoCidade, string uf, string cep = "")

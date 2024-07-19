@@ -1,5 +1,4 @@
 ﻿using ClosedXML.Excel;
-using Migracao.DTO;
 using Migracao.Models;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
@@ -8,8 +7,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Globalization;
 using System.Text;
-using System.Text.RegularExpressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Migracao.Utils
 {
@@ -177,13 +174,14 @@ namespace Migracao.Utils
                     string estadoCellValue = sheet.GetRow(row).GetCell(estadoColumnIndex) != null ? sheet.GetRow(row).GetCell(estadoColumnIndex).ToString() : "";
                     string cepCellValue = sheet.GetRow(row).GetCell(cepColumnIndex) != null ? sheet.GetRow(row).GetCell(cepColumnIndex).ToString() : "";
 
-                    string key = Tools.RemoverAcentos(cidadeCellValue).ToLower() + "|" + estadoCellValue.ToLower();
+                    //string key = Tools.RemoverAcentos(cidadeCellValue).ToLower() + "|" + estadoCellValue.ToLower();
+                    string key = cidadeCellValue.ToLower() + "|" + estadoCellValue.ToLower();
                     if (!cidadeEstadoDict.ContainsKey(key))
                         cidadeEstadoDict.Add(key, cidadeIdCellValue);
 
-                    key = cidadeCellValue.ToLower();
+                    key = Tools.RemoverAcentos(cidadeCellValue).ToLower();
                     if (!cidadeDict.ContainsKey(key))
-                        cidadeDict.Add(key, cidadeIdCellValue);
+                        cidadeDict.Add(key, cidadeCellValue);
 
                     if (cepCellValue != "0" && !string.IsNullOrEmpty(cepCellValue))
                     {
@@ -230,6 +228,24 @@ namespace Migracao.Utils
             }
 
             return false;
+        }
+
+        public string BuscarCidade(string cidade = "")
+        {
+            string key = "";
+
+            if (string.IsNullOrEmpty(cidade))
+                return cidade;
+
+            cidade = Tools.RemoverAcentos(cidade).ToLower();
+
+            if (!string.IsNullOrWhiteSpace(cidade))
+            {
+                if (cidadeDict.ContainsKey(cidade))
+                    return cidadeDict[cidade];
+            }
+
+            return cidade;
         }
 
         public string EncontrarCidadeSemelhante(string textoCidade)

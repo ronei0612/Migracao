@@ -131,11 +131,11 @@ namespace Migracao
                         instance.DataBaseImportacaoPacientesDentistas();
                         instance.DataBaseImportacaoProcedimentosPrecos();
                         instance.DataBaseImportacaoPagosExigiveis();
-                        instance.DataBaseImportacaoProcedimentos();
-                        instance.DataBaseImportacaoFinanceiroRecebiveis();
-                        instance.DataBaseImportacaoAgendamentos();
-                        instance.DataBaseImportacaoDentistas();
-                        instance.DataBaseImportacaoRecebiveisHistVenda();
+                        //instance.DataBaseImportacaoProcedimentos();
+                        //instance.DataBaseImportacaoFinanceiroRecebiveis();
+                        //instance.DataBaseImportacaoAgendamentos();
+                        //instance.DataBaseImportacaoDentistas();
+                        //instance.DataBaseImportacaoRecebiveisHistVenda();
                         break;
                     case "Agendamentos/DesenvClínico":
                         instance.DataBaseImportacaoDevClinico();
@@ -152,11 +152,12 @@ namespace Migracao
                     case "Recebíveis/Pagos/Exigíveis":
                         instance.DataBaseImportacaoPagosExigiveis();
                         break;
+                    //case "Procedimentos":
+                    //    instance.DataBaseImportacaoProcedimentos();
+                    //    break;
 
                         // Complementares
-                        //case "Procedimentos":
-                        //    instance.DataBaseImportacaoProcedimentos();
-                        //    break;
+
 
                         //case "Financeiro (Recebíveis)":
                         //instance.DataBaseImportacaoFinanceiroRecebiveis();

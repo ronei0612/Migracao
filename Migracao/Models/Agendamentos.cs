@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Migracao.Models
+﻿namespace Migracao.Models
 {
     public class Agendamentos
     {
@@ -16,7 +10,7 @@ namespace Migracao.Models
         public string? Codigo_Responsavel { get; set; }
         public string? Nome_Dentista { get; set; }
         public string? Telefone { get; set; }
-        public DateTime Data_Inclusao { get; set; }
+        public DateTime? Data_Inclusao { get; set; }
         public string? Observacao { get; set; }
     }
 }

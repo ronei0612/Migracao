@@ -111,8 +111,8 @@ namespace Migracao.Utils
 
             try
             {
-
-                Parallel.ForEach(agendamentos, agendamento =>
+                foreach (var agendamento in agendamentos)
+                //Parallel.ForEach(agendamentos, agendamento =>
                 {
                     var minutos = agendamento.Hora.Split(':')[1];
                     var horas = agendamento.Hora.Split(':')[0];
@@ -120,7 +120,6 @@ namespace Migracao.Utils
 
                     if (!string.IsNullOrEmpty(horas))
                         dataInicio = dataInicio.AddHours(double.Parse(horas));
-
                     if (!string.IsNullOrEmpty(minutos))
                         dataInicio = dataInicio.AddMinutes(double.Parse(minutos));
 
@@ -131,6 +130,7 @@ namespace Migracao.Utils
                                         .Count();
 
                     var minutosParaAdicionar = numLancamentos > 0 ? 15 * numLancamentos : 15;
+
                     dataTermino = dataTermino.AddMinutes(minutosParaAdicionar);
 
                     var desenvolvimentoClinico = new DesenvolvimentoClinicoDTO
@@ -139,20 +139,18 @@ namespace Migracao.Utils
                         Nome_Completo = agendamento.Nome.ToNome(),
                         Telefone = agendamento.Telefone.ToFone().ToString(),
                         Dentista = agendamento.Nome_Dentista.ToNome(),
-                        //ID = agendamento.Codigo_Responsavel,
                         Desenvolvimento_Clinico = agendamento.Observacao,
-                        Data_Hora_Inicio = agendamento.Data_Inclusao.ToString(),
-                        Data_Hora_Termino = dataTermino.ToString(),
-                        Data_Hora_Atendimento_Inicio = agendamento.Data.ToString(),
-                        Data_Hora_Atendimento_Termino = dataTermino.ToString(),
-                        //Observacao = agendamento.Observacao
+                        Data_Hora_Inicio = dataInicio.ToString(),
+                        Data_Hora_Termino = dataTermino.ToString()
+                        //Data_Hora_Atendimento_Inicio = dataInicio.ToString(),
+                        //Data_Hora_Atendimento_Termino = dataTermino.ToString()
                     };
 
                     lock (lstDesenvolvimentoClinicoDTO)
                     {
                         lstDesenvolvimentoClinicoDTO.Add(desenvolvimentoClinico);
                     }
-                });
+                }//);
             }
             catch (Exception error)
             {

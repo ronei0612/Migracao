@@ -17,11 +17,11 @@ namespace Migracao.Models.DTO
         [DisplayName("Nº Controle")]
         public string? Numero_Controle { get; set; }
 
-        [DisplayName("Paciente CPF")]
-        public string? Paciente_CPF { get; set; }
-
         [DisplayName("Paciente Nome")]
         public string? Paciente_Nome { get; set; }
+
+        [DisplayName("Paciente CPF")]
+        public string? Paciente_CPF { get; set; }
 
         [DisplayName("Dentista Nome")]
         public string? Dentista_Nome { get; set; }
@@ -31,9 +31,6 @@ namespace Migracao.Models.DTO
 
         [DisplayName("Valor")]
         public string? Procedimento_Valor { get; set; }
-
-        [DisplayName("Observação")]
-        public string? Procedimento_Observacao { get; set; }
 
         [DisplayName("Quantidade Orto")]
         public string? Quantidade_Orto { get; set; }
@@ -47,5 +44,8 @@ namespace Migracao.Models.DTO
 
         [DisplayName("Data Atendimento")]
         public string? Data_Atendimento { get; set; }
+
+        [DisplayName("Observação")]
+        public string? Procedimento_Observacao { get; set; }
     }
 }

@@ -88,12 +88,14 @@ namespace Migracao.Sistems
             var arquivoDesenvClinicoSql = "Scripts\\SelectDesenvolvimentoClinico.sql";
             var desenvClinico = new FireBirdContext<DesenvolvimentoClinico>(_pathDB).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
             var desenvClinicoContratos = new FireBirdContext<DesenvolvimentoClinico>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
-            var desenvClinicoMerge = desenvClinico.Union(desenvClinicoContratos).DistinctBy(x => x.Paciente_CPF).ToList();
+            //var desenvClinicoMerge = desenvClinico.Union(desenvClinicoContratos).DistinctBy(x => x.Paciente_CPF).ToList();
+            var desenvClinicoMerge = desenvClinico.Union(desenvClinicoContratos).ToList();
 
             var arquivoAgendamentosSql = "Scripts\\SelectAgendamentos.sql";
             var agendamentosClinico = new FireBirdContext<Agendamentos>(_pathDB).RetornaItensBancoPorQuery(arquivoAgendamentosSql);
-            var agendamentosContratos = new FireBirdContext<Agendamentos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoDesenvClinicoSql);
-            var agendamentosMerge = agendamentosClinico.Union(agendamentosContratos).DistinctBy(x => x.Paciente_CPF).ToList();
+            var agendamentosContratos = new FireBirdContext<Agendamentos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoAgendamentosSql);
+            //var agendamentosMerge = agendamentosClinico.Union(agendamentosContratos).DistinctBy(x => x.Paciente_CPF).ToList();
+            var agendamentosMerge = agendamentosClinico.Union(agendamentosContratos).ToList();
 
             var lstDesenvClinico = ConversorEntidadeParaDTO.ConvertDesenvolvimentoClinicoParaDesenvolvimentoClinicoDTO(desenvClinicoMerge, agendamentosMerge);
 

@@ -1,13 +1,6 @@
 ﻿using Migracao.Models;
-using Migracao.Utils;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Migracao.DTO
 {
@@ -21,10 +14,7 @@ namespace Migracao.DTO
 
         }
 
-        //[DisplayName("Cargo na Clínica")]
-        //public string? Cargo_Clinica { get; set; }
-
-        [DisplayName("Número Prontuário")]
+        [DisplayName("Nº Prontuário")]
         public string? Numero_Prontuario { get; set; }
 
         [DisplayName("Nome Completo")]
@@ -41,9 +31,6 @@ namespace Migracao.DTO
 
         [DisplayName("RG")]
         public string? RG { get; set; }
-
-        [DisplayName("Observações")]
-        public string? Observacoes { get; set; }
 
         [DisplayName("E-mail")]
         public string? Email { get; set; }
@@ -63,9 +50,6 @@ namespace Migracao.DTO
 
         [DisplayName("Profissão")]
         public string? Profissao { get; set; }
-
-        //[DisplayName("Código do Conselho e Estado")]
-        //public string? Codigo_Conselho_Estado { get; set; }
 
         [DisplayName("Telefone Principal")]
         public string? Telefone_Principal { get; set; }
@@ -96,5 +80,8 @@ namespace Migracao.DTO
 
         [DisplayName("CEP")]
         public string? CEP { get; set; }
+
+        [DisplayName("Observações")]
+        public string? Observacoes { get; set; }
     }
 }

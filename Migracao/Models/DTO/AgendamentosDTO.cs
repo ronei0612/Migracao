@@ -28,11 +28,11 @@ namespace Migracao.Models.DTO
 
         [DisplayName("Data Término")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
-        public DateTime Data_Termino { get; set; }
+        public DateTime? Data_Termino { get; set; }
 
         [DisplayName("Data Inclusão")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
-        public DateTime Data_Inclusao { get; set; }
+        public DateTime? Data_Inclusao { get; set; }
 
         [DisplayName("Nome Completo Dentista")]
         public string? Nome_Completo_Dentista { get; set; }

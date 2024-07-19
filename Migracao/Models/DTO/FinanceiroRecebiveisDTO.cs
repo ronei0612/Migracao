@@ -26,7 +26,7 @@ namespace Migracao.Models.DTO
         [DisplayName("Nome")]
         public string? Nome { get; set; }
 
-        [DisplayName("Número do Controle")]
+        [DisplayName("Nº Controle")]
         public string? Numero_Controle { get; set; }
 
         [DisplayName("Recebível Exigível(R/E)")]

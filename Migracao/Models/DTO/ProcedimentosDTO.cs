@@ -15,7 +15,7 @@ namespace Migracao.Models.DTO
 
         }
 
-        [DisplayName("Número do Controle")]
+        [DisplayName("Nº Controle")]
         public string? Numero_Controle { get; set; }
 
         [DisplayName("Paciente CPF")]

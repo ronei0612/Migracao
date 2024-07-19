@@ -545,7 +545,9 @@ namespace Migracao.Utils
                 {
                     var cellValue = dataTable.Rows[i][j].ToString();
 
-                    if (DateTime.TryParseExact(cellValue, "dd/MM/yyyy HH:mm:ss", culture, DateTimeStyles.None, out DateTime data) ||
+                    if (Decimal.TryParse(cellValue, out var moeda))
+                        row.Cell(j + 1).Value = moeda;
+                    else if (DateTime.TryParseExact(cellValue, "dd/MM/yyyy HH:mm:ss", culture, DateTimeStyles.None, out DateTime data) ||
                         DateTime.TryParseExact(cellValue, "dd/MM/yyyy", culture, DateTimeStyles.None, out data))
                         row.Cell(j + 1).Value = data;
                     else
@@ -553,11 +555,17 @@ namespace Migracao.Utils
                 }
             }
 
+            // Fixar a primeira linha (cabeçalho)
+            worksheet.SheetView.FreezeRows(1);
+
             // Aplicar o estilo de fundo ao cabeçalho
             headerRow.Style.Fill.BackgroundColor = XLColor.LightCornflowerBlue;
 
             // Aplicar o filtro automático
             worksheet.Range(1, 1, 1, dataTable.Columns.Count).SetAutoFilter();
+
+            // Ajustar o tamanho das colunas automaticamente
+            worksheet.Columns().AdjustToContents();
 
             // Salvar o arquivo
             workbook.SaveAs(nomeArquivo);

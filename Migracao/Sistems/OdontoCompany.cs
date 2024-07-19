@@ -50,7 +50,7 @@ namespace Migracao.Sistems
                     var dataTable = ExcelHelper.ConversorEntidadeParaDataTable(grupo.Procedimentos);
 
                     if (dataTable != null)
-                        excelHelper.CriarExcelArquivo(fileName + ".xlsx", dataTable);
+                        excelHelper.CriarExcelArquivoV2(fileName + ".xlsx", dataTable);
                 }
             }
             catch (Exception error)
@@ -77,7 +77,7 @@ namespace Migracao.Sistems
             if (dataTablePacientesDentistas != null)
             {
                 var salvarArquivoPacientesDentistas = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_Pacientes");
-                excelHelper.CriarExcelArquivo(salvarArquivoPacientesDentistas + ".xlsx", dataTablePacientesDentistas);
+                excelHelper.CriarExcelArquivoV2(salvarArquivoPacientesDentistas + ".xlsx", dataTablePacientesDentistas);
             }
         }              
 
@@ -102,7 +102,7 @@ namespace Migracao.Sistems
             if (dataTableDesenvClinico != null)
             {
                 var salvarDesenvClinico = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_DesenvClinico");
-                excelHelper.CriarExcelArquivo(salvarDesenvClinico + ".xlsx", dataTableDesenvClinico);
+                excelHelper.CriarExcelArquivoV2(salvarDesenvClinico + ".xlsx", dataTableDesenvClinico);
             }
         }        
 
@@ -139,7 +139,7 @@ namespace Migracao.Sistems
             if (dataTableProcedimentosManutencaoMerge != null)
             {
                 var salvarProcedimentos = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_Procedimentos");
-                excelHelper.CriarExcelArquivo(salvarProcedimentos + ".xlsx", dataTableProcedimentos);
+                excelHelper.CriarExcelArquivoV2(salvarProcedimentos + ".xlsx", dataTableProcedimentos);
             }
         }
 
@@ -160,7 +160,7 @@ namespace Migracao.Sistems
             if (dataTableRecebidos != null)
             {
                 var salvarArquivoRecebidos = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_Financeiro");
-                excelHelper.CriarExcelArquivo(salvarArquivoRecebidos + ".xlsx", dataTableRecebidos);
+                excelHelper.CriarExcelArquivoV2(salvarArquivoRecebidos + ".xlsx", dataTableRecebidos);
             }
         }
 
@@ -195,7 +195,7 @@ namespace Migracao.Sistems
             if (dataTableRecebiveis != null)
             {
                 var salvarArquivoRecebiveis = Tools.GerarNomeArquivo($"CadastroRecebiveis_{Tools.ultimoEstabelecimentoID}_OdontoCompany");
-                excelHelper.CriarExcelArquivo(salvarArquivoRecebiveis + ".xlsx", dataTableRecebiveis);
+                excelHelper.CriarExcelArquivoV2(salvarArquivoRecebiveis + ".xlsx", dataTableRecebiveis);
             }
         }
 
@@ -214,7 +214,7 @@ namespace Migracao.Sistems
             if (dataTableDentistas != null)
             {
                 var salvarArquivoDentistas = Tools.GerarNomeArquivo($"CadastroDentistas_{Tools.ultimoEstabelecimentoID}_OdontoCompany");
-                excelHelper.CriarExcelArquivo(salvarArquivoDentistas + ".xlsx", dataTableDentistas);
+                excelHelper.CriarExcelArquivoV2(salvarArquivoDentistas + ".xlsx", dataTableDentistas);
             }
         }
 
@@ -233,7 +233,7 @@ namespace Migracao.Sistems
             if (dataTableRecebiveisHistVenda != null)
             {
                 var salvarArquivoRecebiveisHistVenda = Tools.GerarNomeArquivo($"CadastroRecebiveisHistVenda_{Tools.ultimoEstabelecimentoID}_OdontoCompany");
-                excelHelper.CriarExcelArquivo(salvarArquivoRecebiveisHistVenda + ".xlsx", dataTableRecebiveisHistVenda);
+                excelHelper.CriarExcelArquivoV2(salvarArquivoRecebiveisHistVenda + ".xlsx", dataTableRecebiveisHistVenda);
             }
         }        
 
@@ -256,7 +256,7 @@ namespace Migracao.Sistems
             if (dataTableAgendamentos != null)
             {
                 var salvarArquivoAgendamentos = Tools.GerarNomeArquivo($"CadastroAgendamentos_{Tools.ultimoEstabelecimentoID}_OdontoCompany");
-                excelHelper.CriarExcelArquivo(salvarArquivoAgendamentos + ".xlsx", dataTableAgendamentos);
+                excelHelper.CriarExcelArquivoV2(salvarArquivoAgendamentos + ".xlsx", dataTableAgendamentos);
             }
         }
 
@@ -275,7 +275,7 @@ namespace Migracao.Sistems
             if (dataTableProcedimentos != null)
             {
                 var salvarProcedimentos = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_Procedimentos");
-                excelHelper.CriarExcelArquivo(salvarProcedimentos + ".xlsx", dataTableProcedimentos);
+                excelHelper.CriarExcelArquivoV2(salvarProcedimentos + ".xlsx", dataTableProcedimentos);
             }
         }
     }

@@ -143,7 +143,7 @@ namespace Migracao
                     case "Procedimentos/Manutenções":
                         instance.DataBaseImportacaoManutencoes();
                         break;
-                    case "Pacientes/Dentistas":
+                    case "Prontuários Pacientes":
                         instance.DataBaseImportacaoPacientesDentistas();
                         break;
                     case "Procedimentos Tabela Preços":

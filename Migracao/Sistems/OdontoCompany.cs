@@ -148,8 +148,9 @@ namespace Migracao.Sistems
             var excelHelper = new ExcelHelper();
 
             var arquivoSql = "Scripts\\SelectFinanceiroRecebidos.sql";
-            var recebidosClinico = new FireBirdContext<Models.Recebidos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
-            var recebidosContratos = new FireBirdContext<Models.Recebidos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoSql);
+
+            var recebidosClinico = new FireBirdContext<Recebidos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+            var recebidosContratos = new FireBirdContext<Recebidos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoSql);
             var recebidosMerge = recebidosClinico.Union(recebidosContratos).DistinctBy(x => x.CNPJ_CPF).ToList();
 
             var lstRecebidos = ConversorEntidadeParaDTO.ConvertRecebidosParaRecebidosDTO(recebidosMerge);
@@ -158,7 +159,7 @@ namespace Migracao.Sistems
 
             if (dataTableRecebidos != null)
             {
-                var salvarArquivoRecebidos = Tools.GerarNomeArquivo($"CadastroRecebidos_Baixas_{Tools.ultimoEstabelecimentoID}_OdontoCompany");
+                var salvarArquivoRecebidos = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_Financeiro");
                 excelHelper.CriarExcelArquivo(salvarArquivoRecebidos + ".xlsx", dataTableRecebidos);
             }
         }

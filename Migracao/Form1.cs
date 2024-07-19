@@ -188,6 +188,7 @@ namespace Migracao
 
         private void OpenFormImportarDataBase(object sender, EventArgs e)
         {
+            Tools.ultimoEstabelecimentoID = txtEstabelecimentoID.Text;
             ImportacaoDataBase importacaoDataBase = new ImportacaoDataBase();
             importacaoDataBase.ShowDialog();
         }

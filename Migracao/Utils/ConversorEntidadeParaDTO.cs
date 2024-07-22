@@ -368,13 +368,14 @@ namespace Migracao.Utils
                     var lstReceber = new PagosExigiveisDTO
                     {
                         CPF = receber.CNPJ_CPF.ToCPF(),
-                        Nome = receber.Nome_Paciente.ToCPF(),
+                        Nome = receber.Nome_Paciente.ToNome(),
                         Numero_Controle = receber.Numero_Controle,
+                        Documento = receber.Documento.ToString(),
                         Recebivel_Exigivel = "R",
                         Valor_Devido = receber.Valor_Devido.ToString(),
                         Valor_Pago = receber.Valor_Pago.ToString(),
-                        Data_Vencimento = receber.Data_Vencimento.ToShortDateString(),
-                        Data_Pagamento = receber.Data_Baixa.ToShortDateString(),
+                        Data_Vencimento = receber.Data_Vencimento.ToString(),
+                        Data_Pagamento = receber.Data_Baixa.ToString(),
                         Observacao_Recebido = ("Observação: " + receber.Observacao + " | Documento: " + receber.Tipo_Documento + " | Situação: " + receber.Situacao +
                         " | Nome do Grupo: " + receber.Nome_Grupo + " | Ordem: " + receber.Ordem),
                         Tipo_Pagamento = formaPagamento,

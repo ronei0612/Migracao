@@ -25,16 +25,19 @@ namespace Migracao.Models.DTO
         //Data Pagamento	Valor Pago	Pagamento Observações
 
         [DisplayName("Documento")]
+        public string? Documento { get; set; }
+
+        [DisplayName("Controle")]
         public string? Numero_Controle { get; set; }
 
         [DisplayName("Parcela")]
         public string? Parcela { get; set; }
 
-        [DisplayName("CPF")]
-        public string? CPF { get; set; }
-
         [DisplayName("Nome Completo")]
         public string? Nome { get; set; }
+
+        [DisplayName("CPF")]
+        public string? CPF { get; set; }
 
 
         [DisplayName("Tipo do Título")]

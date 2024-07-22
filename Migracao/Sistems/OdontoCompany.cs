@@ -149,7 +149,7 @@ namespace Migracao.Sistems
         {
             var excelHelper = new ExcelHelper();
 
-            var arquivoSql = "Scripts\\SelectFinanceiroRecebidos.sql";
+            var arquivoSql = "Scripts\\SelectRecebiveisRecebidosContratos.sql";
 
             var recebidosClinico = new FireBirdContext<Recebidos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
             var recebidosContratos = new FireBirdContext<Recebidos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoSql);

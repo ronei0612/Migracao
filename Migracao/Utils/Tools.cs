@@ -41,6 +41,28 @@ namespace Migracao.Utils
             return "";
         }
 
+        public static TitulosEspeciesID ToFormaPagamento(string texto)
+        {
+
+            switch (texto)
+            {
+                case string a when a.Contains("CREDIARIO"):
+                    return TitulosEspeciesID.Carne;
+                case string b when b.Contains("CHEQUE"):
+                    return TitulosEspeciesID.Cheque;
+                case string b when b.Contains("DINHEIRO"):
+                    return TitulosEspeciesID.Dinheiro;
+                case string b when b.Contains("TRANSF"):
+                    return TitulosEspeciesID.TransferenciaBancaria;
+                case string b when b.Contains("DEBITO") || b.Contains("PIX"):
+                    return TitulosEspeciesID.DepositoEmConta;
+                case string b when b.Contains("CARD") || b.Contains("MASTER") || b.Contains("VISA"):
+                    return TitulosEspeciesID.CartaoCredito;
+                default:
+                    return TitulosEspeciesID.Dinheiro;
+            }
+        }
+
         public static string GetPrimeiroNome(this string texto)
         {
             if (string.IsNullOrEmpty(texto))

@@ -31,7 +31,6 @@ namespace Migracao.Utils
         private Dictionary<string, string> cidadeEstadoDict = new Dictionary<string, string>();
 
         private Dictionary<string, string> cpfKeyDict = new Dictionary<string, string>();
-        private Dictionary<string, string> nomeKeyDict = new Dictionary<string, string>();
         private Dictionary<string, string> nomesUTF8Dict = new Dictionary<string, string>();
 
         public static Dictionary<string, string> pessoaIDTelefonesDict = new Dictionary<string, string>();

@@ -111,8 +111,8 @@ namespace Migracao.Utils
 
             try
             {
-                foreach (var agendamento in agendamentos)
-                //Parallel.ForEach(agendamentos, agendamento =>
+                //foreach (var agendamento in agendamentos)
+                Parallel.ForEach(agendamentos, agendamento =>
                 {
                     var minutos = agendamento.Hora.Split(':')[1];
                     var horas = agendamento.Hora.Split(':')[0];
@@ -150,7 +150,7 @@ namespace Migracao.Utils
                     {
                         lstDesenvolvimentoClinicoDTO.Add(desenvolvimentoClinico);
                     }
-                }//);
+                });
             }
             catch (Exception error)
             {

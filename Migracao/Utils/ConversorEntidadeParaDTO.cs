@@ -361,9 +361,9 @@ namespace Migracao.Utils
             {
                 foreach (var receber in recebidos)
                 {
-
-                    var tipoPagamento = receber.Tipo_Pagamento;
-                    string formaPagamento = ExcelHelper.GetEspecieIDFromFormaPagamentoEntidades(tipoPagamento);
+                    decimal? valorPago = receber.Valor_Pago;
+                    var especiePagamento = receber.Especie_Pagamento;
+                    string formaPagamento = ExcelHelper.GetEspecieIDFromFormaPagamentoEntidades(especiePagamento, valorPago);
 
                     var lstReceber = new PagosExigiveisDTO
                     {

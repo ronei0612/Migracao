@@ -571,19 +571,19 @@ namespace Migracao.Utils
         }
 
         public static List<string[]> LerCSV(string filePath, char separador, Encoding encoding)
+        {
+            var linhas = new List<string[]>();
+            using (var reader = new StreamReader(filePath, encoding))
             {
-                var linhas = new List<string[]>();
-                using (var reader = new StreamReader(filePath, encoding))
+                string linha;
+                while ((linha = reader.ReadLine()) != null)
                 {
-                    string linha;
-                    while ((linha = reader.ReadLine()) != null)
-                    {
-                        string[] valores = linha.Split(separador); // Assumindo que o separador é ';'
-                        linhas.Add(valores);
-                    }
+                    string[] valores = linha.Split(separador); // Assumindo que o separador é ';'
+                    linhas.Add(valores);
                 }
-                return linhas;
             }
+            return linhas;
+        }
 
         public static List<string[]> GetLinhasCSV(string filePath, char separador, int cabecalhos, Encoding encoding)
         {
@@ -648,31 +648,34 @@ namespace Migracao.Utils
             }
         }
 
-        public static string GetEspecieIDFromFormaPagamentoEntidades(string formaPagamento)
+        public static string GetEspecieIDFromFormaPagamentoEntidades(string formaPagamento, decimal? valorPago)
         {
 
             switch (formaPagamento)
             {
-                case string a when a.Equals("17"):
+                case string a when a.Equals("CREDIARIO"):
                     return TitulosEspeciesID.Carne.ToString();
 
-                case string b when b.Contains("4"):
+                case string b when b.Contains("CHEQUE"):
                     return TitulosEspeciesID.Cheque.ToString();
 
-                case string b when b.Contains("1"):
+                case string b when b.Contains("DINHEIRO"):
                     return TitulosEspeciesID.Dinheiro.ToString();
 
-                case string b when b.Contains("22"):
+                case string b when b.Contains("TRANSF"):
                     return TitulosEspeciesID.TransferenciaBancaria.ToString();
 
-                case string b when b.Contains("31") || b.Contains("PIX"):
+                case string b when b.Contains("DEBITO") || b.Contains("PIX"):
                     return TitulosEspeciesID.DepositoEmConta.ToString();
 
-                case string b when b.Contains("8") || b.Contains("MASTER") || b.Contains("VISA"):
+                case string b when b.Contains("CARD") || b.Contains("MASTER") || b.Contains("VISA"):
                     return TitulosEspeciesID.CartaoCredito.ToString();
 
                 default:
-                    return TitulosEspeciesID.Dinheiro.ToString();
+                    if (valorPago > 0)
+                        return TitulosEspeciesID.Dinheiro.ToString();
+                    else
+                        return TitulosEspeciesID.Carteira.ToString();
             }
         }
 
@@ -686,7 +689,7 @@ namespace Migracao.Utils
                     foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(typeof(T)))
                     {
                         dataTable.Columns.Add(prop.DisplayName, prop.PropertyType);
-                    }                    
+                    }
 
                     foreach (var entidade in entidadeDTO)
                     {

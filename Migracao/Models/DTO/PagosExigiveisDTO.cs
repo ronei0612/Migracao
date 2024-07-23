@@ -65,11 +65,6 @@ namespace Migracao.Models.DTO
         [DisplayName("Valor Devido")]
         public string? Valor_Devido { get; set; }
 
-
-        [DisplayName("Observação")]
-        [MaxLength(512)]
-        public string? Observacao_Recebido { get; set; }
-
         [DisplayName("Data Pagamento")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Pagamento { get; set; }
@@ -77,6 +72,11 @@ namespace Migracao.Models.DTO
 
         [DisplayName("Valor Pago")]
         public string? Valor_Pago { get; set; }
+
+
+        [DisplayName("Observação")]
+        [MaxLength(512)]
+        public string? Observacao_Recebido { get; set; }
 
         [DisplayName("Pagamento Observações")]
         public string? Pagamento_Observacoes { get; set; }

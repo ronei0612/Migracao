@@ -112,8 +112,8 @@ namespace Migracao.Utils
 
             try
             {
-                //foreach (var agendamento in agendamentos)
-                Parallel.ForEach(agendamentos, agendamento =>
+                foreach (var agendamento in agendamentos)
+                //Parallel.ForEach(agendamentos, agendamento =>
                 {
                     var minutos = agendamento.Hora.Split(':')[1];
                     var horas = agendamento.Hora.Split(':')[0];
@@ -151,7 +151,7 @@ namespace Migracao.Utils
                     {
                         lstDesenvolvimentoClinicoDTO.Add(desenvolvimentoClinico);
                     }
-                });
+                }//);
             }
             catch (Exception error)
             {
@@ -360,8 +360,8 @@ namespace Migracao.Utils
 
             try
             {
-                Parallel.ForEach(recebidos, receber =>
-                //foreach (var receber in recebidos)
+                //Parallel.ForEach(recebidos, receber =>
+                foreach (var receber in recebidos)
                 {
                     decimal? valorPago = receber.Valor_Pago;
                     var especiePagamento = receber.Especie_Pagamento;
@@ -391,7 +391,7 @@ namespace Migracao.Utils
                     };
 
                     lstReceberDTO.Add(lstReceber);
-                });
+                }//);
             }
             catch (Exception error)
             {
@@ -411,9 +411,12 @@ namespace Migracao.Utils
 
             try
             {
-                Parallel.ForEach(procedimentos, procedimento =>
-                //foreach (var procedimento in procedimentos)
+                //Parallel.ForEach(procedimentos, procedimento =>
+                foreach (var procedimento in procedimentos)
                 {
+                    if (procedimento.Paciente_CPF == "864.093.286-72")
+                        procedimento.Paciente_CPF = procedimento.Paciente_CPF;
+
                     var lstProcedimento = new ProcedimentosDTO
                     {
                         Numero_Controle = procedimento.Numero_Controle,
@@ -431,7 +434,7 @@ namespace Migracao.Utils
                     };
 
                     lstProcedimentosDTO.Add(lstProcedimento);
-                });
+                }//);
             }
             catch (Exception error)
             {

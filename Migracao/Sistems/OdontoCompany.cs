@@ -130,7 +130,7 @@ namespace Migracao.Sistems
             }
 
             var arquivoProcedimentosSql = "Scripts\\SelectProcedimentos.sql";
-            var procedimentosClicico = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoProcedimentosSql);
+            var procedimentosClicico = new FireBirdContext<Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoProcedimentosSql);
             var procedimentosContratos = new FireBirdContext<Procedimentos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoProcedimentosSql);
             var procedimentos = procedimentosClicico.Union(procedimentosContratos).ToList();
 

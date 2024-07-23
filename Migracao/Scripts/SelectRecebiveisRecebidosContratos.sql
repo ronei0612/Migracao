@@ -1,3 +1,27 @@
+--SELECT crd111.DUPLICATA Documento,
+--       crd111.TIPO_DOC Tipo_Documento,
+--       crd111.DOCUMENTO Numero_Controle,
+--       crd111.PARCELA Parcela,
+--       emd101.NOME Nome_Paciente,
+--       crd111.CGC_CPF CNPJ_CPF,
+--       crd111.VALOR_VENDA Valor_Total,
+--       crd111.VALOR Valor_Devido,
+--       crd111.VALOR Valor_Original,
+--       crd111.VENCTO Data_Vencimento,
+--       crd111.VENCTO Vencimento_Recebivel,
+--       bxd111.VALOR Valor_Pago,
+--       bxd111.BAIXA Data_Baixa,
+--       crd013.NOME Especie_Pagamento,
+--       crd013.CODIGO Tipo_Especie,
+--       crd111.OBS Observacao,
+--       bxd111.OBS Pagamento_Observacoes
+--  FROM CRD111 crd111
+--       LEFT JOIN CRD013 crd013 ON crd013.CODIGO = crd111.TIPO_DOC
+--       LEFT JOIN BXD111 bxd111 ON bxd111.DUPLICATA = crd111.DUPLICATA
+--                               AND bxd111.CGC_CPF = crd111.CGC_CPF
+--                               AND bxd111.DOCUMENTO = crd111.DOCUMENTO
+--       LEFT JOIN EMD101 emd101 ON emd101.CGC_CPF = crd111.CGC_CPF
+
 SELECT crd111.DUPLICATA Documento,
        crd111.TIPO_DOC Tipo_Documento,
        crd111.DOCUMENTO Numero_Controle,
@@ -9,19 +33,20 @@ SELECT crd111.DUPLICATA Documento,
        crd111.VALOR Valor_Original,
        crd111.VENCTO Data_Vencimento,
        crd111.VENCTO Vencimento_Recebivel,
-       bxd111.VALOR Valor_Pago,
-       bxd111.BAIXA Data_Baixa,
+       CASE WHEN cxd555.VALOR IS NOT NULL THEN cxd555.VALOR ELSE bxd111.VALOR END AS Valor_Pago,
+       CASE WHEN cxd555.DATA IS NOT NULL THEN cxd555.DATA ELSE bxd111.BAIXA END AS Data_Baixa,
        crd013.NOME Especie_Pagamento,
        crd013.CODIGO Tipo_Especie,
        crd111.OBS Observacao,
-       bxd111.OBS Pagamento_Observacoes
+       CASE WHEN cxd555.HISTORICO IS NOT NULL THEN cxd555.HISTORICO ELSE bxd111.OBS END AS Pagamento_Observacoes
   FROM CRD111 crd111
        LEFT JOIN CRD013 crd013 ON crd013.CODIGO = crd111.TIPO_DOC
        LEFT JOIN BXD111 bxd111 ON bxd111.DUPLICATA = crd111.DUPLICATA
                                AND bxd111.CGC_CPF = crd111.CGC_CPF
                                AND bxd111.DOCUMENTO = crd111.DOCUMENTO
        LEFT JOIN EMD101 emd101 ON emd101.CGC_CPF = crd111.CGC_CPF
-UNION
+       LEFT JOIN CXD555 cxd555 ON cxd555.HISTORICO = 'REC - ' || crd111.DOCUMENTO || ' - ' || emd101.NOME
+UNION ALL
 SELECT man111.DOCUMENTO Documento,
        man111.TIPO_PAGTO Tipo_Documento,
        man111.LANCTO Numero_Controle,
@@ -44,3 +69,75 @@ SELECT man111.DOCUMENTO Documento,
        LEFT JOIN CRD013 crd013 ON crd013.CODIGO = cxd555.TIPO
        LEFT JOIN EMD101 emd101 ON emd101.CGC_CPF = man111.CNPJ_CPF
  WHERE cxd555.HISTORICO NOT LIKE '%ENVELOPE%'
+
+ --UNION ALL
+ --SELECT crd111.DOCUMENTO Documento,
+ --      cxd555.TIPO Tipo_Documento,
+ --      crd111.DUPLICATA Numero_Controle,
+ --      cxd555.LOTE Parcela,
+ --      emd101.NOME Nome_Paciente,
+ --      emd101.CGC_CPF CNPJ_CPF,
+ --      cxd555.VALOR Valor_Total,
+ --      cxd555.VALOR Valor_Devido,
+ --      cxd555.VALOR Valor_Original,
+ --      cxd555.DATA Data_Vencimento,
+ --      cxd555.DATA Vencimento_Recebivel,
+ --      cxd555.VALOR Valor_Pago,
+ --      cxd555.DATA Data_Baixa,
+ --      crd013.NOME Especie_Pagamento,
+ --      crd013.CODIGO Tipo_Especie,
+ --      cxd555.OBS1 Observacao,
+ --      cxd555.HISTORICO Pagamento_Observacoes
+ --FROM CRD111 crd111 
+ --      JOIN EMD101 emd101 ON emd101.CGC_CPF = crd111.CGC_CPF
+ --      JOIN CXD555 cxd555 ON cxd555.HISTORICO = 'REC - ' || crd111.DOCUMENTO || ' - ' || emd101.NOME
+ --      JOIN CRD013 crd013 ON crd013.CODIGO = cxd555.TIPO
+ --WHERE cxd555.HISTORICO LIKE 'REC - %'
+
+ --SELECT cxd555.DOCUMENTO Documento,
+ --      cxd555.TIPO Tipo_Documento,
+ --      cxd555.DOCUMENTO Numero_Controle,
+ --      cxd555.LOTE Parcela,
+ --      --(SELECT NOME FROM EMD101 WHERE CGC_CPF = atd222.CNPJ_CPF) AS Nome_Paciente,
+ --      --emd101.NOME Nome_Paciente,
+ --      cxd555.HISTORICO Nome_Paciente,
+ --      cxd555.CNPJ_CPF CNPJ_CPF,
+ --      cxd555.VALOR Valor_Total,
+ --      cxd555.VALOR Valor_Devido,
+ --      cxd555.VALOR Valor_Original,
+ --      cxd555.DATA Data_Vencimento,
+ --      cxd555.DATA Vencimento_Recebivel,
+ --      cxd555.VALOR Valor_Pago,
+ --      cxd555.DATA Data_Baixa,
+ --      crd013.NOME Especie_Pagamento,
+ --      crd013.CODIGO Tipo_Especie,
+ --      cxd555.OBS1 Observacao,
+ --      cxd555.HISTORICO Pagamento_Observacoes
+ --FROM CXD555 cxd555 
+ --      --JOIN EMD101 emd101 ON emd101.CGC_CPF = atd222.CNPJ_CPF
+ --      --JOIN ATD222 atd222 ON cxd555.HISTORICO = 'REC - ' || atd222.DOCUMENTO-- || ' - ' || emd101.NOME
+ --      JOIN CRD013 crd013 ON crd013.CODIGO = cxd555.TIPO
+ --WHERE cxd555.HISTORICO LIKE 'REC - %'
+
+
+ --SELECT cxd555.DOCUMENTO Documento,
+ --      cxd555.TIPO Tipo_Documento,
+ --      cxd555.DOCUMENTO Numero_Controle,
+ --      cxd555.LOTE Parcela,
+ --      emd101.NOME Nome_Paciente,
+ --      cxd555.CNPJ_CPF CNPJ_CPF,
+ --      cxd555.VALOR Valor_Total,
+ --      cxd555.VALOR Valor_Devido,
+ --      cxd555.VALOR Valor_Original,
+ --      cxd555.DATA Data_Vencimento,
+ --      cxd555.DATA Vencimento_Recebivel,
+ --      cxd555.VALOR Valor_Pago,
+ --      cxd555.DATA Data_Baixa,
+ --      crd013.NOME Especie_Pagamento,
+ --      crd013.CODIGO Tipo_Especie,
+ --      cxd555.OBS1 Observacao,
+ --      cxd555.HISTORICO Pagamento_Observacoes
+ --FROM ATD222 atd222 
+ --      JOIN EMD101 emd101 ON emd101.CGC_CPF = atd222.CNPJ_CPF
+ --      JOIN CXD555 cxd555 ON cxd555.HISTORICO = 'REC - ' || atd222.DOCUMENTO || ' - ' || emd101.NOME
+ --      JOIN CRD013 crd013 ON crd013.CODIGO = cxd555.TIPO

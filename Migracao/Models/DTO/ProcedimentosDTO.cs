@@ -37,6 +37,10 @@ namespace Migracao.Models.DTO
         [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
         public string? Procedimento_Valor { get; set; }
 
+        [DisplayName("Valor Total")]
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
+        public string? Valor_Total { get; set; }
+
         [DisplayName("Data Início")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public string? Data_Inicio { get; set; }

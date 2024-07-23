@@ -2,6 +2,7 @@
 using Migracao.Models;
 using Migracao.Models.DentalOffice;
 using Migracao.Models.DTO;
+using Migracao.Models.OdontoCompany;
 
 namespace Migracao.Utils
 {
@@ -359,11 +360,13 @@ namespace Migracao.Utils
 
             try
             {
-                foreach (var receber in recebidos)
+                Parallel.ForEach(recebidos, receber =>
+                //foreach (var receber in recebidos)
                 {
                     decimal? valorPago = receber.Valor_Pago;
                     var especiePagamento = receber.Especie_Pagamento;
-                    string formaPagamento = ExcelHelper.GetEspecieIDFromFormaPagamentoEntidades(especiePagamento, valorPago);
+                    var formaPagamento = ExcelHelper.GetEspecieIDFromFormaPagamentoEntidades(especiePagamento, valorPago);
+                    //var recebimentoProcedimentos = !string.IsNullOrEmpty(receber.Pagamento_Observacoes) && receber.Pagamento_Observacoes.StartsWith("REC - ");
 
                     var lstReceber = new PagosExigiveisDTO
                     {
@@ -376,8 +379,7 @@ namespace Migracao.Utils
                         Valor_Pago = receber.Valor_Pago.ToString(),
                         Data_Vencimento = receber.Data_Vencimento.ToString(),
                         Data_Pagamento = receber.Data_Baixa.ToString(),
-                        Observacao_Recebido = ("Observação: " + receber.Observacao + " | Documento: " + receber.Tipo_Documento + " | Situação: " + receber.Situacao +
-                        " | Nome do Grupo: " + receber.Nome_Grupo + " | Ordem: " + receber.Ordem),
+                        Observacao_Recebido = receber.Observacao,
                         Tipo_Pagamento = formaPagamento,
                         Valor_Original = receber.Valor_Original.ToString(),
                         //Vencimento_Recebivel = receber.Vencimento_Recebivel.ToShortDateString(),
@@ -389,7 +391,7 @@ namespace Migracao.Utils
                     };
 
                     lstReceberDTO.Add(lstReceber);
-                };
+                });
             }
             catch (Exception error)
             {
@@ -409,8 +411,8 @@ namespace Migracao.Utils
 
             try
             {
-
-                foreach (var procedimento in procedimentos)
+                Parallel.ForEach(procedimentos, procedimento =>
+                //foreach (var procedimento in procedimentos)
                 {
                     var lstProcedimento = new ProcedimentosDTO
                     {
@@ -423,12 +425,13 @@ namespace Migracao.Utils
                         Procedimento_Valor = procedimento.Valor.ToString(),
                         Procedimento_Observacao = procedimento.Observacao,
                         Data_Inicio = procedimento.Data_Inicio.ToString(),
+                        Valor_Total = procedimento.Valor.ToString(),
                         //Data_Termino = procedimento.Data_Termino,
                         Data_Atendimento = procedimento.Data_Atendimento.ToString()
                     };
 
                     lstProcedimentosDTO.Add(lstProcedimento);
-                }
+                });
             }
             catch (Exception error)
             {

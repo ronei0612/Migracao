@@ -9,6 +9,7 @@
         public string? Dente { get; set; }
         public string? Nome_Procedimento { get; set; }
         public decimal? Valor { get; set; }
+        public decimal? Valor_Total { get; set; }
         public string? Observacao { get; set; }
         public DateTime? Data_Inicio { get; set; }
         public DateTime? Data_Atendimento { get; set; }

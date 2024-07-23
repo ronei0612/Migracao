@@ -425,7 +425,7 @@ namespace Migracao.Utils
                         Procedimento_Valor = procedimento.Valor.ToString(),
                         Procedimento_Observacao = procedimento.Observacao,
                         Data_Inicio = procedimento.Data_Inicio.ToString(),
-                        Valor_Total = procedimento.Valor.ToString(),
+                        Valor_Total = procedimento.Valor_Total.ToString(),
                         //Data_Termino = procedimento.Data_Termino,
                         Data_Atendimento = procedimento.Data_Atendimento.ToString()
                     };

@@ -110,29 +110,39 @@ namespace Migracao.Utils
             var lstDesenvolvimentoClinicoDTO = new List<DesenvolvimentoClinicoDTO>();
             var linha = 1;
 
+            var agendamentosAgrupados = agendamentos
+                .GroupBy(a => a.Lancamento)
+                .Select(g => new
+                {
+                    Lancamento = g.Key, // Pega a chave do grupo (Lançamento)
+                    QuantidadeLinhas = g.Count(), // Conta a quantidade de linhas no grupo
+                    Agendamentos = g.Select(a => new
+                    {
+                        a.Paciente_CPF,
+                        a.Nome,
+                        a.Data,
+                        a.Hora,
+                        a.Codigo_Responsavel,
+                        a.Nome_Dentista,
+                        a.Telefone,
+                        a.Data_Inclusao,
+                        a.Observacao
+                    })
+                })
+                .ToList();
             try
             {
-                foreach (var agendamento in agendamentos)
-                //Parallel.ForEach(agendamentos, agendamento =>
+                //foreach (var agendamento1 in agendamentosAgrupadosa)
+                Parallel.ForEach(agendamentosAgrupados, agendamentosAgrupado =>
                 {
-                    var minutos = agendamento.Hora.Split(':')[1];
-                    var horas = agendamento.Hora.Split(':')[0];
-                    var dataInicio = agendamento.Data;
+                    var agendamento = agendamentosAgrupado.Agendamentos.First();
 
-                    if (!string.IsNullOrEmpty(horas))
-                        dataInicio = dataInicio.AddHours(double.Parse(horas));
-                    if (!string.IsNullOrEmpty(minutos))
-                        dataInicio = dataInicio.AddMinutes(double.Parse(minutos));
+                    TimeSpan horaTimeSpan = TimeSpan.Parse(agendamento.Hora);
+                    DateTime dataInicio = agendamento.Data.Add(horaTimeSpan);
 
-                    var dataTermino = dataInicio;
+                    var minutosParaAdicionar = agendamentosAgrupado.QuantidadeLinhas > 1 ? 15 * agendamentosAgrupado.QuantidadeLinhas : 15;
 
-                    var numLancamentos = agendamentos
-                                        .Where(m => m.Lancamento == agendamento.Lancamento)
-                                        .Count();
-
-                    var minutosParaAdicionar = numLancamentos > 0 ? 15 * numLancamentos : 15;
-
-                    dataTermino = dataTermino.AddMinutes(minutosParaAdicionar);
+                    var dataTermino = dataInicio.AddMinutes(minutosParaAdicionar);
 
                     var desenvolvimentoClinico = new DesenvolvimentoClinicoDTO
                     {
@@ -148,11 +158,9 @@ namespace Migracao.Utils
                     };
 
                     lock (lstDesenvolvimentoClinicoDTO)
-                    {
                         lstDesenvolvimentoClinicoDTO.Add(desenvolvimentoClinico);
+                });
                     }
-                }//);
-            }
             catch (Exception error)
             {
                 throw new Exception($"Erro ao converter Desenvolvimento Clinico (Linha {linha}): {error.Message}");

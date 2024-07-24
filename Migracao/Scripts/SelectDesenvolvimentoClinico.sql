@@ -14,7 +14,7 @@
 
 SELECT
 man111.CNPJ_CPF Paciente_CPF,
-emd101.NOME Nome_Paciente,
+emd101.NOME Paciente_Nome,
 man111.NOME_RESP_ATEND Dentista_Nome,
 man101.OBS_ATEND Observacao,
 man111.DATA_ATEND Data_Atendimento
@@ -25,7 +25,7 @@ WHERE man101.TIPO_ATEND IS NULL AND man111.NOME_TIPO IS NULL
 UNION 
 SELECT
 anotacao_clinica.CNPJ_CPF Paciente_CPF,
-emd101.NOME Nome_Paciente,
+emd101.NOME Paciente_Nome,
 anotacao_clinica.NOME_RESP Dentista_Nome,
 anotacao_clinica.ANOTACAO Observacao,
 anotacao_clinica."DATA" Data_Atendimento

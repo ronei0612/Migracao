@@ -160,7 +160,7 @@ namespace Migracao.Utils
                     lock (lstDesenvolvimentoClinicoDTO)
                         lstDesenvolvimentoClinicoDTO.Add(desenvolvimentoClinico);
                 });
-                    }
+            }
             catch (Exception error)
             {
                 throw new Exception($"Erro ao converter Desenvolvimento Clinico (Linha {linha}): {error.Message}");
@@ -368,8 +368,8 @@ namespace Migracao.Utils
 
             try
             {
-                //Parallel.ForEach(recebidos, receber =>
-                foreach (var receber in recebidos)
+                Parallel.ForEach(recebidos, receber =>
+                //foreach (var receber in recebidos)
                 {
                     decimal? valorPago = receber.Valor_Pago;
                     var especiePagamento = receber.Especie_Pagamento;
@@ -398,8 +398,9 @@ namespace Migracao.Utils
                         Pagamento_Observacoes = receber.Pagamento_Observacoes
                     };
 
-                    lstReceberDTO.Add(lstReceber);
-                }//);
+                    lock (lstReceberDTO)
+                        lstReceberDTO.Add(lstReceber);
+                });
             }
             catch (Exception error)
             {
@@ -419,8 +420,8 @@ namespace Migracao.Utils
 
             try
             {
-                //Parallel.ForEach(procedimentos, procedimento =>
-                foreach (var procedimento in procedimentos)
+                Parallel.ForEach(procedimentos, procedimento =>
+                //foreach (var procedimento in procedimentos)
                 {
                     if (procedimento.Paciente_CPF == "864.093.286-72")
                         procedimento.Paciente_CPF = procedimento.Paciente_CPF;
@@ -441,8 +442,9 @@ namespace Migracao.Utils
                         Data_Atendimento = procedimento.Data_Atendimento.ToString()
                     };
 
-                    lstProcedimentosDTO.Add(lstProcedimento);
-                }//);
+                    lock (lstProcedimentosDTO)
+                        lstProcedimentosDTO.Add(lstProcedimento);
+                });
             }
             catch (Exception error)
             {

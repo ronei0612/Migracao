@@ -22,7 +22,7 @@ namespace Migracao.Utils
             }
 
             // Usando Parallel.ForEach para processar a lista de pessoas e preencher o DataTable
-            Parallel.ForEach(pacientesDTO, new ParallelOptions { MaxDegreeOfParallelism = 4 }, paciente =>
+            Parallel.ForEach(pacientesDTO, new ParallelOptions { MaxDegreeOfParallelism = 8 }, paciente =>
             {
                 try
                 {

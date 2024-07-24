@@ -121,6 +121,8 @@ namespace Migracao.Utils
 
         public static string GetPrimeirosCaracteres(this string texto, int max)
         {
+            if (string.IsNullOrEmpty(texto)) return texto;
+
             return texto.Substring(0, Math.Min(max, texto.Length));
         }
 

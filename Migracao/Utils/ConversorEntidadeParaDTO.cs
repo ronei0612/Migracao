@@ -112,19 +112,19 @@ namespace Migracao.Utils
 
             try
             {
-                //foreach (var agendamento1 in agendamentosAgrupadosa)
-                Parallel.ForEach(desenvClicnicos, desenvClicnico =>
+                //foreach (var desenvClicnico in desenvClicnicos)
+                Parallel.ForEach(desenvClicnicos, desenvClinico =>
                 {
-                    var dataTermino = ((DateTime)desenvClicnico.Data_Atendimento).AddMinutes(30);
+                    var dataTermino = ((DateTime)desenvClinico.Data_Atendimento).AddMinutes(30);
                     var desenvolvimentoClinico = new DesenvolvimentoClinicoDTO
                     {
-                        CPF = desenvClicnico.Paciente_CPF.ToCPF(),
-                        Nome_Completo = desenvClicnico.Paciente_Nome.ToNome(),
-                        Dentista = desenvClicnico.Dentista_Nome.ToNome(),
-                        Desenvolvimento_Clinico = desenvClicnico.Procedimento_Observacao,
-                        Data_Hora_Inicio = desenvClicnico.Data_Atendimento.ToString(),
+                        CPF = desenvClinico.Paciente_CPF.ToCPF(),
+                        Nome_Completo = desenvClinico.Paciente_Nome.ToNome(),
+                        Dentista = desenvClinico.Dentista_Nome.ToNome(),
+                        Desenvolvimento_Clinico = desenvClinico.Procedimento_Observacao,
+                        Data_Hora_Inicio = desenvClinico.Data_Atendimento.ToString(),
                         Data_Hora_Termino = dataTermino.ToString(),
-                        Data_Hora_Atendimento_Inicio = desenvClicnico.Data_Atendimento.ToString(),
+                        Data_Hora_Atendimento_Inicio = desenvClinico.Data_Atendimento.ToString(),
                         Data_Hora_Atendimento_Termino = dataTermino.ToString()
                     };
 

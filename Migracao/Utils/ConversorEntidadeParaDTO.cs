@@ -110,6 +110,35 @@ namespace Migracao.Utils
             var lstDesenvolvimentoClinicoDTO = new List<DesenvolvimentoClinicoDTO>();
             var linha = 1;
 
+            try
+            {
+                //foreach (var agendamento1 in agendamentosAgrupadosa)
+                Parallel.ForEach(desenvClicnicos, desenvClicnico =>
+                {
+                    var dataTermino = ((DateTime)desenvClicnico.Data_Atendimento).AddMinutes(30);
+                    var desenvolvimentoClinico = new DesenvolvimentoClinicoDTO
+                    {
+                        CPF = desenvClicnico.Paciente_CPF.ToCPF(),
+                        Nome_Completo = desenvClicnico.Paciente_Nome.ToNome(),
+                        Dentista = desenvClicnico.Dentista_Nome.ToNome(),
+                        Desenvolvimento_Clinico = desenvClicnico.Procedimento_Observacao,
+                        Data_Hora_Inicio = desenvClicnico.Data_Atendimento.ToString(),
+                        Data_Hora_Termino = dataTermino.ToString(),
+                        Data_Hora_Atendimento_Inicio = desenvClicnico.Data_Atendimento.ToString(),
+                        Data_Hora_Atendimento_Termino = dataTermino.ToString()
+                    };
+
+                    lock (lstDesenvolvimentoClinicoDTO)
+                        lstDesenvolvimentoClinicoDTO.Add(desenvolvimentoClinico);
+                });
+            }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro ao converter Desenvolvimento Clinico (Linha {linha}): {error.Message}");
+            }
+
+            linha = 1;
+
             var agendamentosAgrupados = agendamentos
                 .GroupBy(a => a.Lancamento)
                 .Select(g => new
@@ -163,7 +192,7 @@ namespace Migracao.Utils
             }
             catch (Exception error)
             {
-                throw new Exception($"Erro ao converter Desenvolvimento Clinico (Linha {linha}): {error.Message}");
+                throw new Exception($"Erro ao converter Agendamento (Linha {linha}): {error.Message}");
             }
 
             return lstDesenvolvimentoClinicoDTO;

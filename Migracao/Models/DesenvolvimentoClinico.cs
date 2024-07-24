@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Migracao.Models
+﻿namespace Migracao.Models
 {
     public class DesenvolvimentoClinico
     {
@@ -18,6 +10,8 @@ namespace Migracao.Models
         public string? Dentista_Nome { get; set; } // Nome do Dentista
         public string? Procedimento_Nome { get; set; } // Nome do Procedimento
         public DateTime? Data_Inicio { get; set; } // Data de Início (obrigatória)
+        public DateTime? Data_Atendimento { get; set; }
         public string? Procedimento_Observacao { get; set; } // Observação do Procedimento
+        public string? Observacao { get; set; }
     }
 }

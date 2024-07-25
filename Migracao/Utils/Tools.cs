@@ -142,7 +142,7 @@ namespace Migracao.Utils
                 return null;
             //throw new Exception("Erro na conversão de data: " + texto);
             if ((data >= dataMinima && data <= dataMaxima) == false)
-                data = dataHoje;
+                return null;
 
             return data;
         }

@@ -126,10 +126,10 @@ namespace Migracao
                 {
                     // Principais
                     case "TUDO":
-                        instance.DataBaseImportacaoDevClinico();
-                        instance.DataBaseImportacaoManutencoes();
                         instance.DataBaseImportacaoPacientesDentistas();
                         instance.DataBaseImportacaoProcedimentosPrecos();
+                        instance.DataBaseImportacaoDevClinico();
+                        instance.DataBaseImportacaoManutencoes();                        
                         instance.DataBaseImportacaoPagosExigiveis();
                         //instance.DataBaseImportacaoProcedimentos();
                         //instance.DataBaseImportacaoFinanceiroRecebiveis();

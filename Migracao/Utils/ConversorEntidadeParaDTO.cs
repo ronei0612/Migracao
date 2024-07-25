@@ -311,7 +311,8 @@ namespace Migracao.Utils
 
             try
             {
-                foreach (var manutencao in manutencoes)
+                Parallel.ForEach(manutencoes, new ParallelOptions { MaxDegreeOfParallelism = 8 }, manutencao =>
+                //foreach (var manutencao in manutencoes)
                 {
                     if (!string.IsNullOrEmpty(manutencao.Procedimento_Nome) && !string.IsNullOrEmpty(manutencao.Numero_Controle))
                     {
@@ -332,10 +333,10 @@ namespace Migracao.Utils
                             Data_Atendimento = manutencao.Data_Atendimento.ToString(),
                             Data_Inicio = manutencao.Data_Hora_Inicio.ToString()
                         };
-
-                        lstManutencoesDTO.Add(lstManutencao);
+                        lock (lstManutencoesDTO)
+                            lstManutencoesDTO.Add(lstManutencao);
                     }
-                };
+                });
             }
             catch (Exception error)
             {

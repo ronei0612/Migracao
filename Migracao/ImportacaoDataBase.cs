@@ -129,48 +129,28 @@ namespace Migracao
                         instance.DataBaseImportacaoPacientesDentistas();
                         instance.DataBaseImportacaoProcedimentosPrecos();
                         instance.DataBaseImportacaoDevClinico();
-                        instance.DataBaseImportacaoManutencoes();                        
+                        instance.DataBaseImportacaoProcedimentos();
+                        instance.DataBaseImportacaoManutencoes();
                         instance.DataBaseImportacaoPagosExigiveis();
-                        //instance.DataBaseImportacaoProcedimentos();
-                        //instance.DataBaseImportacaoFinanceiroRecebiveis();
-                        //instance.DataBaseImportacaoAgendamentos();
-                        //instance.DataBaseImportacaoDentistas();
-                        //instance.DataBaseImportacaoRecebiveisHistVenda();
                         break;
                     case "Agendamentos/DesenvClínico":
                         instance.DataBaseImportacaoDevClinico();
                         break;
-                    case "Procedimentos/Manutenções":
+                    case "Manutenções":
                         instance.DataBaseImportacaoManutencoes();
                         break;
-                    case "Prontuários Pacientes":
+                    case "Procedimentos":
+                        instance.DataBaseImportacaoProcedimentos();
+                        break;
+                    case "Prontuários":
                         instance.DataBaseImportacaoPacientesDentistas();
                         break;
-                    case "Procedimentos Tabela Preços":
+                    case "Tabela Preços":
                         instance.DataBaseImportacaoProcedimentosPrecos();
                         break;
-                    case "Recebíveis/Pagos/Exigíveis":
+                    case "Financeiro":
                         instance.DataBaseImportacaoPagosExigiveis();
-                        break;
-                    //case "Procedimentos":
-                    //    instance.DataBaseImportacaoProcedimentos();
-                    //    break;
-
-                        // Complementares
-
-
-                        //case "Financeiro (Recebíveis)":
-                        //instance.DataBaseImportacaoFinanceiroRecebiveis();
-                        //    break;
-                        //case "Agendamentos":
-                        //    instance.DataBaseImportacaoAgendamentos();
-                        //    break;
-                        //case "Dentistas":
-                        //    instance.DataBaseImportacaoDentistas();
-                        //    break;
-                        //case "Recebíveis Histórico Vendas":
-                        //    instance.DataBaseImportacaoRecebiveisHistVenda();
-                        //    break;                    
+                        break;                
                 }
             }
             else

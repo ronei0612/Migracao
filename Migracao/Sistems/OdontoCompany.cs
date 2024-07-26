@@ -112,8 +112,6 @@ namespace Migracao.Sistems
         {
             var excelHelper = new ExcelHelper();
 
-            var dataTableProcedimentosManutencaoMerge = new DataTable();
-
             var arquivoSql = "Scripts\\SelectManutencoes.sql";
             var manutencoesClinico = new FireBirdContext<Manutencoes>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
             var manutencoesContratos = new FireBirdContext<Manutencoes>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoSql);
@@ -127,21 +125,6 @@ namespace Migracao.Sistems
             {
                 var salvarManutencoes = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_Manutenções");
                 excelHelper.CriarExcelArquivoV2(salvarManutencoes + ".xlsx", dataTableManutencoes);
-            }
-
-            var arquivoProcedimentosSql = "Scripts\\SelectProcedimentos.sql";
-            var procedimentosClicico = new FireBirdContext<Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoProcedimentosSql);
-            var procedimentosContratos = new FireBirdContext<Procedimentos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoProcedimentosSql);
-            var procedimentos = procedimentosClicico.Union(procedimentosContratos).ToList();
-
-            var lstProcedimentos = ConversorEntidadeParaDTO.ConvertProcedimentosDTO(procedimentos);
-
-            var dataTableProcedimentos = ExcelHelper.ConversorEntidadeParaDataTable(lstProcedimentos);
-
-            if (dataTableProcedimentosManutencaoMerge != null)
-            {
-                var salvarProcedimentos = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_Procedimentos");
-                excelHelper.CriarExcelArquivoV2(salvarProcedimentos + ".xlsx", dataTableProcedimentos);
             }
         }
 
@@ -190,7 +173,7 @@ namespace Migracao.Sistems
 
             var recebiveis = new FireBirdContext<Recebivel>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
 
-            var lstRecebiveis = ConversorEntidadeParaDTO.ConvertRecebiveisParaRecebiveisDTO(recebiveis);
+            var lstRecebiveis = ConversorEntidadeParaDTO.ConvertRecebiveisDTO(recebiveis);
 
             var dataTableRecebiveis = ExcelHelper.ConversorEntidadeParaDataTable(lstRecebiveis);
 
@@ -266,9 +249,10 @@ namespace Migracao.Sistems
         {
             var excelHelper = new ExcelHelper();
 
-            var arquivoSql = "Scripts\\SelectProdedimentos.sql";
-
-            var procedimentos = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+            var arquivoProcedimentosSql = "Scripts\\SelectProcedimentos.sql";
+            var procedimentosClicico = new FireBirdContext<Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoProcedimentosSql);
+            var procedimentosContratos = new FireBirdContext<Procedimentos>(_pathDBContratos).RetornaItensBancoPorQuery(arquivoProcedimentosSql);
+            var procedimentos = procedimentosClicico.Union(procedimentosContratos).ToList();
 
             var lstProcedimentos = ConversorEntidadeParaDTO.ConvertProcedimentosDTO(procedimentos);
 
@@ -279,6 +263,21 @@ namespace Migracao.Sistems
                 var salvarProcedimentos = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_Procedimentos");
                 excelHelper.CriarExcelArquivoV2(salvarProcedimentos + ".xlsx", dataTableProcedimentos);
             }
+            //var excelHelper = new ExcelHelper();
+
+            //var arquivoSql = "Scripts\\SelectProdedimentos.sql";
+
+            //var procedimentos = new FireBirdContext<Models.Procedimentos>(_pathDB).RetornaItensBancoPorQuery(arquivoSql);
+
+            //var lstProcedimentos = ConversorEntidadeParaDTO.ConvertProcedimentosDTO(procedimentos);
+
+            //var dataTableProcedimentos = ExcelHelper.ConversorEntidadeParaDataTable(lstProcedimentos);
+
+            //if (dataTableProcedimentos != null)
+            //{
+            //    var salvarProcedimentos = Tools.GerarNomeArquivo($"{Tools.ultimoEstabelecimentoID}_OdontoCompany_Cadastro_Procedimentos");
+            //    excelHelper.CriarExcelArquivoV2(salvarProcedimentos + ".xlsx", dataTableProcedimentos);
+            //}
         }
     }
 }

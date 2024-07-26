@@ -15,7 +15,8 @@ namespace Migracao.Utils
 
             try
             {
-                foreach (var paciente in pacientes)
+                Parallel.ForEach(pacientes, paciente =>
+                //foreach (var paciente in pacientes)
                 {
                     var lstPacientes = new PacientesDentistasDTO
                     {
@@ -37,15 +38,16 @@ namespace Migracao.Utils
                         Cidade = paciente.Cidade.ToCidade(),
                         UF = paciente.UF?.ToUpper() ?? "",
                         CEP = paciente.CEP,
-                        //Codigo_Conselho_Estado = string.Empty,
                         Estado_Civil = string.Empty,
                         Cidade_Nascimento = string.Empty,
                         Profissao = string.Empty
                     };
 
-                    pacientesDTO.Add(lstPacientes);
+                    lock (pacientesDTO)
+                        pacientesDTO.Add(lstPacientes);
+
                     linha++;
-                };
+                });
             }
             catch (Exception error)
             {
@@ -213,7 +215,7 @@ namespace Migracao.Utils
             }
             catch (Exception error)
             {
-                throw new Exception($"Erro ao converter Procedimentos Tabela Preços: {error.Message}");
+                throw new Exception($"Erro ao converter Tabela Preços: {error.Message}");
             }
 
             return lstProcedimentosPrecosDTO;
@@ -225,7 +227,8 @@ namespace Migracao.Utils
 
             try
             {
-                Parallel.ForEach(manutencoes, new ParallelOptions { MaxDegreeOfParallelism = 8 }, manutencao =>
+                //Parallel.ForEach(manutencoes, new ParallelOptions { MaxDegreeOfParallelism = 8 }, manutencao =>
+                Parallel.ForEach(manutencoes, manutencao =>
                 //foreach (var manutencao in manutencoes)
                 {
                     if (!string.IsNullOrEmpty(manutencao.Procedimento_Nome) && !string.IsNullOrEmpty(manutencao.Numero_Controle))
@@ -247,6 +250,7 @@ namespace Migracao.Utils
                             Data_Atendimento = manutencao.Data_Atendimento.ToString(),
                             Data_Inicio = manutencao.Data_Hora_Inicio.ToString()
                         };
+
                         lock (lstManutencoesDTO)
                             lstManutencoesDTO.Add(lstManutencao);
                     }
@@ -265,9 +269,9 @@ namespace Migracao.Utils
 
         #region Financeiro
 
-        public static List<FinanceiroRecebiveisDTO> ConvertRecebiveisParaRecebiveisDTO(List<Recebivel> recebiveis)
+        public static List<FinanceiroRecebiveisDTO> ConvertRecebiveisDTO(List<Recebivel> recebiveis)
         {
-            List<FinanceiroRecebiveisDTO> lstRecebiveisDTO = new List<FinanceiroRecebiveisDTO>();
+            var lstRecebiveisDTO = new List<FinanceiroRecebiveisDTO>();
 
             try
             {

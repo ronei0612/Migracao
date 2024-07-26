@@ -84,6 +84,14 @@ namespace Migracao.Utils
                 return texto.ToNome().GetPrimeirosCaracteres(20);
         }
 
+        public static string? ToApelido(this string texto)
+        {
+            if (string.IsNullOrEmpty(texto))
+                return "";
+            
+            return texto.GetLetras().Split(' ')[0].GetPrimeirosCaracteres(20).ToNome();
+        }
+
         public static string ToSN(this bool texto)
         {
             if (texto)

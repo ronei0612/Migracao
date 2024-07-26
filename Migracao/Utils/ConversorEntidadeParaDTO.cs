@@ -1,8 +1,6 @@
 ﻿using Migracao.DTO;
 using Migracao.Models;
-using Migracao.Models.DentalOffice;
 using Migracao.Models.DTO;
-using Migracao.Models.OdontoCompany;
 
 namespace Migracao.Utils
 {
@@ -10,9 +8,9 @@ namespace Migracao.Utils
     {
         #region Conversores no modelo de importação
 
-        public static List<PacientesDentistasDTO> ConvertPacientesDentistasParaPacientesDentistasDTO(List<Models.Pacientes> pacientes, List<Models.Dentistas>? dentistas = null)
+        public static List<PacientesDentistasDTO> ConvertPacientesDTO(List<Pacientes> pacientes)
         {
-            var pacientesDentistasDTO = new List<PacientesDentistasDTO>();
+            var pacientesDTO = new List<PacientesDentistasDTO>();
             var linha = 1;
 
             try
@@ -45,7 +43,7 @@ namespace Migracao.Utils
                         Profissao = string.Empty
                     };
 
-                    pacientesDentistasDTO.Add(lstPacientes);
+                    pacientesDTO.Add(lstPacientes);
                     linha++;
                 };
             }
@@ -54,10 +52,10 @@ namespace Migracao.Utils
                 throw new Exception($"Erro ao converter Excel para Pessoas Pacientes (Linha {linha}): {error.Message}");
             }
 
-            return pacientesDentistasDTO;
+            return pacientesDTO;
         }
 
-        public static List<AgendamentosDTO> ConvertAgendamentodsParaAgendamentosDTO(List<Agendamentos> agendamentos)
+        public static List<AgendamentosDTO> ConvertAgendamentosDTO(List<Agendamentos> agendamentos)
         {
             var lstAgendamentosDTO = new List<AgendamentosDTO>();
 
@@ -75,11 +73,6 @@ namespace Migracao.Utils
                         dataInicio = dataInicio.AddMinutes(double.Parse(minutos));
 
                     var dataTermino = dataInicio;
-                    //var idsEncontrados = agendamentos.Where(agenda => agenda.Equals(agendamento.ID)).Count();
-                    //if (idsEncontrados > 0)
-                    //    dataTermino = dataTermino.AddMinutes(15 * idsEncontrados);
-                    //else
-                    //    dataTermino = dataTermino.AddMinutes(15);
 
                     var lstAgendamento = new AgendamentosDTO
                     {
@@ -105,7 +98,7 @@ namespace Migracao.Utils
             return lstAgendamentosDTO;
         }
 
-        public static List<DesenvolvimentoClinicoDTO> ConvertDesenvolvimentoClinicoParaDesenvolvimentoClinicoDTO(List<DesenvolvimentoClinico> desenvClicnicos, List<Agendamentos> agendamentos)
+        public static List<DesenvolvimentoClinicoDTO> ConvertDesenvolvimentoClinicoDTO(List<DesenvolvimentoClinico> desenvClicnicos, List<Agendamentos> agendamentos)
         {
             var lstDesenvolvimentoClinicoDTO = new List<DesenvolvimentoClinicoDTO>();
             var linha = 1;
@@ -198,15 +191,15 @@ namespace Migracao.Utils
             return lstDesenvolvimentoClinicoDTO;
         }
 
-        public static List<ProcedimentosPrecosDTO> ConvertProcedimentosPrecosParaProcedimentosPrecosDTO(List<ProcedimentosPrecos> gruposProcedimentos)
+        public static List<ProcedimentosPrecosDTO> ConvertProcedimentosPrecosDTO(List<ProcedimentosPrecos> gruposProcedimentos)
         {
-            List<ProcedimentosPrecosDTO> lstGruposProcedimentosDTO = new List<ProcedimentosPrecosDTO>();
+            var lstProcedimentosPrecosDTO = new List<ProcedimentosPrecosDTO>();
 
             try
             {
                 foreach (var grupoProcedimento in gruposProcedimentos)
                 {
-                    var lstGruposProcedimentos = new ProcedimentosPrecosDTO
+                    var procedimentosPrecosDTO = new ProcedimentosPrecosDTO
                     {
                         Especialidade = grupoProcedimento.Nome_Grupo,
                         NomeProcedimento = grupoProcedimento.Procedimento_Nome,
@@ -215,7 +208,7 @@ namespace Migracao.Utils
                         TUSS = grupoProcedimento.TUSS
                     };
 
-                    lstGruposProcedimentosDTO.Add(lstGruposProcedimentos);
+                    lstProcedimentosPrecosDTO.Add(procedimentosPrecosDTO);
                 };
             }
             catch (Exception error)
@@ -223,10 +216,10 @@ namespace Migracao.Utils
                 throw new Exception($"Erro ao converter Procedimentos Tabela Preços: {error.Message}");
             }
 
-            return lstGruposProcedimentosDTO;
+            return lstProcedimentosPrecosDTO;
         }
 
-        public static List<ManutencoesDTO> ConvertManutencoesParaManutencoesDTO(List<Manutencoes> manutencoes)
+        public static List<ManutencoesDTO> ConvertManutencoesDTO(List<Manutencoes> manutencoes)
         {
             var lstManutencoesDTO = new List<ManutencoesDTO>();
 
@@ -270,8 +263,6 @@ namespace Migracao.Utils
 
         #endregion
 
-
-
         #region Financeiro
 
         public static List<FinanceiroRecebiveisDTO> ConvertRecebiveisParaRecebiveisDTO(List<Recebivel> recebiveis)
@@ -313,7 +304,7 @@ namespace Migracao.Utils
             return lstRecebiveisDTO;
         }
 
-        public static List<PagosExigiveisDTO> ConvertRecebidosParaRecebidosDTO(List<Recebidos> recebidos)
+        public static List<PagosExigiveisDTO> ConvertRecebidosDTO(List<Recebidos> recebidos)
         {
             var lstReceberDTO = new List<PagosExigiveisDTO>();
 
@@ -365,7 +356,7 @@ namespace Migracao.Utils
 
         #region Complementares
 
-        public static List<ProcedimentosDTO> ConvertProcedimentosParaProcedimentosDTO(List<Models.Procedimentos> procedimentos)
+        public static List<ProcedimentosDTO> ConvertProcedimentosDTO(List<Models.Procedimentos> procedimentos)
         {
             var lstProcedimentosDTO = new List<ProcedimentosDTO>();
 
@@ -403,7 +394,7 @@ namespace Migracao.Utils
         }
         public static List<DentistasDTO> ConvertDentistasParaDentistasDTO(List<Dentistas> dentistas)
         {
-            List<DentistasDTO> lstDentistasDTO = new List<DentistasDTO>();
+            var lstDentistasDTO = new List<DentistasDTO>();
 
             //try
             //{
@@ -432,9 +423,9 @@ namespace Migracao.Utils
 
             return lstDentistasDTO;
         }
-        public static List<RecebiveisHistVendaDTO> ConvertRecebiveisHistVendaParaRecebiveisHistVendaDTO(List<RecebiveisHistVenda> recHistVendas)
+        public static List<RecebiveisHistVendaDTO> ConvertRecebiveisHistVendaDTO(List<RecebiveisHistVenda> recHistVendas)
         {
-            List<RecebiveisHistVendaDTO> lstRecebiveisHistVendaDTO = new List<RecebiveisHistVendaDTO>();
+            var lstRecebiveisHistVendaDTO = new List<RecebiveisHistVendaDTO>();
 
             try
             {
@@ -464,11 +455,5 @@ namespace Migracao.Utils
         }
 
         #endregion
-
-
-
-
-
-
     }
 }

@@ -374,9 +374,6 @@ namespace Migracao.Utils
                 Parallel.ForEach(procedimentos, procedimento =>
                 //foreach (var procedimento in procedimentos)
                 {
-                    if (procedimento.Paciente_CPF == "864.093.286-72")
-                        procedimento.Paciente_CPF = procedimento.Paciente_CPF;
-
                     var lstProcedimento = new ProcedimentosDTO
                     {
                         Numero_Controle = procedimento.Numero_Controle,

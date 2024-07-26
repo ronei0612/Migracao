@@ -405,30 +405,30 @@ namespace Migracao.Utils
         {
             List<DentistasDTO> lstDentistasDTO = new List<DentistasDTO>();
 
-            try
-            {
-                foreach (var dentista in dentistas)
-                {
-                    var lstDentistas = new DentistasDTO
-                    {
-                        //Cargo_Clinica = "Dentista",
-                        //Nome = dentista.Nome_Completo,
-                        //Nome_Social = string.Empty,
-                        //Nome_Completo = dentista.Nome_Completo,
-                        //Apelido = dentista.Nome_Completo.GetPrimeirosCaracteres(20),
-                        //Observacoes = dentista.Observacoes,
-                        //Email = dentista.Email,
-                        //Telefone_Principal = dentista.Telefone,
-                        //Codigo_Conselho_Estado = dentista.Codigo_do_Conselho_e_Estado
-                    };
+            //try
+            //{
+            //    foreach (var dentista in dentistas)
+            //    {
+            //        var lstDentistas = new DentistasDTO
+            //        {
+            //            //Cargo_Clinica = "Dentista",
+            //            //Nome = dentista.Nome_Completo,
+            //            //Nome_Social = string.Empty,
+            //            //Nome_Completo = dentista.Nome_Completo,
+            //            //Apelido = dentista.Nome_Completo.GetPrimeirosCaracteres(20),
+            //            //Observacoes = dentista.Observacoes,
+            //            //Email = dentista.Email,
+            //            //Telefone_Principal = dentista.Telefone,
+            //            //Codigo_Conselho_Estado = dentista.Codigo_do_Conselho_e_Estado
+            //        };
 
-                    lstDentistasDTO.Add(lstDentistas);
-                };
-            }
-            catch (Exception error)
-            {
-                throw new Exception($"Erro ao converter Excel para Pessoas Pacientes: {error.Message}");
-            }
+            //        lstDentistasDTO.Add(lstDentistas);
+            //    };
+            //}
+            //catch (Exception error)
+            //{
+            //    throw new Exception($"Erro ao converter Excel para Pessoas Pacientes: {error.Message}");
+            //}
 
             return lstDentistasDTO;
         }

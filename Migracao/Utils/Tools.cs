@@ -228,6 +228,7 @@ namespace Migracao.Utils
         {
             if (texto == null) return null;
 
+            texto = texto.Replace("\n", " ").Replace("\r\n", " ").Replace("   ", " ").Replace("  ", " ");
             texto = texto.GetLetras().GetPrimeirosCaracteres(70).PrimeiraLetraMaiuscula();
 
             if (texto == null) return null;
@@ -242,7 +243,6 @@ namespace Migracao.Utils
         public static string GetLetras(this string texto)
         {
             return new string(texto.Where(c => char.IsLetter(c) || char.IsWhiteSpace(c) || c == '?').ToArray()).Trim();
-            //return Regex.Replace(texto, @"[^a-zA-Z\?\s]", "").Trim();
         }
 
         public static string GerarNomeArquivo(string nomeArquivo, string extensao = ".xlsx")

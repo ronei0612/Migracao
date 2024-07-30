@@ -536,14 +536,14 @@ namespace Migracao.Utils
                 headerRow.Cell(j + 1).Value = dataTable.Columns[j].ColumnName;
             }
 
+            int rowIndex = 1; // Começa na segunda linha, pois a primeira linha é para os nomes das colunas
             // Adicionar o DataTable ao arquivo Excel
-            for (int i = 0; i < dataTable.Rows.Count; i++)
+            foreach (DataRow rowDataTable in dataTable.Rows)
             {
-                var row = worksheet.Row(i + 2); // Começa na segunda linha, pois a primeira linha é para os nomes das colunas
+                var row = worksheet.Row(rowIndex);
                 for (int j = 0; j < dataTable.Columns.Count; j++)
                 {
-                    var cellValue = dataTable.Rows[i][j].ToString();
-
+                    var cellValue = dataTable.Rows[j].ToString();
                     if (Decimal.TryParse(cellValue, out var moeda))
                         row.Cell(j + 1).Value = moeda;
                     else if (DateTime.TryParseExact(cellValue, "dd/MM/yyyy HH:mm:ss", culture, DateTimeStyles.None, out DateTime data) ||
@@ -552,6 +552,7 @@ namespace Migracao.Utils
                     else
                         row.Cell(j + 1).Value = cellValue;
                 }
+                rowIndex++;
             }
 
             // Fixar a primeira linha (cabeçalho)
@@ -681,39 +682,38 @@ namespace Migracao.Utils
 
         public static DataTable ConversorEntidadeParaDataTable<T>(List<T> entidadeDTO) where T : class
         {
-            {
-                var dataTable = new DataTable();
+            var dataTable = new DataTable();
 
-                try
+            try
+            {
+                foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(typeof(T)))
                 {
+                    dataTable.Columns.Add(prop.DisplayName, prop.PropertyType);
+                }
+
+                foreach (var entidade in entidadeDTO)
+                {
+                    DataRow row = dataTable.NewRow();
+
+                    // Preenche as células da linha com os valores das propriedades da entidade
                     foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(typeof(T)))
                     {
-                        dataTable.Columns.Add(prop.DisplayName, prop.PropertyType);
+                        row[prop.DisplayName] = prop.GetValue(entidade);
                     }
 
-                    foreach (var entidade in entidadeDTO)
+                    // Adiciona a linha ao DataTable de forma thread-safe
+                    lock (dataTable)
                     {
-                        DataRow row = dataTable.NewRow();
-
-                        // Preenche as células da linha com os valores das propriedades da entidade
-                        foreach (PropertyDescriptor prop in TypeDescriptor.GetProperties(typeof(T)))
-                        {
-                            row[prop.DisplayName] = prop.GetValue(entidade);
-                        }
-
-                        // Adiciona a linha ao DataTable de forma thread-safe
-                        lock (dataTable)
-                        {
-                            dataTable.Rows.Add(row);
-                        }
+                        dataTable.Rows.Add(row);
                     }
                 }
-                catch (Exception error)
-                {
-                    throw new Exception($"Erro na conversão da entidade para datatable: {error.Message}");
-                }
-                return dataTable;
             }
+            catch (Exception error)
+            {
+                throw new Exception($"Erro na conversão da entidade para datatable: {error.Message}");
+            }
+
+            return dataTable;
         }
     }
 }

@@ -524,9 +524,10 @@ namespace Migracao.Utils
 
         public void CriarExcelArquivoV2(string nomeArquivo, DataTable dataTable)
         {
+            nomeArquivo = Path.Combine(Path.GetDirectoryName(nomeArquivo), Path.GetFileNameWithoutExtension(nomeArquivo));
             var culture = new CultureInfo("pt-BR");
-            int linhaAtual = 2; // Contador de linhas
-            int planilhaAtual = 1; // Contador de planilhas
+            int linhaAtual = 2;
+            int planilhaAtual = 1;
 
             // Criar a primeira planilha
             var workbook = new XLWorkbook();
@@ -541,13 +542,14 @@ namespace Migracao.Utils
             foreach (DataRow linha in dataTable.Rows)
             {
                 // Verifica se precisa criar uma nova planilha
-                if (linhaAtual == 1048576)
+                //if (linhaAtual == 1048576)
+                if (linhaAtual == 1048)
                 {
                     worksheet.SheetView.FreezeRows(1);
                     headerRow.Style.Fill.BackgroundColor = XLColor.LightCornflowerBlue;
                     worksheet.Range(1, 1, 1, dataTable.Columns.Count).SetAutoFilter();
                     //worksheet.Columns().AdjustToContents(); // Isso aqui Demora
-                    workbook.SaveAs($"{nomeArquivo}_{planilhaAtual}");
+                    workbook.SaveAs($"{nomeArquivo}_{planilhaAtual}.xlsx");
 
                     // Cria uma nova planilha
                     planilhaAtual++;
@@ -592,7 +594,7 @@ namespace Migracao.Utils
 
             if (planilhaAtual > 1)
                 nomeArquivo = $"{nomeArquivo}_{planilhaAtual}";
-            workbook.SaveAs(nomeArquivo);
+            workbook.SaveAs(nomeArquivo + ".xlsx");
         }
 
         public static List<string[]> LerCSV(string filePath, char separador, Encoding encoding)

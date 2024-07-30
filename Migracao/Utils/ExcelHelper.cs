@@ -525,49 +525,73 @@ namespace Migracao.Utils
         public void CriarExcelArquivoV2(string nomeArquivo, DataTable dataTable)
         {
             var culture = new CultureInfo("pt-BR");
+            int linhaAtual = 1; // Contador de linhas
+            int planilhaAtual = 1; // Contador de planilhas
 
+            // Criar a primeira planilha
             var workbook = new XLWorkbook();
             var worksheet = workbook.Worksheets.Add("Planilha1");
 
-            // Adicionar os nomes das colunas ao arquivo Excel
-            var headerRow = worksheet.Row(1); // Começa na primeira linha
+            // Adicionar os nomes das colunas
+            var headerRow = worksheet.Row(1);
             for (int j = 0; j < dataTable.Columns.Count; j++)
-            {
                 headerRow.Cell(j + 1).Value = dataTable.Columns[j].ColumnName;
-            }
 
-            int rowIndex = 1; // Começa na segunda linha, pois a primeira linha é para os nomes das colunas
-            // Adicionar o DataTable ao arquivo Excel
-            foreach (DataRow rowDataTable in dataTable.Rows)
+            // Adicionar os dados da tabela
+            foreach (DataRow linha in dataTable.Rows)
             {
-                var row = worksheet.Row(rowIndex);
+                // Verifica se precisa criar uma nova planilha
+                if (linhaAtual == 1048576)
+                {
+                    worksheet.SheetView.FreezeRows(1);
+                    headerRow.Style.Fill.BackgroundColor = XLColor.LightCornflowerBlue;
+                    worksheet.Range(1, 1, 1, dataTable.Columns.Count).SetAutoFilter();
+                    //worksheet.Columns().AdjustToContents(); // Isso aqui Demora
+                    workbook.SaveAs($"{nomeArquivo}_{planilhaAtual}");
+
+                    // Cria uma nova planilha
+                    planilhaAtual++;
+                    workbook = new XLWorkbook();
+                    worksheet = workbook.Worksheets.Add($"Planilha1");
+
+                    // Adiciona o cabeçalho na nova planilha
+                    headerRow = worksheet.Row(1);
+                    for (int j = 0; j < dataTable.Columns.Count; j++)
+                        headerRow.Cell(j + 1).Value = dataTable.Columns[j].ColumnName;
+
+                    // Reinicia o contador de linhas
+                    linhaAtual = 1;
+                }
+
+                // Adiciona a linha atual na planilha
+                var linhaPlanilha = worksheet.Row(linhaAtual);
                 for (int j = 0; j < dataTable.Columns.Count; j++)
                 {
-                    var cellValue = dataTable.Rows[j].ToString();
-                    if (Decimal.TryParse(cellValue, out var moeda))
-                        row.Cell(j + 1).Value = moeda;
-                    else if (DateTime.TryParseExact(cellValue, "dd/MM/yyyy HH:mm:ss", culture, DateTimeStyles.None, out DateTime data) ||
-                        DateTime.TryParseExact(cellValue, "dd/MM/yyyy", culture, DateTimeStyles.None, out data))
-                        row.Cell(j + 1).Value = data;
+                    var valorCelula = linha[j].ToString();
+
+                    if (Decimal.TryParse(valorCelula, out var moeda))
+                        linhaPlanilha.Cell(j + 1).Value = moeda;
+                    else if (DateTime.TryParseExact(valorCelula, "dd/MM/yyyy HH:mm:ss", culture, DateTimeStyles.None, out DateTime data) ||
+                             DateTime.TryParseExact(valorCelula, "dd/MM/yyyy", culture, DateTimeStyles.None, out data))
+                        linhaPlanilha.Cell(j + 1).Value = data;
                     else
-                        row.Cell(j + 1).Value = cellValue;
+                        linhaPlanilha.Cell(j + 1).Value = valorCelula;
                 }
-                rowIndex++;
+
+                linhaAtual++;
             }
 
             // Fixar a primeira linha (cabeçalho)
             worksheet.SheetView.FreezeRows(1);
-
             // Aplicar o estilo de fundo ao cabeçalho
             headerRow.Style.Fill.BackgroundColor = XLColor.LightCornflowerBlue;
-
             // Aplicar o filtro automático
             worksheet.Range(1, 1, 1, dataTable.Columns.Count).SetAutoFilter();
-
             // Ajustar o tamanho das colunas automaticamente
-            worksheet.Columns().AdjustToContents();
+            //worksheet.Columns().AdjustToContents();// Isso aqui Demora
 
-            // Salvar o arquivo
+            if (planilhaAtual > 1)
+                nomeArquivo = $"{nomeArquivo}_{planilhaAtual}";
             workbook.SaveAs(nomeArquivo);
         }
 

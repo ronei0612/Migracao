@@ -233,8 +233,8 @@ namespace Migracao.Utils
                 {
                     if (!string.IsNullOrEmpty(manutencao.Procedimento_Nome) && !string.IsNullOrEmpty(manutencao.Numero_Controle))
                     {
-                        var itensOrto = manutencoes.Where(m => m.Numero_Controle == manutencao.Numero_Controle && m.Paciente_CPF.Equals(manutencao.Paciente_CPF));
-                        var valorTotal = itensOrto.Where(m => m.Valor.HasValue).Sum(m => m.Valor.Value);
+                        //var itensOrto = manutencoes.Where(m => m.Numero_Controle == manutencao.Numero_Controle && m.Paciente_CPF.Equals(manutencao.Paciente_CPF));
+                        //var valorTotal = itensOrto.Where(m => m.Valor.HasValue).Sum(m => m.Valor.Value);
 
                         var lstManutencao = new ManutencoesDTO
                         {
@@ -245,8 +245,8 @@ namespace Migracao.Utils
                             Procedimento_Nome = manutencao.Procedimento_Nome.ToNome(),
                             Procedimento_Valor = manutencao.Valor.ToString(),
                             Procedimento_Observacao = manutencao.Procedimentos_Observacao,
-                            Quantidade_Orto = itensOrto.Count().ToString(),
-                            Valor_Total = valorTotal.ToString(),
+                            Quantidade_Orto = manutencao.Quantidade_Orto.ToString(),
+                            Valor_Total = manutencao.Valor_Total.ToString(),
                             Data_Atendimento = manutencao.Data_Atendimento.ToString(),
                             Data_Inicio = manutencao.Data_Hora_Inicio.ToString()
                         };

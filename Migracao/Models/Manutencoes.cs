@@ -12,8 +12,8 @@
         public string? Tipo_Pagamento { get; set; }
         public DateTime? Data_Atendimento { get; set; }
         public string? Procedimentos_Observacao { get; set; }
-        public string? Quantidade_Orto { get; set; }
-        public string? Valor_Total { get; set; }
+        public int? Quantidade_Orto { get; set; }
+        public decimal? Valor_Total { get; set; }
         public DateTime? Data_Hora_Inicio { get; set; }
     }
 }

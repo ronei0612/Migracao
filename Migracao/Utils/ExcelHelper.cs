@@ -525,7 +525,7 @@ namespace Migracao.Utils
         public void CriarExcelArquivoV2(string nomeArquivo, DataTable dataTable)
         {
             var culture = new CultureInfo("pt-BR");
-            int linhaAtual = 1; // Contador de linhas
+            int linhaAtual = 2; // Contador de linhas
             int planilhaAtual = 1; // Contador de planilhas
 
             // Criar a primeira planilha
@@ -560,7 +560,7 @@ namespace Migracao.Utils
                         headerRow.Cell(j + 1).Value = dataTable.Columns[j].ColumnName;
 
                     // Reinicia o contador de linhas
-                    linhaAtual = 1;
+                    linhaAtual = 2;
                 }
 
                 // Adiciona a linha atual na planilha

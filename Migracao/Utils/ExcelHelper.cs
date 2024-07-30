@@ -524,7 +524,6 @@ namespace Migracao.Utils
 
         public void CriarExcelArquivoV2(string nomeArquivo, DataTable dataTable)
         {
-            nomeArquivo = Path.Combine(Path.GetDirectoryName(nomeArquivo), Path.GetFileNameWithoutExtension(nomeArquivo));
             var culture = new CultureInfo("pt-BR");
             int linhaAtual = 2;
             int planilhaAtual = 1;

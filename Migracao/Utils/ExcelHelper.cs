@@ -541,8 +541,7 @@ namespace Migracao.Utils
             foreach (DataRow linha in dataTable.Rows)
             {
                 // Verifica se precisa criar uma nova planilha
-                //if (linhaAtual == 1048576)
-                if (linhaAtual == 1048)
+                if (linhaAtual == 1048576)
                 {
                     worksheet.SheetView.FreezeRows(1);
                     headerRow.Style.Fill.BackgroundColor = XLColor.LightCornflowerBlue;
